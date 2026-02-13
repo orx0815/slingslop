@@ -1,0 +1,50 @@
+<div class="design-selection" id="design-selection">
+  <h3 class="select">Design Nav</h3>
+  <nav role="navigation">
+    <ul data-sly-use.cssPicker="org.motorbrot.slingslop.zengarden.slingmodels.CssZenGarden">
+      <li>
+       <a href="https://csszengarden.com/${cssPicker.design.cssId @ context='uri'}/" target="_blank" class="design-name">
+           Original: '${cssPicker.design.name}'
+        </a>  
+        by <a href="${cssPicker.design.designerUrl @ context='uri'}" class="designer-name" target="_blank">${cssPicker.design.designerName}
+        </a>
+      </li>
+      
+      <li>
+        <a href="${cssPicker.nextDesign.urlWithFixedCss @ context='uri'}" class="design-name">
+          Next: '${cssPicker.nextDesign.name}'
+        </a>
+        by <a href="${cssPicker.nextDesign.designerUrl @ context='uri'}" class="designer-name" target="_blank">${cssPicker.nextDesign.designerName}
+        </a>
+      </li>
+      
+      <li>
+        <a href="${cssPicker.previousDesign.urlWithFixedCss @ context='uri'}" class="design-name">
+          Previous: '${cssPicker.previousDesign.name}'
+        </a>
+        by <a href="${cssPicker.previousDesign.designerUrl @ context='uri'}" class="designer-name" target="_blank">${cssPicker.previousDesign.designerName}
+        </a>
+      </li>
+
+      <li>
+        Slingslop <a href="https://github.com/orx0815/slingslop" target="_blank" class="design-name">on Github</a>
+      </li>
+      <li>
+        <a href="https://sling.apache.org/" target="_blank"  class="design-name">Apache Sling™</a>
+        <a href="https://github.com/apache/sling-aggregator" class="designer-name">on Github</a>
+      </li>
+      <li>
+        <a href="https://www.composum.com/" target="_blank"  class="design-name">Composum Pages</a> 
+        <a href="https://github.com/ist-dresden/composum-pages" class="designer-name">on Github</a>
+      </li>
+      <li>
+        <a href="https://www.peregrine-cms.com/" target="_blank"  class="design-name">Peregrine CMS</a>
+        <a href="https://github.com/peregrine-cms" class="designer-name">on Github</a>
+      </li>
+      <li>
+        <a href="https://adapt.to/" target="_blank"  class="design-name">adaptTo()</a>
+        Apache Sling & Friends Tech-Meetup
+      </li>
+    </ul>
+  </nav>
+</div>

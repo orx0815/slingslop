@@ -1,0 +1,16 @@
+<!--/* This template does the same as basepage/head.html - just to prove a point about sling:resourceSuperType  +/-->
+<section class="intro" id="zen-intro">
+  <header role="banner">
+    <h1>${properties.jcr:title}</h1>
+    <h2>Homepage template of Reverse CSS Zengarden example</h2>
+  </header>
+
+  <div class="summary" id="zen-summary" role="article">
+    ${properties.intro_summary @ context='html'}
+  </div>
+
+  <div class="preamble" id="zen-preamble" role="article">
+    <h3>${properties.intro_preamble_headline}</h3>
+    ${properties.intro_preamble @ context='html'}
+  </div>
+</section>

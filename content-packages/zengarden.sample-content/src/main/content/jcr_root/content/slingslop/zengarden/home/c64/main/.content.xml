@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured">
+    <explanation
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/main/explanation"
+        headline="So What is C64 SliMpoGrine?"
+        text=" &lt;p>SliMpoGrine is about how far we can get with existing open-source solutions on self-hosted Sling. The &lt;a href=&quot;https://github.com/apache/sling-org-apache-sling-starter&quot;>Sling Starter&lt;/a> already comes with Composum applications on top, developed by &lt;a href=&quot;https://www.ist-software.com/&quot;>IST&lt;/a>, that provide basic functions like Nodes-Browser (think crx/de), User-Manager and Package-Manager for import/export of content.&lt;/p> &lt;p>And with this groundwork, others were able to develop their own CMS's on top. Here we leverage Sling's OSGi Feature Model to glue together two of them and this silly example into our own application server.&lt;/p> &lt;p> This is not software on it's own but rather a combination of quite a lot open-source software developed by others into something new.&lt;/p> "/>
+    <participation
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/main/participation"
+        headline="SliMpoGrine Participants"
+        text=" &lt;p>The participating CMS's are Composum's Pages+Assets as well as Peregrine-CMS. They both provide a &lt;abbr title=&quot;What You See Is What You Get&quot;>WYSIWYG&lt;/abbr> editor for websites, but with radical different approaches. The first one generates good old HTML, Peregrine renders a vue.js Single-page application. Both share the same repository and just live next to each other within the same Micro-Service / docker-image.&lt;/p>  &lt;p>Noteable CMS's not included:&lt;br/> The offical &lt;a href=&quot;https://github.com/apache/sling-org-apache-sling-app-cms&quot;>Sling CMS App&lt;/a> because like with most of Sling it lacks a bit of visual bling. But for general concepts &lt;a href=&quot;https://adapt.to/2021/schedule/sling-cms-building-a-simple-cms-on-apache-sling&quot;>it's worth a look&lt;/a>, especially for cloud-deployment pipelines. There is &lt;a href=&quot;https://www.websight.io/&quot;>WebSight&lt;/a>, with a free community edition but not open-source. And there is &lt;a href=&quot;https://www.aem.live/&quot;>Adobe's Experience Manager&lt;/a> which is not free at all but actually powers the development of Sling.&lt;/p> "/>
+    <benefits
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/main/benefits"
+        headline="SliMpoGrine Benefits"
+        text=" &lt;p>The shown content should explain the 'how did we get here' in form of text-components with code-blocks and diagrams in future. Content can be synched back into sources on github after creation and become part of the SliMpoGrine server. &lt;/p> "/>
+    <requirements
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/main/requirements"
+        headline="SliMpoGrine Requirements"
+        text=" &lt;p>Required is a general interest in Java middleware... tbc &lt;/p> "/>
+</jcr:root>

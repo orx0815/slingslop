@@ -1,0 +1,11 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--//
+
+  Because of sling:resourceSuperType="slingslop/zengarden/pages/basepage"
+  in apge slingslop/zengarden/pages/c64page it is enough to just overlay the head.
+  Force C64 theme 405 into the sling-model
+//-->
+<title>${properties.jcr:title}</title>
+<link rel="stylesheet" data-sly-use.cssPicker="${'org.motorbrot.slingslop.zengarden.slingmodels.CssZenGarden' @ design_id='405'}"
+      href="${cssPicker.randomCssUrl}" />

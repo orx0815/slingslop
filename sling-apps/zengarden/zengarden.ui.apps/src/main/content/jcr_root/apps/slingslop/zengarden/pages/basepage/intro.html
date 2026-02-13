@@ -1,0 +1,15 @@
+<section class="intro" id="zen-intro">
+  <header role="banner">
+    <h1>${properties.jcr:title}</h1>
+    <h2>${properties.subtitle}</h2>
+  </header>
+
+  <div class="summary" id="zen-summary" role="article">
+    ${properties.intro_summary @ context='html'}
+  </div>
+
+  <div class="preamble" id="zen-preamble" role="article">
+    <h3>${properties.intro_preamble_headline}</h3>
+    ${properties.intro_preamble @ context='html'}
+  </div>
+</section>
