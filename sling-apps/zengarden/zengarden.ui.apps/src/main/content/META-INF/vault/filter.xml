@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+
+    <!--
+        Need to exclude the Install folder otherwise the Bundle will be undeployed
+        as it is in the '/apps/slimpogrine/install' folder (see the 'all'
+        package).
+    -->
+    <filter root="/apps/slingslop" />
+
+</workspaceFilter>

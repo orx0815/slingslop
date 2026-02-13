@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <sly data-sly-include="${'head.html'}"/>
+</head>
+
+<body id="css-zen-garden">
+<div class="page-wrapper">
+
+  <sly data-sly-include="${'intro.html'}" />
+
+	<div class="main supporting" id="zen-supporting" role="main">
+    
+    <sly data-sly-resource="${'./main/explanation'}" />
+    <sly data-sly-resource="${'./main/participation'}" />
+    <sly data-sly-resource="${'./main/benefits'}" />
+    <sly data-sly-resource="${'./main/requirements'}" />
+		<sly data-sly-include="${'footer.html'}" />
+	</div>
+
+	<aside class="sidebar" role="complementary">
+		<div class="wrapper">
+			<sly data-sly-include="${'nav/selection.html'}" />
+      <sly data-sly-include="${'nav/archives.html'}" />
+      <sly data-sly-include="${'nav/resources.html'}" />
+		</div>
+	</aside>
+
+</div>
+
+<!--
+
+  These superfluous divs/spans were originally provided as catch-alls to add extra imagery.
+  These days we have full ::before and ::after support, favour using those instead.
+  These only remain for historical design compatibility. They might go away one day.
+
+-->
+<div class="extra1" role="presentation"></div><div class="extra2" role="presentation"></div><div class="extra3" role="presentation"></div>
+<div class="extra4" role="presentation"></div><div class="extra5" role="presentation"></div><div class="extra6" role="presentation"></div>
+
+</body></html>
