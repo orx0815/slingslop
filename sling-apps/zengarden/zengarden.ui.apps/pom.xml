@@ -10,7 +10,7 @@
     <relativePath>../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>slingslop.ui.apps.example</artifactId>
+  <artifactId>slingslop.zengarden.ui.apps</artifactId>
   <packaging>content-package</packaging>
 
   <name>Slingslop - CssZenGarden UI Apps Example</name>

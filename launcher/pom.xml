@@ -21,6 +21,13 @@
   </description>
   
   <properties>
+    <!-- check docker.* at https://dmp.fabric8.io/ -->
+    <docker.skip>true</docker.skip>
+    <docker.skip.push>true</docker.skip.push>
+    <docker.image.name>ghcr.io/orx0815/slingslop</docker.image.name>
+    <docker.image.tag>snapshot</docker.image.tag>
+    <!-- pass a list of platforms to enable multi-arch builds: linux/amd64,linux/arm64 -->
+    <docker.platforms />
     <slingslop.launcher.version>${project.version}</slingslop.launcher.version>
   </properties>
   
@@ -48,12 +55,13 @@
              - nosample_base - the base Sling Starter
              - oak_persistence_sns - SegmentNodeStore persistence for Oak
              - composum - The Composum Nodes administration tool
-
-             Notably missing are the slingshot and starter samples
+             - slingshot
+             - HTL Read-Eval-Print Loop
+             - and starter samples for nicer login screen
           -->
           <aggregates>
             <aggregate>
-              <classifier>app</classifier>
+              <classifier>slingslop_aggregate</classifier>
               <filesInclude>*.json</filesInclude>
               <includeArtifact>
                 <groupId>org.apache.sling</groupId>
@@ -76,14 +84,45 @@
                 <version>${sling.starter.version}</version>
                 <type>slingosgifeature</type>
               </includeArtifact>
+              
+              <!-- needed for nicer login screen -->
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>starter</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              
+              <!-- old demo -->
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>slingshot</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              
+              <!-- HTL Read-Eval-Print Loop Environment -->
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>htl_repl</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              
             </aggregate>
           </aggregates>
+          
           <scans>
             <scan>
-              <includeClassifier>app</includeClassifier>
+              <includeClassifier>slingslop_aggregate</includeClassifier>
             </scan>
           </scans>
+          
         </configuration>
+        
         <executions>
           <execution>
             <id>prepare-features</id>
@@ -94,8 +133,35 @@
               <goal>attach-features</goal>
             </goals>
           </execution>
+          
+          <!-- For Dockerfile's COPY target/artifacts /opt/sling/artifacts/ -->
+          <execution>
+            <id>create-repository</id>
+            <phase>package</phase>
+            <goals>
+              <!-- A maven-like directory with all artifacts from the selected features will be created -->
+              <goal>repository</goal>
+            </goals>
+            <configuration>
+              <repositories>
+                <repository>
+                  <includeClassifier>slingslop_aggregate</includeClassifier>
+                  <includeArtifact>
+                    <groupId>org.apache.sling</groupId>
+                    <artifactId>org.apache.sling.starter</artifactId>
+                    <!-- Needed for proper logging to stdout -->
+                    <classifier>docker</classifier>
+                    <version>${sling.starter.version}</version>
+                    <type>slingosgifeature</type>
+                  </includeArtifact>
+                </repository>
+              </repositories>
+            </configuration>
+          </execution>
+          
         </executions>
       </plugin>
+      
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -125,6 +191,50 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.48.0</version>
+        <configuration>
+          <skip>${docker.skip}</skip>
+          <skipPush>${docker.skip.push}</skipPush>
+          <containerNamePattern>%e</containerNamePattern>
+          <stopMode>kill</stopMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>build-docker-image</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+              <!-- -D docker.skip.push=false -->
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <!-- Configure the sling image only for build, we don't want to run it  -->
+              <images>
+                <image>
+                  <name>${docker.image.name}:${docker.image.tag}</name>
+                  <build>
+                    <dockerFile>Dockerfile</dockerFile>
+                    <contextDir>${project.basedir}</contextDir>
+                    <tags>
+                      <tag>${docker.image.extra.tag}</tag>
+                    </tags>
+                    <buildx>
+                      <platforms>
+                        <platform>${docker.platforms}</platform>
+                      </platforms>
+                    </buildx>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+            
     </plugins>
   </build>
 </project>

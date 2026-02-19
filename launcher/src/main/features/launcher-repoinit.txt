@@ -1,8 +1,8 @@
-# Set Permissions Composum's InPlace Replication on single instance
+# Set Permissions read permission for everyone on single instance
 
-    create path (sling:Folder) /apps/slingslop/zengarden/css_zen_garden
+create path (sling:Folder) /apps/slingslop/zengarden/css_zen_garden
 
-    set ACL for everyone (ACLOptions=merge)
-        allow jcr:read on /apps/slingslop/zengarden/css_zen_garden
+set ACL for everyone (ACLOptions=merge)
+    allow jcr:read on /apps/slingslop/zengarden/css_zen_garden
 
-    end
+end

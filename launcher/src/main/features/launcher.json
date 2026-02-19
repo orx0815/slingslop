@@ -7,7 +7,7 @@
   ],
   "content-packages:ARTIFACTS|required": [
     {
-        "id":"org.motorbrot/slingslop.ui.apps.example/${slingslop.launcher.version}/zip"
+        "id":"org.motorbrot/slingslop.zengarden.ui.apps/${slingslop.launcher.version}/zip"
     },
     {
         "id":"org.motorbrot/slingslop.zengarden.sample-content/${slingslop.launcher.version}/zip"

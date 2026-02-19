@@ -1,0 +1,22 @@
+services:
+  slingslop:
+    image: ghcr.io/orx0815/slingslop:snapshot
+    build:
+      context: ../launcher
+    ports:
+      - "8080:8080"
+    volumes:
+      - slingslop-volume:/opt/sling/launcher
+  webcache:
+    image: ghcr.io/orx0815/slingslop-webcache:latest
+    environment: 
+      AUTHOR_URL: 172.17.0.1
+      RENDERER_URL: 172.17.0.1
+    build:
+      context: webcache
+    ports:
+      - "80:80"
+    volumes:
+      - slingslop-volume:/opt/sling/launcher
+volumes:
+  slingslop-volume:
