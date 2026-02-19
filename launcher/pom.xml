@@ -16,11 +16,13 @@
 
   <name>Slingslop - Hypermedia PoC - Launcher</name>
   <description>
-    This is a Module which contains a sample feature model build, built on
-    top of the Sling Starter and adding this project's artifacts.
+    This is a Module which contains a sample feature model build, built on top of the Sling Starter,
+    that adds this project's artifacts. It also builds a docker image and runs integration-tests.
   </description>
   
   <properties>
+    <slingslop.launcher.version>${project.version}</slingslop.launcher.version>
+    
     <!-- check docker.* at https://dmp.fabric8.io/ -->
     <docker.skip>true</docker.skip>
     <docker.skip.push>true</docker.skip.push>
@@ -28,8 +30,40 @@
     <docker.image.tag>snapshot</docker.image.tag>
     <!-- pass a list of platforms to enable multi-arch builds: linux/amd64,linux/arm64 -->
     <docker.platforms />
-    <slingslop.launcher.version>${project.version}</slingslop.launcher.version>
+    
+    <it.startTimeoutSeconds>60</it.startTimeoutSeconds>
+    <starter.min.bundles.count>233</starter.min.bundles.count>
+    <starter.check.paths>
+      /content/slingslop/zengarden/home.html,
+      /slingshot/users/slingshot1/travel/home/images/home.jpg,
+      /slingshot/resources/images/background.jpg,
+      /slingshot/users/slingshot2/places/landing/images/landing.jpg,
+      /starter.html,
+      /bin/browser.html,
+      /system/console/bundles
+    </starter.check.paths>
+    <feature.launcher.plugin.version>1.0.2</feature.launcher.plugin.version>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.utils</artifactId>
+      <version>1.11.8</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   
   <build>
     <plugins>
@@ -231,6 +265,83 @@
                 </image>
               </images>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>reserve-http-port</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <configuration>
+              <portNames>
+                <portName>http.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.sling</groupId>
+        <artifactId>feature-launcher-maven-plugin</artifactId>
+        <version>${feature.launcher.plugin.version}</version>
+        <configuration>
+          <launches>
+            <launch>
+              <id>slingslop-aggregate</id>
+              <feature>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <classifier>slingslop_aggregate</classifier>
+                <type>slingosgifeature</type>
+              </feature>
+              <launcherArguments>
+                <frameworkProperties>
+                  <org.osgi.service.http.port>${http.port}</org.osgi.service.http.port>
+                </frameworkProperties>
+              </launcherArguments>
+              <startTimeoutSeconds>${it.startTimeoutSeconds}</startTimeoutSeconds>
+            </launch>
+          </launches>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>start</goal>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*Test.java</include>
+          </includes>
+          <systemPropertyVariables>
+            <launchpad.http.server.url>http://localhost:${http.port}/</launchpad.http.server.url>
+            <starter.http.test.ports>false:${http.port}</starter.http.test.ports>
+            <starter.min.bundles.count>${starter.min.bundles.count}</starter.min.bundles.count>
+            <starter.check.paths>${starter.check.paths}</starter.check.paths>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
