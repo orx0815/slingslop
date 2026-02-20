@@ -21,17 +21,19 @@ If you are using snapshots, to force a rebuild, run:
 
     docker compose build --no-cache --force-rm
 
-## Volume
-
-This Docker Compose setup creates a volume _slingslop-volume_ for the Apache Sling Slingslop repository. To destroy this volume call:
-
-    docker volume rm docker_slingslop-volume
-
-## Use
+## Running
 
 To use the containers, run the command:
 
     docker compose up
+
+## Volume
+
+This Docker Compose setup creates a volume _slingslop-volume_ for the Apache Sling Slingslop repository. To destroy this volume call:
+
+    docker compose down && docker volume rm docker_slingslop-volume
+
+## Host config
 
 Then map the URLs *www.motorbrot.local* and *editor.motorbrot.local* to your docker host. On local hosts, you can add the following entries into your /etc/hosts file:
 

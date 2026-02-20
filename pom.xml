@@ -232,9 +232,9 @@
     <module>sling-apps/zengarden/zengarden.core</module>
     <module>sling-apps/zengarden/zengarden.ui.apps</module>
     
-    <!--module>content-packages/all</module-->
     <module>content-packages/zengarden.sample-content</module>
-    
+    <module>content-packages/complete</module>
+
     <module>launcher</module>
     
   </modules>

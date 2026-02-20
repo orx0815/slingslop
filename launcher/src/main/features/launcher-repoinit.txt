@@ -1,6 +1,10 @@
+# Create Slingslop's base /app folder here 
 # Set Permissions read permission for everyone on single instance
 
 create path (sling:Folder) /apps/slingslop/zengarden/css_zen_garden
+
+# The following is actually redundant to ACL setting via content in
+# sling-apps/zengarden/zengarden.ui.apps/src/main/content/jcr_root/apps/slingslop/zengarden/css_zen_garden/_rep_policy.xml
 
 set ACL for everyone (ACLOptions=merge)
     allow jcr:read on /apps/slingslop/zengarden/css_zen_garden
