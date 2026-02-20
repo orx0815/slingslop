@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+      <artifactId>slingslop.parent</artifactId>
+      <groupId>org.motorbrot</groupId>
+      <version>0.0.1-SNAPSHOT</version>
+      <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>slingslop.complete</artifactId>
+    <packaging>content-package</packaging>
+
+    <name>Slingslop - Complete Zip</name>
+    <description>org.motorbrot.slingslop - Slingslop: All-in-one deployment content package</description>
+
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.zengarden.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.zengarden.ui.apps</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.zengarden.sample-content</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.jackrabbit</groupId>
+                <artifactId>filevault-package-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <packageType>container</packageType>
+                    <embeddedTarget>/apps/slingslop_appcontent-all/install</embeddedTarget>
+                    <embeddeds>
+                        <embedded>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.zengarden.core</artifactId>
+                            <filter>true</filter>
+                        </embedded>
+                    </embeddeds>
+                    <subPackages>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.zengarden.ui.apps</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.zengarden.sample-content</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                    </subPackages>
+                    <!-- This gives the Package a recognizable name in the Package Manager by prepending the Artifact Id of the Project -->
+                    <name>slingslop-complete</name>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

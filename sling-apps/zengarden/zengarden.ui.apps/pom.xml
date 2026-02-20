@@ -13,7 +13,7 @@
   <artifactId>slingslop.zengarden.ui.apps</artifactId>
   <packaging>content-package</packaging>
 
-  <name>Slingslop - CssZenGarden UI Apps Example</name>
+  <name>Slingslop - CssZenGarden UI Apps</name>
   <description>
     This is an example JCR Package, containing CSS/JS HTML/Sightly templates, JSPs etc... also deployed as JCR content
   </description>
@@ -35,7 +35,23 @@
         <configuration>
           <filterSource>${basedir}/src/main/content/META-INF/vault/filter.xml</filterSource>
           <packageType>application</packageType>
+          
+          <!-- 
+          Tweak validator here with validRoots, as we have filter root="/apps/slingslop/zengarden" and it will complain:
+          "Filter root's ancestor is not covered by any of the specified dependencies nor a valid root."
+          see https://wcm-io.atlassian.net/wiki/spaces/WCMIO/pages/1353056261/How+to+make+your+content+packages+comply+with+Jackrabbit+FileVault+Validation#Solutions-for-common-problems      
+          -->
+          <validatorsSettings>
+            <jackrabbit-filter>
+              <options>
+                <validRoots>/apps/slingslop</validRoots>
+              </options>
+            </jackrabbit-filter>
+          </validatorsSettings>
           <properties>
+            <!-- We set access-control in content at:
+                 sling-apps/zengarden/zengarden.ui.apps/src/main/content/jcr_root/apps/slingslop/zengarden/css_zen_garden/_rep_policy.xml
+                 Removing either this acHandling property or the xml alone will rightly concern the validator. -->
             <acHandling>merge_preserve</acHandling>
           </properties>
         </configuration>

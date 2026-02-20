@@ -1,16 +1,7 @@
 {
-  "bundles": [
-    {
-        "id": "org.motorbrot/slingslop.zengarden.core/${slingslop.launcher.version}/jar",
-        "start-order": 20
-    }
-  ],
   "content-packages:ARTIFACTS|required": [
     {
-        "id":"org.motorbrot/slingslop.zengarden.ui.apps/${slingslop.launcher.version}/zip"
-    },
-    {
-        "id":"org.motorbrot/slingslop.zengarden.sample-content/${slingslop.launcher.version}/zip"
+        "id":"org.motorbrot/slingslop.complete/${slingslop.launcher.version}/zip"
     }
   ],
   "repoinit:TEXT|true": "@file"
