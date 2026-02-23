@@ -1,4 +1,10 @@
-<div class="explanation" id="zen-explanation" role="article">
+<div class="explanation" id="zen-explanation" role="article"
+     hx-get="${resource.path}.edit-form.html"
+     hx-trigger="click"
+     hx-target="#editor-modal-container"
+     hx-swap="innerHTML"
+     style="cursor: pointer;"
+     title="Click to edit">
   <h3>${properties.headline}</h3>
   ${properties.text @ context='html'}
 </div>
