@@ -3,3 +3,24 @@
 <title>${properties.jcr:title}</title>
 <link rel="stylesheet" data-sly-use.cssPicker="org.motorbrot.slingslop.zengarden.slingmodels.CssZenGarden"
       href="${cssPicker.randomCssUrl}" />
+
+<!--/*  /zengarden/home.html?minJs=false for unminified sources */-->
+<sly data-sly-test.noMinJs="${request.parameterMap['minJs'][0] == 'false'}">
+  
+  <!-- htmx for hypermedia interactions -->
+  <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
+
+  <!-- TinyMCE Rich Text Editor -->
+  <script src="/apps/slingslop/zengarden/js/tinymce/tinymce.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script src="/apps/slingslop/zengarden/js/editor-modal.js"></script>
+  
+</sly>
+<sly data-sly-test="${!noMinJs}">
+  <!-- Single bundled and minified JavaScript -->
+  <script src="/apps/slingslop/zengarden/js/bundle.min.js"></script>
+</sly>
+
+<!-- Modal styles -->
+<link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor-modal.css" />

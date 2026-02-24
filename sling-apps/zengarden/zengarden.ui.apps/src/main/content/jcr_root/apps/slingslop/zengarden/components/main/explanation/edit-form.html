@@ -1,0 +1,37 @@
+<div id="editor-modal" class="editor-modal">
+  <div class="editor-modal-content">
+    
+    <div class="editor-modal-header">
+      <h2>Edit "${properties.headline}"</h2>
+      <button class="editor-modal-close" onclick="closeEditorModal()" aria-label="Close">&times;</button>
+    </div>
+    
+    <div class="editor-modal-body">
+      <form id="editor-form" 
+            hx-trigger="submit"
+            hx-target="#zen-explanation"
+            hx-swap="outerHTML"
+            hx-post="${resource.path}">
+        
+        <input type="hidden" id="redirect-input" name=":redirect" value="${resource.path}.html" />
+        <input type="text" id="headline-input" name="headline" value="${properties.headline}" />
+        
+        <!-- TinyMCE Editor -->
+        <textarea id="content-editor">
+${properties.text @ context='html'}
+        </textarea>
+        
+        <!-- Hidden input that will be populated with TinyMCE content before submit -->
+        <input type="hidden" id="content-hidden" name="text" />
+        
+      </form>
+    </div>
+    
+    <div class="editor-modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeEditorModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="saveEditorContent()">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>

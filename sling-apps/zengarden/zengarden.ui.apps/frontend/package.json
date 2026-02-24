@@ -1,0 +1,37 @@
+{
+  "name": "slingslop-zengarden-ui-apps",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "TypeScript sources for Slingslop Zen Garden UI",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "copy:tinymce": "cpx \"node_modules/tinymce/**/*\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce\"",
+    "copy:htmx": "cpx \"node_modules/htmx.org/dist/htmx.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\" && cpx \"node_modules/htmx.org/dist/htmx.min.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\"",
+    "copy:libs": "npm run copy:tinymce && npm run copy:htmx",
+    "bundle": "node scripts/bundle.js",
+    "prebuild": "npm run copy:libs",
+    "postbuild": "npm run bundle",
+    "lint": "eslint --config .eslintrc.js ../src/main/typescript --ext .ts",
+    "lint:fix": "eslint --config .eslintrc.js ../src/main/typescript --ext .ts --fix",
+    "format": "prettier --check \"../src/main/typescript/**/*.ts\"",
+    "format:fix": "prettier --write \"../src/main/typescript/**/*.ts\"",
+    "check": "npm run format && npm run lint && npm run build"
+  },
+  "dependencies": {
+    "htmx.org": "^1.9.10",
+    "tinymce": "^6.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "concat": "^1.0.3",
+    "cpx2": "^7.0.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "terser": "^5.27.0",
+    "typescript": "^5.3.3"
+  }
+}

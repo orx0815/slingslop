@@ -65,6 +65,91 @@
         </configuration>
       </plugin>
       
+      <!-- Frontend Maven Plugin for TypeScript compilation and checks -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.15.0</version>
+        <configuration>
+          <workingDirectory>frontend</workingDirectory>
+          <installDirectory>frontend</installDirectory>
+        </configuration>
+        <executions>
+          <!-- Install Node and NPM -->
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <nodeVersion>v24.13.1</nodeVersion>
+              <npmVersion>11.10.1</npmVersion>
+            </configuration>
+          </execution>
+          
+          <!-- Install dependencies -->
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          
+          <!-- Copy libraries (TinyMCE, htmx) from node_modules -->
+          <execution>
+            <id>npm run copy:libs</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run copy:libs</arguments>
+            </configuration>
+          </execution>
+          
+          <!-- Run Prettier format check -->
+          <execution>
+            <id>npm run format</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>run format</arguments>
+            </configuration>
+          </execution>
+          
+          <!-- Run ESLint -->
+          <execution>
+            <id>npm run lint</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+          </execution>
+          
+          <!-- Compile TypeScript -->
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
         
   </build>

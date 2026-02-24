@@ -1,0 +1,15 @@
+# Node and NPM
+node/
+
+# Generated JavaScript from TypeScript
+#src/main/content/jcr_root/apps/slingslop/zengarden/js/editor-modal.js
+
+# Libraries copied from node_modules
+src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce/
+src/main/content/jcr_root/apps/slingslop/zengarden/js/htmx.js
+src/main/content/jcr_root/apps/slingslop/zengarden/js/htmx.min.js
+
+# Bundled and minified JavaScript
+src/main/content/jcr_root/apps/slingslop/zengarden/js/bundle.min.js
+
+
