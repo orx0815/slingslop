@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.sling.api.SlingHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.uri.SlingUriBuilder;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.Self;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Picks a design. Assigned by htl, url or random
  */
-@Model(adaptables = {SlingHttpServletRequest.class})
+@Model(adaptables = {SlingJakartaHttpServletRequest.class})
 public class CssZenGarden {
 
   private final Design[] CSS_DESIGNS = new Design[]{
@@ -64,14 +64,14 @@ public class CssZenGarden {
 
   private Design design;
   
-  private final SlingHttpServletRequest request;
+  private final SlingJakartaHttpServletRequest request;
 
   /**
    * Constructor injection
    * @param request via Sling-Model injection
    */
   @Inject
-  public CssZenGarden(@Self SlingHttpServletRequest request) {
+  public CssZenGarden(@Self SlingJakartaHttpServletRequest request) {
     this.request = request;
     // Keep the same design per request, when model is called in different components
     this.design = (Design)request.getAttribute(REQUEST_ATTRIBUTE_CSS_ZEN_GARDEN_DESIGN);
@@ -99,7 +99,7 @@ public class CssZenGarden {
    * @return Design with that id or null
    */
   @Nullable
-  private Design designFromSuffix(SlingHttpServletRequest request) {
+  private Design designFromSuffix(SlingJakartaHttpServletRequest request) {
     String suffix = request.getRequestPathInfo().getSuffix();
     suffix = StringUtils.getDigits(suffix);
     suffix = StringUtils.substring(suffix, 0, 3);
@@ -115,7 +115,7 @@ public class CssZenGarden {
    * @return Design with that id or null
    */
   @Nullable
-  private Design designFromSightly(SlingHttpServletRequest request) {
+  private Design designFromSightly(SlingJakartaHttpServletRequest request) {
     String idByHtl = (String)request.getAttribute(REQUEST_ATTRIBUTE_HTL_SELECT_DESIGN);
     Design designFromSuffix = byId(idByHtl);
     return designFromSuffix;

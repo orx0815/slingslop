@@ -42,7 +42,7 @@
       /bin/browser.html,
       /system/console/bundles
     </starter.check.paths>
-    <feature.launcher.plugin.version>1.0.2</feature.launcher.plugin.version>
+    <feature.launcher.plugin.version>1.0.4</feature.launcher.plugin.version>
   </properties>
 
   <dependencies>
@@ -229,7 +229,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.48.0</version>
+        <version>0.48.1</version>
         <configuration>
           <skip>${docker.skip}</skip>
           <skipPush>${docker.skip.push}</skipPush>
