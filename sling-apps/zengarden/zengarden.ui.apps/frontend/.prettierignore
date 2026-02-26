@@ -1,9 +1,8 @@
 node_modules/
 target/
-src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce/
 src/main/content/jcr_root/apps/slingslop/zengarden/js/htmx.js
 src/main/content/jcr_root/apps/slingslop/zengarden/js/htmx.min.js
+src/main/content/jcr_root/apps/slingslop/zengarden/js/editor-bundle.js
 src/main/content/jcr_root/apps/slingslop/zengarden/js/bundle.min.js
-src/main/content/jcr_root/apps/slingslop/zengarden/js/editor-modal.js
 *.xml
 *.md

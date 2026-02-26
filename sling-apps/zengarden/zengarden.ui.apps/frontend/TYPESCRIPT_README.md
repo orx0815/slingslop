@@ -1,173 +1,174 @@
-# TypeScript Configuration
+# TypeScript / Frontend Configuration
 
-This module has been configured to use TypeScript with strict type checking, ESLint for code quality, and Prettier for code formatting.
+This module uses TypeScript (type-checking only), **esbuild** for bundling, ESLint for code quality, and Prettier for formatting.
 
 ## File Structure
 
-- `src/typescript/` - TypeScript source files
-- `../src/main/content/jcr_root/apps/slingslop/zengarden/js/` - Compiled JavaScript output
-- `tsconfig.json` - TypeScript compiler configuration
-- `.eslintrc.js` - ESLint configuration
-- `.prettierrc` - Prettier configuration
-- `package.json` - Node.js dependencies and scripts
-- `scripts/bundle.js` - Bundling and minification script
+```
+frontend/
+├── src/typescript/
+│   └── editor-modal.ts        # Editor logic (Tiptap init, toolbar, modal lifecycle)
+├── scripts/
+│   └── bundle.js              # esbuild-based build script
+├── tsconfig.json              # TypeScript config (type-check only, noEmit)
+├── .eslintrc.js               # ESLint configuration
+├── .prettierrc                # Prettier configuration
+└── package.json               # Dependencies and scripts
+```
+
+Output files (written to `../src/main/content/jcr_root/apps/slingslop/zengarden/js/`):
+
+| File | Contents | Used in |
+|---|---|---|
+| `editor-bundle.js` | Tiptap + editor code (unminified) | dev mode (`?minJs=false`) |
+| `bundle.min.js` | htmx + Tiptap + editor code (minified) | production |
+| `htmx.js` / `htmx.min.js` | htmx (copied from node_modules) | dev mode |
 
 ## NPM Scripts
 
-- `npm run build` - Compile TypeScript to JavaScript (includes prebuild and postbuild hooks)
-- `npm run copy:tinymce` - Copy TinyMCE from node_modules to JCR content
-- `npm run copy:htmx` - Copy htmx (both minified and unminified) from node_modules to JCR content
-- `npm run copy:libs` - Copy all libraries (TinyMCE + htmx)
-- `npm run bundle` - Create bundled and minified single JS file (htmx + TinyMCE + editor-modal)
-- `npm run lint` - Run ESLint checks
-- `npm run lint:fix` - Run ESLint with auto-fix
-- `npm run format` - Check code formatting with Prettier
-- `npm run format:fix` - Auto-format code with Prettier
-- `npm run check` - Run all checks (format + lint + build)
+| Script | What it does |
+|---|---|
+| `npm run build` | Copy htmx (`prebuild`), then run `scripts/bundle.js` via esbuild |
+| `npm run typecheck` | Type-check TypeScript without emitting files (`tsc --noEmit`) |
+| `npm run copy:htmx` | Copy htmx.js / htmx.min.js from node_modules to JCR content |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint with auto-fix |
+| `npm run format` | Check formatting with Prettier |
+| `npm run format:fix` | Auto-format with Prettier |
+| `npm run check` | Run all quality gates: `format` + `lint` + `typecheck` |
 
-## Dependency Management
+> **Note**: `tsc` is used for type-checking only. esbuild handles compilation and bundling.
 
-### TinyMCE
-TinyMCE is managed via npm and copied into the JCR content directory during the build:
-
-- **Source**: Installed from npm (`node_modules/tinymce/`)
-- **Destination**: `../src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce/`
-- **Version**: Defined in `package.json` (currently ^6.8.2)
-- **Loading**: The entire TinyMCE distribution is copied so it can self-load its plugins and skins at runtime.
+## Build Pipeline
 
 ```mermaid
 flowchart LR
-   A[src/typescript/editor-modal.ts] --> B[tsc]
-   B --> C[editor-modal.js]
-   D[node_modules/tinymce/] --> E[copy:tinymce]
-   E --> F[js/tinymce/]
-   C --> G[scripts/bundle.js]
-   F --> G
-   H[node_modules/htmx.org/] --> G
-   G --> I[bundle.min.js]
+    A[src/typescript/editor-modal.ts] --> B[esbuild]
+    C[node_modules/@tiptap/*] --> B
+    D[node_modules/htmx.org/] --> E[copy:htmx]
+    E --> F[js/htmx.js]
+    B --> G[js/editor-bundle.js\nunminified dev bundle]
+    D --> H[esbuild banner prepend]
+    A --> H
+    C --> H
+    H --> I[js/bundle.min.js\nminified prod bundle]
 ```
 
+## Dependency Management
+
+### Tiptap (Rich Text Editor)
+All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API key.
+
+**Core**
+- `@tiptap/core` — editor engine
+- `@tiptap/starter-kit` — bold, italic, headings H1–H6, ordered/unordered lists, blockquote, inline code, code block, horizontal rule, undo/redo
+
+**Inline formatting**
+- `@tiptap/extension-underline` — underline
+- `@tiptap/extension-subscript` — subscript
+- `@tiptap/extension-superscript` — superscript
+- `@tiptap/extension-text-style` + `@tiptap/extension-color` — text colour picker
+- `@tiptap/extension-highlight` — multi-colour highlighting
+
+**Block / layout**
+- `@tiptap/extension-text-align` — left / center / right / justify for paragraphs and headings
+- `@tiptap/extension-link` — insert, edit, and remove hyperlinks
+- `@tiptap/extension-image` — insert images by URL
+
+**Tables**
+- `@tiptap/extension-table` + `extension-table-row` + `extension-table-cell` + `extension-table-header` — full table editing with column-resize handles and cell merge/split
+
+**UX helpers**
+- `@tiptap/extension-placeholder` — placeholder text when editor is empty
+- `@tiptap/extension-character-count` — live word & character count bar
+- `@tiptap/extension-typography` — smart quotes, em-dashes, ellipsis auto-replacement
+
 ### htmx
-htmx is managed via npm and automatically copied to the JCR content directory during the build:
+- **Source**: `node_modules/htmx.org/dist/`
+- **Destination**: `js/htmx.js` and `js/htmx.min.js` (copied by `copy:htmx`)
+- **Version**: `^1.9.10` (see `package.json`)
+- In prod (`bundle.min.js`) htmx is prepended as a banner by esbuild so it is available as `window.htmx` before the editor IIFE runs.
 
-- **Source**: Installed from npm (`node_modules/htmx.org/dist/`)
-- **Destination**: `src/main/content/jcr_root/apps/slingslop/zengarden/js/`
-- **Version**: Defined in `package.json` (currently ^1.9.10)
-- **Files**: Both `htmx.js` (unminified) and `htmx.min.js` (minified) are copied
-
-### Bundled JavaScript
-For production, a single minified bundle is created that includes all JavaScript:
-
-- **Contents**: htmx + TinyMCE core + editor-modal.js
-- **Output**: `src/main/content/jcr_root/apps/slingslop/zengarden/js/bundle.min.js`
-- **Build**: Automatically created via `npm run bundle` (postbuild hook)
-- **Minification**: Uses Terser for optimal compression
-
-All generated files are:
-- ✅ Generated during build (via `npm run copy:libs` and `npm run bundle`)
-- ✅ Ignored by git (listed in `.gitignore`)
-- ✅ Excluded from linting and formatting
-
-To update these libraries:
-1. Update the version in `package.json`
-2. Run `npm install` to get the new version
-3. Run `npm run build` (or `mvn compile`) to copy and bundle the updated files
-
-## Maven Integration
-
-The project uses `frontend-maven-plugin` to automate the build process:
-
-1. **generate-resources phase**:
-   - Installs Node.js and npm
-   - Runs `npm install` to install dependencies
-   - Copies libraries (TinyMCE, htmx) from node_modules to JCR content
-2. **process-resources phase**: Runs Prettier format check and ESLint
-3. **compile phase**: Compiles TypeScript to JavaScript and creates bundled minified version
-
-When you run `mvn clean install`, it will:
-- Install Node.js v24.13.1 and npm 11.10.1 locally
-- Install all npm dependencies (including TinyMCE and htmx)
-- Copy library files to the JCR content directory
-- Check code formatting
-- Run linting
-- Compile TypeScript to JavaScript
-- Create bundled and minified JavaScript (bundle.min.js)
-- Package the content
+To update a library:
+1. Change the version in `package.json`
+2. Run `npm install`
+3. Run `npm run build`
 
 ## JavaScript Loading Modes
 
-The application supports two modes for loading JavaScript:
+### Development Mode
+Add `?minJs=false` to any page URL, e.g. `http://localhost:8080/content/page.html?minJs=false`
 
-### Development Mode (with URL-parameter)
-Loads unminified, separate JavaScript files for easier debugging:
-- `htmx.js` - Unminified htmx
-- `editor-modal.js` - Compiled from TypeScript
+Loads three separate, unminified files:
+- `htmx.js`
+- `editor-bundle.js` (Tiptap + editor code)
 
-**Access**: Add `?minJs=false` query parameter (e.g., `http://localhost:8080/content/page.html?minJs=false`)
+### Production Mode (default)
+Loads a single minified file: `bundle.min.js` (htmx + Tiptap + editor code).
 
+**Benefits**:
+- ✅ Single HTTP request
+- ✅ Minified and tree-shaken by esbuild
+- ✅ No separate TinyMCE asset tree to serve
 
-### Production Mode (Minified Bundle)
-Loads a single minified bundle containing all JavaScript:
-- `bundle.min.js` - Minified and concatenated (htmx + TinyMCE core + editor-modal)
+## Editor Features
 
-**Access**: Visit any page normally (e.g., `http://localhost:8080/content/page.html`)
+The Tiptap toolbar in `edit-form.html` exposes:
 
+- **Undo / Redo**
+- **Heading level** select (Paragraph, H1–H6)
+- **Inline**: Bold, Italic, Underline, Strikethrough, Inline code, Subscript, Superscript
+- **Colour & highlight**: colour picker, multi-colour highlight, clear formatting
+- **Alignment**: Left, Center, Right, Justify
+- **Lists & blocks**: Bullet list, Ordered list, Blockquote, Code block, Horizontal rule
+- **Link**: prompt-based insert / edit / remove
+- **Image**: prompt-based insert by URL
+- **Tables**: insert, add/delete columns and rows, merge/split cells, delete table
+- **HTML source toggle**: switch between WYSIWYG and raw HTML editing
+- **Character / word count** bar (live)
 
-**Benefits of bundled mode**:
-- ✅ Single HTTP request instead of 2
-- ✅ Smaller file size due to minification
-- ✅ Faster page load times
-- ✅ Better for production deployments
-- Run linting
-- Compile TypeScript to JavaScript
-- Package the content
+Content is saved as HTML into Sling via the existing htmx form POST.
 
-## Development Workflow
+## Maven Integration
 
-### Local Development
+The project uses `frontend-maven-plugin`:
 
-1. Make changes to TypeScript files in `src/typescript/`
-2. Run `npm run check` to validate your changes
-3. Run `npm run build` to compile to JavaScript
-4. Or simply run `mvn compile` to run the full Maven build
+1. **generate-resources**: Install Node.js + npm, run `npm install`
+2. **process-resources**: Prettier format check + ESLint
+3. **compile**: Run `npm run build` → copies htmx, bundles dev + prod outputs via esbuild
 
-### Code Quality
-
-The setup enforces:
-- **TypeScript strict mode**: All type checks enabled
-- **ESLint**: Code quality rules including TypeScript-specific rules
-- **Prettier**: Consistent code formatting
-
-### IDE Integration
-
-Your IDE should automatically pick up the TypeScript, ESLint, and Prettier configurations for real-time feedback.
+`mvn clean install` produces `editor-bundle.js` and `bundle.min.js` in the JCR content directory.
 
 ## Configuration Files
 
 ### tsconfig.json
-- Strict type checking enabled
-- Targets ES2015
+- `"noEmit": true` — type-checking only; esbuild does the emit
+- `"module": "ESNext"` / `"moduleResolution": "bundler"` — required for esbuild-resolved imports
+- `"target": "ES2020"`
 - Source root: `src/typescript/`
-- Outputs to `../src/main/content/jcr_root/apps/slingslop/zengarden/js/`
 
 ### .eslintrc.js
-- TypeScript-aware linting
-- Prettier integration
-- Strict rules for type safety
+- TypeScript-aware linting with `@typescript-eslint`
+- Prettier integration (formatting errors reported as lint errors)
 
 ### .prettierrc
-- Single quotes
-- 2-space indentation
-- 100 character line width
-- Trailing commas in ES5 mode
+- Single quotes, 2-space indentation, 100-character line width, ES5 trailing commas
+
+## Development Workflow
+
+1. Edit `src/typescript/editor-modal.ts`
+2. `npm run check` — format + lint + type-check
+3. `npm run build` — produce the JS bundles
+4. Or just `mvn compile` for the full Maven pipeline
 
 ## Troubleshooting
 
-If you encounter issues:
-
-1. **Node/npm not found**: Run `mvn clean` to clear and reinstall Node
-2. **Type errors**: Check `tsconfig.json` and ensure types are properly declared
-3. **Linting errors**: Run `npm run lint:fix` to auto-fix common issues
-4. **Formatting errors**: Run `npm run format:fix` to auto-format code
-5. **bundle.js fails — file not found**: Ensure `npm run build` ran first so `editor-modal.js` exists in the output directory
-6. **TinyMCE plugins not loading at runtime**: Ensure `copy:tinymce` ran and the `js/tinymce/` directory is present in the JCR content
+| Symptom | Fix |
+|---|---|
+| Node/npm not found | Run `mvn clean` to clear and reinstall Node |
+| Type errors | Check `tsconfig.json`; run `npm run typecheck` for details |
+| Lint errors | Run `npm run lint:fix` |
+| Formatting errors | Run `npm run format:fix` |
+| `editor-bundle.js` / `bundle.min.js` missing | Run `npm run build` |
+| htmx missing at runtime (dev mode) | Run `npm run copy:htmx` |
+| Tiptap extensions not working | Ensure `npm install` completed and `editor-bundle.js` was rebuilt |

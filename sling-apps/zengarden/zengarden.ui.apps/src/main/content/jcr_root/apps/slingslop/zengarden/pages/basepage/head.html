@@ -10,17 +10,13 @@
   <!-- htmx for hypermedia interactions -->
   <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
 
-  <!-- TinyMCE Rich Text Editor -->
-  <script src="/apps/slingslop/zengarden/js/tinymce/tinymce.js"></script>
-
-  <!-- Custom JavaScript -->
-  <script src="/apps/slingslop/zengarden/js/editor-modal.js"></script>
+  <!-- Tiptap editor + editor interactions (unminified dev bundle) -->
+  <script src="/apps/slingslop/zengarden/js/editor-bundle.js"></script>
   
 </sly>
 <sly data-sly-test="${!noMinJs}">
-  <!-- Single bundled and minified JavaScript -->
+  <!-- Single bundled and minified JavaScript (htmx + Tiptap + editor code) -->
   <script src="/apps/slingslop/zengarden/js/bundle.min.js"></script>
 </sly>
 
-<!-- Modal styles -->
 <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor-modal.css" />

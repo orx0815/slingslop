@@ -1,139 +1,417 @@
 /**
- * Editor Modal Handler for Slimpogrine
- * Manages TinyMCE rich text editor in a modal popup
+ * Editor Modal Handler for Zen Garden
+ * Manages Tiptap rich text editor in a modal popup.
+ * Saves edited HTML directly to Sling via htmx form submission.
  */
 
-// Type declarations for external libraries
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import TextStyle from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import Placeholder from '@tiptap/extension-placeholder';
+import CharacterCount from '@tiptap/extension-character-count';
+import Typography from '@tiptap/extension-typography';
+
+// htmx is loaded as a global script (dev) or bundled via banner (prod)
 declare const htmx: {
   process: (element: HTMLElement) => void;
   trigger: (element: HTMLElement, eventName: string) => void;
 };
 
-declare const tinymce: {
-  init: (config: TinyMCEConfig) => void;
-  get: (selector: string) => TinyMCEEditor;
-  remove: (selector: string) => void;
-};
-
-interface TinyMCEConfig {
-  selector: string;
-  license_key: string;
-  base_url?: string;
-  suffix?: string;
-  theme: string;
-  height: number;
-  menubar: boolean;
-  plugins: string[];
-  toolbar: string;
-  content_style: string;
-  setup?: (editor: TinyMCEEditor) => void;
-}
-
-interface TinyMCEEditor {
-  on: (event: string, callback: () => void) => void;
-  getContent: () => string;
-}
-
-interface HTMXAfterSwapDetail {
-  target: HTMLElement;
-}
-
-interface HTMXAfterSwapEvent extends Event {
-  detail: HTMXAfterSwapDetail;
-}
-
-// Extend Window interface using interface merging (no export needed)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Window {
-  closeEditorModal: () => void;
-  saveEditorContent: () => void;
+// Extend Window interface for modal API
+declare global {
+  interface Window {
+    closeEditorModal: () => void;
+    saveEditorContent: () => void;
+  }
 }
 
 (function (): void {
   'use strict';
 
-  // Wait for DOM to be ready before accessing document.body
-  function initializeEventListeners(): void {
-    // Initialize TinyMCE after htmx loads content into the modal
-    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
-      const htmxEvent = event as HTMXAfterSwapEvent;
-      if (htmxEvent.detail.target.id === 'editor-modal-container') {
-        // Get the form element that contains the passed parameters
-        const form = document.getElementById('editor-form') as HTMLElement;
-        // Re-process htmx attributes on the form
-        htmx.process(form);
+  let editor: Editor | null = null;
+  let isSourceView = false;
 
-        initializeTinyMCE();
+  // ─── Editor initialisation ────────────────────────────────────────────────
+
+  function initializeTiptap(): void {
+    const editorEl = document.getElementById('tiptap-editor');
+    if (!editorEl) {
+      return;
+    }
+
+    // Read initial HTML from the hidden textarea populated by Sling HTL
+    const initialContentEl = document.getElementById(
+      'content-editor'
+    ) as HTMLTextAreaElement | null;
+    const initialContent = initialContentEl?.value ?? '';
+
+    editor = new Editor({
+      element: editorEl,
+      extensions: [
+        StarterKit.configure({
+          heading: { levels: [1, 2, 3, 4, 5, 6] },
+        }),
+        Underline,
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: { rel: 'noopener noreferrer' },
+        }),
+        Image.configure({ inline: false }),
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        TextStyle,
+        Color,
+        Highlight.configure({ multicolor: true }),
+        Subscript,
+        Superscript,
+        Table.configure({ resizable: true }),
+        TableRow,
+        TableHeader,
+        TableCell,
+        Placeholder.configure({
+          placeholder: 'Start typing your content here…',
+        }),
+        CharacterCount,
+        Typography,
+      ],
+      content: initialContent,
+      onUpdate({ editor: ed }): void {
+        updateToolbarState(ed);
+        updateCharCount(ed);
+      },
+      onSelectionUpdate({ editor: ed }): void {
+        updateToolbarState(ed);
+      },
+    });
+
+    setupToolbar();
+    updateToolbarState(editor);
+    updateCharCount(editor);
+  }
+
+  // ─── Toolbar state ────────────────────────────────────────────────────────
+
+  function updateCharCount(ed: Editor): void {
+    const charCountEl = document.getElementById('char-count');
+    if (!charCountEl) {
+      return;
+    }
+    const storage = ed.storage['characterCount'] as
+      | { characters: () => number; words: () => number }
+      | undefined;
+    if (storage) {
+      charCountEl.textContent = `${storage.words()} words · ${storage.characters()} characters`;
+    }
+  }
+
+  function updateToolbarState(ed: Editor): void {
+    const toolbar = document.getElementById('tiptap-toolbar');
+    if (!toolbar) {
+      return;
+    }
+
+    // Toggle-style marks & nodes
+    const toggleActions: string[] = [
+      'bold',
+      'italic',
+      'underline',
+      'strike',
+      'subscript',
+      'superscript',
+      'bulletList',
+      'orderedList',
+      'blockquote',
+      'code',
+      'highlight',
+    ];
+    toggleActions.forEach((action) => {
+      const btn = toolbar.querySelector<HTMLButtonElement>(`[data-action="${action}"]`);
+      if (btn) {
+        btn.classList.toggle('is-active', ed.isActive(action));
+      }
+    });
+
+    // Heading level select
+    const headingSelect = document.getElementById('heading-select') as HTMLSelectElement | null;
+    if (headingSelect) {
+      const headingLevels: Array<1 | 2 | 3 | 4 | 5 | 6> = [1, 2, 3, 4, 5, 6];
+      let found = false;
+      for (const level of headingLevels) {
+        if (ed.isActive('heading', { level })) {
+          headingSelect.value = String(level);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        headingSelect.value = '0';
+      }
+    }
+
+    // Text-align buttons
+    const alignments = ['Left', 'Center', 'Right', 'Justify'] as const;
+    for (const cap of alignments) {
+      const btn = toolbar.querySelector<HTMLButtonElement>(`[data-action="align${cap}"]`);
+      if (btn) {
+        btn.classList.toggle('is-active', ed.isActive({ textAlign: cap.toLowerCase() }));
+      }
+    }
+  }
+
+  // ─── Toolbar actions ──────────────────────────────────────────────────────
+
+  function handleToolbarAction(action: string): void {
+    if (!editor) {
+      return;
+    }
+
+    switch (action) {
+      case 'bold':
+        editor.chain().focus().toggleBold().run();
+        break;
+      case 'italic':
+        editor.chain().focus().toggleItalic().run();
+        break;
+      case 'underline':
+        editor.chain().focus().toggleUnderline().run();
+        break;
+      case 'strike':
+        editor.chain().focus().toggleStrike().run();
+        break;
+      case 'subscript':
+        editor.chain().focus().toggleSubscript().run();
+        break;
+      case 'superscript':
+        editor.chain().focus().toggleSuperscript().run();
+        break;
+      case 'bulletList':
+        editor.chain().focus().toggleBulletList().run();
+        break;
+      case 'orderedList':
+        editor.chain().focus().toggleOrderedList().run();
+        break;
+      case 'blockquote':
+        editor.chain().focus().toggleBlockquote().run();
+        break;
+      case 'codeBlock':
+        editor.chain().focus().toggleCodeBlock().run();
+        break;
+      case 'code':
+        editor.chain().focus().toggleCode().run();
+        break;
+      case 'horizontalRule':
+        editor.chain().focus().setHorizontalRule().run();
+        break;
+      case 'highlight':
+        editor.chain().focus().toggleHighlight().run();
+        break;
+      case 'alignLeft':
+        editor.chain().focus().setTextAlign('left').run();
+        break;
+      case 'alignCenter':
+        editor.chain().focus().setTextAlign('center').run();
+        break;
+      case 'alignRight':
+        editor.chain().focus().setTextAlign('right').run();
+        break;
+      case 'alignJustify':
+        editor.chain().focus().setTextAlign('justify').run();
+        break;
+      case 'undo':
+        editor.chain().focus().undo().run();
+        break;
+      case 'redo':
+        editor.chain().focus().redo().run();
+        break;
+      case 'clearFormatting':
+        editor.chain().focus().clearNodes().unsetAllMarks().run();
+        break;
+      case 'link': {
+        const existing = editor.getAttributes('link').href as string | undefined;
+        const url = window.prompt('Enter URL:', existing ?? 'https://');
+        if (url === null) {
+          break;
+        } // cancelled
+        if (url === '') {
+          editor.chain().focus().unsetLink().run();
+        } else {
+          editor.chain().focus().setLink({ href: url }).run();
+        }
+        break;
+      }
+      case 'image': {
+        const src = window.prompt('Enter image URL:');
+        if (!src) {
+          break;
+        }
+        const alt = window.prompt('Alt text (optional):') ?? '';
+        editor.chain().focus().setImage({ src, alt }).run();
+        break;
+      }
+      case 'insertTable':
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        break;
+      case 'addColumnBefore':
+        editor.chain().focus().addColumnBefore().run();
+        break;
+      case 'addColumnAfter':
+        editor.chain().focus().addColumnAfter().run();
+        break;
+      case 'deleteColumn':
+        editor.chain().focus().deleteColumn().run();
+        break;
+      case 'addRowBefore':
+        editor.chain().focus().addRowBefore().run();
+        break;
+      case 'addRowAfter':
+        editor.chain().focus().addRowAfter().run();
+        break;
+      case 'deleteRow':
+        editor.chain().focus().deleteRow().run();
+        break;
+      case 'deleteTable':
+        editor.chain().focus().deleteTable().run();
+        break;
+      case 'mergeCells':
+        editor.chain().focus().mergeCells().run();
+        break;
+      case 'splitCell':
+        editor.chain().focus().splitCell().run();
+        break;
+      default:
+        break;
+    }
+  }
+
+  // ─── Toolbar wiring ───────────────────────────────────────────────────────
+
+  function setToolbarDisabled(toolbar: HTMLElement, disabled: boolean): void {
+    toolbar
+      .querySelectorAll<
+        HTMLButtonElement | HTMLSelectElement | HTMLInputElement
+      >('button[data-action], select, input[type="color"]')
+      .forEach((el) => {
+        el.disabled = disabled;
+      });
+  }
+
+  function setupToolbar(): void {
+    const toolbar = document.getElementById('tiptap-toolbar');
+    if (!toolbar) {
+      return;
+    }
+
+    // Bind all [data-action] buttons
+    toolbar.querySelectorAll<HTMLButtonElement>('[data-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        if (action) {
+          handleToolbarAction(action);
+        }
+      });
+    });
+
+    // Heading level select
+    const headingSelect = document.getElementById('heading-select') as HTMLSelectElement | null;
+    if (headingSelect) {
+      headingSelect.addEventListener('change', () => {
+        const level = parseInt(headingSelect.value, 10);
+        if (level === 0) {
+          editor?.chain().focus().setParagraph().run();
+        } else {
+          editor
+            ?.chain()
+            .focus()
+            .setHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 })
+            .run();
+        }
+      });
+    }
+
+    // Text colour picker
+    const colorPicker = document.getElementById('text-color-picker') as HTMLInputElement | null;
+    if (colorPicker) {
+      colorPicker.addEventListener('input', () => {
+        editor?.chain().focus().setColor(colorPicker.value).run();
+      });
+    }
+
+    // HTML source toggle
+    const toggleSourceBtnAsButton = document.getElementById(
+      'toggle-source'
+    ) as HTMLButtonElement | null;
+    const editorContainer = document.getElementById('tiptap-editor');
+    const sourceTextarea = document.getElementById('html-source') as HTMLTextAreaElement | null;
+
+    if (toggleSourceBtnAsButton && editorContainer && sourceTextarea) {
+      toggleSourceBtnAsButton.addEventListener('click', () => {
+        isSourceView = !isSourceView;
+        if (isSourceView) {
+          sourceTextarea.value = editor?.getHTML() ?? '';
+          editorContainer.style.display = 'none';
+          sourceTextarea.style.display = 'block';
+          setToolbarDisabled(toolbar, true);
+          toggleSourceBtnAsButton.disabled = false; // keep toggle itself active
+          toggleSourceBtnAsButton.classList.add('is-active');
+          toggleSourceBtnAsButton.title = 'Exit HTML Source Mode';
+        } else {
+          if (editor) {
+            editor.commands.setContent(sourceTextarea.value, false);
+          }
+          sourceTextarea.style.display = 'none';
+          editorContainer.style.display = '';
+          setToolbarDisabled(toolbar, false);
+          toggleSourceBtnAsButton.classList.remove('is-active');
+          toggleSourceBtnAsButton.title = 'View HTML Source';
+        }
+      });
+    }
+  }
+
+  // ─── Modal lifecycle ──────────────────────────────────────────────────────
+
+  function showModal(): void {
+    const modal = document.getElementById('editor-modal');
+    if (modal) {
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function initializeEventListeners(): void {
+    // Open modal after htmx swaps the form content in
+    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
+      const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
+      if (htmxEvent.detail.target.id === 'editor-modal-container') {
+        const form = document.getElementById('editor-form') as HTMLElement;
+        htmx.process(form);
+        initializeTiptap();
         showModal();
       }
     });
 
-    function initializeTinyMCE(): void {
-      // Detect if we're using the minified bundle by checking script sources
-      const scripts = Array.from(document.getElementsByTagName('script'));
-      const isUsingBundle = scripts.some((script) => script.src.includes('bundle.min.js'));
-
-      tinymce.init({
-        selector: '#content-editor',
-        license_key: 'gpl',
-        base_url: '/apps/slingslop/zengarden/js/tinymce',
-        suffix: isUsingBundle ? '.min' : '',
-        theme: 'silver',
-        height: 400,
-        menubar: false,
-        plugins: [
-          'advlist',
-          'autolink',
-          'lists',
-          'link',
-          'image',
-          'charmap',
-          'preview',
-          'anchor',
-          'searchreplace',
-          'visualblocks',
-          'code',
-          'fullscreen',
-          'insertdatetime',
-          'media',
-          'table',
-          'help',
-          'wordcount',
-        ],
-        toolbar:
-          'undo redo | formatselect | bold italic backcolor | ' +
-          'alignleft aligncenter alignright alignjustify | ' +
-          'bullist numlist outdent indent | removeformat | help',
-        content_style:
-          'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px }',
-        setup: function (editor: TinyMCEEditor): void {
-          editor.on('init', function (): void {
-            console.log('TinyMCE initialized');
-          });
-        },
-      });
-    }
-
-    function showModal(): void {
-      initializeEventListeners();
-      const modal = document.getElementById('editor-modal');
-      if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      }
-    }
-
-    // Close modal function
+    // Close modal
     window.closeEditorModal = function (): void {
       const modal = document.getElementById('editor-modal');
       if (modal) {
-        // Destroy TinyMCE instance before closing
-        tinymce.remove('#content-editor');
-
+        if (editor) {
+          editor.destroy();
+          editor = null;
+        }
+        isSourceView = false;
         modal.style.display = 'none';
-        document.body.style.overflow = ''; // Restore scrolling
-
-        // Clear the modal container
+        document.body.style.overflow = '';
         const container = document.getElementById('editor-modal-container');
         if (container) {
           container.innerHTML = '';
@@ -141,23 +419,23 @@ interface Window {
       }
     };
 
-    // Save content function
+    // Save content via htmx
     window.saveEditorContent = function (): void {
-      const content = tinymce.get('content-editor').getContent();
-
-      // Get the form and submit via htmx
+      let content: string;
+      if (isSourceView) {
+        const sourceTextarea = document.getElementById('html-source') as HTMLTextAreaElement | null;
+        content = sourceTextarea?.value ?? '';
+      } else {
+        content = editor?.getHTML() ?? '';
+      }
       const form = document.getElementById('editor-form') as HTMLElement;
-
-      // Update the hidden input with editor content
       const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement;
       hiddenInput.value = content;
-
-      // Trigger htmx submit
       htmx.trigger(form, 'submit');
       window.closeEditorModal();
     };
 
-    // Close modal when clicking outside
+    // Click outside modal to close
     window.onclick = function (event: MouseEvent): void {
       const modal = document.getElementById('editor-modal');
       if (event.target === modal) {
@@ -165,7 +443,7 @@ interface Window {
       }
     };
 
-    // Close modal on ESC key
+    // ESC key to close
     document.addEventListener('keydown', function (event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         const modal = document.getElementById('editor-modal');
@@ -176,7 +454,7 @@ interface Window {
     });
   }
 
-  // Initialize when DOM is ready
+  // Kick everything off once the DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeEventListeners);
   } else {
