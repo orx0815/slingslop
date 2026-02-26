@@ -29,10 +29,9 @@ declare const htmx: {
   trigger: (element: HTMLElement, eventName: string) => void;
 };
 
-// Extend Window interface for modal API
+// Extend Window interface for inline editor API
 declare global {
   interface Window {
-    closeEditorModal: () => void;
     saveEditorContent: () => void;
   }
 }
@@ -381,45 +380,41 @@ declare global {
 
   // ─── Modal lifecycle ──────────────────────────────────────────────────────
 
-  function showModal(): void {
-    const modal = document.getElementById('editor-modal');
-    if (modal) {
-      modal.style.display = 'block';
-      document.body.style.overflow = 'hidden';
+  /** Destroy the Tiptap editor instance if active. */
+  function destroyEditor(): void {
+    if (editor) {
+      editor.destroy();
+      editor = null;
+      isSourceView = false;
     }
   }
 
   function initializeEventListeners(): void {
-    // Open modal after htmx swaps the form content in
-    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
+    // Destroy editor before any outerHTML swap on #zen-explanation (save / cancel)
+    document.body.addEventListener('htmx:beforeSwap', function (event: Event): void {
       const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
-      if (htmxEvent.detail.target.id === 'editor-modal-container') {
-        const form = document.getElementById('editor-form') as HTMLElement;
-        htmx.process(form);
-        initializeTiptap();
-        showModal();
+      if (htmxEvent.detail.target.id === 'zen-explanation') {
+        destroyEditor();
       }
     });
 
-    // Close modal
-    window.closeEditorModal = function (): void {
-      const modal = document.getElementById('editor-modal');
-      if (modal) {
-        if (editor) {
-          editor.destroy();
-          editor = null;
-        }
-        isSourceView = false;
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        const container = document.getElementById('editor-modal-container');
-        if (container) {
-          container.innerHTML = '';
+    // Init Tiptap after htmx swaps the inline editor into #zen-explanation
+    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
+      const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
+      if (htmxEvent.detail.target.id === 'zen-explanation') {
+        const tiptapEl = document.getElementById('tiptap-editor');
+        if (tiptapEl) {
+          // The form was swapped in — register htmx on it and start the editor
+          const form = document.getElementById('editor-form') as HTMLElement | null;
+          if (form) {
+            htmx.process(form);
+          }
+          initializeTiptap();
         }
       }
-    };
+    });
 
-    // Save content via htmx
+    // Save content via htmx (populates hidden input and triggers form submit)
     window.saveEditorContent = function (): void {
       let content: string;
       if (isSourceView) {
@@ -432,26 +427,8 @@ declare global {
       const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement;
       hiddenInput.value = content;
       htmx.trigger(form, 'submit');
-      window.closeEditorModal();
+      // No manual close needed — htmx outerHTML swap restores the view
     };
-
-    // Click outside modal to close
-    window.onclick = function (event: MouseEvent): void {
-      const modal = document.getElementById('editor-modal');
-      if (event.target === modal) {
-        window.closeEditorModal();
-      }
-    };
-
-    // ESC key to close
-    document.addEventListener('keydown', function (event: KeyboardEvent): void {
-      if (event.key === 'Escape') {
-        const modal = document.getElementById('editor-modal');
-        if (modal && modal.style.display === 'block') {
-          window.closeEditorModal();
-        }
-      }
-    });
   }
 
   // Kick everything off once the DOM is ready

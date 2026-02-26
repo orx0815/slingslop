@@ -182,16 +182,21 @@
  * Tiptap editor styles
  */
 
-/* ── Tiptap toolbar ──────────────────────────────────────────────────── */
+/* ── Tiptap toolbar — fixed to the top of the viewport while editing ── */
 .tiptap-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9001;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: 6px 8px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
+  padding: 6px 10px;
+  background: rgba(240, 240, 240, 0.97);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .toolbar-group {
   display: flex;
@@ -255,21 +260,21 @@
   cursor: not-allowed;
 }
 
-/* ── Tiptap editor container ─────────────────────────────────────────── */
+/* ── Tiptap editor container — transparent so page styles shine through ─ */
 .tiptap-editor-container {
-  border: 1px solid #ccc;
-  background: #fff;
+  /* No border or background: inherit the page's look */
 }
 .tiptap-editor-container .ProseMirror {
-  min-height: 280px;
-  padding: 12px 16px;
+  /* Inherit ALL typographic styles from the surrounding page */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  min-height: 4em;
   outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
 }
-.tiptap-editor-container .ProseMirror:focus {
-  box-shadow: inset 0 0 0 2px #4a90d9;
+.tiptap-editor-container .ProseMirror:focus-visible {
+  outline: none;
 }
 /* Placeholder text */
 .tiptap-editor-container .ProseMirror p.is-editor-empty:first-child::before {
@@ -371,10 +376,62 @@
   font-size: 11px;
   color: #888;
   text-align: right;
-  padding: 3px 10px;
-  background: #f5f5f5;
-  border: 1px solid #ccc;
-  border-top: 1px solid #e0e0e0;
-  border-radius: 0 0 4px 4px;
+  padding: 2px 0;
+  margin-top: 2px;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Inline editor — replaces the component in-place (no modal overlay)
+   ───────────────────────────────────────────────────────────────────────── */
+
+/** Subtle focus ring on the component being edited; no background override
+    so the page's own colours / images remain fully visible. */
+.explanation--editing {
+  /* Room for the fixed toolbar at top (~46px) and footer bar at bottom (~54px) */
+  padding-top: 54px;
+  padding-bottom: 62px;
+  /* Faint left accent so the user knows what is editable */
+  border-left: 3px solid #0d6efd;
+  padding-left: 12px;
+}
+
+/** Bottom bar — fixed to viewport bottom; contains headline input + actions */
+.inline-editor-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(248, 249, 250, 0.97);
+  backdrop-filter: blur(4px);
+  border-top: 1px solid #dee2e6;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.10);
+  flex-wrap: wrap;
+}
+
+.inline-headline-input {
+  flex: 1 1 200px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  min-width: 0;
+  background: #fff;
+}
+
+.inline-headline-input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.inline-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}

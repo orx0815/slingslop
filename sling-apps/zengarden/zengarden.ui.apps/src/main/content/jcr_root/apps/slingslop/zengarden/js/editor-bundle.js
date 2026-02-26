@@ -23029,39 +23029,33 @@ img.ProseMirror-separator {
         });
       }
     }
-    function showModal() {
-      const modal = document.getElementById("editor-modal");
-      if (modal) {
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden";
+    function destroyEditor() {
+      if (editor) {
+        editor.destroy();
+        editor = null;
+        isSourceView = false;
       }
     }
     function initializeEventListeners() {
-      document.body.addEventListener("htmx:afterSwap", function(event) {
+      document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
-        if (htmxEvent.detail.target.id === "editor-modal-container") {
-          const form = document.getElementById("editor-form");
-          htmx.process(form);
-          initializeTiptap();
-          showModal();
+        if (htmxEvent.detail.target.id === "zen-explanation") {
+          destroyEditor();
         }
       });
-      window.closeEditorModal = function() {
-        const modal = document.getElementById("editor-modal");
-        if (modal) {
-          if (editor) {
-            editor.destroy();
-            editor = null;
-          }
-          isSourceView = false;
-          modal.style.display = "none";
-          document.body.style.overflow = "";
-          const container = document.getElementById("editor-modal-container");
-          if (container) {
-            container.innerHTML = "";
+      document.body.addEventListener("htmx:afterSwap", function(event) {
+        const htmxEvent = event;
+        if (htmxEvent.detail.target.id === "zen-explanation") {
+          const tiptapEl = document.getElementById("tiptap-editor");
+          if (tiptapEl) {
+            const form = document.getElementById("editor-form");
+            if (form) {
+              htmx.process(form);
+            }
+            initializeTiptap();
           }
         }
-      };
+      });
       window.saveEditorContent = function() {
         let content;
         if (isSourceView) {
@@ -23074,22 +23068,7 @@ img.ProseMirror-separator {
         const hiddenInput = document.getElementById("content-hidden");
         hiddenInput.value = content;
         htmx.trigger(form, "submit");
-        window.closeEditorModal();
       };
-      window.onclick = function(event) {
-        const modal = document.getElementById("editor-modal");
-        if (event.target === modal) {
-          window.closeEditorModal();
-        }
-      };
-      document.addEventListener("keydown", function(event) {
-        if (event.key === "Escape") {
-          const modal = document.getElementById("editor-modal");
-          if (modal && modal.style.display === "block") {
-            window.closeEditorModal();
-          }
-        }
-      });
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initializeEventListeners);

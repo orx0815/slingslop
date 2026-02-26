@@ -1,25 +1,14 @@
-<div id="editor-modal" class="editor-modal">
-  <div class="editor-modal-content">
-    
-    <div class="editor-modal-header">
-      <h2>Edit "${properties.headline}"</h2>
-      <button class="editor-modal-close" onclick="closeEditorModal()" aria-label="Close">&times;</button>
-    </div>
-    
-    <div class="editor-modal-body">
-      <form id="editor-form" 
-            hx-trigger="submit"
-            hx-target="#zen-explanation"
-            hx-swap="outerHTML"
-            hx-post="${resource.path}">
-        
-        <input type="hidden" id="redirect-input" name=":redirect" value="${resource.path}.html" />
-        <input type="text" id="headline-input" name="headline" value="${properties.headline}" />
+<div id="zen-explanation" class="explanation explanation--editing" role="article">
 
-        <!-- Hidden textarea: carries initial HTML from Sling; read by editor-modal.js on init -->
-        <textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+  <form id="editor-form"
+        hx-trigger="submit"
+        hx-target="#zen-explanation"
+        hx-swap="outerHTML"
+        hx-post="${resource.path}">
 
-        <!-- ── Tiptap Toolbar ───────────────────────────────────────────── -->
+    <input type="hidden" name=":redirect" value="${resource.path}.html" />
+
+        <!-- ── Tiptap Toolbar (fixed to viewport top) ─────────────────── -->
         <div id="tiptap-toolbar" class="tiptap-toolbar" role="toolbar" aria-label="Editor toolbar">
 
           <!-- Undo / Redo -->
@@ -103,7 +92,10 @@
 
         </div><!-- /.tiptap-toolbar -->
 
-        <!-- ── Tiptap editor mount point ────────────────────────────────── -->
+        <!-- Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init -->
+        <textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+
+        <!-- ── Tiptap editor mount point (renders in normal page flow) ── -->
         <div id="tiptap-editor" class="tiptap-editor-container"></div>
 
         <!-- ── Raw HTML source textarea (shown when source mode is active) ── -->
@@ -116,14 +108,19 @@
         <!-- Hidden input populated with editor HTML before htmx submit -->
         <input type="hidden" id="content-hidden" name="text" />
 
-      </form>
+    <!-- ── Bottom bar: headline + Save / Cancel (fixed to viewport bottom) ── -->
+    <div class="inline-editor-footer">
+      <input type="text" id="headline-input" name="headline" value="${properties.headline}"
+             class="inline-headline-input" placeholder="Headline" />
+      <div class="inline-editor-actions">
+        <button type="button" class="btn btn-secondary"
+                hx-get="${resource.path}.html"
+                hx-target="#zen-explanation"
+                hx-swap="outerHTML">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
+      </div>
     </div>
-    
-    <div class="editor-modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="closeEditorModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" onclick="saveEditorContent()">
-        Save Changes
-      </button>
-    </div>
-  </div>
+
+  </form>
+
 </div>
