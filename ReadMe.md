@@ -8,18 +8,29 @@ Using HTMX|Datastar|Alpine-Ajax to GET component **markup** and to POST content 
 ### Key Directories
 
 - `sling-apps/`  
-Contains the actual applications. Each one consists of Java business-logic in the form of OSGi bundles (e.g. `zengarden.core`)
- and UI content for html/css + as little JavaScript as possible (e.g. zengarden.ui.apps).
-- `content-packages/`: Holds sample content. These become part of the launcher/docker-image. Also a complete-package to install everything into a running instace.
-- `docker/`: Contains `docker-compose.yml` with example configurations for the web cache proxy.
-- `launcher/`: The core module responsible for building the runnable Sling application using the `slingfeature-maven-plugin`. The feature definitions are in `launcher/src/main/features`.
+	Contains the actual applications.  Each one consists of two types of  modules:  
+	-  OSGi bundles (e.g. `zengarden.core`)  for java business-logic in the form of OSGi-Services, -Components and classic Servlets.  Also Sling-Models, referenced by templates. Very powerful ⚠️
+	-  UI content-packages (e.g. zengarden.ui.apps) for html templates and CSS. Also as little JavaScript as possible.
+	  The `frontent` sub-folder has npm-scripts to deal with that: TypeScript compilation, ESLint checks, dependencies and bundling everything into a minified js.
+	
+- `content-packages/`  
+	Holds sample-content (text and images) in `Jackrabbit FileVault` (VLT)  zips.  
+	Usually this is used to transfer content between instances, in this case they also become part of the launcher/docker-image.   
+	A complete-package to install everything at once into a running instance.  
+	(Note the three different kinds of  [packageType](https://jackrabbit.apache.org/filevault-package-maven-plugin/generate-metadata-mojo.html#packageType) : `application`|`content`|`container` using different validators.) 
+	
+- `docker/`  
+  Contains `docker-compose.yml` with example configurations for the web cache proxy.
+  
+- `launcher/`  
+  The core module responsible for building the runnable Sling application using the `slingfeature-maven-plugin`. The feature definitions are in `launcher/src/main/features`.
 
 ## Local Development Workflow
 
 ### Prerequisites
 
-1.  **Java 21** and
-2.  **Maven 3.9.1x** for building the project.
+1.  **Java 25** and
+2.  **Maven 3.9.12+** for building the project.
 3.  **Docker** Optional, for running the apps and their web-proxy a in a container
 
 ### Building the Project
@@ -51,7 +62,7 @@ There are three primary ways to run the application locally:
     The admin-ui at http://localhost:8080/  
 
 2.  **Using Docker Compose:**
-    This method uses the `docker-compose.yml` file to start the application and the web cache.
+    This method uses the `docker-compose.yml` file to start the application and the web cache proxy.
 
     ```bash
     # From the root directory
@@ -72,16 +83,47 @@ There are three primary ways to run the application locally:
        ```  
 
     - Oak MongoDB DocumentStore with  
-
+    
       ```bash
       docker volume create sling-launcher
       docker run --rm -p 27017:27017 mongo:4.4.6
       docker run --rm -p 8081:8080 -v sling-launcher:/opt/sling/launcher apache/sling:13 oak_mongo
-       ```  
-    
-### Developing the Application
-    and install the ./content-packages/complete/target/slingslop.complete-x.y.z-SNAPSHOT.zip
-        
+      ```
+     and install the ./content-packages/complete/target/slingslop.complete-x.y.z-SNAPSHOT.zip 
 
-Maven goals vor dev
-   - sling:install cq:install wcmio-content-package:install sling:fsmount
+### Developing the Application
+
+With a running instance, each bundle or package can be deployed separately. This allows fast code->compile->run  development cycles.
+
+**Inside an OSGi bundle** project, run :
+
+```bash
+mvn install sling:install
+```  
+
+**Inside an content-package** project , run :
+
+```bash
+mvn install wcmio-content-package:install
+```  
+
+**This one works in both**:
+
+```bash
+mvn -Pfast cq:install
+```  
+
+### File System Resource Provider
+When working on an **application content project** ( html/css/js/sightly/jsp/freemarker/thymeleaf ) the fastest is to mount the local filesystem directly into JCR:
+
+```bash
+mvn sling:fsmount
+```  
+
+That way you can save a file inside your IDE and immediately reload your browser.  
+When done, you should unmount again:  
+
+```bash
+mvn sling:fsmount
+```
+followed by `cq:install` to have a "normal" state in JCR.
