@@ -154,6 +154,13 @@
     outline: 2px dashed rgba(0, 123, 255, 0.3);
 }
 
+/* Block editing of other components while one is already being edited */
+body[data-zen-editing] [data-zen-editable] {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.5;
+}
+
 /* Loading indicator */
 .htmx-request .htmx-indicator {
     display: inline-block;

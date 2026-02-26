@@ -395,6 +395,7 @@ declare global {
       const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
       if (htmxEvent.detail.target.hasAttribute('data-zen-editable-editing')) {
         destroyEditor();
+        document.body.removeAttribute('data-zen-editing');
       }
     });
 
@@ -407,6 +408,7 @@ declare global {
           htmx.process(form);
         }
         initializeTiptap();
+        document.body.setAttribute('data-zen-editing', '');
       }
     });
 

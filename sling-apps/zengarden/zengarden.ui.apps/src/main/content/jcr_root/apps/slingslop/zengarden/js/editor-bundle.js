@@ -23041,6 +23041,7 @@ img.ProseMirror-separator {
         const htmxEvent = event;
         if (htmxEvent.detail.target.hasAttribute("data-zen-editable-editing")) {
           destroyEditor();
+          document.body.removeAttribute("data-zen-editing");
         }
       });
       document.body.addEventListener("htmx:afterSwap", function() {
@@ -23051,6 +23052,7 @@ img.ProseMirror-separator {
             htmx.process(form);
           }
           initializeTiptap();
+          document.body.setAttribute("data-zen-editing", "");
         }
       });
       window.saveEditorContent = function() {
