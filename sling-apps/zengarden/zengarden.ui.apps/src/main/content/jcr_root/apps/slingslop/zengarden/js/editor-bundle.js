@@ -23039,21 +23039,18 @@ img.ProseMirror-separator {
     function initializeEventListeners() {
       document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
-        if (htmxEvent.detail.target.id === "zen-explanation") {
+        if (htmxEvent.detail.target.hasAttribute("data-zen-editable-editing")) {
           destroyEditor();
         }
       });
-      document.body.addEventListener("htmx:afterSwap", function(event) {
-        const htmxEvent = event;
-        if (htmxEvent.detail.target.id === "zen-explanation") {
-          const tiptapEl = document.getElementById("tiptap-editor");
-          if (tiptapEl) {
-            const form = document.getElementById("editor-form");
-            if (form) {
-              htmx.process(form);
-            }
-            initializeTiptap();
+      document.body.addEventListener("htmx:afterSwap", function() {
+        const tiptapEl = document.getElementById("tiptap-editor");
+        if (tiptapEl) {
+          const form = document.getElementById("editor-form");
+          if (form) {
+            htmx.process(form);
           }
+          initializeTiptap();
         }
       });
       window.saveEditorContent = function() {

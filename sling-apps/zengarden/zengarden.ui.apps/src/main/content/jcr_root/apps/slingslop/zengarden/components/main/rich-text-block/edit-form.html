@@ -1,8 +1,8 @@
-<div id="zen-explanation" class="explanation explanation--editing" role="article">
+<div class="${resource.name}" data-zen-editable-editing="true" role="article">
 
   <form id="editor-form"
         hx-trigger="submit"
-        hx-target="#zen-explanation"
+        hx-target="closest [data-zen-editable-editing]"
         hx-swap="outerHTML"
         hx-post="${resource.path}">
 
@@ -102,7 +102,7 @@
         <textarea id="html-source" class="html-source-textarea" style="display:none;"
                   aria-label="HTML source code"></textarea>
 
-        <!-- ── Character / word count ────────────────────────────────────── -->
+        <!-- ── Character / word count ─────────────────────────────────── -->
         <div id="char-count" class="tiptap-char-count"></div>
 
         <!-- Hidden input populated with editor HTML before htmx submit -->
@@ -115,7 +115,7 @@
       <div class="inline-editor-actions">
         <button type="button" class="btn btn-secondary"
                 hx-get="${resource.path}.html"
-                hx-target="#zen-explanation"
+                hx-target="closest [data-zen-editable-editing]"
                 hx-swap="outerHTML">Cancel</button>
         <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
       </div>

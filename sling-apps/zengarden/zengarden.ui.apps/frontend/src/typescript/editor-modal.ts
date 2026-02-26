@@ -390,27 +390,23 @@ declare global {
   }
 
   function initializeEventListeners(): void {
-    // Destroy editor before any outerHTML swap on #zen-explanation (save / cancel)
+    // Destroy editor before any swap that removes the active editing div
     document.body.addEventListener('htmx:beforeSwap', function (event: Event): void {
       const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
-      if (htmxEvent.detail.target.id === 'zen-explanation') {
+      if (htmxEvent.detail.target.hasAttribute('data-zen-editable-editing')) {
         destroyEditor();
       }
     });
 
-    // Init Tiptap after htmx swaps the inline editor into #zen-explanation
-    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
-      const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
-      if (htmxEvent.detail.target.id === 'zen-explanation') {
-        const tiptapEl = document.getElementById('tiptap-editor');
-        if (tiptapEl) {
-          // The form was swapped in — register htmx on it and start the editor
-          const form = document.getElementById('editor-form') as HTMLElement | null;
-          if (form) {
-            htmx.process(form);
-          }
-          initializeTiptap();
+    // Init Tiptap after htmx swaps in the edit form (detected by #tiptap-editor presence)
+    document.body.addEventListener('htmx:afterSwap', function (): void {
+      const tiptapEl = document.getElementById('tiptap-editor');
+      if (tiptapEl) {
+        const form = document.getElementById('editor-form') as HTMLElement | null;
+        if (form) {
+          htmx.process(form);
         }
+        initializeTiptap();
       }
     });
 

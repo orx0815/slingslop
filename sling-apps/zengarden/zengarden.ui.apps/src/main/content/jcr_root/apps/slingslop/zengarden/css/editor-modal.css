@@ -142,14 +142,14 @@
     background-color: #545b62;
 }
 
-/* Make the editable div more prominent */
-.explanation {
+/* Hover / cursor affordance for any inline-editable component */
+[data-zen-editable] {
     transition: background-color 0.2s;
     padding: 10px;
     border-radius: 4px;
 }
 
-.explanation:hover {
+[data-zen-editable]:hover {
     background-color: rgba(0, 123, 255, 0.05);
     outline: 2px dashed rgba(0, 123, 255, 0.3);
 }
@@ -386,7 +386,7 @@
 
 /** Subtle focus ring on the component being edited; no background override
     so the page's own colours / images remain fully visible. */
-.explanation--editing {
+[data-zen-editable-editing] {
   /* Room for the fixed toolbar at top (~46px) and footer bar at bottom (~54px) */
   padding-top: 54px;
   padding-bottom: 62px;
