@@ -11,10 +11,10 @@
     "bundle": "node scripts/bundle.js",
     "prebuild": "npm run copy:libs",
     "postbuild": "npm run bundle",
-    "lint": "eslint --config .eslintrc.js ../src/main/typescript --ext .ts",
-    "lint:fix": "eslint --config .eslintrc.js ../src/main/typescript --ext .ts --fix",
-    "format": "prettier --check \"../src/main/typescript/**/*.ts\"",
-    "format:fix": "prettier --write \"../src/main/typescript/**/*.ts\"",
+    "lint": "eslint --config .eslintrc.js ./src/typescript --ext .ts",
+    "lint:fix": "eslint --config .eslintrc.js ./src/typescript --ext .ts --fix",
+    "format": "prettier --check \"./src/typescript/**/*.ts\"",
+    "format:fix": "prettier --write \"./src/typescript/**/*.ts\"",
     "check": "npm run format && npm run lint && npm run build"
   },
   "dependencies": {

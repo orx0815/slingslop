@@ -4,12 +4,13 @@ This module has been configured to use TypeScript with strict type checking, ESL
 
 ## File Structure
 
-- `../src/main/typescript/` - TypeScript source files
+- `src/typescript/` - TypeScript source files
 - `../src/main/content/jcr_root/apps/slingslop/zengarden/js/` - Compiled JavaScript output
 - `tsconfig.json` - TypeScript compiler configuration
 - `.eslintrc.js` - ESLint configuration
 - `.prettierrc` - Prettier configuration
 - `package.json` - Node.js dependencies and scripts
+- `scripts/bundle.js` - Bundling and minification script
 
 ## NPM Scripts
 
@@ -27,13 +28,24 @@ This module has been configured to use TypeScript with strict type checking, ESL
 ## Dependency Management
 
 ### TinyMCE
-TinyMCE is managed via npm and automatically copied to the JCR content directory during the build:
+TinyMCE is managed via npm and copied into the JCR content directory during the build:
 
 - **Source**: Installed from npm (`node_modules/tinymce/`)
-- **Destination**: `src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce/`
+- **Destination**: `../src/main/content/jcr_root/apps/slingslop/zengarden/js/tinymce/`
 - **Version**: Defined in `package.json` (currently ^6.8.2)
-- **Files**: Both `tinymce.js` (unminified) and `tinymce.min.js` (minified) are available
-- **Configuration**: The editor automatically configures `base_url` and `suffix` to load plugins, themes, and icons from the correct location, whether using the bundle or separate files
+- **Loading**: The entire TinyMCE distribution is copied so it can self-load its plugins and skins at runtime.
+
+```mermaid
+flowchart LR
+   A[src/typescript/editor-modal.ts] --> B[tsc]
+   B --> C[editor-modal.js]
+   D[node_modules/tinymce/] --> E[copy:tinymce]
+   E --> F[js/tinymce/]
+   C --> G[scripts/bundle.js]
+   F --> G
+   H[node_modules/htmx.org/] --> G
+   G --> I[bundle.min.js]
+```
 
 ### htmx
 htmx is managed via npm and automatically copied to the JCR content directory during the build:
@@ -46,7 +58,7 @@ htmx is managed via npm and automatically copied to the JCR content directory du
 ### Bundled JavaScript
 For production, a single minified bundle is created that includes all JavaScript:
 
-- **Contents**: htmx + TinyMCE + editor-modal.js
+- **Contents**: htmx + TinyMCE core + editor-modal.js
 - **Output**: `src/main/content/jcr_root/apps/slingslop/zengarden/js/bundle.min.js`
 - **Build**: Automatically created via `npm run bundle` (postbuild hook)
 - **Minification**: Uses Terser for optimal compression
@@ -65,13 +77,12 @@ To update these libraries:
 
 The project uses `frontend-maven-plugin` to automate the build process:
 
-1. **generate-resources phase**: 
+1. **generate-resources phase**:
    - Installs Node.js and npm
    - Runs `npm install` to install dependencies
    - Copies libraries (TinyMCE, htmx) from node_modules to JCR content
 2. **process-resources phase**: Runs Prettier format check and ESLint
 3. **compile phase**: Compiles TypeScript to JavaScript and creates bundled minified version
-3. **compile phase**: Compiles TypeScript to JavaScript
 
 When you run `mvn clean install`, it will:
 - Install Node.js v24.13.1 and npm 11.10.1 locally
@@ -90,21 +101,20 @@ The application supports two modes for loading JavaScript:
 ### Development Mode (with URL-parameter)
 Loads unminified, separate JavaScript files for easier debugging:
 - `htmx.js` - Unminified htmx
-- `tinymce/tinymce.js` - Unminified TinyMCE
-- `editor-modal.js` - Compiled from TypeScript (unminified)
+- `editor-modal.js` - Compiled from TypeScript
 
 **Access**: Add `?minJs=false` query parameter (e.g., `http://localhost:8080/content/page.html?minJs=false`)
 
 
 ### Production Mode (Minified Bundle)
 Loads a single minified bundle containing all JavaScript:
-- `bundle.min.js` - Minified and concatenated (htmx + TinyMCE + editor-modal)
+- `bundle.min.js` - Minified and concatenated (htmx + TinyMCE core + editor-modal)
 
 **Access**: Visit any page normally (e.g., `http://localhost:8080/content/page.html`)
 
 
 **Benefits of bundled mode**:
-- ✅ Single HTTP request instead of 3
+- ✅ Single HTTP request instead of 2
 - ✅ Smaller file size due to minification
 - ✅ Faster page load times
 - ✅ Better for production deployments
@@ -116,7 +126,7 @@ Loads a single minified bundle containing all JavaScript:
 
 ### Local Development
 
-1. Make changes to TypeScript files in `src/main/typescript/`
+1. Make changes to TypeScript files in `src/typescript/`
 2. Run `npm run check` to validate your changes
 3. Run `npm run build` to compile to JavaScript
 4. Or simply run `mvn compile` to run the full Maven build
@@ -137,7 +147,8 @@ Your IDE should automatically pick up the TypeScript, ESLint, and Prettier confi
 ### tsconfig.json
 - Strict type checking enabled
 - Targets ES2015
-- Outputs to `src/main/content/jcr_root/apps/slingslop/zengarden/js/`
+- Source root: `src/typescript/`
+- Outputs to `../src/main/content/jcr_root/apps/slingslop/zengarden/js/`
 
 ### .eslintrc.js
 - TypeScript-aware linting
@@ -158,3 +169,5 @@ If you encounter issues:
 2. **Type errors**: Check `tsconfig.json` and ensure types are properly declared
 3. **Linting errors**: Run `npm run lint:fix` to auto-fix common issues
 4. **Formatting errors**: Run `npm run format:fix` to auto-format code
+5. **bundle.js fails — file not found**: Ensure `npm run build` ran first so `editor-modal.js` exists in the output directory
+6. **TinyMCE plugins not loading at runtime**: Ensure `copy:tinymce` ran and the `js/tinymce/` directory is present in the JCR content

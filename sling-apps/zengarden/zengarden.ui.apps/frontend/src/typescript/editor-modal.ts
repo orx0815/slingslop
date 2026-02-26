@@ -50,70 +50,65 @@ interface Window {
 }
 
 (function (): void {
-  "use strict";
+  'use strict';
 
   // Wait for DOM to be ready before accessing document.body
   function initializeEventListeners(): void {
     // Initialize TinyMCE after htmx loads content into the modal
-    document.body.addEventListener(
-      "htmx:afterSwap",
-      function (event: Event): void {
-        const htmxEvent = event as HTMXAfterSwapEvent;
-        if (htmxEvent.detail.target.id === "editor-modal-container") {
-          // Get the form element that contains the passed parameters
-          const form = document.getElementById("editor-form") as HTMLElement;
-          // Re-process htmx attributes on the form
-          htmx.process(form);
+    document.body.addEventListener('htmx:afterSwap', function (event: Event): void {
+      const htmxEvent = event as HTMXAfterSwapEvent;
+      if (htmxEvent.detail.target.id === 'editor-modal-container') {
+        // Get the form element that contains the passed parameters
+        const form = document.getElementById('editor-form') as HTMLElement;
+        // Re-process htmx attributes on the form
+        htmx.process(form);
 
-          initializeTinyMCE();
-          showModal();
-        }
-      },
-    );
+        initializeTinyMCE();
+        showModal();
+      }
+    });
 
     function initializeTinyMCE(): void {
       // Detect if we're using the minified bundle by checking script sources
-      const scripts = Array.from(document.getElementsByTagName("script"));
-      const isUsingBundle = scripts.some((script) =>
-        script.src.includes("bundle.min.js"),
-      );
+      const scripts = Array.from(document.getElementsByTagName('script'));
+      const isUsingBundle = scripts.some((script) => script.src.includes('bundle.min.js'));
 
       tinymce.init({
-        selector: "#content-editor",
-        license_key: "gpl",
-        base_url: "/apps/slingslop/zengarden/js/tinymce",
-        suffix: isUsingBundle ? ".min" : "",
-        theme: "silver",
+        selector: '#content-editor',
+        license_key: 'gpl',
+        base_url: '/apps/slingslop/zengarden/js/tinymce',
+        suffix: isUsingBundle ? '.min' : '',
+        theme: 'silver',
         height: 400,
         menubar: false,
         plugins: [
-          "advlist",
-          "autolink",
-          "lists",
-          "link",
-          "image",
-          "charmap",
-          "preview",
-          "anchor",
-          "searchreplace",
-          "visualblocks",
-          "code",
-          "fullscreen",
-          "insertdatetime",
-          "media",
-          "table",
-          "help",
-          "wordcount",
+          'advlist',
+          'autolink',
+          'lists',
+          'link',
+          'image',
+          'charmap',
+          'preview',
+          'anchor',
+          'searchreplace',
+          'visualblocks',
+          'code',
+          'fullscreen',
+          'insertdatetime',
+          'media',
+          'table',
+          'help',
+          'wordcount',
         ],
         toolbar:
-          "undo redo | formatselect | bold italic backcolor | " +
-          "alignleft aligncenter alignright alignjustify | " +
-          "bullist numlist outdent indent | removeformat | help",
+          'undo redo | formatselect | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist outdent indent | removeformat | help',
         content_style:
           'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px }',
         setup: function (editor: TinyMCEEditor): void {
-          editor.on("init", function (): void {
-            console.log("TinyMCE initialized");
+          editor.on('init', function (): void {
+            console.log('TinyMCE initialized');
           });
         },
       });
@@ -121,62 +116,60 @@ interface Window {
 
     function showModal(): void {
       initializeEventListeners();
-      const modal = document.getElementById("editor-modal");
+      const modal = document.getElementById('editor-modal');
       if (modal) {
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden"; // Prevent background scrolling
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
       }
     }
 
     // Close modal function
     window.closeEditorModal = function (): void {
-      const modal = document.getElementById("editor-modal");
+      const modal = document.getElementById('editor-modal');
       if (modal) {
         // Destroy TinyMCE instance before closing
-        tinymce.remove("#content-editor");
+        tinymce.remove('#content-editor');
 
-        modal.style.display = "none";
-        document.body.style.overflow = ""; // Restore scrolling
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
 
         // Clear the modal container
-        const container = document.getElementById("editor-modal-container");
+        const container = document.getElementById('editor-modal-container');
         if (container) {
-          container.innerHTML = "";
+          container.innerHTML = '';
         }
       }
     };
 
     // Save content function
     window.saveEditorContent = function (): void {
-      const content = tinymce.get("content-editor").getContent();
+      const content = tinymce.get('content-editor').getContent();
 
       // Get the form and submit via htmx
-      const form = document.getElementById("editor-form") as HTMLElement;
+      const form = document.getElementById('editor-form') as HTMLElement;
 
       // Update the hidden input with editor content
-      const hiddenInput = document.getElementById(
-        "content-hidden",
-      ) as HTMLInputElement;
+      const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement;
       hiddenInput.value = content;
 
       // Trigger htmx submit
-      htmx.trigger(form, "submit");
+      htmx.trigger(form, 'submit');
       window.closeEditorModal();
     };
 
     // Close modal when clicking outside
     window.onclick = function (event: MouseEvent): void {
-      const modal = document.getElementById("editor-modal");
+      const modal = document.getElementById('editor-modal');
       if (event.target === modal) {
         window.closeEditorModal();
       }
     };
 
     // Close modal on ESC key
-    document.addEventListener("keydown", function (event: KeyboardEvent): void {
-      if (event.key === "Escape") {
-        const modal = document.getElementById("editor-modal");
-        if (modal && modal.style.display === "block") {
+    document.addEventListener('keydown', function (event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('editor-modal');
+        if (modal && modal.style.display === 'block') {
           window.closeEditorModal();
         }
       }
@@ -184,8 +177,8 @@ interface Window {
   }
 
   // Initialize when DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeEventListeners);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeEventListeners);
   } else {
     initializeEventListeners();
   }
