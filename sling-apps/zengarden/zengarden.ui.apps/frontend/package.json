@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/bundle.js",
     "typecheck": "tsc --noEmit",
-    "copy:htmx": "cpx \"node_modules/htmx.org/dist/htmx.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\" && cpx \"node_modules/htmx.org/dist/htmx.min.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\"",
+    "copy:htmx": "cpx \"node_modules/htmx.org/dist/htmx.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\"",
     "copy:libs": "npm run copy:htmx",
     "prebuild": "npm run copy:htmx",
     "lint": "eslint --config .eslintrc.js ./src/typescript --ext .ts",

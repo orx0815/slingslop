@@ -1,0 +1,99 @@
+/*
+ * Inline editing affordances — editable hover states, active editing,
+ * fixed footer bar, headline input, htmx loading indicator
+ */
+
+/* ── Hover / cursor affordance for clickable-to-edit components ──────── */
+
+[data-zen-editable] {
+  transition: background-color 0.2s;
+  padding: 10px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgb(0 123 255 / 0.05);
+    outline: 2px dashed rgb(0 123 255 / 0.3);
+  }
+}
+
+/* Block editing of other components while one is already being edited */
+body[data-zen-editing] [data-zen-editable] {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* ── htmx loading indicator ──────────────────────────────────────────── */
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline-block;
+}
+
+/* ── Active editing region — replaces component in-place ─────────────── */
+
+/**
+ * Subtle focus ring; no background override so page colours / images
+ * remain fully visible.
+ */
+[data-zen-editable-editing] {
+  /* Room for the fixed toolbar (~46 px) and footer bar (~54 px) */
+  padding-top: 54px;
+  padding-bottom: 62px;
+  /* Faint left accent */
+  border-left: 3px solid #0d6efd;
+  padding-left: 12px;
+}
+
+/* ── Bottom bar — fixed to viewport bottom ───────────────────────────── */
+
+.inline-editor-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgb(248 249 250 / 0.97);
+  backdrop-filter: blur(4px);
+  border-top: 1px solid #dee2e6;
+  box-shadow: 0 -2px 6px rgb(0 0 0 / 0.10);
+  flex-wrap: wrap;
+}
+
+#edit-component-btn {
+  margin-left: 0;
+}
+
+/* ── Headline input inside the modal ─────────────────────────────────── */
+
+.inline-headline-input {
+  flex: 1 1 200px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  min-width: 0;
+  background: #fff;
+
+  &:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgb(13 110 253 / 0.25);
+  }
+}
+
+/* ── Save / Cancel button group ──────────────────────────────────────── */
+
+.inline-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}

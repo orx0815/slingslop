@@ -1,0 +1,107 @@
+/*
+ * Modal dialog box — content panel, header, body, footer actions
+ */
+
+.editor-component-modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.3);
+  animation: slideDown 0.3s;
+
+  @media (max-width: 768px) {
+    width: 95%;
+    margin: 10% auto;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.editor-component-modal-header {
+  padding: 20px 30px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+  }
+}
+
+.editor-component-modal-close {
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 26px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 12px;
+
+  &:hover,
+  &:focus {
+    color: #000;
+  }
+}
+
+.editor-component-modal-body {
+  padding: 30px;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    margin: 0 0 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #212529;
+    background-color: #fff;
+
+    &:focus {
+      border-color: #80bdff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgb(0 123 255 / 0.15);
+    }
+  }
+}
+
+.editor-component-modal-actions {
+  padding: 20px 30px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  border-radius: 0 0 8px 8px;
+  text-align: right;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+}

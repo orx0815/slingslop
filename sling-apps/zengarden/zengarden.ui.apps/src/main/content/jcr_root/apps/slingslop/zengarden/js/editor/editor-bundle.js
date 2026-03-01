@@ -1983,19 +1983,19 @@
           });
         });
       });
-      let state = labeled[states.join(",")] = new ContentMatch(states.indexOf(nfa2.length - 1) > -1);
+      let state2 = labeled[states.join(",")] = new ContentMatch(states.indexOf(nfa2.length - 1) > -1);
       for (let i = 0; i < out.length; i++) {
         let states2 = out[i][1].sort(cmp);
-        state.next.push({ type: out[i][0], next: labeled[states2.join(",")] || explore(states2) });
+        state2.next.push({ type: out[i][0], next: labeled[states2.join(",")] || explore(states2) });
       }
-      return state;
+      return state2;
     }
   }
   function checkForDeadEnds(match, stream) {
     for (let i = 0, work = [match]; i < work.length; i++) {
-      let state = work[i], dead = !state.validEnd, nodes = [];
-      for (let j = 0; j < state.next.length; j++) {
-        let { type, next } = state.next[j];
+      let state2 = work[i], dead = !state2.validEnd, nodes = [];
+      for (let j = 0; j < state2.next.length; j++) {
+        let { type, next } = state2.next[j];
         nodes.push(type.name);
         if (dead && !(type.isText || type.hasRequiredAttrs()))
           dead = false;
@@ -5603,14 +5603,14 @@
     /**
     @internal
     */
-    constructor(state) {
-      super(state.doc);
+    constructor(state2) {
+      super(state2.doc);
       this.curSelectionFor = 0;
       this.updated = 0;
       this.meta = /* @__PURE__ */ Object.create(null);
       this.time = Date.now();
-      this.curSelection = state.selection;
-      this.storedMarks = state.storedMarks;
+      this.curSelection = state2.selection;
+      this.storedMarks = state2.storedMarks;
     }
     /**
     The transaction's current selection. This defaults to the editor
@@ -5816,8 +5816,8 @@
       init(config) {
         return config.storedMarks || null;
       },
-      apply(tr2, _marks, _old, state) {
-        return state.selection.$cursor ? tr2.storedMarks : null;
+      apply(tr2, _marks, _old, state2) {
+        return state2.selection.$cursor ? tr2.storedMarks : null;
       }
     }),
     new FieldDesc("scrollToSelection", {
@@ -5981,9 +5981,9 @@
         for (let prop in pluginFields) {
           if (prop == "doc" || prop == "selection")
             throw new RangeError("The JSON fields `doc` and `selection` are reserved");
-          let plugin = pluginFields[prop], state = plugin.spec.state;
-          if (state && state.toJSON)
-            result[prop] = state.toJSON.call(plugin, this[plugin.key]);
+          let plugin = pluginFields[prop], state2 = plugin.spec.state;
+          if (state2 && state2.toJSON)
+            result[prop] = state2.toJSON.call(plugin, this[plugin.key]);
         }
       return result;
     }
@@ -6012,9 +6012,9 @@
         } else {
           if (pluginFields)
             for (let prop in pluginFields) {
-              let plugin = pluginFields[prop], state = plugin.spec.state;
-              if (plugin.key == field.name && state && state.fromJSON && Object.prototype.hasOwnProperty.call(json, prop)) {
-                instance[field.name] = state.fromJSON.call(plugin, config, json[prop], instance);
+              let plugin = pluginFields[prop], state2 = plugin.spec.state;
+              if (plugin.key == field.name && state2 && state2.fromJSON && Object.prototype.hasOwnProperty.call(json, prop)) {
+                instance[field.name] = state2.fromJSON.call(plugin, config, json[prop], instance);
                 return;
               }
             }
@@ -6049,8 +6049,8 @@
     /**
     Extract the plugin's state field from an editor state.
     */
-    getState(state) {
-      return state[this.key];
+    getState(state2) {
+      return state2[this.key];
     }
   };
   var keys = /* @__PURE__ */ Object.create(null);
@@ -6071,14 +6071,14 @@
     Get the active plugin with this key, if any, from an editor
     state.
     */
-    get(state) {
-      return state.config.pluginsByKey[this.key];
+    get(state2) {
+      return state2.config.pluginsByKey[this.key];
     }
     /**
     Get the plugin's state from an editor state.
     */
-    getState(state) {
-      return state[this.key];
+    getState(state2) {
+      return state2[this.key];
     }
   };
 
@@ -6625,25 +6625,25 @@
     let y = top ? rect.top : rect.bottom;
     return { top: y, bottom: y, left: rect.left, right: rect.right };
   }
-  function withFlushedState(view, state, f) {
+  function withFlushedState(view, state2, f) {
     let viewState = view.state, active = view.root.activeElement;
-    if (viewState != state)
-      view.updateState(state);
+    if (viewState != state2)
+      view.updateState(state2);
     if (active != view.dom)
       view.focus();
     try {
       return f();
     } finally {
-      if (viewState != state)
+      if (viewState != state2)
         view.updateState(viewState);
       if (active != view.dom && active)
         active.focus();
     }
   }
-  function endOfTextblockVertical(view, state, dir) {
-    let sel = state.selection;
+  function endOfTextblockVertical(view, state2, dir) {
+    let sel = state2.selection;
     let $pos = dir == "up" ? sel.$from : sel.$to;
-    return withFlushedState(view, state, () => {
+    return withFlushedState(view, state2, () => {
       let { node: dom } = view.docView.domFromPos($pos.pos, dir == "up" ? -1 : 1);
       for (; ; ) {
         let nearest = view.docView.nearestDesc(dom, true);
@@ -6674,8 +6674,8 @@
     });
   }
   var maybeRTL = /[\u0590-\u08ac]/;
-  function endOfTextblockHorizontal(view, state, dir) {
-    let { $head } = state.selection;
+  function endOfTextblockHorizontal(view, state2, dir) {
+    let { $head } = state2.selection;
     if (!$head.parent.isTextblock)
       return false;
     let offset = $head.parentOffset, atStart = !offset, atEnd = offset == $head.parent.content.size;
@@ -6684,7 +6684,7 @@
       return $head.pos == $head.start() || $head.pos == $head.end();
     if (!maybeRTL.test($head.parent.textContent) || !sel.modify)
       return dir == "left" || dir == "backward" ? atStart : atEnd;
-    return withFlushedState(view, state, () => {
+    return withFlushedState(view, state2, () => {
       let { focusNode: oldNode, focusOffset: oldOff, anchorNode, anchorOffset } = view.domSelectionRange();
       let oldBidiLevel = sel.caretBidiLevel;
       sel.modify("move", dir, "character");
@@ -6705,12 +6705,12 @@
   var cachedState = null;
   var cachedDir = null;
   var cachedResult = false;
-  function endOfTextblock(view, state, dir) {
-    if (cachedState == state && cachedDir == dir)
+  function endOfTextblock(view, state2, dir) {
+    if (cachedState == state2 && cachedDir == dir)
       return cachedResult;
-    cachedState = state;
+    cachedState = state2;
     cachedDir = dir;
-    return cachedResult = dir == "up" || dir == "down" ? endOfTextblockVertical(view, state, dir) : endOfTextblockHorizontal(view, state, dir);
+    return cachedResult = dir == "up" || dir == "down" ? endOfTextblockVertical(view, state2, dir) : endOfTextblockHorizontal(view, state2, dir);
   }
   var NOT_DIRTY = 0;
   var CHILD_DIRTY = 1;
@@ -8243,10 +8243,10 @@
     let domSel = view.domSelectionRange();
     return isEquivalentPosition(anchorDOM.node, anchorDOM.offset, domSel.anchorNode, domSel.anchorOffset);
   }
-  function moveSelectionBlock(state, dir) {
-    let { $anchor, $head } = state.selection;
+  function moveSelectionBlock(state2, dir) {
+    let { $anchor, $head } = state2.selection;
     let $side = dir > 0 ? $anchor.max($head) : $anchor.min($head);
-    let $start = !$side.parent.inlineContent ? $side : $side.depth ? state.doc.resolve(dir > 0 ? $side.after() : $side.before()) : null;
+    let $start = !$side.parent.inlineContent ? $side : $side.depth ? state2.doc.resolve(dir > 0 ? $side.after() : $side.before()) : null;
     return $start && Selection.findFrom($start, dir);
   }
   function apply(view, sel) {
@@ -8450,9 +8450,9 @@
       sel.extend(node, offset);
     }
     view.domObserver.setCurSelection();
-    let { state } = view;
+    let { state: state2 } = view;
     setTimeout(() => {
-      if (view.state == state)
+      if (view.state == state2)
         selectionToDOM(view);
     }, 50);
   }
@@ -8517,9 +8517,9 @@
     }
     return false;
   }
-  function switchEditable(view, node, state) {
+  function switchEditable(view, node, state2) {
     view.domObserver.stop();
-    node.contentEditable = state;
+    node.contentEditable = state2;
     view.domObserver.start();
   }
   function safariDownArrowBug(view) {
@@ -9185,14 +9185,14 @@
   editHandlers.compositionstart = editHandlers.compositionupdate = (view) => {
     if (!view.composing) {
       view.domObserver.flush();
-      let { state } = view, $pos = state.selection.$to;
-      if (state.selection instanceof TextSelection && (state.storedMarks || !$pos.textOffset && $pos.parentOffset && $pos.nodeBefore.marks.some((m) => m.type.spec.inclusive === false) || chrome && windows && selectionBeforeUneditable(view))) {
+      let { state: state2 } = view, $pos = state2.selection.$to;
+      if (state2.selection instanceof TextSelection && (state2.storedMarks || !$pos.textOffset && $pos.parentOffset && $pos.nodeBefore.marks.some((m) => m.type.spec.inclusive === false) || chrome && windows && selectionBeforeUneditable(view))) {
         view.markCursor = view.state.storedMarks || $pos.marks();
         endComposition(view, true);
         view.markCursor = null;
       } else {
-        endComposition(view, !state.selection.empty);
-        if (gecko && state.selection.empty && $pos.parentOffset && !$pos.textOffset && $pos.nodeBefore.marks.length) {
+        endComposition(view, !state2.selection.empty);
+        if (gecko && state2.selection.empty && $pos.parentOffset && !$pos.textOffset && $pos.nodeBefore.marks.length) {
           let sel = view.domSelectionRange();
           for (let node = sel.focusNode, offset = sel.focusOffset; node && node.nodeType == 1 && offset != 0; ) {
             let before = offset < 0 ? node.lastChild : node.childNodes[offset - 1];
@@ -10890,18 +10890,18 @@
     Update the editor's `state` prop, without touching any of the
     other props.
     */
-    updateState(state) {
-      this.updateStateInner(state, this._props);
+    updateState(state2) {
+      this.updateStateInner(state2, this._props);
     }
-    updateStateInner(state, prevProps) {
+    updateStateInner(state2, prevProps) {
       var _a;
       let prev = this.state, redraw = false, updateSel = false;
-      if (state.storedMarks && this.composing) {
+      if (state2.storedMarks && this.composing) {
         clearComposition(this);
         updateSel = true;
       }
-      this.state = state;
-      let pluginsChanged = prev.plugins != state.plugins || this._props.plugins != prevProps.plugins;
+      this.state = state2;
+      let pluginsChanged = prev.plugins != state2.plugins || this._props.plugins != prevProps.plugins;
       if (pluginsChanged || this._props.plugins != prevProps.plugins || this._props.nodeViews != prevProps.nodeViews) {
         let nodeViews = buildNodeViews(this);
         if (changedNodeViews(nodeViews, this.nodeViews)) {
@@ -10915,22 +10915,22 @@
       this.editable = getEditable(this);
       updateCursorWrapper(this);
       let innerDeco = viewDecorations(this), outerDeco = computeDocDeco(this);
-      let scroll = prev.plugins != state.plugins && !prev.doc.eq(state.doc) ? "reset" : state.scrollToSelection > prev.scrollToSelection ? "to selection" : "preserve";
-      let updateDoc = redraw || !this.docView.matchesNode(state.doc, outerDeco, innerDeco);
-      if (updateDoc || !state.selection.eq(prev.selection))
+      let scroll = prev.plugins != state2.plugins && !prev.doc.eq(state2.doc) ? "reset" : state2.scrollToSelection > prev.scrollToSelection ? "to selection" : "preserve";
+      let updateDoc = redraw || !this.docView.matchesNode(state2.doc, outerDeco, innerDeco);
+      if (updateDoc || !state2.selection.eq(prev.selection))
         updateSel = true;
       let oldScrollPos = scroll == "preserve" && updateSel && this.dom.style.overflowAnchor == null && storeScrollPos(this);
       if (updateSel) {
         this.domObserver.stop();
-        let forceSelUpdate = updateDoc && (ie || chrome) && !this.composing && !prev.selection.empty && !state.selection.empty && selectionContextChanged(prev.selection, state.selection);
+        let forceSelUpdate = updateDoc && (ie || chrome) && !this.composing && !prev.selection.empty && !state2.selection.empty && selectionContextChanged(prev.selection, state2.selection);
         if (updateDoc) {
           let chromeKludge = chrome ? this.trackWrites = this.domSelectionRange().focusNode : null;
           if (this.composing)
             this.input.compositionNode = findCompositionNode(this);
-          if (redraw || !this.docView.update(state.doc, outerDeco, innerDeco, this)) {
+          if (redraw || !this.docView.update(state2.doc, outerDeco, innerDeco, this)) {
             this.docView.updateOuterDeco(outerDeco);
             this.docView.destroy();
-            this.docView = docViewDesc(state.doc, outerDeco, innerDeco, this.dom, this);
+            this.docView = docViewDesc(state2.doc, outerDeco, innerDeco, this.dom, this);
           }
           if (chromeKludge && (!this.trackWrites || !this.dom.contains(this.trackWrites)))
             forceSelUpdate = true;
@@ -10938,13 +10938,13 @@
         if (forceSelUpdate || !(this.input.mouseDown && this.domObserver.currentSelection.eq(this.domSelectionRange()) && anchorInRightPlace(this))) {
           selectionToDOM(this, forceSelUpdate);
         } else {
-          syncNodeSelection(this, state.selection);
+          syncNodeSelection(this, state2.selection);
           this.domObserver.setCurSelection();
         }
         this.domObserver.start();
       }
       this.updatePluginViews(prev);
-      if (((_a = this.dragging) === null || _a === void 0 ? void 0 : _a.node) && !prev.doc.eq(state.doc))
+      if (((_a = this.dragging) === null || _a === void 0 ? void 0 : _a.node) && !prev.doc.eq(state2.doc))
         this.updateDraggedNode(this.dragging, prev);
       if (scroll == "reset") {
         this.dom.scrollTop = 0;
@@ -11154,8 +11154,8 @@
     to the view's current state by default, but it is possible to
     pass a different state.
     */
-    endOfTextblock(dir, state) {
-      return endOfTextblock(this, state || this.state, dir);
+    endOfTextblock(dir, state2) {
+      return endOfTextblock(this, state2 || this.state, dir);
     }
     /**
     Run the editor's paste logic with the given HTML string. The
@@ -11490,21 +11490,21 @@
   }
 
   // node_modules/prosemirror-commands/dist/index.js
-  var deleteSelection = (state, dispatch) => {
-    if (state.selection.empty)
+  var deleteSelection = (state2, dispatch) => {
+    if (state2.selection.empty)
       return false;
     if (dispatch)
-      dispatch(state.tr.deleteSelection().scrollIntoView());
+      dispatch(state2.tr.deleteSelection().scrollIntoView());
     return true;
   };
-  function atBlockStart(state, view) {
-    let { $cursor } = state.selection;
-    if (!$cursor || (view ? !view.endOfTextblock("backward", state) : $cursor.parentOffset > 0))
+  function atBlockStart(state2, view) {
+    let { $cursor } = state2.selection;
+    if (!$cursor || (view ? !view.endOfTextblock("backward", state2) : $cursor.parentOffset > 0))
       return null;
     return $cursor;
   }
-  var joinBackward = (state, dispatch, view) => {
-    let $cursor = atBlockStart(state, view);
+  var joinBackward = (state2, dispatch, view) => {
+    let $cursor = atBlockStart(state2, view);
     if (!$cursor)
       return false;
     let $cut = findCutBefore($cursor);
@@ -11513,18 +11513,18 @@
       if (target == null)
         return false;
       if (dispatch)
-        dispatch(state.tr.lift(range, target).scrollIntoView());
+        dispatch(state2.tr.lift(range, target).scrollIntoView());
       return true;
     }
     let before = $cut.nodeBefore;
-    if (deleteBarrier(state, $cut, dispatch, -1))
+    if (deleteBarrier(state2, $cut, dispatch, -1))
       return true;
     if ($cursor.parent.content.size == 0 && (textblockAt(before, "end") || NodeSelection.isSelectable(before))) {
       for (let depth = $cursor.depth; ; depth--) {
-        let delStep = replaceStep(state.doc, $cursor.before(depth), $cursor.after(depth), Slice.empty);
+        let delStep = replaceStep(state2.doc, $cursor.before(depth), $cursor.after(depth), Slice.empty);
         if (delStep && delStep.slice.size < delStep.to - delStep.from) {
           if (dispatch) {
-            let tr2 = state.tr.step(delStep);
+            let tr2 = state2.tr.step(delStep);
             tr2.setSelection(textblockAt(before, "end") ? Selection.findFrom(tr2.doc.resolve(tr2.mapping.map($cut.pos, -1)), -1) : NodeSelection.create(tr2.doc, $cut.pos - before.nodeSize));
             dispatch(tr2.scrollIntoView());
           }
@@ -11536,26 +11536,26 @@
     }
     if (before.isAtom && $cut.depth == $cursor.depth - 1) {
       if (dispatch)
-        dispatch(state.tr.delete($cut.pos - before.nodeSize, $cut.pos).scrollIntoView());
+        dispatch(state2.tr.delete($cut.pos - before.nodeSize, $cut.pos).scrollIntoView());
       return true;
     }
     return false;
   };
-  var joinTextblockBackward = (state, dispatch, view) => {
-    let $cursor = atBlockStart(state, view);
+  var joinTextblockBackward = (state2, dispatch, view) => {
+    let $cursor = atBlockStart(state2, view);
     if (!$cursor)
       return false;
     let $cut = findCutBefore($cursor);
-    return $cut ? joinTextblocksAround(state, $cut, dispatch) : false;
+    return $cut ? joinTextblocksAround(state2, $cut, dispatch) : false;
   };
-  var joinTextblockForward = (state, dispatch, view) => {
-    let $cursor = atBlockEnd(state, view);
+  var joinTextblockForward = (state2, dispatch, view) => {
+    let $cursor = atBlockEnd(state2, view);
     if (!$cursor)
       return false;
     let $cut = findCutAfter($cursor);
-    return $cut ? joinTextblocksAround(state, $cut, dispatch) : false;
+    return $cut ? joinTextblocksAround(state2, $cut, dispatch) : false;
   };
-  function joinTextblocksAround(state, $cut, dispatch) {
+  function joinTextblocksAround(state2, $cut, dispatch) {
     let before = $cut.nodeBefore, beforeText = before, beforePos = $cut.pos - 1;
     for (; !beforeText.isTextblock; beforePos--) {
       if (beforeText.type.spec.isolating)
@@ -11574,11 +11574,11 @@
         return false;
       afterText = child;
     }
-    let step = replaceStep(state.doc, beforePos, afterPos, Slice.empty);
+    let step = replaceStep(state2.doc, beforePos, afterPos, Slice.empty);
     if (!step || step.from != beforePos || step instanceof ReplaceStep && step.slice.size >= afterPos - beforePos)
       return false;
     if (dispatch) {
-      let tr2 = state.tr.step(step);
+      let tr2 = state2.tr.step(step);
       tr2.setSelection(TextSelection.create(tr2.doc, beforePos));
       dispatch(tr2.scrollIntoView());
     }
@@ -11593,12 +11593,12 @@
     }
     return false;
   }
-  var selectNodeBackward = (state, dispatch, view) => {
-    let { $head, empty: empty2 } = state.selection, $cut = $head;
+  var selectNodeBackward = (state2, dispatch, view) => {
+    let { $head, empty: empty2 } = state2.selection, $cut = $head;
     if (!empty2)
       return false;
     if ($head.parent.isTextblock) {
-      if (view ? !view.endOfTextblock("backward", state) : $head.parentOffset > 0)
+      if (view ? !view.endOfTextblock("backward", state2) : $head.parentOffset > 0)
         return false;
       $cut = findCutBefore($head);
     }
@@ -11606,7 +11606,7 @@
     if (!node || !NodeSelection.isSelectable(node))
       return false;
     if (dispatch)
-      dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView());
+      dispatch(state2.tr.setSelection(NodeSelection.create(state2.doc, $cut.pos - node.nodeSize)).scrollIntoView());
     return true;
   };
   function findCutBefore($pos) {
@@ -11619,27 +11619,27 @@
       }
     return null;
   }
-  function atBlockEnd(state, view) {
-    let { $cursor } = state.selection;
-    if (!$cursor || (view ? !view.endOfTextblock("forward", state) : $cursor.parentOffset < $cursor.parent.content.size))
+  function atBlockEnd(state2, view) {
+    let { $cursor } = state2.selection;
+    if (!$cursor || (view ? !view.endOfTextblock("forward", state2) : $cursor.parentOffset < $cursor.parent.content.size))
       return null;
     return $cursor;
   }
-  var joinForward = (state, dispatch, view) => {
-    let $cursor = atBlockEnd(state, view);
+  var joinForward = (state2, dispatch, view) => {
+    let $cursor = atBlockEnd(state2, view);
     if (!$cursor)
       return false;
     let $cut = findCutAfter($cursor);
     if (!$cut)
       return false;
     let after = $cut.nodeAfter;
-    if (deleteBarrier(state, $cut, dispatch, 1))
+    if (deleteBarrier(state2, $cut, dispatch, 1))
       return true;
     if ($cursor.parent.content.size == 0 && (textblockAt(after, "start") || NodeSelection.isSelectable(after))) {
-      let delStep = replaceStep(state.doc, $cursor.before(), $cursor.after(), Slice.empty);
+      let delStep = replaceStep(state2.doc, $cursor.before(), $cursor.after(), Slice.empty);
       if (delStep && delStep.slice.size < delStep.to - delStep.from) {
         if (dispatch) {
-          let tr2 = state.tr.step(delStep);
+          let tr2 = state2.tr.step(delStep);
           tr2.setSelection(textblockAt(after, "start") ? Selection.findFrom(tr2.doc.resolve(tr2.mapping.map($cut.pos)), 1) : NodeSelection.create(tr2.doc, tr2.mapping.map($cut.pos)));
           dispatch(tr2.scrollIntoView());
         }
@@ -11648,17 +11648,17 @@
     }
     if (after.isAtom && $cut.depth == $cursor.depth - 1) {
       if (dispatch)
-        dispatch(state.tr.delete($cut.pos, $cut.pos + after.nodeSize).scrollIntoView());
+        dispatch(state2.tr.delete($cut.pos, $cut.pos + after.nodeSize).scrollIntoView());
       return true;
     }
     return false;
   };
-  var selectNodeForward = (state, dispatch, view) => {
-    let { $head, empty: empty2 } = state.selection, $cut = $head;
+  var selectNodeForward = (state2, dispatch, view) => {
+    let { $head, empty: empty2 } = state2.selection, $cut = $head;
     if (!empty2)
       return false;
     if ($head.parent.isTextblock) {
-      if (view ? !view.endOfTextblock("forward", state) : $head.parentOffset < $head.parent.content.size)
+      if (view ? !view.endOfTextblock("forward", state2) : $head.parentOffset < $head.parent.content.size)
         return false;
       $cut = findCutAfter($head);
     }
@@ -11666,7 +11666,7 @@
     if (!node || !NodeSelection.isSelectable(node))
       return false;
     if (dispatch)
-      dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos)).scrollIntoView());
+      dispatch(state2.tr.setSelection(NodeSelection.create(state2.doc, $cut.pos)).scrollIntoView());
     return true;
   };
   function findCutAfter($pos) {
@@ -11680,55 +11680,55 @@
       }
     return null;
   }
-  var joinUp = (state, dispatch) => {
-    let sel = state.selection, nodeSel = sel instanceof NodeSelection, point;
+  var joinUp = (state2, dispatch) => {
+    let sel = state2.selection, nodeSel = sel instanceof NodeSelection, point;
     if (nodeSel) {
-      if (sel.node.isTextblock || !canJoin(state.doc, sel.from))
+      if (sel.node.isTextblock || !canJoin(state2.doc, sel.from))
         return false;
       point = sel.from;
     } else {
-      point = joinPoint(state.doc, sel.from, -1);
+      point = joinPoint(state2.doc, sel.from, -1);
       if (point == null)
         return false;
     }
     if (dispatch) {
-      let tr2 = state.tr.join(point);
+      let tr2 = state2.tr.join(point);
       if (nodeSel)
-        tr2.setSelection(NodeSelection.create(tr2.doc, point - state.doc.resolve(point).nodeBefore.nodeSize));
+        tr2.setSelection(NodeSelection.create(tr2.doc, point - state2.doc.resolve(point).nodeBefore.nodeSize));
       dispatch(tr2.scrollIntoView());
     }
     return true;
   };
-  var joinDown = (state, dispatch) => {
-    let sel = state.selection, point;
+  var joinDown = (state2, dispatch) => {
+    let sel = state2.selection, point;
     if (sel instanceof NodeSelection) {
-      if (sel.node.isTextblock || !canJoin(state.doc, sel.to))
+      if (sel.node.isTextblock || !canJoin(state2.doc, sel.to))
         return false;
       point = sel.to;
     } else {
-      point = joinPoint(state.doc, sel.to, 1);
+      point = joinPoint(state2.doc, sel.to, 1);
       if (point == null)
         return false;
     }
     if (dispatch)
-      dispatch(state.tr.join(point).scrollIntoView());
+      dispatch(state2.tr.join(point).scrollIntoView());
     return true;
   };
-  var lift2 = (state, dispatch) => {
-    let { $from, $to } = state.selection;
+  var lift2 = (state2, dispatch) => {
+    let { $from, $to } = state2.selection;
     let range = $from.blockRange($to), target = range && liftTarget(range);
     if (target == null)
       return false;
     if (dispatch)
-      dispatch(state.tr.lift(range, target).scrollIntoView());
+      dispatch(state2.tr.lift(range, target).scrollIntoView());
     return true;
   };
-  var newlineInCode = (state, dispatch) => {
-    let { $head, $anchor } = state.selection;
+  var newlineInCode = (state2, dispatch) => {
+    let { $head, $anchor } = state2.selection;
     if (!$head.parent.type.spec.code || !$head.sameParent($anchor))
       return false;
     if (dispatch)
-      dispatch(state.tr.insertText("\n").scrollIntoView());
+      dispatch(state2.tr.insertText("\n").scrollIntoView());
     return true;
   };
   function defaultBlockAt(match) {
@@ -11739,22 +11739,22 @@
     }
     return null;
   }
-  var exitCode = (state, dispatch) => {
-    let { $head, $anchor } = state.selection;
+  var exitCode = (state2, dispatch) => {
+    let { $head, $anchor } = state2.selection;
     if (!$head.parent.type.spec.code || !$head.sameParent($anchor))
       return false;
     let above = $head.node(-1), after = $head.indexAfter(-1), type = defaultBlockAt(above.contentMatchAt(after));
     if (!type || !above.canReplaceWith(after, after, type))
       return false;
     if (dispatch) {
-      let pos = $head.after(), tr2 = state.tr.replaceWith(pos, pos, type.createAndFill());
+      let pos = $head.after(), tr2 = state2.tr.replaceWith(pos, pos, type.createAndFill());
       tr2.setSelection(Selection.near(tr2.doc.resolve(pos), 1));
       dispatch(tr2.scrollIntoView());
     }
     return true;
   };
-  var createParagraphNear = (state, dispatch) => {
-    let sel = state.selection, { $from, $to } = sel;
+  var createParagraphNear = (state2, dispatch) => {
+    let sel = state2.selection, { $from, $to } = sel;
     if (sel instanceof AllSelection || $from.parent.inlineContent || $to.parent.inlineContent)
       return false;
     let type = defaultBlockAt($to.parent.contentMatchAt($to.indexAfter()));
@@ -11762,21 +11762,21 @@
       return false;
     if (dispatch) {
       let side = (!$from.parentOffset && $to.index() < $to.parent.childCount ? $from : $to).pos;
-      let tr2 = state.tr.insert(side, type.createAndFill());
+      let tr2 = state2.tr.insert(side, type.createAndFill());
       tr2.setSelection(TextSelection.create(tr2.doc, side + 1));
       dispatch(tr2.scrollIntoView());
     }
     return true;
   };
-  var liftEmptyBlock = (state, dispatch) => {
-    let { $cursor } = state.selection;
+  var liftEmptyBlock = (state2, dispatch) => {
+    let { $cursor } = state2.selection;
     if (!$cursor || $cursor.parent.content.size)
       return false;
     if ($cursor.depth > 1 && $cursor.after() != $cursor.end(-1)) {
       let before = $cursor.before();
-      if (canSplit(state.doc, before)) {
+      if (canSplit(state2.doc, before)) {
         if (dispatch)
-          dispatch(state.tr.split(before).scrollIntoView());
+          dispatch(state2.tr.split(before).scrollIntoView());
         return true;
       }
     }
@@ -11784,17 +11784,17 @@
     if (target == null)
       return false;
     if (dispatch)
-      dispatch(state.tr.lift(range, target).scrollIntoView());
+      dispatch(state2.tr.lift(range, target).scrollIntoView());
     return true;
   };
   function splitBlockAs(splitNode) {
-    return (state, dispatch) => {
-      let { $from, $to } = state.selection;
-      if (state.selection instanceof NodeSelection && state.selection.node.isBlock) {
-        if (!$from.parentOffset || !canSplit(state.doc, $from.pos))
+    return (state2, dispatch) => {
+      let { $from, $to } = state2.selection;
+      if (state2.selection instanceof NodeSelection && state2.selection.node.isBlock) {
+        if (!$from.parentOffset || !canSplit(state2.doc, $from.pos))
           return false;
         if (dispatch)
-          dispatch(state.tr.split($from.pos).scrollIntoView());
+          dispatch(state2.tr.split($from.pos).scrollIntoView());
         return true;
       }
       if (!$from.depth)
@@ -11817,8 +11817,8 @@
           types.unshift(null);
         }
       }
-      let tr2 = state.tr;
-      if (state.selection instanceof TextSelection || state.selection instanceof AllSelection)
+      let tr2 = state2.tr;
+      if (state2.selection instanceof TextSelection || state2.selection instanceof AllSelection)
         tr2.deleteSelection();
       let splitPos = tr2.mapping.map($from.pos);
       let can = canSplit(tr2.doc, splitPos, types.length, types);
@@ -11840,40 +11840,40 @@
     };
   }
   var splitBlock = splitBlockAs();
-  var selectParentNode = (state, dispatch) => {
-    let { $from, to } = state.selection, pos;
+  var selectParentNode = (state2, dispatch) => {
+    let { $from, to } = state2.selection, pos;
     let same = $from.sharedDepth(to);
     if (same == 0)
       return false;
     pos = $from.before(same);
     if (dispatch)
-      dispatch(state.tr.setSelection(NodeSelection.create(state.doc, pos)));
+      dispatch(state2.tr.setSelection(NodeSelection.create(state2.doc, pos)));
     return true;
   };
-  var selectAll = (state, dispatch) => {
+  var selectAll = (state2, dispatch) => {
     if (dispatch)
-      dispatch(state.tr.setSelection(new AllSelection(state.doc)));
+      dispatch(state2.tr.setSelection(new AllSelection(state2.doc)));
     return true;
   };
-  function joinMaybeClear(state, $pos, dispatch) {
+  function joinMaybeClear(state2, $pos, dispatch) {
     let before = $pos.nodeBefore, after = $pos.nodeAfter, index = $pos.index();
     if (!before || !after || !before.type.compatibleContent(after.type))
       return false;
     if (!before.content.size && $pos.parent.canReplace(index - 1, index)) {
       if (dispatch)
-        dispatch(state.tr.delete($pos.pos - before.nodeSize, $pos.pos).scrollIntoView());
+        dispatch(state2.tr.delete($pos.pos - before.nodeSize, $pos.pos).scrollIntoView());
       return true;
     }
-    if (!$pos.parent.canReplace(index, index + 1) || !(after.isTextblock || canJoin(state.doc, $pos.pos)))
+    if (!$pos.parent.canReplace(index, index + 1) || !(after.isTextblock || canJoin(state2.doc, $pos.pos)))
       return false;
     if (dispatch)
-      dispatch(state.tr.join($pos.pos).scrollIntoView());
+      dispatch(state2.tr.join($pos.pos).scrollIntoView());
     return true;
   }
-  function deleteBarrier(state, $cut, dispatch, dir) {
+  function deleteBarrier(state2, $cut, dispatch, dir) {
     let before = $cut.nodeBefore, after = $cut.nodeAfter, conn, match;
     let isolated = before.type.spec.isolating || after.type.spec.isolating;
-    if (!isolated && joinMaybeClear(state, $cut, dispatch))
+    if (!isolated && joinMaybeClear(state2, $cut, dispatch))
       return true;
     let canDelAfter = !isolated && $cut.parent.canReplace($cut.index(), $cut.index() + 1);
     if (canDelAfter && (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) && match.matchType(conn[0] || after.type).validEnd) {
@@ -11882,7 +11882,7 @@
         for (let i = conn.length - 1; i >= 0; i--)
           wrap2 = Fragment.from(conn[i].create(null, wrap2));
         wrap2 = Fragment.from(before.copy(wrap2));
-        let tr2 = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap2, 1, 0), conn.length, true));
+        let tr2 = state2.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap2, 1, 0), conn.length, true));
         let $joinAt = tr2.doc.resolve(end + 2 * conn.length);
         if ($joinAt.nodeAfter && $joinAt.nodeAfter.type == before.type && canJoin(tr2.doc, $joinAt.pos))
           tr2.join($joinAt.pos);
@@ -11894,7 +11894,7 @@
     let range = selAfter && selAfter.$from.blockRange(selAfter.$to), target = range && liftTarget(range);
     if (target != null && target >= $cut.depth) {
       if (dispatch)
-        dispatch(state.tr.lift(range, target).scrollIntoView());
+        dispatch(state2.tr.lift(range, target).scrollIntoView());
       return true;
     }
     if (canDelAfter && textblockAt(after, "start", true) && textblockAt(before, "end")) {
@@ -11913,7 +11913,7 @@
           let end = Fragment.empty;
           for (let i = wrap2.length - 1; i >= 0; i--)
             end = Fragment.from(wrap2[i].copy(end));
-          let tr2 = state.tr.step(new ReplaceAroundStep($cut.pos - wrap2.length, $cut.pos + after.nodeSize, $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth, new Slice(end, wrap2.length, 0), 0, true));
+          let tr2 = state2.tr.step(new ReplaceAroundStep($cut.pos - wrap2.length, $cut.pos + after.nodeSize, $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth, new Slice(end, wrap2.length, 0), 0, true));
           dispatch(tr2.scrollIntoView());
         }
         return true;
@@ -11922,8 +11922,8 @@
     return false;
   }
   function selectTextblockSide(side) {
-    return function(state, dispatch) {
-      let sel = state.selection, $pos = side < 0 ? sel.$from : sel.$to;
+    return function(state2, dispatch) {
+      let sel = state2.selection, $pos = side < 0 ? sel.$from : sel.$to;
       let depth = $pos.depth;
       while ($pos.node(depth).isInline) {
         if (!depth)
@@ -11933,29 +11933,29 @@
       if (!$pos.node(depth).isTextblock)
         return false;
       if (dispatch)
-        dispatch(state.tr.setSelection(TextSelection.create(state.doc, side < 0 ? $pos.start(depth) : $pos.end(depth))));
+        dispatch(state2.tr.setSelection(TextSelection.create(state2.doc, side < 0 ? $pos.start(depth) : $pos.end(depth))));
       return true;
     };
   }
   var selectTextblockStart = selectTextblockSide(-1);
   var selectTextblockEnd = selectTextblockSide(1);
   function wrapIn(nodeType, attrs = null) {
-    return function(state, dispatch) {
-      let { $from, $to } = state.selection;
+    return function(state2, dispatch) {
+      let { $from, $to } = state2.selection;
       let range = $from.blockRange($to), wrapping = range && findWrapping(range, nodeType, attrs);
       if (!wrapping)
         return false;
       if (dispatch)
-        dispatch(state.tr.wrap(range, wrapping).scrollIntoView());
+        dispatch(state2.tr.wrap(range, wrapping).scrollIntoView());
       return true;
     };
   }
   function setBlockType2(nodeType, attrs = null) {
-    return function(state, dispatch) {
+    return function(state2, dispatch) {
       let applicable = false;
-      for (let i = 0; i < state.selection.ranges.length && !applicable; i++) {
-        let { $from: { pos: from2 }, $to: { pos: to } } = state.selection.ranges[i];
-        state.doc.nodesBetween(from2, to, (node, pos) => {
+      for (let i = 0; i < state2.selection.ranges.length && !applicable; i++) {
+        let { $from: { pos: from2 }, $to: { pos: to } } = state2.selection.ranges[i];
+        state2.doc.nodesBetween(from2, to, (node, pos) => {
           if (applicable)
             return false;
           if (!node.isTextblock || node.hasMarkup(nodeType, attrs))
@@ -11963,7 +11963,7 @@
           if (node.type == nodeType) {
             applicable = true;
           } else {
-            let $pos = state.doc.resolve(pos), index = $pos.index();
+            let $pos = state2.doc.resolve(pos), index = $pos.index();
             applicable = $pos.parent.canReplaceWith(index, index + 1, nodeType);
           }
         });
@@ -11971,9 +11971,9 @@
       if (!applicable)
         return false;
       if (dispatch) {
-        let tr2 = state.tr;
-        for (let i = 0; i < state.selection.ranges.length; i++) {
-          let { $from: { pos: from2 }, $to: { pos: to } } = state.selection.ranges[i];
+        let tr2 = state2.tr;
+        for (let i = 0; i < state2.selection.ranges.length; i++) {
+          let { $from: { pos: from2 }, $to: { pos: to } } = state2.selection.ranges[i];
           tr2.setBlockType(from2, to, nodeType, attrs);
         }
         dispatch(tr2.scrollIntoView());
@@ -11982,9 +11982,9 @@
     };
   }
   function chainCommands(...commands2) {
-    return function(state, dispatch, view) {
+    return function(state2, dispatch, view) {
       for (let i = 0; i < commands2.length; i++)
-        if (commands2[i](state, dispatch, view))
+        if (commands2[i](state2, dispatch, view))
           return true;
       return false;
     };
@@ -12017,12 +12017,12 @@
 
   // node_modules/prosemirror-schema-list/dist/index.js
   function wrapInList(listType, attrs = null) {
-    return function(state, dispatch) {
-      let { $from, $to } = state.selection;
+    return function(state2, dispatch) {
+      let { $from, $to } = state2.selection;
       let range = $from.blockRange($to);
       if (!range)
         return false;
-      let tr2 = dispatch ? state.tr : null;
+      let tr2 = dispatch ? state2.tr : null;
       if (!wrapRangeInList(tr2, range, listType, attrs))
         return false;
       if (dispatch)
@@ -12069,21 +12069,21 @@
     return tr2;
   }
   function liftListItem(itemType) {
-    return function(state, dispatch) {
-      let { $from, $to } = state.selection;
+    return function(state2, dispatch) {
+      let { $from, $to } = state2.selection;
       let range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild.type == itemType);
       if (!range)
         return false;
       if (!dispatch)
         return true;
       if ($from.node(range.depth - 1).type == itemType)
-        return liftToOuterList(state, dispatch, itemType, range);
+        return liftToOuterList(state2, dispatch, itemType, range);
       else
-        return liftOutOfList(state, dispatch, range);
+        return liftOutOfList(state2, dispatch, range);
     };
   }
-  function liftToOuterList(state, dispatch, itemType, range) {
-    let tr2 = state.tr, end = range.end, endOfList = range.$to.end(range.depth);
+  function liftToOuterList(state2, dispatch, itemType, range) {
+    let tr2 = state2.tr, end = range.end, endOfList = range.$to.end(range.depth);
     if (end < endOfList) {
       tr2.step(new ReplaceAroundStep(end - 1, endOfList, end, endOfList, new Slice(Fragment.from(itemType.create(null, range.parent.copy())), 1, 0), 1, true));
       range = new NodeRange(tr2.doc.resolve(range.$from.pos), tr2.doc.resolve(endOfList), range.depth);
@@ -12098,8 +12098,8 @@
     dispatch(tr2.scrollIntoView());
     return true;
   }
-  function liftOutOfList(state, dispatch, range) {
-    let tr2 = state.tr, list = range.parent;
+  function liftOutOfList(state2, dispatch, range) {
+    let tr2 = state2.tr, list = range.parent;
     for (let pos = range.end, i = range.endIndex - 1, e = range.startIndex; i > e; i--) {
       pos -= list.child(i).nodeSize;
       tr2.delete(pos - 1, pos + 1);
@@ -12117,8 +12117,8 @@
     return true;
   }
   function sinkListItem(itemType) {
-    return function(state, dispatch) {
-      let { $from, $to } = state.selection;
+    return function(state2, dispatch) {
+      let { $from, $to } = state2.selection;
       let range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild.type == itemType);
       if (!range)
         return false;
@@ -12133,7 +12133,7 @@
         let inner = Fragment.from(nestedBefore ? itemType.create() : null);
         let slice2 = new Slice(Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))), nestedBefore ? 3 : 1, 0);
         let before = range.start, after = range.end;
-        dispatch(state.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice2, 1, true)).scrollIntoView());
+        dispatch(state2.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice2, 1, true)).scrollIntoView());
       }
       return true;
     };
@@ -12141,18 +12141,18 @@
 
   // node_modules/@tiptap/core/dist/index.js
   function createChainableState(config) {
-    const { state, transaction } = config;
+    const { state: state2, transaction } = config;
     let { selection } = transaction;
     let { doc: doc3 } = transaction;
     let { storedMarks } = transaction;
     return {
-      ...state,
-      apply: state.apply.bind(state),
-      applyTransaction: state.applyTransaction.bind(state),
-      plugins: state.plugins,
-      schema: state.schema,
-      reconfigure: state.reconfigure.bind(state),
-      toJSON: state.toJSON.bind(state),
+      ...state2,
+      apply: state2.apply.bind(state2),
+      applyTransaction: state2.applyTransaction.bind(state2),
+      plugins: state2.plugins,
+      schema: state2.schema,
+      reconfigure: state2.reconfigure.bind(state2),
+      toJSON: state2.toJSON.bind(state2),
       get storedMarks() {
         return storedMarks;
       },
@@ -12183,9 +12183,9 @@
       return this.customState || this.editor.state;
     }
     get commands() {
-      const { rawCommands, editor, state } = this;
+      const { rawCommands, editor, state: state2 } = this;
       const { view } = editor;
-      const { tr: tr2 } = state;
+      const { tr: tr2 } = state2;
       const props = this.buildProps(tr2);
       return Object.fromEntries(Object.entries(rawCommands).map(([name, command2]) => {
         const method = (...args) => {
@@ -12205,11 +12205,11 @@
       return () => this.createCan();
     }
     createChain(startTr, shouldDispatch = true) {
-      const { rawCommands, editor, state } = this;
+      const { rawCommands, editor, state: state2 } = this;
       const { view } = editor;
       const callbacks = [];
       const hasStartTransaction = !!startTr;
-      const tr2 = startTr || state.tr;
+      const tr2 = startTr || state2.tr;
       const run3 = () => {
         if (!hasStartTransaction && shouldDispatch && !tr2.getMeta("preventDispatch") && !this.hasCustomState) {
           view.dispatch(tr2);
@@ -12231,9 +12231,9 @@
       return chain;
     }
     createCan(startTr) {
-      const { rawCommands, state } = this;
+      const { rawCommands, state: state2 } = this;
       const dispatch = false;
-      const tr2 = startTr || state.tr;
+      const tr2 = startTr || state2.tr;
       const props = this.buildProps(tr2, dispatch);
       const formattedCommands = Object.fromEntries(Object.entries(rawCommands).map(([name, command2]) => {
         return [name, (...args) => command2(...args)({ ...props, dispatch: void 0 })];
@@ -12244,14 +12244,14 @@
       };
     }
     buildProps(tr2, shouldDispatch = true) {
-      const { rawCommands, editor, state } = this;
+      const { rawCommands, editor, state: state2 } = this;
       const { view } = editor;
       const props = {
         tr: tr2,
         editor,
         view,
         state: createChainableState({
-          state,
+          state: state2,
           transaction: tr2
         }),
         dispatch: shouldDispatch ? () => void 0 : void 0,
@@ -12708,7 +12708,7 @@
         return;
       }
       const tr2 = view.state.tr;
-      const state = createChainableState({
+      const state2 = createChainableState({
         state: view.state,
         transaction: tr2
       });
@@ -12718,10 +12718,10 @@
       };
       const { commands: commands2, chain, can } = new CommandManager({
         editor,
-        state
+        state: state2
       });
       const handler = rule.handler({
-        state,
+        state: state2,
         range,
         match,
         commands: commands2,
@@ -12749,7 +12749,7 @@
         init() {
           return null;
         },
-        apply(tr2, prev, state) {
+        apply(tr2, prev, state2) {
           const stored = tr2.getMeta(plugin);
           if (stored) {
             return stored;
@@ -12762,7 +12762,7 @@
               if (typeof text === "string") {
                 text = text;
               } else {
-                text = getHTMLFromFragment(Fragment.from(text), state.schema);
+                text = getHTMLFromFragment(Fragment.from(text), state2.schema);
               }
               const { from: from2 } = simulatedInputMeta;
               const to = from2 + text.length;
@@ -12968,13 +12968,13 @@
     });
   };
   function run(config) {
-    const { editor, state, from: from2, to, rule, pasteEvent, dropEvent } = config;
+    const { editor, state: state2, from: from2, to, rule, pasteEvent, dropEvent } = config;
     const { commands: commands2, chain, can } = new CommandManager({
       editor,
-      state
+      state: state2
     });
     const handlers2 = [];
-    state.doc.nodesBetween(from2, to, (node, pos) => {
+    state2.doc.nodesBetween(from2, to, (node, pos) => {
       if (!node.isTextblock || node.type.spec.code) {
         return;
       }
@@ -12989,11 +12989,11 @@
         const start = resolvedFrom + match.index + 1;
         const end = start + match[0].length;
         const range = {
-          from: state.tr.mapping.map(start),
-          to: state.tr.mapping.map(end)
+          from: state2.tr.mapping.map(start),
+          to: state2.tr.mapping.map(end)
         };
         const handler = rule.handler({
-          state,
+          state: state2,
           range,
           match,
           commands: commands2,
@@ -13029,10 +13029,10 @@
     } catch {
       dropEvent = null;
     }
-    const processEvent = ({ state, from: from2, to, rule, pasteEvt }) => {
-      const tr2 = state.tr;
+    const processEvent = ({ state: state2, from: from2, to, rule, pasteEvt }) => {
+      const tr2 = state2.tr;
       const chainableState = createChainableState({
-        state,
+        state: state2,
         transaction: tr2
       });
       const handler = run({
@@ -13107,7 +13107,7 @@
             }
           }
         },
-        appendTransaction: (transactions, oldState, state) => {
+        appendTransaction: (transactions, oldState, state2) => {
           const transaction = transactions[0];
           const isPaste = transaction.getMeta("uiEvent") === "paste" && !isPastedFromProseMirror;
           const isDrop = transaction.getMeta("uiEvent") === "drop" && !isDroppedFromProseMirror;
@@ -13121,27 +13121,27 @@
             if (typeof text === "string") {
               text = text;
             } else {
-              text = getHTMLFromFragment(Fragment.from(text), state.schema);
+              text = getHTMLFromFragment(Fragment.from(text), state2.schema);
             }
             const { from: from3 } = simulatedPasteMeta;
             const to2 = from3 + text.length;
             const pasteEvt = createClipboardPasteEvent(text);
             return processEvent({
               rule,
-              state,
+              state: state2,
               from: from3,
               to: { b: to2 },
               pasteEvt
             });
           }
-          const from2 = oldState.doc.content.findDiffStart(state.doc.content);
-          const to = oldState.doc.content.findDiffEnd(state.doc.content);
+          const from2 = oldState.doc.content.findDiffStart(state2.doc.content);
+          const to = oldState.doc.content.findDiffEnd(state2.doc.content);
           if (!isNumber(from2) || !to || from2 === to.b) {
             return;
           }
           return processEvent({
             rule,
-            state,
+            state: state2,
             from: from2,
             to,
             pasteEvt: pasteEvent
@@ -13503,8 +13503,8 @@
           props: {
             clipboardTextSerializer: () => {
               const { editor } = this;
-              const { state, schema } = editor;
-              const { doc: doc3, selection } = state;
+              const { state: state2, schema } = editor;
+              const { doc: doc3, selection } = state2;
               const { ranges } = selection;
               const from2 = Math.min(...ranges.map((range2) => range2.$from.pos));
               const to = Math.max(...ranges.map((range2) => range2.$to.pos));
@@ -13533,14 +13533,14 @@
   var clearContent = (emitUpdate = false) => ({ commands: commands2 }) => {
     return commands2.setContent("", emitUpdate);
   };
-  var clearNodes = () => ({ state, tr: tr2, dispatch }) => {
+  var clearNodes = () => ({ state: state2, tr: tr2, dispatch }) => {
     const { selection } = tr2;
     const { ranges } = selection;
     if (!dispatch) {
       return true;
     }
     ranges.forEach(({ $from, $to }) => {
-      state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+      state2.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
         if (node.type.isText) {
           return;
         }
@@ -13566,12 +13566,12 @@
   var command = (fn) => (props) => {
     return fn(props);
   };
-  var createParagraphNear2 = () => ({ state, dispatch }) => {
-    return createParagraphNear(state, dispatch);
+  var createParagraphNear2 = () => ({ state: state2, dispatch }) => {
+    return createParagraphNear(state2, dispatch);
   };
   var cut = (originRange, targetPos) => ({ editor, tr: tr2 }) => {
-    const { state } = editor;
-    const contentSlice = state.doc.slice(originRange.from, originRange.to);
+    const { state: state2 } = editor;
+    const contentSlice = state2.doc.slice(originRange.from, originRange.to);
     tr2.deleteRange(originRange.from, originRange.to);
     const newPos = tr2.mapping.map(targetPos);
     tr2.insert(newPos, contentSlice.content);
@@ -13598,8 +13598,8 @@
     }
     return false;
   };
-  var deleteNode = (typeOrName) => ({ tr: tr2, state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
+  var deleteNode = (typeOrName) => ({ tr: tr2, state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
     const $pos = tr2.selection.$anchor;
     for (let depth = $pos.depth; depth > 0; depth -= 1) {
       const node = $pos.node(depth);
@@ -13621,14 +13621,14 @@
     }
     return true;
   };
-  var deleteSelection2 = () => ({ state, dispatch }) => {
-    return deleteSelection(state, dispatch);
+  var deleteSelection2 = () => ({ state: state2, dispatch }) => {
+    return deleteSelection(state2, dispatch);
   };
   var enter = () => ({ commands: commands2 }) => {
     return commands2.keyboardShortcut("Enter");
   };
-  var exitCode2 = () => ({ state, dispatch }) => {
-    return exitCode(state, dispatch);
+  var exitCode2 = () => ({ state: state2, dispatch }) => {
+    return exitCode(state2, dispatch);
   };
   function objectIncludes(object1, object2, options = { strict: true }) {
     const keys2 = Object.keys(object2);
@@ -13700,8 +13700,8 @@
     }
     return nameOrType;
   }
-  var extendMarkRange = (typeOrName, attributes = {}) => ({ tr: tr2, state, dispatch }) => {
-    const type = getMarkType(typeOrName, state.schema);
+  var extendMarkRange = (typeOrName, attributes = {}) => ({ tr: tr2, state: state2, dispatch }) => {
+    const type = getMarkType(typeOrName, state2.schema);
     const { doc: doc3, selection } = tr2;
     const { $from, from: from2, to } = selection;
     if (dispatch) {
@@ -14014,21 +14014,21 @@
     }
     return true;
   };
-  var joinUp2 = () => ({ state, dispatch }) => {
-    return joinUp(state, dispatch);
+  var joinUp2 = () => ({ state: state2, dispatch }) => {
+    return joinUp(state2, dispatch);
   };
-  var joinDown2 = () => ({ state, dispatch }) => {
-    return joinDown(state, dispatch);
+  var joinDown2 = () => ({ state: state2, dispatch }) => {
+    return joinDown(state2, dispatch);
   };
-  var joinBackward2 = () => ({ state, dispatch }) => {
-    return joinBackward(state, dispatch);
+  var joinBackward2 = () => ({ state: state2, dispatch }) => {
+    return joinBackward(state2, dispatch);
   };
-  var joinForward2 = () => ({ state, dispatch }) => {
-    return joinForward(state, dispatch);
+  var joinForward2 = () => ({ state: state2, dispatch }) => {
+    return joinForward(state2, dispatch);
   };
-  var joinItemBackward = () => ({ state, dispatch, tr: tr2 }) => {
+  var joinItemBackward = () => ({ state: state2, dispatch, tr: tr2 }) => {
     try {
-      const point = joinPoint(state.doc, state.selection.$from.pos, -1);
+      const point = joinPoint(state2.doc, state2.selection.$from.pos, -1);
       if (point === null || point === void 0) {
         return false;
       }
@@ -14041,9 +14041,9 @@
       return false;
     }
   };
-  var joinItemForward = () => ({ state, dispatch, tr: tr2 }) => {
+  var joinItemForward = () => ({ state: state2, dispatch, tr: tr2 }) => {
     try {
-      const point = joinPoint(state.doc, state.selection.$from.pos, 1);
+      const point = joinPoint(state2.doc, state2.selection.$from.pos, 1);
       if (point === null || point === void 0) {
         return false;
       }
@@ -14056,11 +14056,11 @@
       return false;
     }
   };
-  var joinTextblockBackward2 = () => ({ state, dispatch }) => {
-    return joinTextblockBackward(state, dispatch);
+  var joinTextblockBackward2 = () => ({ state: state2, dispatch }) => {
+    return joinTextblockBackward(state2, dispatch);
   };
-  var joinTextblockForward2 = () => ({ state, dispatch }) => {
-    return joinTextblockForward(state, dispatch);
+  var joinTextblockForward2 = () => ({ state: state2, dispatch }) => {
+    return joinTextblockForward(state2, dispatch);
   };
   function isMacOS() {
     return typeof navigator !== "undefined" ? /Mac/.test(navigator.platform) : false;
@@ -14132,11 +14132,11 @@
     });
     return true;
   };
-  function isNodeActive(state, typeOrName, attributes = {}) {
-    const { from: from2, to, empty: empty2 } = state.selection;
-    const type = typeOrName ? getNodeType(typeOrName, state.schema) : null;
+  function isNodeActive(state2, typeOrName, attributes = {}) {
+    const { from: from2, to, empty: empty2 } = state2.selection;
+    const type = typeOrName ? getNodeType(typeOrName, state2.schema) : null;
     const nodeRanges = [];
-    state.doc.nodesBetween(from2, to, (node, pos) => {
+    state2.doc.nodesBetween(from2, to, (node, pos) => {
       if (node.isText) {
         return;
       }
@@ -14161,23 +14161,23 @@
     const range = matchedNodeRanges.reduce((sum, nodeRange) => sum + nodeRange.to - nodeRange.from, 0);
     return range >= selectionRange;
   }
-  var lift3 = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    const isActive2 = isNodeActive(state, type, attributes);
+  var lift3 = (typeOrName, attributes = {}) => ({ state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    const isActive2 = isNodeActive(state2, type, attributes);
     if (!isActive2) {
       return false;
     }
-    return lift2(state, dispatch);
+    return lift2(state2, dispatch);
   };
-  var liftEmptyBlock2 = () => ({ state, dispatch }) => {
-    return liftEmptyBlock(state, dispatch);
+  var liftEmptyBlock2 = () => ({ state: state2, dispatch }) => {
+    return liftEmptyBlock(state2, dispatch);
   };
-  var liftListItem2 = (typeOrName) => ({ state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    return liftListItem(type)(state, dispatch);
+  var liftListItem2 = (typeOrName) => ({ state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    return liftListItem(type)(state2, dispatch);
   };
-  var newlineInCode2 = () => ({ state, dispatch }) => {
-    return newlineInCode(state, dispatch);
+  var newlineInCode2 = () => ({ state: state2, dispatch }) => {
+    return newlineInCode(state2, dispatch);
   };
   function getSchemaTypeNameByName(name, schema) {
     if (schema.nodes[name]) {
@@ -14197,22 +14197,22 @@
       return newObj;
     }, {});
   }
-  var resetAttributes = (typeOrName, attributes) => ({ tr: tr2, state, dispatch }) => {
+  var resetAttributes = (typeOrName, attributes) => ({ tr: tr2, state: state2, dispatch }) => {
     let nodeType = null;
     let markType = null;
-    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state.schema);
+    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state2.schema);
     if (!schemaType) {
       return false;
     }
     if (schemaType === "node") {
-      nodeType = getNodeType(typeOrName, state.schema);
+      nodeType = getNodeType(typeOrName, state2.schema);
     }
     if (schemaType === "mark") {
-      markType = getMarkType(typeOrName, state.schema);
+      markType = getMarkType(typeOrName, state2.schema);
     }
     if (dispatch) {
       tr2.selection.ranges.forEach((range) => {
-        state.doc.nodesBetween(range.$from.pos, range.$to.pos, (node, pos) => {
+        state2.doc.nodesBetween(range.$from.pos, range.$to.pos, (node, pos) => {
           if (nodeType && nodeType === node.type) {
             tr2.setNodeMarkup(pos, void 0, deleteProps(node.attrs, attributes));
           }
@@ -14241,20 +14241,20 @@
     }
     return true;
   };
-  var selectNodeBackward2 = () => ({ state, dispatch }) => {
-    return selectNodeBackward(state, dispatch);
+  var selectNodeBackward2 = () => ({ state: state2, dispatch }) => {
+    return selectNodeBackward(state2, dispatch);
   };
-  var selectNodeForward2 = () => ({ state, dispatch }) => {
-    return selectNodeForward(state, dispatch);
+  var selectNodeForward2 = () => ({ state: state2, dispatch }) => {
+    return selectNodeForward(state2, dispatch);
   };
-  var selectParentNode2 = () => ({ state, dispatch }) => {
-    return selectParentNode(state, dispatch);
+  var selectParentNode2 = () => ({ state: state2, dispatch }) => {
+    return selectParentNode(state2, dispatch);
   };
-  var selectTextblockEnd2 = () => ({ state, dispatch }) => {
-    return selectTextblockEnd(state, dispatch);
+  var selectTextblockEnd2 = () => ({ state: state2, dispatch }) => {
+    return selectTextblockEnd(state2, dispatch);
   };
-  var selectTextblockStart2 = () => ({ state, dispatch }) => {
-    return selectTextblockStart(state, dispatch);
+  var selectTextblockStart2 = () => ({ state: state2, dispatch }) => {
+    return selectTextblockStart(state2, dispatch);
   };
   function createDocument(content, schema, parseOptions = {}, options = {}) {
     return createNodeFromContent(content, schema, {
@@ -14283,17 +14283,17 @@
       errorOnInvalidContent: (_b = options.errorOnInvalidContent) !== null && _b !== void 0 ? _b : editor.options.enableContentCheck
     });
   };
-  function getMarkAttributes(state, typeOrName) {
-    const type = getMarkType(typeOrName, state.schema);
-    const { from: from2, to, empty: empty2 } = state.selection;
+  function getMarkAttributes(state2, typeOrName) {
+    const type = getMarkType(typeOrName, state2.schema);
+    const { from: from2, to, empty: empty2 } = state2.selection;
     const marks = [];
     if (empty2) {
-      if (state.storedMarks) {
-        marks.push(...state.storedMarks);
+      if (state2.storedMarks) {
+        marks.push(...state2.storedMarks);
       }
-      marks.push(...state.selection.$head.marks());
+      marks.push(...state2.selection.$head.marks());
     } else {
-      state.doc.nodesBetween(from2, to, (node) => {
+      state2.doc.nodesBetween(from2, to, (node) => {
         marks.push(...node.marks);
       });
     }
@@ -14356,11 +14356,11 @@
     };
     return getTextBetween(node, range, options);
   }
-  function getNodeAttributes(state, typeOrName) {
-    const type = getNodeType(typeOrName, state.schema);
-    const { from: from2, to } = state.selection;
+  function getNodeAttributes(state2, typeOrName) {
+    const type = getNodeType(typeOrName, state2.schema);
+    const { from: from2, to } = state2.selection;
     const nodes = [];
-    state.doc.nodesBetween(from2, to, (node2) => {
+    state2.doc.nodesBetween(from2, to, (node2) => {
       nodes.push(node2);
     });
     const node = nodes.reverse().find((nodeItem) => nodeItem.type.name === type.name);
@@ -14369,13 +14369,13 @@
     }
     return { ...node.attrs };
   }
-  function getAttributes(state, typeOrName) {
-    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state.schema);
+  function getAttributes(state2, typeOrName) {
+    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state2.schema);
     if (schemaType === "node") {
-      return getNodeAttributes(state, typeOrName);
+      return getNodeAttributes(state2, typeOrName);
     }
     if (schemaType === "mark") {
-      return getMarkAttributes(state, typeOrName);
+      return getMarkAttributes(state2, typeOrName);
     }
     return {};
   }
@@ -14469,11 +14469,11 @@
       return extensionAttribute.attribute.keepOnSplit;
     }));
   }
-  function isMarkActive(state, typeOrName, attributes = {}) {
-    const { empty: empty2, ranges } = state.selection;
-    const type = typeOrName ? getMarkType(typeOrName, state.schema) : null;
+  function isMarkActive(state2, typeOrName, attributes = {}) {
+    const { empty: empty2, ranges } = state2.selection;
+    const type = typeOrName ? getMarkType(typeOrName, state2.schema) : null;
     if (empty2) {
-      return !!(state.storedMarks || state.selection.$from.marks()).filter((mark) => {
+      return !!(state2.storedMarks || state2.selection.$from.marks()).filter((mark) => {
         if (!type) {
           return true;
         }
@@ -14485,7 +14485,7 @@
     ranges.forEach(({ $from, $to }) => {
       const from2 = $from.pos;
       const to = $to.pos;
-      state.doc.nodesBetween(from2, to, (node, pos) => {
+      state2.doc.nodesBetween(from2, to, (node, pos) => {
         if (!node.isText && !node.marks.length) {
           return;
         }
@@ -14518,16 +14518,16 @@
     const range = matchedRange > 0 ? matchedRange + excludedRange : matchedRange;
     return range >= selectionRange;
   }
-  function isActive(state, name, attributes = {}) {
+  function isActive(state2, name, attributes = {}) {
     if (!name) {
-      return isNodeActive(state, null, attributes) || isMarkActive(state, null, attributes);
+      return isNodeActive(state2, null, attributes) || isMarkActive(state2, null, attributes);
     }
-    const schemaType = getSchemaTypeNameByName(name, state.schema);
+    const schemaType = getSchemaTypeNameByName(name, state2.schema);
     if (schemaType === "node") {
-      return isNodeActive(state, name, attributes);
+      return isNodeActive(state2, name, attributes);
     }
     if (schemaType === "mark") {
-      return isMarkActive(state, name, attributes);
+      return isMarkActive(state2, name, attributes);
     }
     return false;
   }
@@ -14584,7 +14584,7 @@
   function isNodeSelection(value) {
     return value instanceof NodeSelection;
   }
-  function canSetMark(state, tr2, newMarkType) {
+  function canSetMark(state2, tr2, newMarkType) {
     var _a;
     const { selection } = tr2;
     let cursor = null;
@@ -14592,13 +14592,13 @@
       cursor = selection.$cursor;
     }
     if (cursor) {
-      const currentMarks = (_a = state.storedMarks) !== null && _a !== void 0 ? _a : cursor.marks();
+      const currentMarks = (_a = state2.storedMarks) !== null && _a !== void 0 ? _a : cursor.marks();
       return !!newMarkType.isInSet(currentMarks) || !currentMarks.some((mark) => mark.type.excludes(newMarkType));
     }
     const { ranges } = selection;
     return ranges.some(({ $from, $to }) => {
-      let someNodeSupportsMark = $from.depth === 0 ? state.doc.inlineContent && state.doc.type.allowsMarkType(newMarkType) : false;
-      state.doc.nodesBetween($from.pos, $to.pos, (node, _pos, parent) => {
+      let someNodeSupportsMark = $from.depth === 0 ? state2.doc.inlineContent && state2.doc.type.allowsMarkType(newMarkType) : false;
+      state2.doc.nodesBetween($from.pos, $to.pos, (node, _pos, parent) => {
         if (someNodeSupportsMark) {
           return false;
         }
@@ -14612,13 +14612,13 @@
       return someNodeSupportsMark;
     });
   }
-  var setMark = (typeOrName, attributes = {}) => ({ tr: tr2, state, dispatch }) => {
+  var setMark = (typeOrName, attributes = {}) => ({ tr: tr2, state: state2, dispatch }) => {
     const { selection } = tr2;
     const { empty: empty2, ranges } = selection;
-    const type = getMarkType(typeOrName, state.schema);
+    const type = getMarkType(typeOrName, state2.schema);
     if (dispatch) {
       if (empty2) {
-        const oldAttributes = getMarkAttributes(state, type);
+        const oldAttributes = getMarkAttributes(state2, type);
         tr2.addStoredMark(type.create({
           ...oldAttributes,
           ...attributes
@@ -14627,7 +14627,7 @@
         ranges.forEach((range) => {
           const from2 = range.$from.pos;
           const to = range.$to.pos;
-          state.doc.nodesBetween(from2, to, (node, pos) => {
+          state2.doc.nodesBetween(from2, to, (node, pos) => {
             const trimmedFrom = Math.max(pos, from2);
             const trimmedTo = Math.min(pos + node.nodeSize, to);
             const someHasMark = node.marks.find((mark) => mark.type === type);
@@ -14647,24 +14647,24 @@
         });
       }
     }
-    return canSetMark(state, tr2, type);
+    return canSetMark(state2, tr2, type);
   };
   var setMeta = (key, value) => ({ tr: tr2 }) => {
     tr2.setMeta(key, value);
     return true;
   };
-  var setNode = (typeOrName, attributes = {}) => ({ state, dispatch, chain }) => {
-    const type = getNodeType(typeOrName, state.schema);
+  var setNode = (typeOrName, attributes = {}) => ({ state: state2, dispatch, chain }) => {
+    const type = getNodeType(typeOrName, state2.schema);
     let attributesToCopy;
-    if (state.selection.$anchor.sameParent(state.selection.$head)) {
-      attributesToCopy = state.selection.$anchor.parent.attrs;
+    if (state2.selection.$anchor.sameParent(state2.selection.$head)) {
+      attributesToCopy = state2.selection.$anchor.parent.attrs;
     }
     if (!type.isTextblock) {
       console.warn('[tiptap warn]: Currently "setNode()" only supports text block nodes.');
       return false;
     }
     return chain().command(({ commands: commands2 }) => {
-      const canSetBlock = setBlockType2(type, { ...attributesToCopy, ...attributes })(state);
+      const canSetBlock = setBlockType2(type, { ...attributesToCopy, ...attributes })(state2);
       if (canSetBlock) {
         return true;
       }
@@ -14695,18 +14695,18 @@
     }
     return true;
   };
-  var sinkListItem2 = (typeOrName) => ({ state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    return sinkListItem(type)(state, dispatch);
+  var sinkListItem2 = (typeOrName) => ({ state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    return sinkListItem(type)(state2, dispatch);
   };
-  function ensureMarks(state, splittableMarks) {
-    const marks = state.storedMarks || state.selection.$to.parentOffset && state.selection.$from.marks();
+  function ensureMarks(state2, splittableMarks) {
+    const marks = state2.storedMarks || state2.selection.$to.parentOffset && state2.selection.$from.marks();
     if (marks) {
       const filteredMarks = marks.filter((mark) => splittableMarks === null || splittableMarks === void 0 ? void 0 : splittableMarks.includes(mark.type.name));
-      state.tr.ensureMarks(filteredMarks);
+      state2.tr.ensureMarks(filteredMarks);
     }
   }
-  var splitBlock2 = ({ keepMarks = true } = {}) => ({ tr: tr2, state, dispatch, editor }) => {
+  var splitBlock2 = ({ keepMarks = true } = {}) => ({ tr: tr2, state: state2, dispatch, editor }) => {
     const { selection, doc: doc3 } = tr2;
     const { $from, $to } = selection;
     const extensionAttributes = editor.extensionManager.attributes;
@@ -14717,7 +14717,7 @@
       }
       if (dispatch) {
         if (keepMarks) {
-          ensureMarks(state, editor.extensionManager.splittableMarks);
+          ensureMarks(state2, editor.extensionManager.splittableMarks);
         }
         tr2.split($from.pos).scrollIntoView();
       }
@@ -14759,17 +14759,17 @@
         }
       }
       if (keepMarks) {
-        ensureMarks(state, editor.extensionManager.splittableMarks);
+        ensureMarks(state2, editor.extensionManager.splittableMarks);
       }
       tr2.scrollIntoView();
     }
     return can;
   };
-  var splitListItem = (typeOrName, overrideAttrs = {}) => ({ tr: tr2, state, dispatch, editor }) => {
+  var splitListItem = (typeOrName, overrideAttrs = {}) => ({ tr: tr2, state: state2, dispatch, editor }) => {
     var _a;
-    const type = getNodeType(typeOrName, state.schema);
-    const { $from, $to } = state.selection;
-    const node = state.selection.node;
+    const type = getNodeType(typeOrName, state2.schema);
+    const { $from, $to } = state2.selection;
+    const node = state2.selection.node;
     if (node && node.isBlock || $from.depth < 2 || !$from.sameParent($to)) {
       return false;
     }
@@ -14831,7 +14831,7 @@
       return false;
     }
     if (dispatch) {
-      const { selection, storedMarks } = state;
+      const { selection, storedMarks } = state2;
       const { splittableMarks } = editor.extensionManager;
       const marks = storedMarks || selection.$to.parentOffset && selection.$from.marks();
       tr2.split($from.pos, 2, types).scrollIntoView();
@@ -14877,11 +14877,11 @@
     tr2.join(after);
     return true;
   };
-  var toggleList = (listTypeOrName, itemTypeOrName, keepMarks, attributes = {}) => ({ editor, tr: tr2, state, dispatch, chain, commands: commands2, can }) => {
+  var toggleList = (listTypeOrName, itemTypeOrName, keepMarks, attributes = {}) => ({ editor, tr: tr2, state: state2, dispatch, chain, commands: commands2, can }) => {
     const { extensions, splittableMarks } = editor.extensionManager;
-    const listType = getNodeType(listTypeOrName, state.schema);
-    const itemType = getNodeType(itemTypeOrName, state.schema);
-    const { selection, storedMarks } = state;
+    const listType = getNodeType(listTypeOrName, state2.schema);
+    const itemType = getNodeType(itemTypeOrName, state2.schema);
+    const { selection, storedMarks } = state2;
     const { $from, $to } = selection;
     const range = $from.blockRange($to);
     const marks = storedMarks || selection.$to.parentOffset && selection.$from.marks();
@@ -14919,51 +14919,51 @@
       return commands2.clearNodes();
     }).wrapInList(listType, attributes).command(() => joinListBackwards(tr2, listType)).command(() => joinListForwards(tr2, listType)).run();
   };
-  var toggleMark = (typeOrName, attributes = {}, options = {}) => ({ state, commands: commands2 }) => {
+  var toggleMark = (typeOrName, attributes = {}, options = {}) => ({ state: state2, commands: commands2 }) => {
     const { extendEmptyMarkRange = false } = options;
-    const type = getMarkType(typeOrName, state.schema);
-    const isActive2 = isMarkActive(state, type, attributes);
+    const type = getMarkType(typeOrName, state2.schema);
+    const isActive2 = isMarkActive(state2, type, attributes);
     if (isActive2) {
       return commands2.unsetMark(type, { extendEmptyMarkRange });
     }
     return commands2.setMark(type, attributes);
   };
-  var toggleNode = (typeOrName, toggleTypeOrName, attributes = {}) => ({ state, commands: commands2 }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    const toggleType = getNodeType(toggleTypeOrName, state.schema);
-    const isActive2 = isNodeActive(state, type, attributes);
+  var toggleNode = (typeOrName, toggleTypeOrName, attributes = {}) => ({ state: state2, commands: commands2 }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    const toggleType = getNodeType(toggleTypeOrName, state2.schema);
+    const isActive2 = isNodeActive(state2, type, attributes);
     let attributesToCopy;
-    if (state.selection.$anchor.sameParent(state.selection.$head)) {
-      attributesToCopy = state.selection.$anchor.parent.attrs;
+    if (state2.selection.$anchor.sameParent(state2.selection.$head)) {
+      attributesToCopy = state2.selection.$anchor.parent.attrs;
     }
     if (isActive2) {
       return commands2.setNode(toggleType, attributesToCopy);
     }
     return commands2.setNode(type, { ...attributesToCopy, ...attributes });
   };
-  var toggleWrap = (typeOrName, attributes = {}) => ({ state, commands: commands2 }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    const isActive2 = isNodeActive(state, type, attributes);
+  var toggleWrap = (typeOrName, attributes = {}) => ({ state: state2, commands: commands2 }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    const isActive2 = isNodeActive(state2, type, attributes);
     if (isActive2) {
       return commands2.lift(type);
     }
     return commands2.wrapIn(type, attributes);
   };
-  var undoInputRule = () => ({ state, dispatch }) => {
-    const plugins = state.plugins;
+  var undoInputRule = () => ({ state: state2, dispatch }) => {
+    const plugins = state2.plugins;
     for (let i = 0; i < plugins.length; i += 1) {
       const plugin = plugins[i];
       let undoable;
-      if (plugin.spec.isInputRules && (undoable = plugin.getState(state))) {
+      if (plugin.spec.isInputRules && (undoable = plugin.getState(state2))) {
         if (dispatch) {
-          const tr2 = state.tr;
+          const tr2 = state2.tr;
           const toUndo = undoable.transform;
           for (let j = toUndo.steps.length - 1; j >= 0; j -= 1) {
             tr2.step(toUndo.steps[j].invert(toUndo.docs[j]));
           }
           if (undoable.text) {
             const marks = tr2.doc.resolve(undoable.from).marks();
-            tr2.replaceWith(undoable.from, undoable.to, state.schema.text(undoable.text, marks));
+            tr2.replaceWith(undoable.from, undoable.to, state2.schema.text(undoable.text, marks));
           } else {
             tr2.delete(undoable.from, undoable.to);
           }
@@ -14986,11 +14986,11 @@
     }
     return true;
   };
-  var unsetMark = (typeOrName, options = {}) => ({ tr: tr2, state, dispatch }) => {
+  var unsetMark = (typeOrName, options = {}) => ({ tr: tr2, state: state2, dispatch }) => {
     var _a;
     const { extendEmptyMarkRange = false } = options;
     const { selection } = tr2;
-    const type = getMarkType(typeOrName, state.schema);
+    const type = getMarkType(typeOrName, state2.schema);
     const { $from, empty: empty2, ranges } = selection;
     if (!dispatch) {
       return true;
@@ -15012,18 +15012,18 @@
     tr2.removeStoredMark(type);
     return true;
   };
-  var updateAttributes = (typeOrName, attributes = {}) => ({ tr: tr2, state, dispatch }) => {
+  var updateAttributes = (typeOrName, attributes = {}) => ({ tr: tr2, state: state2, dispatch }) => {
     let nodeType = null;
     let markType = null;
-    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state.schema);
+    const schemaType = getSchemaTypeNameByName(typeof typeOrName === "string" ? typeOrName : typeOrName.name, state2.schema);
     if (!schemaType) {
       return false;
     }
     if (schemaType === "node") {
-      nodeType = getNodeType(typeOrName, state.schema);
+      nodeType = getNodeType(typeOrName, state2.schema);
     }
     if (schemaType === "mark") {
-      markType = getMarkType(typeOrName, state.schema);
+      markType = getMarkType(typeOrName, state2.schema);
     }
     if (dispatch) {
       tr2.selection.ranges.forEach((range) => {
@@ -15034,7 +15034,7 @@
         let trimmedFrom;
         let trimmedTo;
         if (tr2.selection.empty) {
-          state.doc.nodesBetween(from2, to, (node, pos) => {
+          state2.doc.nodesBetween(from2, to, (node, pos) => {
             if (nodeType && nodeType === node.type) {
               trimmedFrom = Math.max(pos, from2);
               trimmedTo = Math.min(pos + node.nodeSize, to);
@@ -15043,7 +15043,7 @@
             }
           });
         } else {
-          state.doc.nodesBetween(from2, to, (node, pos) => {
+          state2.doc.nodesBetween(from2, to, (node, pos) => {
             if (pos < from2 && nodeType && nodeType === node.type) {
               trimmedFrom = Math.max(pos, from2);
               trimmedTo = Math.min(pos + node.nodeSize, to);
@@ -15094,13 +15094,13 @@
     }
     return true;
   };
-  var wrapIn2 = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    return wrapIn(type, attributes)(state, dispatch);
+  var wrapIn2 = (typeOrName, attributes = {}) => ({ state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    return wrapIn(type, attributes)(state2, dispatch);
   };
-  var wrapInList2 = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
-    const type = getNodeType(typeOrName, state.schema);
-    return wrapInList(type, attributes)(state, dispatch);
+  var wrapInList2 = (typeOrName, attributes = {}) => ({ state: state2, dispatch }) => {
+    const type = getNodeType(typeOrName, state2.schema);
+    return wrapInList(type, attributes)(state2, dispatch);
   };
   var commands = /* @__PURE__ */ Object.freeze({
     __proto__: null,
@@ -15326,13 +15326,13 @@
               return;
             }
             const tr2 = newState.tr;
-            const state = createChainableState({
+            const state2 = createChainableState({
               state: newState,
               transaction: tr2
             });
             const { commands: commands2 } = new CommandManager({
               editor: this.editor,
-              state
+              state: state2
             });
             commands2.clearNodes();
             if (!tr2.steps.length) {
@@ -15785,9 +15785,9 @@ img.ProseMirror-separator {
      */
     registerPlugin(plugin, handlePlugins) {
       const plugins = isFunction(handlePlugins) ? handlePlugins(plugin, [...this.state.plugins]) : [...this.state.plugins, plugin];
-      const state = this.state.reconfigure({ plugins });
-      this.view.updateState(state);
-      return state;
+      const state2 = this.state.reconfigure({ plugins });
+      this.view.updateState(state2);
+      return state2;
     }
     /**
      * Unregister a ProseMirror plugin.
@@ -15808,11 +15808,11 @@ img.ProseMirror-separator {
       if (prevPlugins.length === plugins.length) {
         return void 0;
       }
-      const state = this.state.reconfigure({
+      const state2 = this.state.reconfigure({
         plugins
       });
-      this.view.updateState(state);
-      return state;
+      this.view.updateState(state2);
+      return state2;
     }
     /**
      * Creates an extension manager.
@@ -15948,14 +15948,14 @@ img.ProseMirror-separator {
         });
         return;
       }
-      const state = this.state.apply(transaction);
-      const selectionHasChanged = !this.state.selection.eq(state.selection);
+      const state2 = this.state.apply(transaction);
+      const selectionHasChanged = !this.state.selection.eq(state2.selection);
       this.emit("beforeTransaction", {
         editor: this,
         transaction,
-        nextState: state
+        nextState: state2
       });
-      this.view.updateState(state);
+      this.view.updateState(state2);
       this.emit("transaction", {
         editor: this,
         transaction
@@ -16081,19 +16081,19 @@ img.ProseMirror-separator {
   function markInputRule(config) {
     return new InputRule({
       find: config.find,
-      handler: ({ state, range, match }) => {
+      handler: ({ state: state2, range, match }) => {
         const attributes = callOrReturn(config.getAttributes, void 0, match);
         if (attributes === false || attributes === null) {
           return null;
         }
-        const { tr: tr2 } = state;
+        const { tr: tr2 } = state2;
         const captureGroup = match[match.length - 1];
         const fullMatch = match[0];
         if (captureGroup) {
           const startSpaces = fullMatch.search(/\S/);
           const textStart = range.from + fullMatch.indexOf(captureGroup);
           const textEnd = textStart + captureGroup.length;
-          const excludedMarks = getMarksBetween(range.from, range.to, state.doc).filter((item) => {
+          const excludedMarks = getMarksBetween(range.from, range.to, state2.doc).filter((item) => {
             const excluded = item.mark.type.excluded;
             return excluded.find((type) => type === config.type && type !== item.mark.type);
           }).filter((item) => item.to > textStart);
@@ -16116,9 +16116,9 @@ img.ProseMirror-separator {
   function nodeInputRule(config) {
     return new InputRule({
       find: config.find,
-      handler: ({ state, range, match }) => {
+      handler: ({ state: state2, range, match }) => {
         const attributes = callOrReturn(config.getAttributes, void 0, match) || {};
-        const { tr: tr2 } = state;
+        const { tr: tr2 } = state2;
         const start = range.from;
         let end = range.to;
         const newNode = config.type.create(attributes);
@@ -16144,20 +16144,20 @@ img.ProseMirror-separator {
   function textblockTypeInputRule(config) {
     return new InputRule({
       find: config.find,
-      handler: ({ state, range, match }) => {
-        const $start = state.doc.resolve(range.from);
+      handler: ({ state: state2, range, match }) => {
+        const $start = state2.doc.resolve(range.from);
         const attributes = callOrReturn(config.getAttributes, void 0, match) || {};
         if (!$start.node(-1).canReplaceWith($start.index(-1), $start.indexAfter(-1), config.type)) {
           return null;
         }
-        state.tr.delete(range.from, range.to).setBlockType(range.from, range.from, config.type, attributes);
+        state2.tr.delete(range.from, range.to).setBlockType(range.from, range.from, config.type, attributes);
       }
     });
   }
   function textInputRule(config) {
     return new InputRule({
       find: config.find,
-      handler: ({ state, range, match }) => {
+      handler: ({ state: state2, range, match }) => {
         let insert = config.replace;
         let start = range.from;
         const end = range.to;
@@ -16171,16 +16171,16 @@ img.ProseMirror-separator {
             start = end;
           }
         }
-        state.tr.insertText(insert, start, end);
+        state2.tr.insertText(insert, start, end);
       }
     });
   }
   function wrappingInputRule(config) {
     return new InputRule({
       find: config.find,
-      handler: ({ state, range, match, chain }) => {
+      handler: ({ state: state2, range, match, chain }) => {
         const attributes = callOrReturn(config.getAttributes, void 0, match) || {};
-        const tr2 = state.tr.delete(range.from, range.to);
+        const tr2 = state2.tr.delete(range.from, range.to);
         const $start = tr2.doc.resolve(range.from);
         const blockRange = $start.blockRange();
         const wrapping = blockRange && findWrapping(blockRange, config.type, attributes);
@@ -16189,7 +16189,7 @@ img.ProseMirror-separator {
         }
         tr2.wrap(blockRange, wrapping);
         if (config.keepMarks && config.editor) {
-          const { selection, storedMarks } = state;
+          const { selection, storedMarks } = state2;
           const { splittableMarks } = config.editor.extensionManager;
           const marks = storedMarks || selection.$to.parentOffset && selection.$from.marks();
           if (marks) {
@@ -16272,12 +16272,12 @@ img.ProseMirror-separator {
   function markPasteRule(config) {
     return new PasteRule({
       find: config.find,
-      handler: ({ state, range, match, pasteEvent }) => {
+      handler: ({ state: state2, range, match, pasteEvent }) => {
         const attributes = callOrReturn(config.getAttributes, void 0, match, pasteEvent);
         if (attributes === false || attributes === null) {
           return null;
         }
-        const { tr: tr2 } = state;
+        const { tr: tr2 } = state2;
         const captureGroup = match[match.length - 1];
         const fullMatch = match[0];
         let markEnd = range.to;
@@ -16285,7 +16285,7 @@ img.ProseMirror-separator {
           const startSpaces = fullMatch.search(/\S/);
           const textStart = range.from + fullMatch.indexOf(captureGroup);
           const textEnd = textStart + captureGroup.length;
-          const excludedMarks = getMarksBetween(range.from, range.to, state.doc).filter((item) => {
+          const excludedMarks = getMarksBetween(range.from, range.to, state2.doc).filter((item) => {
             const excluded = item.mark.type.excluded;
             return excluded.find((type) => type === config.type && type !== item.mark.type);
           }).filter((item) => item.to > textStart);
@@ -16305,8 +16305,8 @@ img.ProseMirror-separator {
       }
     });
   }
-  function canInsertNode(state, nodeType) {
-    const { selection } = state;
+  function canInsertNode(state2, nodeType) {
+    const { selection } = state2;
     const { $from } = selection;
     if (selection instanceof NodeSelection) {
       const index = $from.index();
@@ -16663,8 +16663,8 @@ img.ProseMirror-separator {
           if (!this.options.exitOnTripleEnter) {
             return false;
           }
-          const { state } = editor;
-          const { selection } = state;
+          const { state: state2 } = editor;
+          const { selection } = state2;
           const { $from, empty: empty2 } = selection;
           if (!empty2 || $from.parent.type !== this.type) {
             return false;
@@ -16684,8 +16684,8 @@ img.ProseMirror-separator {
           if (!this.options.exitOnArrowDown) {
             return false;
           }
-          const { state } = editor;
-          const { selection, doc: doc3 } = state;
+          const { state: state2 } = editor;
+          const { selection, doc: doc3 } = state2;
           const { $from, empty: empty2 } = selection;
           if (!empty2 || $from.parent.type !== this.type) {
             return false;
@@ -17083,20 +17083,20 @@ img.ProseMirror-separator {
   });
   function arrow(axis, dir) {
     const dirStr = axis == "vert" ? dir > 0 ? "down" : "up" : dir > 0 ? "right" : "left";
-    return function(state, dispatch, view) {
-      let sel = state.selection;
+    return function(state2, dispatch, view) {
+      let sel = state2.selection;
       let $start = dir > 0 ? sel.$to : sel.$from, mustMove = sel.empty;
       if (sel instanceof TextSelection) {
         if (!view.endOfTextblock(dirStr) || $start.depth == 0)
           return false;
         mustMove = false;
-        $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
+        $start = state2.doc.resolve(dir > 0 ? $start.after() : $start.before());
       }
       let $found = GapCursor.findGapCursorFrom($start, dir, mustMove);
       if (!$found)
         return false;
       if (dispatch)
-        dispatch(state.tr.setSelection(new GapCursor($found)));
+        dispatch(state2.tr.setSelection(new GapCursor($found)));
       return true;
     };
   }
@@ -17127,12 +17127,12 @@ img.ProseMirror-separator {
     view.dispatch(tr2);
     return false;
   }
-  function drawGapCursor(state) {
-    if (!(state.selection instanceof GapCursor))
+  function drawGapCursor(state2) {
+    if (!(state2.selection instanceof GapCursor))
       return null;
     let node = document.createElement("div");
     node.className = "ProseMirror-gapcursor";
-    return DecorationSet.create(state.doc, [Decoration.widget(state.selection.head, node, { key: "gapcursor" })]);
+    return DecorationSet.create(state2.doc, [Decoration.widget(state2.selection.head, node, { key: "gapcursor" })]);
   }
 
   // node_modules/@tiptap/extension-gapcursor/dist/index.js
@@ -17182,11 +17182,11 @@ img.ProseMirror-separator {
     },
     addCommands() {
       return {
-        setHardBreak: () => ({ commands: commands2, chain, state, editor }) => {
+        setHardBreak: () => ({ commands: commands2, chain, state: state2, editor }) => {
           return commands2.first([
             () => commands2.exitCode(),
             () => commands2.command(() => {
-              const { selection, storedMarks } = state;
+              const { selection, storedMarks } = state2;
               if (selection.$from.parent.type.spec.isolating) {
                 return false;
               }
@@ -17473,7 +17473,7 @@ img.ProseMirror-separator {
     }
     // Pop the latest event off the branch's history and apply it
     // to a document transform.
-    popEvent(state, preserveItems) {
+    popEvent(state2, preserveItems) {
       if (this.eventCount == 0)
         return null;
       let end = this.items.length;
@@ -17489,7 +17489,7 @@ img.ProseMirror-separator {
         remap = this.remapping(end, this.items.length);
         mapFrom = remap.maps.length;
       }
-      let transform = state.tr;
+      let transform = state2.tr;
       let selection, remaining;
       let addAfter = [], addBefore = [];
       this.items.forEach((item, i) => {
@@ -17686,7 +17686,7 @@ img.ProseMirror-separator {
     }
   };
   var DEPTH_OVERFLOW = 20;
-  function applyTransaction(history2, state, tr2, options) {
+  function applyTransaction(history2, state2, tr2, options) {
     let historyTr = tr2.getMeta(historyKey), rebased;
     if (historyTr)
       return historyTr.historyState;
@@ -17697,14 +17697,14 @@ img.ProseMirror-separator {
       return history2;
     } else if (appended && appended.getMeta(historyKey)) {
       if (appended.getMeta(historyKey).redo)
-        return new HistoryState(history2.done.addTransform(tr2, void 0, options, mustPreserveItems(state)), history2.undone, rangesFor(tr2.mapping.maps), history2.prevTime, history2.prevComposition);
+        return new HistoryState(history2.done.addTransform(tr2, void 0, options, mustPreserveItems(state2)), history2.undone, rangesFor(tr2.mapping.maps), history2.prevTime, history2.prevComposition);
       else
-        return new HistoryState(history2.done, history2.undone.addTransform(tr2, void 0, options, mustPreserveItems(state)), null, history2.prevTime, history2.prevComposition);
+        return new HistoryState(history2.done, history2.undone.addTransform(tr2, void 0, options, mustPreserveItems(state2)), null, history2.prevTime, history2.prevComposition);
     } else if (tr2.getMeta("addToHistory") !== false && !(appended && appended.getMeta("addToHistory") === false)) {
       let composition = tr2.getMeta("composition");
       let newGroup = history2.prevTime == 0 || !appended && history2.prevComposition != composition && (history2.prevTime < (tr2.time || 0) - options.newGroupDelay || !isAdjacentTo(tr2, history2.prevRanges));
       let prevRanges = appended ? mapRanges(history2.prevRanges, tr2.mapping) : rangesFor(tr2.mapping.maps);
-      return new HistoryState(history2.done.addTransform(tr2, newGroup ? state.selection.getBookmark() : void 0, options, mustPreserveItems(state)), Branch.empty, prevRanges, tr2.time, composition == null ? history2.prevComposition : composition);
+      return new HistoryState(history2.done.addTransform(tr2, newGroup ? state2.selection.getBookmark() : void 0, options, mustPreserveItems(state2)), Branch.empty, prevRanges, tr2.time, composition == null ? history2.prevComposition : composition);
     } else if (rebased = tr2.getMeta("rebased")) {
       return new HistoryState(history2.done.rebased(tr2, rebased), history2.undone.rebased(tr2, rebased), mapRanges(history2.prevRanges, tr2.mapping), history2.prevTime, history2.prevComposition);
     } else {
@@ -17741,21 +17741,21 @@ img.ProseMirror-separator {
     }
     return result;
   }
-  function histTransaction(history2, state, redo2) {
-    let preserveItems = mustPreserveItems(state);
-    let histOptions = historyKey.get(state).spec.config;
-    let pop = (redo2 ? history2.undone : history2.done).popEvent(state, preserveItems);
+  function histTransaction(history2, state2, redo2) {
+    let preserveItems = mustPreserveItems(state2);
+    let histOptions = historyKey.get(state2).spec.config;
+    let pop = (redo2 ? history2.undone : history2.done).popEvent(state2, preserveItems);
     if (!pop)
       return null;
     let selection = pop.selection.resolve(pop.transform.doc);
-    let added = (redo2 ? history2.done : history2.undone).addTransform(pop.transform, state.selection.getBookmark(), histOptions, preserveItems);
+    let added = (redo2 ? history2.done : history2.undone).addTransform(pop.transform, state2.selection.getBookmark(), histOptions, preserveItems);
     let newHist = new HistoryState(redo2 ? added : pop.remaining, redo2 ? pop.remaining : added, null, 0, -1);
     return pop.transform.setSelection(selection).setMeta(historyKey, { redo: redo2, historyState: newHist });
   }
   var cachedPreserveItems = false;
   var cachedPreserveItemsPlugins = null;
-  function mustPreserveItems(state) {
-    let plugins = state.plugins;
+  function mustPreserveItems(state2) {
+    let plugins = state2.plugins;
     if (cachedPreserveItemsPlugins != plugins) {
       cachedPreserveItems = false;
       cachedPreserveItemsPlugins = plugins;
@@ -17780,8 +17780,8 @@ img.ProseMirror-separator {
         init() {
           return new HistoryState(Branch.empty, Branch.empty, null, 0, -1);
         },
-        apply(tr2, hist, state) {
-          return applyTransaction(hist, state, tr2, config);
+        apply(tr2, hist, state2) {
+          return applyTransaction(hist, state2, tr2, config);
         }
       },
       config,
@@ -17800,12 +17800,12 @@ img.ProseMirror-separator {
     });
   }
   function buildCommand(redo2, scroll) {
-    return (state, dispatch) => {
-      let hist = historyKey.getState(state);
+    return (state2, dispatch) => {
+      let hist = historyKey.getState(state2);
       if (!hist || (redo2 ? hist.undone : hist.done).eventCount == 0)
         return false;
       if (dispatch) {
-        let tr2 = histTransaction(hist, state, redo2);
+        let tr2 = histTransaction(hist, state2, redo2);
         if (tr2)
           dispatch(scroll ? tr2.scrollIntoView() : tr2);
       }
@@ -17828,11 +17828,11 @@ img.ProseMirror-separator {
     },
     addCommands() {
       return {
-        undo: () => ({ state, dispatch }) => {
-          return undo(state, dispatch);
+        undo: () => ({ state: state2, dispatch }) => {
+          return undo(state2, dispatch);
         },
-        redo: () => ({ state, dispatch }) => {
-          return redo(state, dispatch);
+        redo: () => ({ state: state2, dispatch }) => {
+          return redo(state2, dispatch);
         }
       };
     },
@@ -17870,11 +17870,11 @@ img.ProseMirror-separator {
     },
     addCommands() {
       return {
-        setHorizontalRule: () => ({ chain, state }) => {
-          if (!canInsertNode(state, state.schema.nodes[this.name])) {
+        setHorizontalRule: () => ({ chain, state: state2 }) => {
+          if (!canInsertNode(state2, state2.schema.nodes[this.name])) {
             return false;
           }
-          const { selection } = state;
+          const { selection } = state2;
           const { $from: $originFrom, $to: $originTo } = selection;
           const currentChain = chain();
           if ($originFrom.parentOffset === 0) {
@@ -18362,19 +18362,19 @@ img.ProseMirror-separator {
      * @returns {?State<T>} the next state, if any
      */
     go(input) {
-      const state = this;
-      const nextState = state.j[input];
+      const state2 = this;
+      const nextState = state2.j[input];
       if (nextState) {
         return nextState;
       }
-      for (let i = 0; i < state.jr.length; i++) {
-        const regex = state.jr[i][0];
-        const nextState2 = state.jr[i][1];
+      for (let i = 0; i < state2.jr.length; i++) {
+        const regex = state2.jr[i][0];
+        const nextState2 = state2.jr[i][1];
         if (nextState2 && regex.test(input)) {
           return nextState2;
         }
       }
-      return state.jd;
+      return state2.jd;
     },
     /**
      * Whether the state has a transition for the given input. Set the second
@@ -18433,15 +18433,15 @@ img.ProseMirror-separator {
      * @returns {State<T>} taken after the given input
      */
     ts(input, next, flags, groups) {
-      let state = this;
+      let state2 = this;
       const len = input.length;
       if (!len) {
-        return state;
+        return state2;
       }
       for (let i = 0; i < len - 1; i++) {
-        state = state.tt(input[i]);
+        state2 = state2.tt(input[i]);
       }
-      return state.tt(input[len - 1], next, flags, groups);
+      return state2.tt(input[len - 1], next, flags, groups);
     },
     /**
      * Short for "take transition", this is a method for building/working with
@@ -18471,13 +18471,13 @@ img.ProseMirror-separator {
      */
     tt(input, next, flags, groups) {
       groups = groups || State.groups;
-      const state = this;
+      const state2 = this;
       if (next && next.j) {
-        state.j[input] = next;
+        state2.j[input] = next;
         return next;
       }
       const t = next;
-      let nextState, templateState = state.go(input);
+      let nextState, templateState = state2.go(input);
       if (templateState) {
         nextState = new State();
         Object.assign(nextState.j, templateState.j);
@@ -18498,14 +18498,14 @@ img.ProseMirror-separator {
         }
         nextState.t = t;
       }
-      state.j[input] = nextState;
+      state2.j[input] = nextState;
       return nextState;
     }
   };
-  var ta = (state, input, next, flags, groups) => state.ta(input, next, flags, groups);
-  var tr = (state, regexp, next, flags, groups) => state.tr(regexp, next, flags, groups);
-  var ts = (state, input, next, flags, groups) => state.ts(input, next, flags, groups);
-  var tt = (state, input, next, flags, groups) => state.tt(input, next, flags, groups);
+  var ta = (state2, input, next, flags, groups) => state2.ta(input, next, flags, groups);
+  var tr = (state2, regexp, next, flags, groups) => state2.tr(regexp, next, flags, groups);
+  var ts = (state2, input, next, flags, groups) => state2.ts(input, next, flags, groups);
+  var tt = (state2, input, next, flags, groups) => state2.tt(input, next, flags, groups);
   var WORD = "WORD";
   var UWORD = "UWORD";
   var ASCIINUMERICAL = "ASCIINUMERICAL";
@@ -18802,18 +18802,18 @@ img.ProseMirror-separator {
     let cursor = 0;
     let charCursor = 0;
     while (charCursor < charCount) {
-      let state = start;
+      let state2 = start;
       let nextState = null;
       let tokenLength = 0;
       let latestAccepting = null;
       let sinceAccepts = -1;
       let charsSinceAccepts = -1;
-      while (charCursor < charCount && (nextState = state.go(iterable[charCursor]))) {
-        state = nextState;
-        if (state.accepts()) {
+      while (charCursor < charCount && (nextState = state2.go(iterable[charCursor]))) {
+        state2 = nextState;
+        if (state2.accepts()) {
           sinceAccepts = 0;
           charsSinceAccepts = 0;
-          latestAccepting = state;
+          latestAccepting = state2;
         } else if (sinceAccepts >= 0) {
           sinceAccepts += iterable[charCursor].length;
           charsSinceAccepts++;
@@ -18851,23 +18851,23 @@ img.ProseMirror-separator {
     }
     return result;
   }
-  function fastts(state, input, t, defaultt, jr) {
+  function fastts(state2, input, t, defaultt, jr) {
     let next;
     const len = input.length;
     for (let i = 0; i < len - 1; i++) {
       const char = input[i];
-      if (state.j[char]) {
-        next = state.j[char];
+      if (state2.j[char]) {
+        next = state2.j[char];
       } else {
         next = new State(defaultt);
         next.jr = jr.slice();
-        state.j[char] = next;
+        state2.j[char] = next;
       }
-      state = next;
+      state2 = next;
     }
     next = new State(t);
     next.jr = jr.slice();
-    state.j[input[len - 1]] = next;
+    state2.j[input[len - 1]] = next;
     return next;
   }
   function decodeTlds(encoded) {
@@ -19310,21 +19310,21 @@ img.ProseMirror-separator {
     let multis = [];
     let textTokens = [];
     while (cursor < len) {
-      let state = start;
+      let state2 = start;
       let secondState = null;
       let nextState = null;
       let multiLength = 0;
       let latestAccepting = null;
       let sinceAccepts = -1;
-      while (cursor < len && !(secondState = state.go(tokens[cursor].t))) {
+      while (cursor < len && !(secondState = state2.go(tokens[cursor].t))) {
         textTokens.push(tokens[cursor++]);
       }
-      while (cursor < len && (nextState = secondState || state.go(tokens[cursor].t))) {
+      while (cursor < len && (nextState = secondState || state2.go(tokens[cursor].t))) {
         secondState = null;
-        state = nextState;
-        if (state.accepts()) {
+        state2 = nextState;
+        if (state2.accepts()) {
           sinceAccepts = 0;
-          latestAccepting = state;
+          latestAccepting = state2;
         } else if (sinceAccepts >= 0) {
           sinceAccepts++;
         }
@@ -19557,8 +19557,8 @@ img.ProseMirror-separator {
       key: new PluginKey("handlePasteLink"),
       props: {
         handlePaste: (view, event, slice2) => {
-          const { state } = view;
-          const { selection } = state;
+          const { state: state2 } = view;
+          const { selection } = state2;
           const { empty: empty2 } = selection;
           if (empty2) {
             return false;
@@ -20482,13 +20482,13 @@ img.ProseMirror-separator {
     }
     return null;
   }
-  function isInTable(state) {
-    const $head = state.selection.$head;
+  function isInTable(state2) {
+    const $head = state2.selection.$head;
     for (let d = $head.depth; d > 0; d--) if ($head.node(d).type.spec.tableRole == "row") return true;
     return false;
   }
-  function selectionCell(state) {
-    const sel = state.selection;
+  function selectionCell(state2) {
+    const sel = state2.selection;
     if ("$anchorCell" in sel && sel.$anchorCell) return sel.$anchorCell.pos > sel.$headCell.pos ? sel.$anchorCell : sel.$headCell;
     else if ("node" in sel && sel.node && sel.node.type.spec.tableRole == "cell") return sel.$anchor;
     const $cell = cellAround(sel.$head) || cellNear(sel.$head);
@@ -20727,13 +20727,13 @@ img.ProseMirror-separator {
       else return Selection.near($headCell, 1);
     }
   };
-  function drawCellSelection(state) {
-    if (!(state.selection instanceof CellSelection)) return null;
+  function drawCellSelection(state2) {
+    if (!(state2.selection instanceof CellSelection)) return null;
     const cells = [];
-    state.selection.forEachCell((node, pos) => {
+    state2.selection.forEachCell((node, pos) => {
       cells.push(Decoration.node(pos, pos + node.nodeSize, { class: "selectedCell" }));
     });
-    return DecorationSet.create(state.doc, cells);
+    return DecorationSet.create(state2.doc, cells);
   }
   function isCellBoundarySelection({ $from, $to }) {
     if ($from.pos == $to.pos || $from.pos < $to.pos - 6) return false;
@@ -20763,9 +20763,9 @@ img.ProseMirror-separator {
     }
     return fromCellBoundaryNode !== toCellBoundaryNode && $to.parentOffset === 0;
   }
-  function normalizeSelection(state, tr2, allowTableNodeSelection) {
-    const sel = (tr2 || state).selection;
-    const doc3 = (tr2 || state).doc;
+  function normalizeSelection(state2, tr2, allowTableNodeSelection) {
+    const sel = (tr2 || state2).selection;
+    const doc3 = (tr2 || state2).doc;
     let normalize2;
     let role;
     if (sel instanceof NodeSelection && (role = sel.node.type.spec.tableRole)) {
@@ -20781,7 +20781,7 @@ img.ProseMirror-separator {
       }
     } else if (sel instanceof TextSelection && isCellBoundarySelection(sel)) normalize2 = TextSelection.create(doc3, sel.from);
     else if (sel instanceof TextSelection && isTextSelectionAcrossCells(sel)) normalize2 = TextSelection.create(doc3, sel.$from.start(), sel.$from.end());
-    if (normalize2) (tr2 || (tr2 = state.tr)).setSelection(normalize2);
+    if (normalize2) (tr2 || (tr2 = state2.tr)).setSelection(normalize2);
     return tr2;
   }
   var fixTablesKey = new PluginKey("fix-tables");
@@ -20800,19 +20800,19 @@ img.ProseMirror-separator {
       offset += child.nodeSize;
     }
   }
-  function fixTables(state, oldState) {
+  function fixTables(state2, oldState) {
     let tr2;
     const check = (node, pos) => {
-      if (node.type.spec.tableRole == "table") tr2 = fixTable(state, node, pos, tr2);
+      if (node.type.spec.tableRole == "table") tr2 = fixTable(state2, node, pos, tr2);
     };
-    if (!oldState) state.doc.descendants(check);
-    else if (oldState.doc != state.doc) changedDescendants(oldState.doc, state.doc, 0, check);
+    if (!oldState) state2.doc.descendants(check);
+    else if (oldState.doc != state2.doc) changedDescendants(oldState.doc, state2.doc, 0, check);
     return tr2;
   }
-  function fixTable(state, table, tablePos, tr2) {
+  function fixTable(state2, table, tablePos, tr2) {
     const map2 = TableMap.get(table);
     if (!map2.problems) return tr2;
-    if (!tr2) tr2 = state.tr;
+    if (!tr2) tr2 = state2.tr;
     const mustAdd = [];
     for (let i = 0; i < map2.height; i++) mustAdd.push(0);
     for (let i = 0; i < map2.problems.length; i++) {
@@ -20857,7 +20857,7 @@ img.ProseMirror-separator {
         if (row.firstChild) role = row.firstChild.type.spec.tableRole;
         const nodes = [];
         for (let j = 0; j < add; j++) {
-          const node = tableNodeTypes(state.schema)[role].createAndFill();
+          const node = tableNodeTypes(state2.schema)[role].createAndFill();
           if (node) nodes.push(node);
         }
         const side = (i == 0 || first2 == i - 1) && last == i ? pos + 1 : end - 1;
@@ -20867,9 +20867,9 @@ img.ProseMirror-separator {
     }
     return tr2.setMeta(fixTablesKey, { fixTables: true });
   }
-  function selectedRect(state) {
-    const sel = state.selection;
-    const $pos = selectionCell(state);
+  function selectedRect(state2) {
+    const sel = state2.selection;
+    const $pos = selectionCell(state2);
     const table = $pos.node(-1);
     const tableStart = $pos.start(-1);
     const map2 = TableMap.get(table);
@@ -20898,19 +20898,19 @@ img.ProseMirror-separator {
     }
     return tr2;
   }
-  function addColumnBefore(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function addColumnBefore(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state);
-      dispatch(addColumn(state.tr, rect, rect.left));
+      const rect = selectedRect(state2);
+      dispatch(addColumn(state2.tr, rect, rect.left));
     }
     return true;
   }
-  function addColumnAfter(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function addColumnAfter(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state);
-      dispatch(addColumn(state.tr, rect, rect.right));
+      const rect = selectedRect(state2);
+      dispatch(addColumn(state2.tr, rect, rect.right));
     }
     return true;
   }
@@ -20929,11 +20929,11 @@ img.ProseMirror-separator {
       row += attrs.rowspan;
     }
   }
-  function deleteColumn(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function deleteColumn(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state);
-      const tr2 = state.tr;
+      const rect = selectedRect(state2);
+      const tr2 = state2.tr;
       if (rect.left == 0 && rect.right == rect.map.width) return false;
       for (let i = rect.right - 1; ; i--) {
         removeColumn(tr2, rect, i);
@@ -20976,19 +20976,19 @@ img.ProseMirror-separator {
     tr2.insert(rowPos, tableNodeTypes(table.type.schema).row.create(null, cells));
     return tr2;
   }
-  function addRowBefore(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function addRowBefore(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state);
-      dispatch(addRow(state.tr, rect, rect.top));
+      const rect = selectedRect(state2);
+      dispatch(addRow(state2.tr, rect, rect.top));
     }
     return true;
   }
-  function addRowAfter(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function addRowAfter(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state);
-      dispatch(addRow(state.tr, rect, rect.bottom));
+      const rect = selectedRect(state2);
+      dispatch(addRow(state2.tr, rect, rect.bottom));
     }
     return true;
   }
@@ -21023,10 +21023,10 @@ img.ProseMirror-separator {
       }
     }
   }
-  function deleteRow(state, dispatch) {
-    if (!isInTable(state)) return false;
+  function deleteRow(state2, dispatch) {
+    if (!isInTable(state2)) return false;
     if (dispatch) {
-      const rect = selectedRect(state), tr2 = state.tr;
+      const rect = selectedRect(state2), tr2 = state2.tr;
       if (rect.top == 0 && rect.bottom == rect.map.height) return false;
       for (let i = rect.bottom - 1; ; i--) {
         removeRow(tr2, rect, i);
@@ -21059,13 +21059,13 @@ img.ProseMirror-separator {
     }
     return false;
   }
-  function mergeCells(state, dispatch) {
-    const sel = state.selection;
+  function mergeCells(state2, dispatch) {
+    const sel = state2.selection;
     if (!(sel instanceof CellSelection) || sel.$anchorCell.pos == sel.$headCell.pos) return false;
-    const rect = selectedRect(state), { map: map2 } = rect;
+    const rect = selectedRect(state2), { map: map2 } = rect;
     if (cellsOverlapRectangle(map2, rect)) return false;
     if (dispatch) {
-      const tr2 = state.tr;
+      const tr2 = state2.tr;
       const seen = {};
       let content = Fragment.empty;
       let mergedPos;
@@ -21099,15 +21099,15 @@ img.ProseMirror-separator {
     }
     return true;
   }
-  function splitCell(state, dispatch) {
-    const nodeTypes = tableNodeTypes(state.schema);
+  function splitCell(state2, dispatch) {
+    const nodeTypes = tableNodeTypes(state2.schema);
     return splitCellWithType(({ node }) => {
       return nodeTypes[node.type.spec.tableRole];
-    })(state, dispatch);
+    })(state2, dispatch);
   }
   function splitCellWithType(getCellType) {
-    return (state, dispatch) => {
-      const sel = state.selection;
+    return (state2, dispatch) => {
+      const sel = state2.selection;
       let cellNode;
       let cellPos;
       if (!(sel instanceof CellSelection)) {
@@ -21134,7 +21134,7 @@ img.ProseMirror-separator {
           ...baseAttrs,
           colspan: 1
         };
-        const rect = selectedRect(state), tr2 = state.tr;
+        const rect = selectedRect(state2), tr2 = state2.tr;
         for (let i = 0; i < rect.right - rect.left; i++) attrs.push(colwidth ? {
           ...baseAttrs,
           colwidth: colwidth && colwidth[i] ? [colwidth[i]] : null
@@ -21164,13 +21164,13 @@ img.ProseMirror-separator {
     };
   }
   function setCellAttr(name, value) {
-    return function(state, dispatch) {
-      if (!isInTable(state)) return false;
-      const $cell = selectionCell(state);
+    return function(state2, dispatch) {
+      if (!isInTable(state2)) return false;
+      const $cell = selectionCell(state2);
       if ($cell.nodeAfter.attrs[name] === value) return false;
       if (dispatch) {
-        const tr2 = state.tr;
-        if (state.selection instanceof CellSelection) state.selection.forEachCell((node, pos) => {
+        const tr2 = state2.tr;
+        if (state2.selection instanceof CellSelection) state2.selection.forEachCell((node, pos) => {
           if (node.attrs[name] !== value) tr2.setNodeMarkup(pos, null, {
             ...node.attrs,
             [name]: value
@@ -21186,11 +21186,11 @@ img.ProseMirror-separator {
     };
   }
   function deprecated_toggleHeader(type) {
-    return function(state, dispatch) {
-      if (!isInTable(state)) return false;
+    return function(state2, dispatch) {
+      if (!isInTable(state2)) return false;
       if (dispatch) {
-        const types = tableNodeTypes(state.schema);
-        const rect = selectedRect(state), tr2 = state.tr;
+        const types = tableNodeTypes(state2.schema);
+        const rect = selectedRect(state2), tr2 = state2.tr;
         const cells = rect.map.cellsInRect(type == "column" ? {
           left: rect.left,
           top: 0,
@@ -21226,11 +21226,11 @@ img.ProseMirror-separator {
   function toggleHeader(type, options) {
     options = options || { useDeprecatedLogic: false };
     if (options.useDeprecatedLogic) return deprecated_toggleHeader(type);
-    return function(state, dispatch) {
-      if (!isInTable(state)) return false;
+    return function(state2, dispatch) {
+      if (!isInTable(state2)) return false;
       if (dispatch) {
-        const types = tableNodeTypes(state.schema);
-        const rect = selectedRect(state), tr2 = state.tr;
+        const types = tableNodeTypes(state2.schema);
+        const rect = selectedRect(state2), tr2 = state2.tr;
         const isHeaderRowEnabled = isHeaderEnabledByType("row", rect, types);
         const isHeaderColumnEnabled = isHeaderEnabledByType("column", rect, types);
         const selectionStartsAt = (type === "column" ? isHeaderRowEnabled : type === "row" ? isHeaderColumnEnabled : false) ? 1 : 0;
@@ -21281,31 +21281,31 @@ img.ProseMirror-separator {
     return null;
   }
   function goToNextCell(direction) {
-    return function(state, dispatch) {
-      if (!isInTable(state)) return false;
-      const cell = findNextCell(selectionCell(state), direction);
+    return function(state2, dispatch) {
+      if (!isInTable(state2)) return false;
+      const cell = findNextCell(selectionCell(state2), direction);
       if (cell == null) return false;
       if (dispatch) {
-        const $cell = state.doc.resolve(cell);
-        dispatch(state.tr.setSelection(TextSelection.between($cell, moveCellForward($cell))).scrollIntoView());
+        const $cell = state2.doc.resolve(cell);
+        dispatch(state2.tr.setSelection(TextSelection.between($cell, moveCellForward($cell))).scrollIntoView());
       }
       return true;
     };
   }
-  function deleteTable(state, dispatch) {
-    const $pos = state.selection.$anchor;
+  function deleteTable(state2, dispatch) {
+    const $pos = state2.selection.$anchor;
     for (let d = $pos.depth; d > 0; d--) if ($pos.node(d).type.spec.tableRole == "table") {
-      if (dispatch) dispatch(state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView());
+      if (dispatch) dispatch(state2.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView());
       return true;
     }
     return false;
   }
-  function deleteCellSelection(state, dispatch) {
-    const sel = state.selection;
+  function deleteCellSelection(state2, dispatch) {
+    const sel = state2.selection;
     if (!(sel instanceof CellSelection)) return false;
     if (dispatch) {
-      const tr2 = state.tr;
-      const baseContent = tableNodeTypes(state.schema).cell.createAndFill().content;
+      const tr2 = state2.tr;
+      const baseContent = tableNodeTypes(state2.schema).cell.createAndFill().content;
       sel.forEachCell((cell, pos) => {
         if (!cell.content.eq(baseContent)) tr2.replace(tr2.mapping.map(pos + 1), tr2.mapping.map(pos + cell.nodeSize - 1), new Slice(baseContent, 0, 0));
       });
@@ -21472,13 +21472,13 @@ img.ProseMirror-separator {
     }
     return found2;
   }
-  function insertCells(state, dispatch, tableStart, rect, cells) {
-    let table = tableStart ? state.doc.nodeAt(tableStart - 1) : state.doc;
+  function insertCells(state2, dispatch, tableStart, rect, cells) {
+    let table = tableStart ? state2.doc.nodeAt(tableStart - 1) : state2.doc;
     if (!table) throw new Error("No table found");
     let map2 = TableMap.get(table);
     const { top, left } = rect;
     const right = left + cells.width, bottom = top + cells.height;
-    const tr2 = state.tr;
+    const tr2 = state2.tr;
     let mapFrom = 0;
     function recomp() {
       table = tableStart ? tr2.doc.nodeAt(tableStart - 1) : tr2.doc;
@@ -21513,45 +21513,45 @@ img.ProseMirror-separator {
     Delete: deleteCellSelection,
     "Mod-Delete": deleteCellSelection
   });
-  function maybeSetSelection(state, dispatch, selection) {
-    if (selection.eq(state.selection)) return false;
-    if (dispatch) dispatch(state.tr.setSelection(selection).scrollIntoView());
+  function maybeSetSelection(state2, dispatch, selection) {
+    if (selection.eq(state2.selection)) return false;
+    if (dispatch) dispatch(state2.tr.setSelection(selection).scrollIntoView());
     return true;
   }
   function arrow2(axis, dir) {
-    return (state, dispatch, view) => {
+    return (state2, dispatch, view) => {
       if (!view) return false;
-      const sel = state.selection;
-      if (sel instanceof CellSelection) return maybeSetSelection(state, dispatch, Selection.near(sel.$headCell, dir));
+      const sel = state2.selection;
+      if (sel instanceof CellSelection) return maybeSetSelection(state2, dispatch, Selection.near(sel.$headCell, dir));
       if (axis != "horiz" && !sel.empty) return false;
       const end = atEndOfCell(view, axis, dir);
       if (end == null) return false;
-      if (axis == "horiz") return maybeSetSelection(state, dispatch, Selection.near(state.doc.resolve(sel.head + dir), dir));
+      if (axis == "horiz") return maybeSetSelection(state2, dispatch, Selection.near(state2.doc.resolve(sel.head + dir), dir));
       else {
-        const $cell = state.doc.resolve(end);
+        const $cell = state2.doc.resolve(end);
         const $next = nextCell($cell, axis, dir);
         let newSel;
         if ($next) newSel = Selection.near($next, 1);
-        else if (dir < 0) newSel = Selection.near(state.doc.resolve($cell.before(-1)), -1);
-        else newSel = Selection.near(state.doc.resolve($cell.after(-1)), 1);
-        return maybeSetSelection(state, dispatch, newSel);
+        else if (dir < 0) newSel = Selection.near(state2.doc.resolve($cell.before(-1)), -1);
+        else newSel = Selection.near(state2.doc.resolve($cell.after(-1)), 1);
+        return maybeSetSelection(state2, dispatch, newSel);
       }
     };
   }
   function shiftArrow(axis, dir) {
-    return (state, dispatch, view) => {
+    return (state2, dispatch, view) => {
       if (!view) return false;
-      const sel = state.selection;
+      const sel = state2.selection;
       let cellSel;
       if (sel instanceof CellSelection) cellSel = sel;
       else {
         const end = atEndOfCell(view, axis, dir);
         if (end == null) return false;
-        cellSel = new CellSelection(state.doc.resolve(end));
+        cellSel = new CellSelection(state2.doc.resolve(end));
       }
       const $head = nextCell(cellSel.$headCell, axis, dir);
       if (!$head) return false;
-      return maybeSetSelection(state, dispatch, new CellSelection(cellSel.$anchorCell, $head));
+      return maybeSetSelection(state2, dispatch, new CellSelection(cellSel.$anchorCell, $head));
     };
   }
   function handleTripleClick2(view, pos) {
@@ -21720,10 +21720,10 @@ img.ProseMirror-separator {
     const plugin = new Plugin({
       key: columnResizingPluginKey,
       state: {
-        init(_, state) {
+        init(_, state2) {
           var _plugin$spec;
           const nodeViews = (_plugin$spec = plugin.spec) === null || _plugin$spec === void 0 || (_plugin$spec = _plugin$spec.props) === null || _plugin$spec === void 0 ? void 0 : _plugin$spec.nodeViews;
-          const tableName = tableNodeTypes(state.schema).table.name;
+          const tableName = tableNodeTypes(state2.schema).table.name;
           if (View && nodeViews) nodeViews[tableName] = (node, view) => {
             return new View(node, defaultCellMinWidth, view);
           };
@@ -21734,8 +21734,8 @@ img.ProseMirror-separator {
         }
       },
       props: {
-        attributes: (state) => {
-          const pluginState = columnResizingPluginKey.getState(state);
+        attributes: (state2) => {
+          const pluginState = columnResizingPluginKey.getState(state2);
           return pluginState && pluginState.activeHandle > -1 ? { class: "resize-cursor" } : {};
         },
         handleDOMEvents: {
@@ -21749,9 +21749,9 @@ img.ProseMirror-separator {
             handleMouseDown(view, event, cellMinWidth, defaultCellMinWidth);
           }
         },
-        decorations: (state) => {
-          const pluginState = columnResizingPluginKey.getState(state);
-          if (pluginState && pluginState.activeHandle > -1) return handleDecorations(state, pluginState.activeHandle);
+        decorations: (state2) => {
+          const pluginState = columnResizingPluginKey.getState(state2);
+          if (pluginState && pluginState.activeHandle > -1) return handleDecorations(state2, pluginState.activeHandle);
         },
         nodeViews: {}
       }
@@ -21764,16 +21764,16 @@ img.ProseMirror-separator {
       this.dragging = dragging;
     }
     apply(tr2) {
-      const state = this;
+      const state2 = this;
       const action = tr2.getMeta(columnResizingPluginKey);
       if (action && action.setHandle != null) return new ResizeState2(action.setHandle, false);
-      if (action && action.setDragging !== void 0) return new ResizeState2(state.activeHandle, action.setDragging);
-      if (state.activeHandle > -1 && tr2.docChanged) {
-        let handle = tr2.mapping.map(state.activeHandle, -1);
+      if (action && action.setDragging !== void 0) return new ResizeState2(state2.activeHandle, action.setDragging);
+      if (state2.activeHandle > -1 && tr2.docChanged) {
+        let handle = tr2.mapping.map(state2.activeHandle, -1);
         if (!pointsAtCell(tr2.doc.resolve(handle))) handle = -1;
-        return new ResizeState2(handle, state.dragging);
+        return new ResizeState2(handle, state2.dragging);
       }
-      return state;
+      return state2;
     }
   };
   function handleMouseMove(view, event, handleWidth, lastColumnResizable) {
@@ -21913,9 +21913,9 @@ img.ProseMirror-separator {
   function zeroes(n) {
     return Array(n).fill(0);
   }
-  function handleDecorations(state, cell) {
+  function handleDecorations(state2, cell) {
     const decorations = [];
-    const $cell = state.doc.resolve(cell);
+    const $cell = state2.doc.resolve(cell);
     const table = $cell.node(-1);
     if (!table) return DecorationSet.empty;
     const map2 = TableMap.get(table);
@@ -21929,11 +21929,11 @@ img.ProseMirror-separator {
         const pos = start + cellPos + table.nodeAt(cellPos).nodeSize - 1;
         const dom = document.createElement("div");
         dom.className = "column-resize-handle";
-        if ((_columnResizingPlugin = columnResizingPluginKey.getState(state)) === null || _columnResizingPlugin === void 0 ? void 0 : _columnResizingPlugin.dragging) decorations.push(Decoration.node(start + cellPos, start + cellPos + table.nodeAt(cellPos).nodeSize, { class: "column-resize-dragging" }));
+        if ((_columnResizingPlugin = columnResizingPluginKey.getState(state2)) === null || _columnResizingPlugin === void 0 ? void 0 : _columnResizingPlugin.dragging) decorations.push(Decoration.node(start + cellPos, start + cellPos + table.nodeAt(cellPos).nodeSize, { class: "column-resize-dragging" }));
         decorations.push(Decoration.widget(pos, dom));
       }
     }
-    return DecorationSet.create(state.doc, decorations);
+    return DecorationSet.create(state2.doc, decorations);
   }
   function tableEditing({ allowTableNodeSelection = false } = {}) {
     return new Plugin({
@@ -21960,8 +21960,8 @@ img.ProseMirror-separator {
         handleKeyDown: handleKeyDown2,
         handlePaste
       },
-      appendTransaction(_, oldState, state) {
-        return normalizeSelection(state, fixTables(state, oldState), allowTableNodeSelection);
+      appendTransaction(_, oldState, state2) {
+        return normalizeSelection(state2, fixTables(state2, oldState), allowTableNodeSelection);
       }
     });
   }
@@ -22182,60 +22182,60 @@ img.ProseMirror-separator {
           }
           return true;
         },
-        addColumnBefore: () => ({ state, dispatch }) => {
-          return addColumnBefore(state, dispatch);
+        addColumnBefore: () => ({ state: state2, dispatch }) => {
+          return addColumnBefore(state2, dispatch);
         },
-        addColumnAfter: () => ({ state, dispatch }) => {
-          return addColumnAfter(state, dispatch);
+        addColumnAfter: () => ({ state: state2, dispatch }) => {
+          return addColumnAfter(state2, dispatch);
         },
-        deleteColumn: () => ({ state, dispatch }) => {
-          return deleteColumn(state, dispatch);
+        deleteColumn: () => ({ state: state2, dispatch }) => {
+          return deleteColumn(state2, dispatch);
         },
-        addRowBefore: () => ({ state, dispatch }) => {
-          return addRowBefore(state, dispatch);
+        addRowBefore: () => ({ state: state2, dispatch }) => {
+          return addRowBefore(state2, dispatch);
         },
-        addRowAfter: () => ({ state, dispatch }) => {
-          return addRowAfter(state, dispatch);
+        addRowAfter: () => ({ state: state2, dispatch }) => {
+          return addRowAfter(state2, dispatch);
         },
-        deleteRow: () => ({ state, dispatch }) => {
-          return deleteRow(state, dispatch);
+        deleteRow: () => ({ state: state2, dispatch }) => {
+          return deleteRow(state2, dispatch);
         },
-        deleteTable: () => ({ state, dispatch }) => {
-          return deleteTable(state, dispatch);
+        deleteTable: () => ({ state: state2, dispatch }) => {
+          return deleteTable(state2, dispatch);
         },
-        mergeCells: () => ({ state, dispatch }) => {
-          return mergeCells(state, dispatch);
+        mergeCells: () => ({ state: state2, dispatch }) => {
+          return mergeCells(state2, dispatch);
         },
-        splitCell: () => ({ state, dispatch }) => {
-          return splitCell(state, dispatch);
+        splitCell: () => ({ state: state2, dispatch }) => {
+          return splitCell(state2, dispatch);
         },
-        toggleHeaderColumn: () => ({ state, dispatch }) => {
-          return toggleHeader("column")(state, dispatch);
+        toggleHeaderColumn: () => ({ state: state2, dispatch }) => {
+          return toggleHeader("column")(state2, dispatch);
         },
-        toggleHeaderRow: () => ({ state, dispatch }) => {
-          return toggleHeader("row")(state, dispatch);
+        toggleHeaderRow: () => ({ state: state2, dispatch }) => {
+          return toggleHeader("row")(state2, dispatch);
         },
-        toggleHeaderCell: () => ({ state, dispatch }) => {
-          return toggleHeaderCell(state, dispatch);
+        toggleHeaderCell: () => ({ state: state2, dispatch }) => {
+          return toggleHeaderCell(state2, dispatch);
         },
-        mergeOrSplit: () => ({ state, dispatch }) => {
-          if (mergeCells(state, dispatch)) {
+        mergeOrSplit: () => ({ state: state2, dispatch }) => {
+          if (mergeCells(state2, dispatch)) {
             return true;
           }
-          return splitCell(state, dispatch);
+          return splitCell(state2, dispatch);
         },
-        setCellAttribute: (name, value) => ({ state, dispatch }) => {
-          return setCellAttr(name, value)(state, dispatch);
+        setCellAttribute: (name, value) => ({ state: state2, dispatch }) => {
+          return setCellAttr(name, value)(state2, dispatch);
         },
-        goToNextCell: () => ({ state, dispatch }) => {
-          return goToNextCell(1)(state, dispatch);
+        goToNextCell: () => ({ state: state2, dispatch }) => {
+          return goToNextCell(1)(state2, dispatch);
         },
-        goToPreviousCell: () => ({ state, dispatch }) => {
-          return goToNextCell(-1)(state, dispatch);
+        goToPreviousCell: () => ({ state: state2, dispatch }) => {
+          return goToNextCell(-1)(state2, dispatch);
         },
-        fixTables: () => ({ state, dispatch }) => {
+        fixTables: () => ({ state: state2, dispatch }) => {
           if (dispatch) {
-            fixTables(state);
+            fixTables(state2);
           }
           return true;
         },
@@ -22507,12 +22507,12 @@ img.ProseMirror-separator {
             }
             initialEvaluationDone = true;
           },
-          filterTransaction: (transaction, state) => {
+          filterTransaction: (transaction, state2) => {
             const limit = this.options.limit;
             if (!transaction.docChanged || limit === 0 || limit === null || limit === void 0) {
               return true;
             }
-            const oldSize = this.storage.characters({ node: state.doc });
+            const oldSize = this.storage.characters({ node: state2.doc });
             const newSize = this.storage.characters({ node: transaction.doc });
             if (newSize <= limit) {
               return true;
@@ -22732,360 +22732,378 @@ img.ProseMirror-separator {
     }
   });
 
-  // src/typescript/editor-modal.ts
+  // src/typescript/editor/state.ts
+  var state = {
+    editor: null,
+    isSourceView: false
+  };
+
+  // src/typescript/editor/toolbar.ts
+  function updateCharCount(ed) {
+    const charCountEl = document.getElementById("char-count");
+    if (!charCountEl) {
+      return;
+    }
+    const storage = ed.storage["characterCount"];
+    if (storage) {
+      charCountEl.textContent = `${storage.words()} words \xB7 ${storage.characters()} characters`;
+    }
+  }
+  function updateToolbarState(ed) {
+    const toolbar = document.getElementById("tiptap-toolbar");
+    if (!toolbar) {
+      return;
+    }
+    const toggleActions = [
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "subscript",
+      "superscript",
+      "bulletList",
+      "orderedList",
+      "blockquote",
+      "code",
+      "highlight"
+    ];
+    toggleActions.forEach((action) => {
+      const btn = toolbar.querySelector(`[data-action="${action}"]`);
+      if (btn) {
+        btn.classList.toggle("is-active", ed.isActive(action));
+      }
+    });
+    const headingSelect = document.getElementById("heading-select");
+    if (headingSelect) {
+      const levels = [1, 2, 3, 4, 5, 6];
+      let found2 = false;
+      for (const level of levels) {
+        if (ed.isActive("heading", { level })) {
+          headingSelect.value = String(level);
+          found2 = true;
+          break;
+        }
+      }
+      if (!found2) {
+        headingSelect.value = "0";
+      }
+    }
+    const alignments = ["Left", "Center", "Right", "Justify"];
+    for (const cap of alignments) {
+      const btn = toolbar.querySelector(`[data-action="align${cap}"]`);
+      if (btn) {
+        btn.classList.toggle("is-active", ed.isActive({ textAlign: cap.toLowerCase() }));
+      }
+    }
+  }
+  function setToolbarDisabled(toolbar, disabled) {
+    toolbar.querySelectorAll('button[data-action], select, input[type="color"]').forEach((el) => {
+      el.disabled = disabled;
+    });
+  }
+  function handleToolbarAction(action) {
+    const { editor } = state;
+    if (!editor) {
+      return;
+    }
+    switch (action) {
+      case "bold":
+        editor.chain().focus().toggleBold().run();
+        break;
+      case "italic":
+        editor.chain().focus().toggleItalic().run();
+        break;
+      case "underline":
+        editor.chain().focus().toggleUnderline().run();
+        break;
+      case "strike":
+        editor.chain().focus().toggleStrike().run();
+        break;
+      case "subscript":
+        editor.chain().focus().toggleSubscript().run();
+        break;
+      case "superscript":
+        editor.chain().focus().toggleSuperscript().run();
+        break;
+      case "bulletList":
+        editor.chain().focus().toggleBulletList().run();
+        break;
+      case "orderedList":
+        editor.chain().focus().toggleOrderedList().run();
+        break;
+      case "blockquote":
+        editor.chain().focus().toggleBlockquote().run();
+        break;
+      case "codeBlock":
+        editor.chain().focus().toggleCodeBlock().run();
+        break;
+      case "code":
+        editor.chain().focus().toggleCode().run();
+        break;
+      case "horizontalRule":
+        editor.chain().focus().setHorizontalRule().run();
+        break;
+      case "highlight":
+        editor.chain().focus().toggleHighlight().run();
+        break;
+      case "alignLeft":
+        editor.chain().focus().setTextAlign("left").run();
+        break;
+      case "alignCenter":
+        editor.chain().focus().setTextAlign("center").run();
+        break;
+      case "alignRight":
+        editor.chain().focus().setTextAlign("right").run();
+        break;
+      case "alignJustify":
+        editor.chain().focus().setTextAlign("justify").run();
+        break;
+      case "undo":
+        editor.chain().focus().undo().run();
+        break;
+      case "redo":
+        editor.chain().focus().redo().run();
+        break;
+      case "clearFormatting":
+        editor.chain().focus().clearNodes().unsetAllMarks().run();
+        break;
+      case "link": {
+        const existing = editor.getAttributes("link").href;
+        const url = window.prompt("Enter URL:", existing ?? "https://");
+        if (url === null) {
+          break;
+        }
+        if (url === "") {
+          editor.chain().focus().unsetLink().run();
+        } else {
+          editor.chain().focus().setLink({ href: url }).run();
+        }
+        break;
+      }
+      case "image": {
+        const src = window.prompt("Enter image URL:");
+        if (!src) {
+          break;
+        }
+        const alt = window.prompt("Alt text (optional):") ?? "";
+        editor.chain().focus().setImage({ src, alt }).run();
+        break;
+      }
+      case "insertTable":
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        break;
+      case "addColumnBefore":
+        editor.chain().focus().addColumnBefore().run();
+        break;
+      case "addColumnAfter":
+        editor.chain().focus().addColumnAfter().run();
+        break;
+      case "deleteColumn":
+        editor.chain().focus().deleteColumn().run();
+        break;
+      case "addRowBefore":
+        editor.chain().focus().addRowBefore().run();
+        break;
+      case "addRowAfter":
+        editor.chain().focus().addRowAfter().run();
+        break;
+      case "deleteRow":
+        editor.chain().focus().deleteRow().run();
+        break;
+      case "deleteTable":
+        editor.chain().focus().deleteTable().run();
+        break;
+      case "mergeCells":
+        editor.chain().focus().mergeCells().run();
+        break;
+      case "splitCell":
+        editor.chain().focus().splitCell().run();
+        break;
+      default:
+        break;
+    }
+  }
+  function setupToolbar() {
+    const toolbar = document.getElementById("tiptap-toolbar");
+    if (!toolbar) {
+      return;
+    }
+    toolbar.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-action");
+        if (action) {
+          handleToolbarAction(action);
+        }
+      });
+    });
+    const headingSelect = document.getElementById("heading-select");
+    if (headingSelect) {
+      headingSelect.addEventListener("change", () => {
+        const level = parseInt(headingSelect.value, 10);
+        if (level === 0) {
+          state.editor?.chain().focus().setParagraph().run();
+        } else {
+          state.editor?.chain().focus().setHeading({ level }).run();
+        }
+      });
+    }
+    const colorPicker = document.getElementById("text-color-picker");
+    if (colorPicker) {
+      colorPicker.addEventListener("input", () => {
+        state.editor?.chain().focus().setColor(colorPicker.value).run();
+      });
+    }
+    const toggleBtn = document.getElementById("toggle-source");
+    const editorContainer = document.getElementById("tiptap-editor");
+    const sourceTextarea = document.getElementById("html-source");
+    if (toggleBtn && editorContainer && sourceTextarea) {
+      toggleBtn.addEventListener("click", () => {
+        state.isSourceView = !state.isSourceView;
+        if (state.isSourceView) {
+          sourceTextarea.value = state.editor?.getHTML() ?? "";
+          editorContainer.style.display = "none";
+          sourceTextarea.style.display = "block";
+          setToolbarDisabled(toolbar, true);
+          toggleBtn.disabled = false;
+          toggleBtn.classList.add("is-active");
+          toggleBtn.title = "Exit HTML Source Mode";
+        } else {
+          if (state.editor) {
+            state.editor.commands.setContent(sourceTextarea.value, false);
+          }
+          sourceTextarea.style.display = "none";
+          editorContainer.style.display = "";
+          setToolbarDisabled(toolbar, false);
+          toggleBtn.classList.remove("is-active");
+          toggleBtn.title = "View HTML Source";
+        }
+      });
+    }
+  }
+
+  // src/typescript/editor/tiptap.ts
+  function initializeTiptap() {
+    const editorEl = document.getElementById("tiptap-editor");
+    if (!editorEl) {
+      return;
+    }
+    const initialContentEl = document.getElementById("content-editor");
+    const initialContent = initialContentEl?.value ?? "";
+    state.editor = new Editor({
+      element: editorEl,
+      extensions: [
+        StarterKit.configure({
+          heading: { levels: [1, 2, 3, 4, 5, 6] }
+        }),
+        Underline,
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: { rel: "noopener noreferrer" }
+        }),
+        Image.configure({ inline: false }),
+        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        TextStyle,
+        Color,
+        Highlight.configure({ multicolor: true }),
+        Subscript,
+        Superscript,
+        Table.configure({ resizable: true }),
+        TableRow,
+        TableHeader,
+        TableCell,
+        Placeholder.configure({
+          placeholder: "Start typing your content here\u2026"
+        }),
+        CharacterCount,
+        Typography
+      ],
+      content: initialContent,
+      onUpdate({ editor: ed }) {
+        updateToolbarState(ed);
+        updateCharCount(ed);
+      },
+      onSelectionUpdate({ editor: ed }) {
+        updateToolbarState(ed);
+      }
+    });
+    setupToolbar();
+    updateToolbarState(state.editor);
+    updateCharCount(state.editor);
+  }
+  function destroyEditor() {
+    if (state.editor) {
+      state.editor.destroy();
+      state.editor = null;
+      state.isSourceView = false;
+    }
+  }
+
+  // src/typescript/editor/component-modal.ts
+  function showComponentModal() {
+    mountComponentModal();
+    const modal = document.getElementById("editor-component-modal");
+    if (!modal) {
+      return;
+    }
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    modal.querySelector("input, textarea, select")?.focus();
+  }
+  function hideComponentModal() {
+    const modal = document.getElementById("editor-component-modal");
+    if (!modal) {
+      return;
+    }
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  function mountComponentModal() {
+    const modal = document.getElementById("editor-component-modal");
+    const globalContainer = document.getElementById("editor-modal-container");
+    if (!modal || !globalContainer || modal.parentElement === globalContainer) {
+      return;
+    }
+    globalContainer.appendChild(modal);
+  }
+  function unmountComponentModal() {
+    const modal = document.getElementById("editor-component-modal");
+    modal?.remove();
+  }
+  function wireComponentModal() {
+    const modal = document.getElementById("editor-component-modal");
+    const openButton = document.getElementById("edit-component-btn");
+    if (!modal || !openButton) {
+      return;
+    }
+    openButton.addEventListener("click", showComponentModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        hideComponentModal();
+      }
+    });
+    mountComponentModal();
+  }
+
+  // src/typescript/editor/save.ts
+  function saveEditorContent() {
+    let content;
+    if (state.isSourceView) {
+      const sourceTextarea = document.getElementById("html-source");
+      content = sourceTextarea?.value ?? "";
+    } else {
+      content = state.editor?.getHTML() ?? "";
+    }
+    const form = document.getElementById("editor-form");
+    const hiddenInput = document.getElementById("content-hidden");
+    hiddenInput.value = content;
+    htmx.trigger(form, "submit");
+  }
+
+  // src/typescript/editor.ts
   (function() {
     "use strict";
-    let editor = null;
-    let isSourceView = false;
-    function initializeTiptap() {
-      const editorEl = document.getElementById("tiptap-editor");
-      if (!editorEl) {
-        return;
-      }
-      const initialContentEl = document.getElementById(
-        "content-editor"
-      );
-      const initialContent = initialContentEl?.value ?? "";
-      editor = new Editor({
-        element: editorEl,
-        extensions: [
-          StarterKit.configure({
-            heading: { levels: [1, 2, 3, 4, 5, 6] }
-          }),
-          Underline,
-          Link.configure({
-            openOnClick: false,
-            HTMLAttributes: { rel: "noopener noreferrer" }
-          }),
-          Image.configure({ inline: false }),
-          TextAlign.configure({ types: ["heading", "paragraph"] }),
-          TextStyle,
-          Color,
-          Highlight.configure({ multicolor: true }),
-          Subscript,
-          Superscript,
-          Table.configure({ resizable: true }),
-          TableRow,
-          TableHeader,
-          TableCell,
-          Placeholder.configure({
-            placeholder: "Start typing your content here\u2026"
-          }),
-          CharacterCount,
-          Typography
-        ],
-        content: initialContent,
-        onUpdate({ editor: ed }) {
-          updateToolbarState(ed);
-          updateCharCount(ed);
-        },
-        onSelectionUpdate({ editor: ed }) {
-          updateToolbarState(ed);
-        }
-      });
-      setupToolbar();
-      updateToolbarState(editor);
-      updateCharCount(editor);
-    }
-    function updateCharCount(ed) {
-      const charCountEl = document.getElementById("char-count");
-      if (!charCountEl) {
-        return;
-      }
-      const storage = ed.storage["characterCount"];
-      if (storage) {
-        charCountEl.textContent = `${storage.words()} words \xB7 ${storage.characters()} characters`;
-      }
-    }
-    function updateToolbarState(ed) {
-      const toolbar = document.getElementById("tiptap-toolbar");
-      if (!toolbar) {
-        return;
-      }
-      const toggleActions = [
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "subscript",
-        "superscript",
-        "bulletList",
-        "orderedList",
-        "blockquote",
-        "code",
-        "highlight"
-      ];
-      toggleActions.forEach((action) => {
-        const btn = toolbar.querySelector(`[data-action="${action}"]`);
-        if (btn) {
-          btn.classList.toggle("is-active", ed.isActive(action));
-        }
-      });
-      const headingSelect = document.getElementById("heading-select");
-      if (headingSelect) {
-        const headingLevels = [1, 2, 3, 4, 5, 6];
-        let found2 = false;
-        for (const level of headingLevels) {
-          if (ed.isActive("heading", { level })) {
-            headingSelect.value = String(level);
-            found2 = true;
-            break;
-          }
-        }
-        if (!found2) {
-          headingSelect.value = "0";
-        }
-      }
-      const alignments = ["Left", "Center", "Right", "Justify"];
-      for (const cap of alignments) {
-        const btn = toolbar.querySelector(`[data-action="align${cap}"]`);
-        if (btn) {
-          btn.classList.toggle("is-active", ed.isActive({ textAlign: cap.toLowerCase() }));
-        }
-      }
-    }
-    function handleToolbarAction(action) {
-      if (!editor) {
-        return;
-      }
-      switch (action) {
-        case "bold":
-          editor.chain().focus().toggleBold().run();
-          break;
-        case "italic":
-          editor.chain().focus().toggleItalic().run();
-          break;
-        case "underline":
-          editor.chain().focus().toggleUnderline().run();
-          break;
-        case "strike":
-          editor.chain().focus().toggleStrike().run();
-          break;
-        case "subscript":
-          editor.chain().focus().toggleSubscript().run();
-          break;
-        case "superscript":
-          editor.chain().focus().toggleSuperscript().run();
-          break;
-        case "bulletList":
-          editor.chain().focus().toggleBulletList().run();
-          break;
-        case "orderedList":
-          editor.chain().focus().toggleOrderedList().run();
-          break;
-        case "blockquote":
-          editor.chain().focus().toggleBlockquote().run();
-          break;
-        case "codeBlock":
-          editor.chain().focus().toggleCodeBlock().run();
-          break;
-        case "code":
-          editor.chain().focus().toggleCode().run();
-          break;
-        case "horizontalRule":
-          editor.chain().focus().setHorizontalRule().run();
-          break;
-        case "highlight":
-          editor.chain().focus().toggleHighlight().run();
-          break;
-        case "alignLeft":
-          editor.chain().focus().setTextAlign("left").run();
-          break;
-        case "alignCenter":
-          editor.chain().focus().setTextAlign("center").run();
-          break;
-        case "alignRight":
-          editor.chain().focus().setTextAlign("right").run();
-          break;
-        case "alignJustify":
-          editor.chain().focus().setTextAlign("justify").run();
-          break;
-        case "undo":
-          editor.chain().focus().undo().run();
-          break;
-        case "redo":
-          editor.chain().focus().redo().run();
-          break;
-        case "clearFormatting":
-          editor.chain().focus().clearNodes().unsetAllMarks().run();
-          break;
-        case "link": {
-          const existing = editor.getAttributes("link").href;
-          const url = window.prompt("Enter URL:", existing ?? "https://");
-          if (url === null) {
-            break;
-          }
-          if (url === "") {
-            editor.chain().focus().unsetLink().run();
-          } else {
-            editor.chain().focus().setLink({ href: url }).run();
-          }
-          break;
-        }
-        case "image": {
-          const src = window.prompt("Enter image URL:");
-          if (!src) {
-            break;
-          }
-          const alt = window.prompt("Alt text (optional):") ?? "";
-          editor.chain().focus().setImage({ src, alt }).run();
-          break;
-        }
-        case "insertTable":
-          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-          break;
-        case "addColumnBefore":
-          editor.chain().focus().addColumnBefore().run();
-          break;
-        case "addColumnAfter":
-          editor.chain().focus().addColumnAfter().run();
-          break;
-        case "deleteColumn":
-          editor.chain().focus().deleteColumn().run();
-          break;
-        case "addRowBefore":
-          editor.chain().focus().addRowBefore().run();
-          break;
-        case "addRowAfter":
-          editor.chain().focus().addRowAfter().run();
-          break;
-        case "deleteRow":
-          editor.chain().focus().deleteRow().run();
-          break;
-        case "deleteTable":
-          editor.chain().focus().deleteTable().run();
-          break;
-        case "mergeCells":
-          editor.chain().focus().mergeCells().run();
-          break;
-        case "splitCell":
-          editor.chain().focus().splitCell().run();
-          break;
-        default:
-          break;
-      }
-    }
-    function setToolbarDisabled(toolbar, disabled) {
-      toolbar.querySelectorAll('button[data-action], select, input[type="color"]').forEach((el) => {
-        el.disabled = disabled;
-      });
-    }
-    function setupToolbar() {
-      const toolbar = document.getElementById("tiptap-toolbar");
-      if (!toolbar) {
-        return;
-      }
-      toolbar.querySelectorAll("[data-action]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const action = btn.getAttribute("data-action");
-          if (action) {
-            handleToolbarAction(action);
-          }
-        });
-      });
-      const headingSelect = document.getElementById("heading-select");
-      if (headingSelect) {
-        headingSelect.addEventListener("change", () => {
-          const level = parseInt(headingSelect.value, 10);
-          if (level === 0) {
-            editor?.chain().focus().setParagraph().run();
-          } else {
-            editor?.chain().focus().setHeading({ level }).run();
-          }
-        });
-      }
-      const colorPicker = document.getElementById("text-color-picker");
-      if (colorPicker) {
-        colorPicker.addEventListener("input", () => {
-          editor?.chain().focus().setColor(colorPicker.value).run();
-        });
-      }
-      const toggleSourceBtnAsButton = document.getElementById(
-        "toggle-source"
-      );
-      const editorContainer = document.getElementById("tiptap-editor");
-      const sourceTextarea = document.getElementById("html-source");
-      if (toggleSourceBtnAsButton && editorContainer && sourceTextarea) {
-        toggleSourceBtnAsButton.addEventListener("click", () => {
-          isSourceView = !isSourceView;
-          if (isSourceView) {
-            sourceTextarea.value = editor?.getHTML() ?? "";
-            editorContainer.style.display = "none";
-            sourceTextarea.style.display = "block";
-            setToolbarDisabled(toolbar, true);
-            toggleSourceBtnAsButton.disabled = false;
-            toggleSourceBtnAsButton.classList.add("is-active");
-            toggleSourceBtnAsButton.title = "Exit HTML Source Mode";
-          } else {
-            if (editor) {
-              editor.commands.setContent(sourceTextarea.value, false);
-            }
-            sourceTextarea.style.display = "none";
-            editorContainer.style.display = "";
-            setToolbarDisabled(toolbar, false);
-            toggleSourceBtnAsButton.classList.remove("is-active");
-            toggleSourceBtnAsButton.title = "View HTML Source";
-          }
-        });
-      }
-    }
-    function destroyEditor() {
-      if (editor) {
-        editor.destroy();
-        editor = null;
-        isSourceView = false;
-      }
-    }
-    function showComponentModal() {
-      mountComponentModal();
-      const modal = document.getElementById("editor-component-modal");
-      if (!modal) {
-        return;
-      }
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      const firstInput = modal.querySelector("input, textarea, select");
-      firstInput?.focus();
-    }
-    function hideComponentModal() {
-      const modal = document.getElementById("editor-component-modal");
-      if (!modal) {
-        return;
-      }
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-    function mountComponentModal() {
-      const modal = document.getElementById("editor-component-modal");
-      const globalContainer = document.getElementById("editor-modal-container");
-      if (!modal || !globalContainer || modal.parentElement === globalContainer) {
-        return;
-      }
-      globalContainer.appendChild(modal);
-    }
-    function unmountComponentModal() {
-      const modal = document.getElementById("editor-component-modal");
-      if (!modal) {
-        return;
-      }
-      modal.remove();
-    }
-    function wireComponentModal() {
-      const modal = document.getElementById("editor-component-modal");
-      const openButton = document.getElementById("edit-component-btn");
-      if (!modal || !openButton) {
-        return;
-      }
-      openButton.addEventListener("click", showComponentModal);
-      modal.addEventListener("click", (event) => {
-        if (event.target === modal) {
-          hideComponentModal();
-        }
-      });
-      mountComponentModal();
-    }
     function initializeEventListeners() {
       document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
@@ -23108,8 +23126,6 @@ img.ProseMirror-separator {
           document.body.setAttribute("data-zen-editing", "");
         }
       });
-      window.openEditorComponentModal = showComponentModal;
-      window.closeEditorComponentModal = hideComponentModal;
       document.addEventListener("keydown", function(event) {
         if (event.key === "Escape") {
           const modal = document.getElementById("editor-component-modal");
@@ -23118,19 +23134,9 @@ img.ProseMirror-separator {
           }
         }
       });
-      window.saveEditorContent = function() {
-        let content;
-        if (isSourceView) {
-          const sourceTextarea = document.getElementById("html-source");
-          content = sourceTextarea?.value ?? "";
-        } else {
-          content = editor?.getHTML() ?? "";
-        }
-        const form = document.getElementById("editor-form");
-        const hiddenInput = document.getElementById("content-hidden");
-        hiddenInput.value = content;
-        htmx.trigger(form, "submit");
-      };
+      window.saveEditorContent = saveEditorContent;
+      window.openEditorComponentModal = showComponentModal;
+      window.closeEditorComponentModal = hideComponentModal;
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initializeEventListeners);

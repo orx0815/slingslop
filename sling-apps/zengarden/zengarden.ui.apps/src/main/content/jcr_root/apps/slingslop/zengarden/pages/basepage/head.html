@@ -6,17 +6,27 @@
 
 <!--/*  /zengarden/home.html?minJs=false for unminified sources */-->
 <sly data-sly-test.noMinJs="${request.parameterMap['minJs'][0] == 'false'}">
-  
+
   <!-- htmx for hypermedia interactions -->
   <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
 
-  <!-- Tiptap editor + editor interactions (unminified dev bundle) -->
-  <script src="/apps/slingslop/zengarden/js/editor-bundle.js"></script>
-  
+  <!-- Public bundle (unminified) -->
+  <script src="/apps/slingslop/zengarden/js/public/public-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/public/public.css" />
+
+  <!-- Editor bundle (unminified) -->
+  <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.css" />
+
 </sly>
 <sly data-sly-test="${!noMinJs}">
-  <!-- Single bundled and minified JavaScript (htmx + Tiptap + editor code) -->
-  <script src="/apps/slingslop/zengarden/js/bundle.min.js"></script>
-</sly>
 
-<link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor-modal.css" />
+  <!-- Public bundle (minified) -->
+  <script src="/apps/slingslop/zengarden/js/public/public-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/public/public.min.css" />
+
+  <!-- Editor bundle (minified, htmx inlined) -->
+  <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.min.css" />
+
+</sly>
