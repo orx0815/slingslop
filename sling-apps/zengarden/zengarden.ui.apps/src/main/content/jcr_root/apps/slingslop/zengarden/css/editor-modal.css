@@ -2,10 +2,10 @@
  * Modal Styles for Rich Text Editor
  */
 
-.editor-modal {
-    display: none;
+.editor-component-modal {
+  display: none;
     position: fixed;
-    z-index: 1200;
+    z-index: 10050;
     left: 0;
     top: 0;
     width: 100%;
@@ -15,12 +15,16 @@
     animation: fadeIn 0.3s;
 }
 
+  .editor-component-modal.is-open {
+    display: block;
+  }
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-.editor-modal-content {
+.editor-component-modal-content {
     background-color: #fefefe;
     margin: 5% auto;
     padding: 0;
@@ -43,7 +47,7 @@
     }
 }
 
-.editor-modal-header {
+.editor-component-modal-header {
     padding: 20px 30px;
     background-color: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
@@ -53,39 +57,34 @@
     align-items: center;
 }
 
-.editor-modal-header h2 {
+  .editor-component-modal-header h2 {
     margin: 0;
     font-size: 1.5rem;
     color: #333;
 }
 
-.editor-modal-close {
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+  .editor-component-modal-close {
+    color: #666;
     background: none;
     border: none;
+    cursor: pointer;
+    font-size: 26px;
+    line-height: 1;
     padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
+    margin-left: 12px;
+  }
 
-.editor-modal-close:hover,
-.editor-modal-close:focus {
+  .editor-component-modal-close:hover,
+  .editor-component-modal-close:focus {
     color: #000;
-}
+  }
 
-.editor-modal-body {
+  .editor-component-modal-body {
     padding: 30px;
 }
 
-.editor-modal-body input[type="text"],
-.editor-modal-body textarea {
+  .editor-component-modal-body input[type="text"],
+  .editor-component-modal-body textarea {
     width: 100%;
     box-sizing: border-box;
     padding: 10px 12px;
@@ -98,14 +97,14 @@
     background-color: #fff;
 }
 
-.editor-modal-body input[type="text"]:focus,
-.editor-modal-body textarea:focus {
+  .editor-component-modal-body input[type="text"]:focus,
+  .editor-component-modal-body textarea:focus {
     border-color: #80bdff;
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-.editor-modal-footer {
+  .editor-component-modal-actions {
     padding: 20px 30px;
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
@@ -172,14 +171,14 @@ body[data-zen-editing] [data-zen-editable] {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .editor-modal-content {
+  .editor-component-modal-content {
         width: 95%;
         margin: 10% auto;
     }
     
-    .editor-modal-header,
-    .editor-modal-body,
-    .editor-modal-footer {
+  .editor-component-modal-header,
+  .editor-component-modal-body,
+  .editor-component-modal-actions {
         padding: 15px;
     }
 }
@@ -267,16 +266,16 @@ body[data-zen-editing] [data-zen-editable] {
   cursor: not-allowed;
 }
 
-/* ── Tiptap editor container — transparent so page styles shine through ─ */
 .tiptap-editor-container {
-  /* No border or background: inherit the page's look */
+  font: inherit;
+  color: inherit;
 }
+
 .tiptap-editor-container .ProseMirror {
   /* Inherit ALL typographic styles from the surrounding page */
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
+  font: inherit;
   color: inherit;
+  letter-spacing: inherit;
   min-height: 4em;
   outline: none;
 }
@@ -418,6 +417,10 @@ body[data-zen-editing] [data-zen-editable] {
   border-top: 1px solid #dee2e6;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.10);
   flex-wrap: wrap;
+}
+
+#edit-component-btn {
+  margin-left: 0;
 }
 
 .inline-headline-input {

@@ -33,6 +33,8 @@ declare const htmx: {
 declare global {
   interface Window {
     saveEditorContent: () => void;
+    openEditorComponentModal: () => void;
+    closeEditorComponentModal: () => void;
   }
 }
 
@@ -389,11 +391,71 @@ declare global {
     }
   }
 
+  function showComponentModal(): void {
+    mountComponentModal();
+    const modal = document.getElementById('editor-component-modal');
+    if (!modal) {
+      return;
+    }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    const firstInput = modal.querySelector<HTMLInputElement>('input, textarea, select');
+    firstInput?.focus();
+  }
+
+  function hideComponentModal(): void {
+    const modal = document.getElementById('editor-component-modal');
+    if (!modal) {
+      return;
+    }
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function mountComponentModal(): void {
+    const modal = document.getElementById('editor-component-modal');
+    const globalContainer = document.getElementById('editor-modal-container');
+    if (!modal || !globalContainer || modal.parentElement === globalContainer) {
+      return;
+    }
+    globalContainer.appendChild(modal);
+  }
+
+  function unmountComponentModal(): void {
+    const modal = document.getElementById('editor-component-modal');
+    if (!modal) {
+      return;
+    }
+    modal.remove();
+  }
+
+  function wireComponentModal(): void {
+    const modal = document.getElementById('editor-component-modal');
+    const openButton = document.getElementById('edit-component-btn');
+    if (!modal || !openButton) {
+      return;
+    }
+
+    openButton.addEventListener('click', showComponentModal);
+    modal.addEventListener('click', (event: MouseEvent) => {
+      if (event.target === modal) {
+        hideComponentModal();
+      }
+    });
+
+    mountComponentModal();
+  }
+
   function initializeEventListeners(): void {
     // Destroy editor before any swap that removes the active editing div
     document.body.addEventListener('htmx:beforeSwap', function (event: Event): void {
       const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
       if (htmxEvent.detail.target.hasAttribute('data-zen-editable-editing')) {
+        hideComponentModal();
+        unmountComponentModal();
         destroyEditor();
         document.body.removeAttribute('data-zen-editing');
       }
@@ -408,7 +470,20 @@ declare global {
           htmx.process(form);
         }
         initializeTiptap();
+        wireComponentModal();
         document.body.setAttribute('data-zen-editing', '');
+      }
+    });
+
+    window.openEditorComponentModal = showComponentModal;
+    window.closeEditorComponentModal = hideComponentModal;
+
+    document.addEventListener('keydown', function (event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('editor-component-modal');
+        if (modal?.classList.contains('is-open')) {
+          hideComponentModal();
+        }
       }
     });
 

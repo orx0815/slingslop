@@ -4,5 +4,6 @@ echo '[NOTE] Launching application, this will fail if you did not build the proj
 echo '[NOTE] Remove the launcher folder to throw away local changes'
 echo '-------------------------------------------------------------------------------------------'
 
-target/dependency/org.apache.sling.feature.launcher/bin/launcher -f target/slingfeature-tmp/feature-slingslop_aggregate.json
+export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
 
+target/dependency/org.apache.sling.feature.launcher/bin/launcher -f target/slingfeature-tmp/feature-slingslop_aggregate.json

@@ -23036,10 +23036,62 @@ img.ProseMirror-separator {
         isSourceView = false;
       }
     }
+    function showComponentModal() {
+      mountComponentModal();
+      const modal = document.getElementById("editor-component-modal");
+      if (!modal) {
+        return;
+      }
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      const firstInput = modal.querySelector("input, textarea, select");
+      firstInput?.focus();
+    }
+    function hideComponentModal() {
+      const modal = document.getElementById("editor-component-modal");
+      if (!modal) {
+        return;
+      }
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    function mountComponentModal() {
+      const modal = document.getElementById("editor-component-modal");
+      const globalContainer = document.getElementById("editor-modal-container");
+      if (!modal || !globalContainer || modal.parentElement === globalContainer) {
+        return;
+      }
+      globalContainer.appendChild(modal);
+    }
+    function unmountComponentModal() {
+      const modal = document.getElementById("editor-component-modal");
+      if (!modal) {
+        return;
+      }
+      modal.remove();
+    }
+    function wireComponentModal() {
+      const modal = document.getElementById("editor-component-modal");
+      const openButton = document.getElementById("edit-component-btn");
+      if (!modal || !openButton) {
+        return;
+      }
+      openButton.addEventListener("click", showComponentModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          hideComponentModal();
+        }
+      });
+      mountComponentModal();
+    }
     function initializeEventListeners() {
       document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
         if (htmxEvent.detail.target.hasAttribute("data-zen-editable-editing")) {
+          hideComponentModal();
+          unmountComponentModal();
           destroyEditor();
           document.body.removeAttribute("data-zen-editing");
         }
@@ -23052,7 +23104,18 @@ img.ProseMirror-separator {
             htmx.process(form);
           }
           initializeTiptap();
+          wireComponentModal();
           document.body.setAttribute("data-zen-editing", "");
+        }
+      });
+      window.openEditorComponentModal = showComponentModal;
+      window.closeEditorComponentModal = hideComponentModal;
+      document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+          const modal = document.getElementById("editor-component-modal");
+          if (modal?.classList.contains("is-open")) {
+            hideComponentModal();
+          }
         }
       });
       window.saveEditorContent = function() {

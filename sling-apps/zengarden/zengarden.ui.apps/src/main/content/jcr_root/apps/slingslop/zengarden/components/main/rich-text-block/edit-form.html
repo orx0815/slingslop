@@ -108,10 +108,29 @@
         <!-- Hidden input populated with editor HTML before htmx submit -->
         <input type="hidden" id="content-hidden" name="text" />
 
-    <!-- ── Bottom bar: headline + Save / Cancel (fixed to viewport bottom) ── -->
+    <div id="editor-component-modal" class="editor-component-modal" aria-hidden="true">
+      <div class="editor-component-modal-content" role="dialog" aria-modal="true" aria-labelledby="editor-component-modal-title">
+        <div class="editor-component-modal-header">
+          <h2 id="editor-component-modal-title">Edit Component</h2>
+          <button type="button" class="editor-component-modal-close" aria-label="Close" onclick="closeEditorComponentModal()">×</button>
+        </div>
+        <div class="editor-component-modal-body">
+          <input type="text" id="headline-input" name="headline" value="${properties.headline}"
+                 class="inline-headline-input" placeholder="Headline" form="editor-form" />
+        </div>
+        <div class="editor-component-modal-actions">
+          <button type="button" class="btn btn-secondary"
+                  hx-get="${resource.path}.html"
+                  hx-target="[data-zen-editable-editing]"
+                  hx-swap="outerHTML">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Bottom bar: open component modal + Save / Cancel (fixed to viewport bottom) ── -->
     <div class="inline-editor-footer">
-      <input type="text" id="headline-input" name="headline" value="${properties.headline}"
-             class="inline-headline-input" placeholder="Headline" />
+      <button type="button" id="edit-component-btn" class="btn btn-secondary">Edit Component</button>
       <div class="inline-editor-actions">
         <button type="button" class="btn btn-secondary"
                 hx-get="${resource.path}.html"
