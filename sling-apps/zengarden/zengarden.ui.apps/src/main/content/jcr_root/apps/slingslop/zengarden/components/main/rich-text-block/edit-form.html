@@ -128,6 +128,13 @@
       </div>
     </div>
 
+    <!-- ── Save error notification (fixed above footer) ─────────────────── -->
+    <div id="editor-save-error" class="editor-save-error" role="alert" aria-live="assertive" aria-hidden="true">
+      <span class="editor-save-error__icon" aria-hidden="true">⚠</span>
+      <span class="editor-save-error__message"></span>
+      <button type="button" class="editor-save-error__close" aria-label="Dismiss" onclick="this.closest('.editor-save-error').classList.remove('is-visible');this.closest('.editor-save-error').setAttribute('aria-hidden','true')">×</button>
+    </div>
+
     <!-- ── Bottom bar: open component modal + Save / Cancel (fixed to viewport bottom) ── -->
     <div class="inline-editor-footer">
       <button type="button" id="edit-component-btn" class="btn btn-secondary">Edit Component</button>

@@ -18,6 +18,13 @@ export function saveEditorContent(): void {
     content = state.editor?.getHTML() ?? '';
   }
 
+  // Clear any previous save error before attempting again
+  const errorEl = document.getElementById('editor-save-error');
+  if (errorEl) {
+    errorEl.classList.remove('is-visible');
+    errorEl.setAttribute('aria-hidden', 'true');
+  }
+
   const form = document.getElementById('editor-form') as HTMLElement;
   const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement;
   hiddenInput.value = content;

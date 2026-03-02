@@ -23095,6 +23095,11 @@ img.ProseMirror-separator {
     } else {
       content = state.editor?.getHTML() ?? "";
     }
+    const errorEl = document.getElementById("editor-save-error");
+    if (errorEl) {
+      errorEl.classList.remove("is-visible");
+      errorEl.setAttribute("aria-hidden", "true");
+    }
     const form = document.getElementById("editor-form");
     const hiddenInput = document.getElementById("content-hidden");
     hiddenInput.value = content;
@@ -23124,6 +23129,29 @@ img.ProseMirror-separator {
           initializeTiptap();
           wireComponentModal();
           document.body.setAttribute("data-zen-editing", "");
+        }
+      });
+      document.body.addEventListener("htmx:responseError", function(event) {
+        const htmxEvent = event;
+        const status = htmxEvent.detail.xhr.status;
+        let message;
+        if (status === 401 || status === 422) {
+          message = "Save failed: you are not logged in. Please log in and try again.";
+        } else if (status === 404) {
+          message = "Save failed: the content could not be found (404).";
+        } else if (status === 500) {
+          message = "Save failed: a server error occurred (500). Please try again later.";
+        } else {
+          message = `Save failed: unexpected server response (${status}).`;
+        }
+        const errorEl = document.getElementById("editor-save-error");
+        if (errorEl) {
+          const msgEl = errorEl.querySelector(".editor-save-error__message");
+          if (msgEl) {
+            msgEl.textContent = message;
+          }
+          errorEl.setAttribute("aria-hidden", "false");
+          errorEl.classList.add("is-visible");
         }
       });
       document.addEventListener("keydown", function(event) {

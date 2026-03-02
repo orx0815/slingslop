@@ -6,7 +6,7 @@
 [![Maven 3.9.12+](https://img.shields.io/badge/Maven-3.9.12%2B-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)](#prerequisites)
 
 ## Hypermedia Driven Applications (HDA) based on Apache Sling.  
-Using HTMX|Datastar|Alpine-Ajax to GET component **markup** and to POST content via Sling's OOTB endpoints
+Using HTMX to GET component **markup** and to POST content via Sling's OOTB endpoints
 
 (The name is a pun about the Apache Sling Slingshot sample application, that didn't get much love either.)
 
@@ -96,19 +96,14 @@ There are four primary ways to run the application locally:
       ```
      and install the ./content-packages/complete/target/slingslop.complete-x.y.z-SNAPSHOT.zip 
 
-4.  **Run the prebuilt Slingslop image from GHCR (quickest for newbies):**
+4.  **Run the prebuilt Slingslop image from GHCR:**
 
     ```bash
     docker pull ghcr.io/orx0815/slingslop:latest
-    docker volume create sling-launcher
-    docker run --rm -p 8080:8080 -v sling-launcher:/opt/sling/launcher ghcr.io/orx0815/slingslop:latest
+    docker run --rm -p 8080:8080 ghcr.io/orx0815/slingslop:latest
     ```
 
     Then open http://localhost:8080/content/slingslop/zengarden/home.html
-
-    Helpful notes:
-    - If the package is private, log in first: `echo <YOUR_GITHUB_PAT> | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin`
-    - Use a specific published tag instead of `latest` when you want reproducible runs.
 
 ### Developing the Application
 

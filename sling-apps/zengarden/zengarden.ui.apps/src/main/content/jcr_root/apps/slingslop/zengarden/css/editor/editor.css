@@ -490,6 +490,58 @@ body[data-zen-editing] [data-zen-editable] {
   }
 }
 
+/* ── Save error notification ────────────────────────────────────────── */
+
+.editor-save-error {
+  display: none;
+  position: fixed;
+  bottom: 54px; /* above the inline-editor-footer */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9002;
+  max-width: 540px;
+  width: calc(100% - 2rem);
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.18);
+  align-items: center;
+  gap: 8px;
+
+  &.is-visible {
+    display: flex;
+  }
+}
+
+.editor-save-error__icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.editor-save-error__message {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.editor-save-error__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0 2px;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 /* ── Save / Cancel button group ──────────────────────────────────────── */
 
 .inline-editor-actions {
