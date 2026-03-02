@@ -1,6 +1,6 @@
 # Adopted from https://github.com/apache/sling-org-apache-sling-starter/blob/master/Dockerfile
 
-FROM docker.io/eclipse-temurin:21
+FROM docker.io/eclipse-temurin:25
 
 LABEL org.opencontainers.image.authors="orx0815@users.noreply.github.com"
 

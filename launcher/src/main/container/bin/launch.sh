@@ -18,8 +18,9 @@ feature="${feature},${docker_feature}"
 if [ ! -z "${JAVA_DEBUG_PORT}" ]; then
     JAVA_DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${JAVA_DEBUG_PORT}"
 fi
-# remove add-opens after SLING-10831 is fixed
-JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED ${JAVA_DEBUG_OPTS} ${EXTRA_JAVA_OPTS}"
+
+# add jdk25 performance benefits
+JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication ${JAVA_DEBUG_OPTS} ${EXTRA_JAVA_OPTS}"
 
 agents=$(find agents -name "*.jar")
 for agent in ${agents}; do
