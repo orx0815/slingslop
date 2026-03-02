@@ -1,5 +1,10 @@
 # Slingslop
 
+[![CI](https://img.shields.io/github/actions/workflow/status/orx0815/slingslop/maven-main.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/orx0815/slingslop/actions/workflows/maven-main.yml)
+[![Publish](https://img.shields.io/github/actions/workflow/status/orx0815/slingslop/publish-ghcr.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Publish)](https://github.com/orx0815/slingslop/actions/workflows/publish-ghcr.yml)
+[![Java 25](https://img.shields.io/badge/Java-25-007396?style=for-the-badge&logo=openjdk&logoColor=white)](#prerequisites)
+[![Maven 3.9.12+](https://img.shields.io/badge/Maven-3.9.12%2B-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)](#prerequisites)
+
 ## Hypermedia Driven Applications (HDA) based on Apache Sling.  
 Using HTMX|Datastar|Alpine-Ajax to GET component **markup** and to POST content via Sling's OOTB endpoints
 
@@ -49,7 +54,7 @@ mvn clean install -Ddocker.skip=false
 
 ### Running the Application
 
-There are three primary ways to run the application locally:
+There are four primary ways to run the application locally:
 
 1.  **Using the Launcher Script (Recommended for development):**
     The `launcher/launch.sh` script starts the application directly without Docker. This is useful for quick development cycles.
@@ -90,6 +95,20 @@ There are three primary ways to run the application locally:
       docker run --rm -p 8081:8080 -v sling-launcher:/opt/sling/launcher apache/sling:13 oak_mongo
       ```
      and install the ./content-packages/complete/target/slingslop.complete-x.y.z-SNAPSHOT.zip 
+
+4.  **Run the prebuilt Slingslop image from GHCR (quickest for newbies):**
+
+    ```bash
+    docker pull ghcr.io/orx0815/slingslop:latest
+    docker volume create sling-launcher
+    docker run --rm -p 8080:8080 -v sling-launcher:/opt/sling/launcher ghcr.io/orx0815/slingslop:latest
+    ```
+
+    Then open http://localhost:8080/content/slingslop/zengarden/home.html
+
+    Helpful notes:
+    - If the package is private, log in first: `echo <YOUR_GITHUB_PAT> | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin`
+    - Use a specific published tag instead of `latest` when you want reproducible runs.
 
 ### Developing the Application
 
