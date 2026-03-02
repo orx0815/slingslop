@@ -3,15 +3,19 @@
  */
 
 .editor-component-modal-content {
-  background-color: #fefefe;
+  background-color: var(--color-white-soft);
   margin: 5% auto;
   padding: 0;
-  border: 1px solid #888;
+  border: 1px solid var(--color-text-muted);
   width: 90%;
   max-width: 900px;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgb(0 0 0 / 0.3);
-  animation: slideDown 0.3s;
+  animation: slideDown 0.8s;
+
+  .is-closing & {
+    animation: slideUp 0.25s forwards;
+  }
 
   @media (max-width: 768px) {
     width: 95%;
@@ -30,10 +34,21 @@
   }
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
 .editor-component-modal-header {
   padding: 20px 30px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border-ui);
   border-radius: 8px 8px 0 0;
   display: flex;
   justify-content: space-between;
@@ -46,12 +61,12 @@
   h2 {
     margin: 0;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--color-text);
   }
 }
 
 .editor-component-modal-close {
-  color: #666;
+  color: var(--color-text-muted);
   background: none;
   border: none;
   cursor: pointer;
@@ -62,7 +77,7 @@
 
   &:hover,
   &:focus {
-    color: #000;
+    color: var(--color-black);
   }
 }
 
@@ -79,25 +94,25 @@
     box-sizing: border-box;
     padding: 10px 12px;
     margin: 0 0 16px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     font-size: 14px;
     line-height: 1.4;
-    color: #212529;
-    background-color: #fff;
+    color: var(--color-text);
+    background-color: var(--color-white);
 
     &:focus {
-      border-color: #80bdff;
+      border-color: var(--color-focus-ring);
       outline: none;
-      box-shadow: 0 0 0 3px rgb(0 123 255 / 0.15);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
     }
   }
 }
 
 .editor-component-modal-actions {
   padding: 20px 30px;
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background-color: var(--color-bg-subtle);
+  border-top: 1px solid var(--color-border-ui);
   border-radius: 0 0 8px 8px;
   text-align: right;
 

@@ -24,7 +24,7 @@
     /* Placeholder text */
     p.is-editor-empty:first-child::before {
       content: attr(data-placeholder);
-      color: #aaa;
+      color: var(--color-text-placeholder);
       pointer-events: none;
       float: left;
       height: 0;
@@ -39,14 +39,14 @@
 
       td,
       th {
-        border: 1px solid #ccc;
+        border: 1px solid var(--color-border);
         padding: 6px 10px;
         vertical-align: top;
         position: relative;
       }
 
       th {
-        background: #f5f5f5;
+        background: var(--color-bg-subtle);
         font-weight: 600;
       }
     }
@@ -56,7 +56,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: rgb(74 144 217 / 0.15);
+      background: var(--color-active-border-tint);
       pointer-events: none;
     }
 
@@ -67,21 +67,21 @@
       top: 0;
       bottom: 0;
       width: 4px;
-      background: #4a90d9;
+      background: var(--color-active-border);
       cursor: col-resize;
     }
 
     /* ── Blockquote ──────────────────────────────────────────────────── */
     blockquote {
-      border-left: 4px solid #ccc;
+      border-left: 4px solid var(--color-border);
       margin: 0.5em 0;
       padding: 0.25em 1em;
-      color: #555;
+      color: var(--color-text-muted);
     }
 
     /* ── Code ────────────────────────────────────────────────────────── */
     code {
-      background: #f0f0f0;
+      background: var(--color-code-inline-bg);
       border-radius: 3px;
       padding: 0.1em 0.3em;
       font-family: "Courier New", Courier, monospace;
@@ -89,8 +89,8 @@
     }
 
     pre {
-      background: #282828;
-      color: #f8f8f2;
+      background: var(--color-code-bg);
+      color: var(--color-code-fg);
       border-radius: 4px;
       padding: 12px 16px;
       overflow-x: auto;
@@ -106,7 +106,7 @@
     /* ── Horizontal rule ─────────────────────────────────────────────── */
     hr {
       border: none;
-      border-top: 2px solid #ddd;
+      border-top: 2px solid var(--color-hover);
       margin: 1em 0;
     }
   }
@@ -119,21 +119,21 @@
   width: 100%;
   min-height: 280px;
   padding: 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
   line-height: 1.5;
   resize: vertical;
   box-sizing: border-box;
-  background: #1e1e2e;
-  color: #cdd6f4;
+  background: var(--color-source-editor-bg);
+  color: var(--color-source-editor-fg);
 }
 
 /* ── Character / word count bar ──────────────────────────────────────── */
 
 .tiptap-char-count {
   font-size: 11px;
-  color: #888;
+  color: var(--color-text-muted);
   text-align: right;
   padding: 2px 0;
   margin-top: 2px;

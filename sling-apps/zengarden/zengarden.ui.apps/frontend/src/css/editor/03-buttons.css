@@ -14,19 +14,19 @@
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: var(--color-primary);
   color: white;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: var(--color-primary-hover);
   }
 }
 
 .btn-secondary {
-  background-color: #6c757d;
+  background-color: var(--color-secondary);
   color: white;
 
   &:hover {
-    background-color: #545b62;
+    background-color: var(--color-secondary-hover);
   }
 }

@@ -23055,9 +23055,16 @@ img.ProseMirror-separator {
     if (!modal) {
       return;
     }
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+    modal.classList.add("is-closing");
+    modal.addEventListener(
+      "animationend",
+      () => {
+        modal.classList.remove("is-open", "is-closing");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      },
+      { once: true }
+    );
   }
   function mountComponentModal() {
     const modal = document.getElementById("editor-component-modal");
