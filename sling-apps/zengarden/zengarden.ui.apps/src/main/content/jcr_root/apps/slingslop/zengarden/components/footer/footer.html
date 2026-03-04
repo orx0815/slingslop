@@ -1,0 +1,22 @@
+<footer data-zen-editable="true"
+        hx-get="${resource.path}.edit-form.html"
+        hx-trigger="click"
+        hx-swap="outerHTML"
+        style="cursor: pointer;"
+        title="Click to edit footer links">
+  <a href="${properties.footer1Link @ context='uri'}"
+     title="${properties.footer1Title @ context='attribute'}"
+     class="zen-validate-html">${properties.footer1Text}</a>
+  <a href="${properties.footer2Link @ context='uri'}"
+     title="${properties.footer2Title @ context='attribute'}"
+     class="zen-validate-css">${properties.footer2Text}</a>
+  <a href="${properties.footer3Link @ context='uri'}"
+     title="${properties.footer3Title @ context='attribute'}"
+     class="zen-license">${properties.footer3Text}</a>
+  <a href="${properties.footer4Link @ context='uri'}"
+     title="${properties.footer4Title @ context='attribute'}"
+     class="zen-accessibility">${properties.footer4Text}</a>
+  <a href="${properties.footer5Link @ context='uri'}"
+     title="${properties.footer5Title @ context='attribute'}"
+     class="zen-github">${properties.footer5Text}</a>
+</footer>

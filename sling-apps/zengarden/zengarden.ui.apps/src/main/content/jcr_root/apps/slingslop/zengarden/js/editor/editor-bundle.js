@@ -23095,13 +23095,6 @@ img.ProseMirror-separator {
 
   // src/typescript/editor/save.ts
   function saveEditorContent() {
-    let content;
-    if (state.isSourceView) {
-      const sourceTextarea = document.getElementById("html-source");
-      content = sourceTextarea?.value ?? "";
-    } else {
-      content = state.editor?.getHTML() ?? "";
-    }
     const errorEl = document.getElementById("editor-save-error");
     if (errorEl) {
       errorEl.classList.remove("is-visible");
@@ -23109,13 +23102,50 @@ img.ProseMirror-separator {
     }
     const form = document.getElementById("editor-form");
     const hiddenInput = document.getElementById("content-hidden");
-    hiddenInput.value = content;
+    if (hiddenInput) {
+      let content;
+      if (state.isSourceView) {
+        const sourceTextarea = document.getElementById("html-source");
+        content = sourceTextarea?.value ?? "";
+      } else {
+        content = state.editor?.getHTML() ?? "";
+      }
+      hiddenInput.value = content;
+    }
     htmx.trigger(form, "submit");
   }
 
   // src/typescript/editor.ts
   (function() {
     "use strict";
+    function isRichtextEditMode() {
+      const marker = document.querySelector("[data-inline-richtext]");
+      if (marker) {
+        return marker.dataset.inlineRichtext === "true";
+      }
+      return !!document.getElementById("content-editor");
+    }
+    function enableNoRichtextMode() {
+      const editingRoot = document.querySelector("[data-zen-editable-editing]");
+      if (editingRoot) {
+        editingRoot.classList.add("no-richtext-edit");
+      }
+      ["tiptap-toolbar", "tiptap-editor", "html-source", "char-count"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = "none";
+        }
+      });
+      const editButton = document.getElementById("edit-component-btn");
+      if (editButton) {
+        editButton.style.display = "none";
+      }
+      const footerBar = document.querySelector(".inline-editor-footer");
+      if (footerBar) {
+        footerBar.style.display = "none";
+      }
+      showComponentModal();
+    }
     function initializeEventListeners() {
       document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
@@ -23133,8 +23163,13 @@ img.ProseMirror-separator {
           if (form) {
             htmx.process(form);
           }
-          initializeTiptap();
           wireComponentModal();
+          if (isRichtextEditMode()) {
+            initializeTiptap();
+          } else {
+            destroyEditor();
+            enableNoRichtextMode();
+          }
           document.body.setAttribute("data-zen-editing", "");
         }
       });

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
-    jcr:description="Base component for inline rich-text editing with Tiptap"
+    jcr:description="Base component for inline component editing (with optional rich-text)"
     jcr:primaryType="sling:Folder"
-    jcr:title="Rich Text Block (base)"/>
+    jcr:title="Editable Component (base)"/>

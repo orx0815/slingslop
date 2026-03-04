@@ -10,14 +10,6 @@ declare const htmx: {
  * htmx form submission to the Sling POST Servlet.
  */
 export function saveEditorContent(): void {
-  let content: string;
-  if (state.isSourceView) {
-    const sourceTextarea = document.getElementById('html-source') as HTMLTextAreaElement | null;
-    content = sourceTextarea?.value ?? '';
-  } else {
-    content = state.editor?.getHTML() ?? '';
-  }
-
   // Clear any previous save error before attempting again
   const errorEl = document.getElementById('editor-save-error');
   if (errorEl) {
@@ -26,8 +18,20 @@ export function saveEditorContent(): void {
   }
 
   const form = document.getElementById('editor-form') as HTMLElement;
-  const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement;
-  hiddenInput.value = content;
+  const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement | null;
+
+  if (hiddenInput) {
+    let content: string;
+    if (state.isSourceView) {
+      const sourceTextarea = document.getElementById('html-source') as HTMLTextAreaElement | null;
+      content = sourceTextarea?.value ?? '';
+    } else {
+      content = state.editor?.getHTML() ?? '';
+    }
+
+    hiddenInput.value = content;
+  }
+
   htmx.trigger(form, 'submit');
   // No manual close needed — htmx outerHTML swap restores the view component
 }

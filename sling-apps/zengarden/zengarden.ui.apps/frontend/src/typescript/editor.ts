@@ -32,6 +32,47 @@ declare global {
 (function (): void {
   'use strict';
 
+  /**
+   * Edit form contract:
+   * - Components that use richtext should provide #content-editor and #content-hidden.
+   * - Components can set data-inline-richtext="true|false" on their edit-form-fields root.
+   *   `false` skips Tiptap and opens the component modal directly.
+   */
+  function isRichtextEditMode(): boolean {
+    const marker = document.querySelector('[data-inline-richtext]') as HTMLElement | null;
+    if (marker) {
+      return marker.dataset.inlineRichtext === 'true';
+    }
+
+    return !!document.getElementById('content-editor');
+  }
+
+  function enableNoRichtextMode(): void {
+    const editingRoot = document.querySelector('[data-zen-editable-editing]') as HTMLElement | null;
+    if (editingRoot) {
+      editingRoot.classList.add('no-richtext-edit');
+    }
+
+    ['tiptap-toolbar', 'tiptap-editor', 'html-source', 'char-count'].forEach((id: string): void => {
+      const el = document.getElementById(id) as HTMLElement | null;
+      if (el) {
+        el.style.display = 'none';
+      }
+    });
+
+    const editButton = document.getElementById('edit-component-btn') as HTMLElement | null;
+    if (editButton) {
+      editButton.style.display = 'none';
+    }
+
+    const footerBar = document.querySelector('.inline-editor-footer') as HTMLElement | null;
+    if (footerBar) {
+      footerBar.style.display = 'none';
+    }
+
+    showComponentModal();
+  }
+
   function initializeEventListeners(): void {
     // Destroy editor before any swap that removes the active editing region
     document.body.addEventListener('htmx:beforeSwap', function (event: Event): void {
@@ -52,8 +93,15 @@ declare global {
         if (form) {
           htmx.process(form);
         }
-        initializeTiptap();
         wireComponentModal();
+
+        if (isRichtextEditMode()) {
+          initializeTiptap();
+        } else {
+          destroyEditor();
+          enableNoRichtextMode();
+        }
+
         document.body.setAttribute('data-zen-editing', '');
       }
     });

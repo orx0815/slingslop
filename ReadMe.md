@@ -30,7 +30,8 @@ Using HTMX to GET component **markup** and to POST content via Sling's OOTB endp
 - `launcher/`  
   The core module responsible for building the runnable Sling application using the `slingfeature-maven-plugin`. The feature definitions are in `launcher/src/main/features`.
 
-## Local Development Workflow
+- doc/
+  Help coding agents grasp some concepts and conventions
 
 ### Prerequisites
 
