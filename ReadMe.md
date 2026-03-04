@@ -29,6 +29,8 @@ Using HTMX to GET component **markup** and to POST content via Sling's OOTB endp
   
 - `launcher/`  
   The core module responsible for building the runnable Sling application using the `slingfeature-maven-plugin`. The feature definitions are in `launcher/src/main/features`.
+  
+  Includes a launcher dependency BOM module (`launcher/launcher-dependencies`) for provided API version alignment with Sling. Dependencies listed there can simple be used, because they are already present in the launcher so do not need to be added to own OSGi bundles.
 
 - doc/
   Help coding agents grasp some concepts and conventions
