@@ -1,4 +1,4 @@
-<div class="${resource.name}" data-zen-editable-editing="true" role="article">
+<div data-zen-editable-editing="true">
 
   <form id="editor-form"
         hx-trigger="submit"
@@ -7,7 +7,7 @@
         hx-post="${resource.path}">
 
     <input type="hidden" name=":redirect" value="${resource.path}.html" />
-
+    
         <!-- ── Tiptap Toolbar (fixed to viewport top) ─────────────────── -->
         <div id="tiptap-toolbar" class="tiptap-toolbar" role="toolbar" aria-label="Editor toolbar">
 
@@ -92,9 +92,7 @@
 
         </div><!-- /.tiptap-toolbar -->
 
-        <!-- Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init -->
-        <textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
-
+        
         <!-- ── Tiptap editor mount point (renders in normal page flow) ── -->
         <div id="tiptap-editor" class="tiptap-editor-container"></div>
 
@@ -105,9 +103,6 @@
         <!-- ── Character / word count ─────────────────────────────────── -->
         <div id="char-count" class="tiptap-char-count"></div>
 
-        <!-- Hidden input populated with editor HTML before htmx submit -->
-        <input type="hidden" id="content-hidden" name="text" />
-
     <div id="editor-component-modal" class="editor-component-modal" aria-hidden="true">
       <div class="editor-component-modal-content" role="dialog" aria-modal="true" aria-labelledby="editor-component-modal-title">
         <div class="editor-component-modal-header">
@@ -115,8 +110,7 @@
           <button type="button" class="editor-component-modal-close" aria-label="Close" onclick="closeEditorComponentModal()">×</button>
         </div>
         <div class="editor-component-modal-body">
-          <input type="text" id="headline-input" name="headline" value="${properties.headline}"
-                 class="inline-headline-input" placeholder="Headline" form="editor-form" />
+          <sly data-sly-include="${'edit-form-fields.html'}" />
         </div>
         <div class="editor-component-modal-actions">
           <button type="button" class="btn btn-secondary"
