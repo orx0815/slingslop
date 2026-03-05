@@ -13,7 +13,7 @@ export function saveEditorContent(): void {
   // Clear any previous save error before attempting again
   const errorEl = document.getElementById('editor-save-error');
   if (errorEl) {
-    errorEl.classList.remove('is-visible');
+    errorEl.classList.remove('is-visible', 'is-closing');
     errorEl.setAttribute('aria-hidden', 'true');
   }
 

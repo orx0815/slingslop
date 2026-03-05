@@ -34,10 +34,22 @@ slingslop/zengarden/components/editable-component instead.
       </div>
     </div>
 
-    <div id="editor-save-error" class="editor-save-error" role="alert" aria-live="assertive" aria-hidden="true">
-      <span class="editor-save-error__icon" aria-hidden="true">⚠</span>
-      <span class="editor-save-error__message"></span>
-      <button type="button" class="editor-save-error__close" aria-label="Dismiss" onclick="this.closest('.editor-save-error').classList.remove('is-visible');this.closest('.editor-save-error').setAttribute('aria-hidden','true')">×</button>
+    <!-- ── Save error notification (centered overlay) ───────────────────── -->
+    <div id="editor-save-error" class="editor-save-error" role="alertdialog" aria-modal="true" aria-live="assertive" aria-hidden="true" aria-labelledby="editor-save-error-title">
+      <div class="editor-save-error__dialog">
+        <div class="editor-save-error__header">
+          <div class="hal-9000" aria-hidden="true">
+            <div class="hal-9000__eye"></div>
+          </div>
+          <div id="editor-save-error-title" class="editor-save-error__title">Save Failed</div>
+        </div>
+        <div class="editor-save-error__body">
+          <p class="editor-save-error__message"></p>
+        </div>
+        <div class="editor-save-error__footer">
+          <button type="button" class="editor-save-error__close" aria-label="Dismiss error" onclick="dismissSaveError()">Dismiss</button>
+        </div>
+      </div>
     </div>
 
   </form>

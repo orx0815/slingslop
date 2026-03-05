@@ -26,6 +26,7 @@ declare global {
     saveEditorContent: () => void;
     openEditorComponentModal: () => void;
     closeEditorComponentModal: () => void;
+    dismissSaveError: () => void;
   }
 }
 
@@ -73,7 +74,9 @@ declare global {
       const status = htmxEvent.detail.xhr.status;
 
       let message: string;
-      if (status === 401 || status === 422) {
+      if (status === 422) {
+        message = "I'm sorry, Dave. I'm afraid I can't let you do that. (w/o login)";
+      } else if (status === 401) {
         message = 'Save failed: you are not logged in. Please log in and try again.';
       } else if (status === 404) {
         message = 'Save failed: the content could not be found (404).';
@@ -104,10 +107,22 @@ declare global {
       }
     });
 
+    // Animated dismiss for save-error overlay
+    function dismissSaveError(): void {
+      const errorEl = document.getElementById('editor-save-error');
+      if (!errorEl || !errorEl.classList.contains('is-visible')) return;
+      errorEl.classList.add('is-closing');
+      window.setTimeout(() => {
+        errorEl.classList.remove('is-visible', 'is-closing');
+        errorEl.setAttribute('aria-hidden', 'true');
+      }, 420);
+    }
+
     // Expose API to HTL onclick attributes
     window.saveEditorContent = saveEditorContent;
     window.openEditorComponentModal = showComponentModal;
     window.closeEditorComponentModal = hideComponentModal;
+    window.dismissSaveError = dismissSaveError;
   }
 
   if (document.readyState === 'loading') {

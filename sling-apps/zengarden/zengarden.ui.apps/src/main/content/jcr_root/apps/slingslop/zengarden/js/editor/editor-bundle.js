@@ -23113,7 +23113,7 @@ img.ProseMirror-separator {
   function saveEditorContent() {
     const errorEl = document.getElementById("editor-save-error");
     if (errorEl) {
-      errorEl.classList.remove("is-visible");
+      errorEl.classList.remove("is-visible", "is-closing");
       errorEl.setAttribute("aria-hidden", "true");
     }
     const form = document.getElementById("editor-form");
@@ -23164,7 +23164,9 @@ img.ProseMirror-separator {
         const htmxEvent = event;
         const status = htmxEvent.detail.xhr.status;
         let message;
-        if (status === 401 || status === 422) {
+        if (status === 422) {
+          message = "I'm sorry, Dave. I'm afraid I can't let you do that. (w/o login)";
+        } else if (status === 401) {
           message = "Save failed: you are not logged in. Please log in and try again.";
         } else if (status === 404) {
           message = "Save failed: the content could not be found (404).";
@@ -23191,9 +23193,19 @@ img.ProseMirror-separator {
           }
         }
       });
+      function dismissSaveError() {
+        const errorEl = document.getElementById("editor-save-error");
+        if (!errorEl || !errorEl.classList.contains("is-visible")) return;
+        errorEl.classList.add("is-closing");
+        window.setTimeout(() => {
+          errorEl.classList.remove("is-visible", "is-closing");
+          errorEl.setAttribute("aria-hidden", "true");
+        }, 420);
+      }
       window.saveEditorContent = saveEditorContent;
       window.openEditorComponentModal = showComponentModal;
       window.closeEditorComponentModal = hideComponentModal;
+      window.dismissSaveError = dismissSaveError;
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initializeEventListeners);
