@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured">
+    <banner
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/banner"
+        title="slimpogrine Contact"
+        subtitle="Get in touch"/>
+    <summary
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/summary"
+        text="&lt;p>Contact information goes here.&lt;/p>"/>
+    <preamble
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/preamble"
+        headline="About this Page"
+        text="&lt;p>Preamble content goes here.&lt;/p>"/>
+</jcr:root>

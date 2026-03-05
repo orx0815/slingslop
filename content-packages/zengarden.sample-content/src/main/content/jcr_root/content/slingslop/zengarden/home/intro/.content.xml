@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured">
+    <banner
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/banner"
+        title="Slingslop"
+        subtitle="Sling Composum Peregrine"/>
+    <summary
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/summary"
+        text="&lt;p>A demonstration of what can be accomplished with &lt;a href=&quot;https://sling.apache.org&quot; target=&quot;_blank&quot;>Apache Sling™&lt;/a>. This example is a silly reverse &lt;a href=&quot;https://csszengarden.com&quot; target=&quot;_blank&quot;>CSS Zen Garden&lt;/a>.&lt;/p> &lt;p>See also &lt;a href=&quot;https://slimpo.motorbrot.org&quot;>Composum&lt;/a> and &lt;a href=&quot;https://sligrine.motorbrot.org&quot;>Peregrine&lt;/a>, two CMS on same microservice.&lt;/p>"/>
+    <preamble
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="slingslop/zengarden/components/intro/preamble"
+        headline="The Content to Enlightenment"
+        text="&lt;p>Littering a dark and dreary alley lies the past of &quot;content&quot;. In the 2000s, the CSS Zen Garden was eye-opening about the separation of look&amp;feel from content.&lt;/p> &lt;p>This page gets a new look every 10 seconds, resulting in confusion. But it makes a point that this is about the content and it&apos;s management by open-source means.&lt;/p> &lt;p>The CSS Zen Garden styles &lt;a href=&quot;https://github.com/mezzoblue/csszengarden.com&quot; target=&quot;_blank&quot;>were blatantly copied&lt;/a>. They predate smartphones, often need fixed text length or overlay headlines with images, which makes writing this text hard. But they are incredibly fast compared to &quot;modern&quot; web.&lt;/p>"/>
+</jcr:root>

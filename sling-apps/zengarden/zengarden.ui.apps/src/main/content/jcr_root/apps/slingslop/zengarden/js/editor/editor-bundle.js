@@ -23188,14 +23188,27 @@ img.ProseMirror-separator {
       document.addEventListener("keydown", function(event) {
         if (event.key === "Escape") {
           const modal = document.getElementById("editor-component-modal");
+          const tiptapEl = document.getElementById("tiptap-editor");
           if (modal?.classList.contains("is-open")) {
-            hideComponentModal();
+            if (!tiptapEl) {
+              const cancelBtn = modal.querySelector(".btn-secondary[hx-get]");
+              cancelBtn?.click();
+            } else {
+              hideComponentModal();
+            }
+          } else if (tiptapEl) {
+            const cancelBtn = document.querySelector(
+              ".inline-editor-footer .btn-secondary[hx-get]"
+            );
+            cancelBtn?.click();
           }
         }
       });
       function dismissSaveError() {
         const errorEl = document.getElementById("editor-save-error");
-        if (!errorEl || !errorEl.classList.contains("is-visible")) return;
+        if (!errorEl || !errorEl.classList.contains("is-visible")) {
+          return;
+        }
         errorEl.classList.add("is-closing");
         window.setTimeout(() => {
           errorEl.classList.remove("is-visible", "is-closing");

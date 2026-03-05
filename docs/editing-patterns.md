@@ -32,6 +32,33 @@ Editor behavior (implemented in frontend TS):
 Reference implementation:
 - `components/footer/edit-form-fields.html`
 
+## Preserving Layout During Inline Editing (Richtext Only)
+
+When a component's view element carries CSS classes or semantic attributes (e.g. `class="preamble"`, `id="zen-preamble"`, `role="article"`), replacing it wholesale with the supertype's plain `<div data-zen-editable-editing="true">` breaks the layout during editing.
+
+For richtext supertype components, `edit-form.html` is intentionally split:
+
+| File | Location | Purpose |
+|---|---|---|
+| `edit-form.html` | supertype or **override in component** | wrapper element only |
+| `edit-form-inner.html` | supertype only | full form/Tiptap/modal body |
+
+To preserve layout, add `edit-form.html` to the concrete component with the correct wrapper element and delegate the body via `data-sly-include`:
+
+```html
+<div class="preamble" id="zen-preamble" role="article" data-zen-editable-editing="true">
+  <sly data-sly-include="${'edit-form-inner.html'}" />
+</div>
+```
+
+Sling resolves `edit-form-inner.html` up the supertype chain automatically — no copy needed in the component.
+
+This override is **only needed for the richtext supertype**. Modal-only components (`editable-component-modal`) render their modal on top of the page, so the wrapper element's classes are irrelevant.
+
+Reference implementations:
+- `components/intro/summary/edit-form.html`
+- `components/intro/preamble/edit-form.html`
+
 ## Generic Field Row Markup
 
 Use these reusable classes for edit forms:
@@ -75,10 +102,11 @@ This regenerates:
 4. Choose mode:
 	- Richtext: add `#content-editor` and `#content-hidden`.
 	- Modal-only: use `editable-component-modal` as `sling:resourceSuperType`.
-5. Use generic field classes (`edit-field-*`) for consistent layout.
-6. Ensure all field controls include `form="editor-form"`.
-7. Add sample content node under `content-packages/zengarden.sample-content/...`.
-8. Run build from `frontend`:
+5. **(Richtext only)** If the view element carries CSS classes/id/role that must be preserved during editing, add `edit-form.html` with the correct wrapper element and `<sly data-sly-include="${'edit-form-inner.html'}" />`. Skip this for modal-only components.
+6. Use generic field classes (`edit-field-*`) for consistent layout.
+7. Ensure all field controls include `form="editor-form"`.
+8. Add sample content node under `content-packages/zengarden.sample-content/...`.
+9. Run build from `frontend`:
 
 ```bash
 cd sling-apps/zengarden/zengarden.ui.apps/frontend
@@ -136,5 +164,15 @@ npm run build
 		 style="cursor: pointer;"
 		 title="Click to edit">
 	...rendered output...
+</div>
+```
+
+### `edit-form.html` (Layout-Preserving Wrapper — Richtext Only)
+
+Only needed when the view element has classes/id/role that must survive the swap into editing mode:
+
+```html
+<div class="my-section" id="zen-my-section" role="article" data-zen-editable-editing="true">
+  <sly data-sly-include="${'edit-form-inner.html'}" />
 </div>
 ```

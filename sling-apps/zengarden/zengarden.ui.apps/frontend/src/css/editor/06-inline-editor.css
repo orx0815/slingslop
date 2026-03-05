@@ -40,12 +40,8 @@ body[data-zen-editing] [data-zen-editable] {
  * remain fully visible.
  */
 [data-zen-editable-editing] {
-  /* Room for the fixed toolbar (~46 px) and footer bar (~54 px) */
-  padding-top: 54px;
-  padding-bottom: 62px;
-  /* Faint left accent */
   border-left: 3px solid var(--color-primary-accent);
-  padding-left: 12px;
+  padding-left: 5px;
 }
 
 /* ── Bottom bar — fixed to viewport bottom ───────────────────────────── */

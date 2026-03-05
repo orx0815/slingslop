@@ -97,12 +97,30 @@ declare global {
       }
     });
 
-    // Escape key closes the component modal
+    // Escape key behaviour:
+    // - Modal open, modal-only component  → Cancel (restores original HTML)
+    // - Modal open, richtext component    → close modal, stay in inline edit
+    // - Modal closed, inline edit active  → Cancel (restores original HTML)
     document.addEventListener('keydown', function (event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         const modal = document.getElementById('editor-component-modal');
+        const tiptapEl = document.getElementById('tiptap-editor');
+
         if (modal?.classList.contains('is-open')) {
-          hideComponentModal();
+          if (!tiptapEl) {
+            // Modal-only mode: trigger Cancel to restore original component HTML
+            const cancelBtn = modal.querySelector<HTMLButtonElement>('.btn-secondary[hx-get]');
+            cancelBtn?.click();
+          } else {
+            // Richtext: just close the modal, keep inline editing
+            hideComponentModal();
+          }
+        } else if (tiptapEl) {
+          // Inline edit active, modal not open: trigger the footer Cancel button
+          const cancelBtn = document.querySelector<HTMLButtonElement>(
+            '.inline-editor-footer .btn-secondary[hx-get]'
+          );
+          cancelBtn?.click();
         }
       }
     });
@@ -110,7 +128,9 @@ declare global {
     // Animated dismiss for save-error overlay
     function dismissSaveError(): void {
       const errorEl = document.getElementById('editor-save-error');
-      if (!errorEl || !errorEl.classList.contains('is-visible')) return;
+      if (!errorEl || !errorEl.classList.contains('is-visible')) {
+        return;
+      }
       errorEl.classList.add('is-closing');
       window.setTimeout(() => {
         errorEl.classList.remove('is-visible', 'is-closing');

@@ -1,15 +1,5 @@
 <section class="intro" id="zen-intro">
-  <header role="banner">
-    <h1>${properties.jcr:title}</h1>
-    <h2>${properties.subtitle}</h2>
-  </header>
-
-  <div class="summary" id="zen-summary" role="article">
-    ${properties.intro_summary @ context='html'}
-  </div>
-
-  <div class="preamble" id="zen-preamble" role="article">
-    <h3>${properties.intro_preamble_headline}</h3>
-    ${properties.intro_preamble @ context='html'}
-  </div>
+  <sly data-sly-resource="${'./intro/banner' @ resourceType='slingslop/zengarden/components/intro/banner'}" />
+  <sly data-sly-resource="${'./intro/summary' @ resourceType='slingslop/zengarden/components/intro/summary'}" />
+  <sly data-sly-resource="${'./intro/preamble' @ resourceType='slingslop/zengarden/components/intro/preamble'}" />
 </section>
