@@ -23039,6 +23039,9 @@ img.ProseMirror-separator {
   }
 
   // src/typescript/editor/component-modal.ts
+  function unlockBodyScroll() {
+    document.body.style.overflow = "";
+  }
   function showComponentModal() {
     mountComponentModal();
     const modal = document.getElementById("editor-component-modal");
@@ -23053,18 +23056,28 @@ img.ProseMirror-separator {
   function hideComponentModal() {
     const modal = document.getElementById("editor-component-modal");
     if (!modal) {
+      unlockBodyScroll();
       return;
     }
+    let isFinalized = false;
+    const finalize = () => {
+      if (isFinalized) {
+        return;
+      }
+      isFinalized = true;
+      modal.classList.remove("is-open", "is-closing");
+      modal.setAttribute("aria-hidden", "true");
+      unlockBodyScroll();
+    };
     modal.classList.add("is-closing");
     modal.addEventListener(
       "animationend",
       () => {
-        modal.classList.remove("is-open", "is-closing");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
+        finalize();
       },
       { once: true }
     );
+    window.setTimeout(finalize, 300);
   }
   function mountComponentModal() {
     const modal = document.getElementById("editor-component-modal");
@@ -23075,16 +23088,19 @@ img.ProseMirror-separator {
     globalContainer.appendChild(modal);
   }
   function unmountComponentModal() {
+    unlockBodyScroll();
     const modal = document.getElementById("editor-component-modal");
     modal?.remove();
   }
   function wireComponentModal() {
     const modal = document.getElementById("editor-component-modal");
     const openButton = document.getElementById("edit-component-btn");
-    if (!modal || !openButton) {
+    if (!modal) {
       return;
     }
-    openButton.addEventListener("click", showComponentModal);
+    if (openButton) {
+      openButton.addEventListener("click", showComponentModal);
+    }
     modal.addEventListener("click", (event) => {
       if (event.target === modal) {
         hideComponentModal();
@@ -23118,34 +23134,6 @@ img.ProseMirror-separator {
   // src/typescript/editor.ts
   (function() {
     "use strict";
-    function isRichtextEditMode() {
-      const marker = document.querySelector("[data-inline-richtext]");
-      if (marker) {
-        return marker.dataset.inlineRichtext === "true";
-      }
-      return !!document.getElementById("content-editor");
-    }
-    function enableNoRichtextMode() {
-      const editingRoot = document.querySelector("[data-zen-editable-editing]");
-      if (editingRoot) {
-        editingRoot.classList.add("no-richtext-edit");
-      }
-      ["tiptap-toolbar", "tiptap-editor", "html-source", "char-count"].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.style.display = "none";
-        }
-      });
-      const editButton = document.getElementById("edit-component-btn");
-      if (editButton) {
-        editButton.style.display = "none";
-      }
-      const footerBar = document.querySelector(".inline-editor-footer");
-      if (footerBar) {
-        footerBar.style.display = "none";
-      }
-      showComponentModal();
-    }
     function initializeEventListeners() {
       document.body.addEventListener("htmx:beforeSwap", function(event) {
         const htmxEvent = event;
@@ -23157,21 +23145,20 @@ img.ProseMirror-separator {
         }
       });
       document.body.addEventListener("htmx:afterSwap", function() {
+        const form = document.getElementById("editor-form");
+        if (!form) {
+          return;
+        }
+        htmx.process(form);
+        wireComponentModal();
         const tiptapEl = document.getElementById("tiptap-editor");
         if (tiptapEl) {
-          const form = document.getElementById("editor-form");
-          if (form) {
-            htmx.process(form);
-          }
-          wireComponentModal();
-          if (isRichtextEditMode()) {
-            initializeTiptap();
-          } else {
-            destroyEditor();
-            enableNoRichtextMode();
-          }
-          document.body.setAttribute("data-zen-editing", "");
+          initializeTiptap();
+        } else {
+          destroyEditor();
+          showComponentModal();
         }
+        document.body.setAttribute("data-zen-editing", "");
       });
       document.body.addEventListener("htmx:responseError", function(event) {
         const htmxEvent = event;

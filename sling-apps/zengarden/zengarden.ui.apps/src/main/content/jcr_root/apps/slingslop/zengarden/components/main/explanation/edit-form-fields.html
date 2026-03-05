@@ -16,4 +16,4 @@
 <!--/* Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init */-->
 <textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
 <!--/* Hidden input populated with editor HTML before htmx submit */-->
-<input type="hidden" id="content-hidden" name="text" />
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />

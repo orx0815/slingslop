@@ -1,5 +1,9 @@
 // ─── Modal visibility ─────────────────────────────────────────────────────
 
+function unlockBodyScroll(): void {
+  document.body.style.overflow = '';
+}
+
 export function showComponentModal(): void {
   mountComponentModal();
   const modal = document.getElementById('editor-component-modal');
@@ -15,18 +19,32 @@ export function showComponentModal(): void {
 export function hideComponentModal(): void {
   const modal = document.getElementById('editor-component-modal');
   if (!modal) {
+    unlockBodyScroll();
     return;
   }
+
+  let isFinalized = false;
+  const finalize = (): void => {
+    if (isFinalized) {
+      return;
+    }
+    isFinalized = true;
+    modal.classList.remove('is-open', 'is-closing');
+    modal.setAttribute('aria-hidden', 'true');
+    unlockBodyScroll();
+  };
+
   modal.classList.add('is-closing');
   modal.addEventListener(
     'animationend',
     () => {
-      modal.classList.remove('is-open', 'is-closing');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      finalize();
     },
     { once: true }
   );
+
+  // HTMX swaps may remove the modal before animationend fires.
+  window.setTimeout(finalize, 300);
 }
 
 // ─── Modal portalling ─────────────────────────────────────────────────────
@@ -43,6 +61,7 @@ export function mountComponentModal(): void {
 }
 
 export function unmountComponentModal(): void {
+  unlockBodyScroll();
   const modal = document.getElementById('editor-component-modal');
   modal?.remove();
 }
@@ -52,11 +71,13 @@ export function unmountComponentModal(): void {
 export function wireComponentModal(): void {
   const modal = document.getElementById('editor-component-modal');
   const openButton = document.getElementById('edit-component-btn');
-  if (!modal || !openButton) {
+  if (!modal) {
     return;
   }
 
-  openButton.addEventListener('click', showComponentModal);
+  if (openButton) {
+    openButton.addEventListener('click', showComponentModal);
+  }
 
   // Click on backdrop closes the modal
   modal.addEventListener('click', (event: MouseEvent) => {

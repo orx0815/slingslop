@@ -2,30 +2,30 @@
 
 This project uses reusable HTMX-based inline editing patterns for Sling components.
 
-## Richtext Supertype Pattern
+## Editing Supertypes
 
-Base supertype:
+Richtext supertype:
 - `slingslop/zengarden/components/editable-component`
+
+Modal-only supertype:
+- `slingslop/zengarden/components/editable-component-modal`
 
 Reusable contract:
 - Reuse supertype `edit-form.html`
 - Override only `edit-form-fields.html` in concrete components
+- Every form field control must set `form="editor-form"` (`input`, `textarea`, `select`, etc.)
 
 For richtext-enabled components, include in `edit-form-fields.html`:
 - `<textarea id="content-editor">...</textarea>` with initial HTML
 - `<input type="hidden" id="content-hidden" name="text" />`
 
-## No-Richtext Components
+## Modal-Only Components
 
-If a component wants the same modal/save flow **without** Tiptap, set on your fields root:
-
-```html
-<div data-inline-richtext="false"> ... </div>
-```
+If a component wants the same modal/save flow **without** Tiptap, use:
+- `sling:resourceSuperType="slingslop/zengarden/components/editable-component-modal"`
 
 Editor behavior (implemented in frontend TS):
-- Skips Tiptap initialization
-- Hides richtext toolbar/editor/source/count UI
+- Detects modal-only mode by missing `#tiptap-editor` in the swapped form
 - Opens component modal directly
 - Saves via normal HTMX submit (no richtext serialization required)
 
@@ -74,10 +74,11 @@ This regenerates:
 3. Add `edit-form-fields.html` only (reuse supertype `edit-form.html`).
 4. Choose mode:
 	- Richtext: add `#content-editor` and `#content-hidden`.
-	- No richtext: set `data-inline-richtext="false"` on fields root.
+	- Modal-only: use `editable-component-modal` as `sling:resourceSuperType`.
 5. Use generic field classes (`edit-field-*`) for consistent layout.
-6. Add sample content node under `content-packages/zengarden.sample-content/...`.
-7. Run build from `frontend`:
+6. Ensure all field controls include `form="editor-form"`.
+7. Add sample content node under `content-packages/zengarden.sample-content/...`.
+8. Run build from `frontend`:
 
 ```bash
 cd sling-apps/zengarden/zengarden.ui.apps/frontend
@@ -103,14 +104,14 @@ npm run build
 	</div>
 </div>
 
-<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
-<input type="hidden" id="content-hidden" name="text" />
+<textarea id="content-editor" style="display:none;" form="editor-form">${properties.text @ context='html'}</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />
 ```
 
-### `edit-form-fields.html` (No Richtext)
+### `edit-form-fields.html` (Modal-Only)
 
 ```html
-<div class="edit-fields-list" data-inline-richtext="false">
+<div class="edit-fields-list">
 	<div class="edit-fields-group">
 		<div class="edit-fields-grid">
 			<label class="edit-field-row">
