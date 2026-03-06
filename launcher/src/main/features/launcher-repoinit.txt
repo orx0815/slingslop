@@ -10,3 +10,114 @@ set ACL for everyone (ACLOptions=merge)
     allow jcr:read on /apps/slingslop/zengarden/css_zen_garden
 
 end
+
+# Register AEM-specific node types so AEM content packages can be installed
+register nodetypes
+<<===
+<'dam'='http://www.day.com/dam/1.0'>
+<'cq'='http://www.day.com/jcr/cq/1.0'>
+
+// ---- DAM types ----
+
+[dam:Asset] > nt:hierarchyNode
+  + jcr:content (dam:AssetContent) = dam:AssetContent
+
+[dam:AssetContent] > nt:unstructured
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+  + metadata (nt:unstructured) = nt:unstructured
+  + renditions (nt:folder) = nt:folder
+
+[dam:AssetFolder] > nt:folder, mix:title orderable
+
+[dam:cfVariationNode] mixin
+  - * (undefined) multiple
+  - * (undefined)
+
+[dam:cfData] > nt:unstructured
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[dam:Thumbnail] > nt:unstructured
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+// ---- CQ / Page types ----
+
+[cq:Page] > nt:hierarchyNode, mix:title orderable
+  + jcr:content (nt:base) = nt:unstructured
+  + * (nt:base) = nt:base version
+
+[cq:PageContent] > nt:unstructured, mix:title
+  - cq:template (string)
+  - cq:lastModified (date)
+  - cq:lastModifiedBy (string)
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:Template] > nt:hierarchyNode, mix:title
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:Component] > nt:folder, mix:title
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:EditConfig] > nt:hierarchyNode, nt:unstructured orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:Tag] > nt:hierarchyNode, mix:title
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:ReplicationStatus] mixin
+  - cq:lastReplicated (date)
+  - cq:lastReplicatedBy (string)
+  - cq:lastReplicationAction (string)
+  - cq:lastPublished (date)
+  - cq:lastPublishedBy (string)
+
+[cq:ReplicationStatus2] mixin
+  - cq:lastReplicated (date)
+  - cq:lastReplicatedBy (string)
+  - cq:lastReplicationAction (string)
+  - cq:lastPublished (date)
+  - cq:lastPublishedBy (string)
+
+[cq:Taggable] mixin
+  - cq:tags (string) multiple
+
+[cq:ClientLibraryFolder] > sling:Folder
+  - categories (string) multiple
+  - dependencies (string) multiple
+  - embed (string) multiple
+  - channels (string) multiple
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:Dialog] > nt:unstructured, mix:title orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:Widget] > nt:unstructured orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+[cq:WidgetCollection] > nt:unstructured orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:base version
+
+===>>
