@@ -1,7 +1,7 @@
 # Frontend Build (JS + CSS)
 
 This directory contains all source TypeScript and CSS for the Sling/HTL-based Zen Garden editor.
-Bundling is done with **esbuild** (JS) and a custom Node.js resolver (CSS), orchestrated by `scripts/bundle.js`.
+Bundling is done with **esbuild** (JS + CSS), orchestrated by `scripts/bundle.js`.
 No SCSS, no PostCSS — plain modern CSS with native nesting.
 
 ---
@@ -77,14 +77,15 @@ src/main/resources/apps/zengarden/clientlibs/
 
 ## NPM Scripts
 
-| Script           | What it does                                          |
-|------------------|-------------------------------------------------------|
-| `npm run build`  | Run `prebuild` then `scripts/bundle.js`               |
-| `npm run check`  | Prettier format check + ESLint + TypeScript typecheck |
-| `npm run format` | Auto-fix formatting with Prettier                     |
-| `copy:htmx`      | Copy `htmx.js` from node_modules to output folder     |
+| Script           | What it does                                                           |
+|------------------|------------------------------------------------------------------------|
+| `npm run build`  | Full build: dev + minified JS/CSS (`prebuild` copies htmx first)       |
+| `npm run watch`  | Watch mode: rebuild dev JS/CSS on every file save (`?minLibs=no` only) |
+| `npm run check`  | Prettier format check + ESLint + TypeScript typecheck                  |
+| `npm run format` | Auto-fix formatting with Prettier                                      |
+| `copy:htmx`      | Copy `htmx.js` from node_modules to output folder                     |
 
-The `prebuild` hook runs `copy:htmx` automatically before every build.
+The `prebuild` hook runs `copy:htmx` automatically before every `npm run build`.
 
 ---
 
@@ -93,38 +94,29 @@ The `prebuild` hook runs `copy:htmx` automatically before every build.
 ```mermaid
 graph TD
     A[npm run build] --> B[prebuild: copy htmx.js]
-    B --> C[scripts/bundle.js]
+    B --> C[scripts/bundle.js — esbuild for JS + CSS]
 
-    C --> D[buildJs - editor]
-    C --> E[buildJs - public]
-    C --> F[buildCss - editor]
-    C --> G[buildCss - public]
+    C --> D[editor-bundle.js — dev, inline source map]
+    C --> E[editor-bundle.min.js — prod, htmx inlined]
+    C --> F[editor.css — dev, inline source map]
+    C --> G[editor.min.css — prod]
 
-    D --> D1[editor-bundle.js]
-    D --> D2[editor-bundle.min.js]
-
-    E --> E1[public-bundle.js]
-    E --> E2[public-bundle.min.js]
-
-    F --> F1[resolveImports: inline @imports]
-    F1 --> F2[editor.css]
-    F1 --> F3[minifyCss → editor.min.css]
-
-    G --> G1[resolveImports]
-    G1 --> G2[public.css]
-    G1 --> G3[public.min.css]
+    C --> H[public-bundle.js — dev]
+    C --> I[public-bundle.min.js — prod]
+    C --> J[public.css — dev]
+    C --> K[public.min.css — prod]
 ```
 
 ---
 
 ## CSS Build Details
 
-CSS is handled entirely in `scripts/bundle.js` — no external CSS processor.
+CSS is bundled by **esbuild** — the same tool used for JS.
 
-- **`resolveImports(file)`** — reads a CSS entry file, recursively inlines `@import` references
-- **`minifyCss(source)`** — strips comments and collapses whitespace
-- **Native nesting** — partials use CSS nesting (`& .child`, `&:hover`, etc.) directly; no transpilation
-- Both `.css` (readable) and `.min.css` (minified) are written for every bundle
+- **`@import` resolution** — esbuild resolves all `@import` statements natively
+- **Native nesting** — partials use CSS nesting (`& .child`, `&:hover`, etc.) directly; no transpilation needed
+- **Dev output** (`.css`) — unminified with an inline source map; open DevTools → Sources to navigate per-partial
+- **Prod output** (`.min.css`) — minified, no source map
 
 ### Adding a new CSS partial
 
@@ -252,12 +244,56 @@ The output files are inside `src/main/resources/` and packaged into the content 
 
 ## Development Workflow
 
+### One-off build
+
 1. Edit source files under `src/typescript/` or `src/css/`
 2. `npm run check` — format + lint + type-check
 3. `npm run build` — produce all JS and CSS bundles
 4. Or `mvn compile` for the full Maven pipeline
 
----
+### Live-edit with watch + fsmount
+
+This combination gives you a fast inner loop: save a file → browser reload shows the change immediately, no Maven required.
+
+**Terminal 1 — mount the Sling JCR onto the local filesystem:**
+```bash
+# must run inside the ui.apps content-package directory
+cd sling-apps/zengarden/zengarden.ui.apps
+mvn sling:fsmount
+```
+This maps `src/main/content/jcr_root/…` in the content bundle directly into the running Sling instance.
+Files written there are served live by Sling on the next request.
+
+**Terminal 2 — start the esbuild file watcher:**
+```bash
+cd sling-apps/zengarden/zengarden.ui.apps/frontend
+npm run watch
+```
+esbuild watches `src/typescript/` and `src/css/`, rebuilds the dev bundles in milliseconds on every save,
+and writes them straight into the fsmounted JCR path.
+
+**Browser:**
+Open your page with `?minLibs=no` — Sling will serve the freshly rebuilt unminified files.
+Use DevTools → Sources to inspect/debug individual `.ts` and `.css` partials via the inline source maps.
+
+> **Note:** `npm run watch` only rebuilds the dev (unminified) bundles.
+> Run `npm run build` once before committing to regenerate the minified production files.
+
+**When finished — unmount and deploy properly:**
+```bash
+# Terminal 1: stop the watcher (Ctrl+C), then in the ui.apps directory:
+cd sling-apps/zengarden/zengarden.ui.apps
+mvn sling:fsunmount
+```
+This removes the filesystem overlay so Sling goes back to reading from the JCR.
+
+```bash
+# Then upload everything into the JCR (frontend-maven-plugin runs npm run build automatically):
+cd sling-apps/zengarden/zengarden.ui.apps
+./content-upload.sh
+```
+After `content-upload.sh` the running Sling instance has the fully built and properly deployed content.
+
 
 ## Troubleshooting
 
@@ -266,7 +302,5 @@ The output files are inside `src/main/resources/` and packaged into the content 
 | `npm run check` fails — format | Prettier violation | `npm run format` then re-check |
 | `npm run check` fails — lint | ESLint error (e.g. missing braces) | `npx eslint --fix src/typescript` then `npm run format` |
 | `npm run check` fails — typecheck | TypeScript error | Fix types; `tsc --noEmit` for details |
-| CSS `@import` not resolving | Path relative to entry file | Use paths relative to the entry CSS file |
-| `public.css` parsed incorrectly | `@import` in a comment | Don't use `@import` syntax even in comments |
-| JS changes not visible in browser | Cached minified bundle | Reload with `?minLibs=no` or hard refresh |
+| JS/CSS changes not visible in browser | Cached minified bundle | Reload with `?minLibs=no` or hard refresh |
 | Maven build fails at `check` | Formatting drift after code edit | Run `npm run format` before committing |
