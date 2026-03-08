@@ -4,8 +4,8 @@
 <link rel="stylesheet" data-sly-use.cssPicker="org.motorbrot.slingslop.zengarden.slingmodels.CssZenGarden"
       href="${cssPicker.randomCssUrl}" />
 
-<!--/*  /zengarden/home.html?minJs=false for unminified sources */-->
-<sly data-sly-test.noMinJs="${request.parameterMap['minJs'][0] == 'false'}">
+<!--/*  /zengarden/home.html?minLibs=no for unminified sources */-->
+<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
 
   <!-- htmx for hypermedia interactions -->
   <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.css" />
 
 </sly>
-<sly data-sly-test="${!noMinJs}">
+<sly data-sly-test="${!noMinLibs}">
 
   <!-- Public bundle (minified) -->
   <script src="/apps/slingslop/zengarden/js/public/public-bundle.min.js"></script>

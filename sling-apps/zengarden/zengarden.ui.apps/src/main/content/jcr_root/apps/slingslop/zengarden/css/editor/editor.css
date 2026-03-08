@@ -18,6 +18,8 @@
  *   src/main/content/jcr_root/apps/slingslop/zengarden/css/editor/editor.css
  * That file is auto-generated — edit here, not there.
  */
+
+/* ─ START of src/css/editor/00-variables.css ─ */
 /*
  * Color tokens — single source of truth for all editor colors
  */
@@ -74,6 +76,9 @@
   --color-error-text:        #842029;   /* error notification text */
 }
 
+/* ─ END of 00-variables.css ─ */
+
+/* ─ START of src/css/editor/01-modal-overlay.css ─ */
 /*
  * Modal overlay — backdrop + open state + enter/exit animations
  */
@@ -107,6 +112,9 @@
   to   { opacity: 0; }
 }
 
+/* ─ END of 01-modal-overlay.css ─ */
+
+/* ─ START of src/css/editor/02-modal-dialog.css ─ */
 /*
  * Modal dialog box — content panel, header, body, footer actions
  */
@@ -231,6 +239,9 @@
   }
 }
 
+/* ─ END of 02-modal-dialog.css ─ */
+
+/* ─ START of src/css/editor/03-buttons.css ─ */
 /*
  * Shared button styles — used in modal footer and inline-editor footer
  */
@@ -264,6 +275,9 @@
   }
 }
 
+/* ─ END of 03-buttons.css ─ */
+
+/* ─ START of src/css/editor/04-toolbar.css ─ */
 /*
  * Tiptap toolbar — fixed to the top of the viewport while editing
  */
@@ -355,6 +369,9 @@
   }
 }
 
+/* ─ END of 04-toolbar.css ─ */
+
+/* ─ START of src/css/editor/05-tiptap-editor.css ─ */
 /*
  * Tiptap editor — ProseMirror content area, source textarea, char count
  */
@@ -496,6 +513,9 @@
   margin-top: 2px;
 }
 
+/* ─ END of 05-tiptap-editor.css ─ */
+
+/* ─ START of src/css/editor/06-inline-editor.css ─ */
 /*
  * Inline editing affordances — editable hover states, active editing,
  * fixed footer bar, headline input, htmx loading indicator
@@ -896,3 +916,4 @@ body[data-zen-editing] [data-zen-editable] {
 }
 
 
+/* ─ END of 06-inline-editor.css ─ */

@@ -63,7 +63,7 @@ src/main/resources/apps/zengarden/clientlibs/
 │   ├── public/
 │   │   ├── public-bundle.js
 │   │   └── public-bundle.min.js
-│   └── htmx.js                     ← htmx dev copy (loaded separately in ?minJs=false mode)
+│   └── htmx.js                     ← htmx dev copy (loaded separately in ?minLibs=no mode)
 └── css/
     ├── editor/
     │   ├── editor.css
@@ -193,7 +193,7 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 ### htmx
 - Copied from `node_modules/htmx.org/dist/htmx.js` by `copy:htmx`
 - In prod (`editor-bundle.min.js`) htmx is prepended as an esbuild banner so it is available before the editor IIFE runs
-- In dev (`?minJs=false`) htmx is loaded as a separate `<script>` tag
+- In dev (`?minLibs=no`) htmx is loaded as a separate `<script>` tag
 
 ---
 
@@ -202,21 +202,21 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 `pages/basepage/head.html` uses an inline dev switch:
 
 ```html
-<!-- ?minJs=false → load plain JS + separate htmx.js -->
-<sly data-sly-test.noMinJs="${request.parameterMap['minJs'][0] == 'false'}">
+<!-- ?minLibs=no → load plain JS + separate htmx.js -->
+<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
   <script src=".../js/htmx.js"></script>
   <script src=".../js/editor/editor-bundle.js"></script>
   <link rel="stylesheet" href=".../css/editor/editor.css">
 </sly>
 
 <!-- default → load minified bundle (htmx inlined via esbuild banner) -->
-<sly data-sly-test="${!noMinJs}">
+<sly data-sly-test="${!noMinLibs}">
   <script src=".../js/editor/editor-bundle.min.js"></script>
   <link rel="stylesheet" href=".../css/editor/editor.min.css">
 </sly>
 ```
 
-Access dev mode at: `http://localhost:8080/content/...?minJs=false`
+Access dev mode at: `http://localhost:8080/content/...?minLibs=no`
 
 ---
 
@@ -268,5 +268,5 @@ The output files are inside `src/main/resources/` and packaged into the content 
 | `npm run check` fails — typecheck | TypeScript error | Fix types; `tsc --noEmit` for details |
 | CSS `@import` not resolving | Path relative to entry file | Use paths relative to the entry CSS file |
 | `public.css` parsed incorrectly | `@import` in a comment | Don't use `@import` syntax even in comments |
-| JS changes not visible in browser | Cached minified bundle | Reload with `?minJs=false` or hard refresh |
+| JS changes not visible in browser | Cached minified bundle | Reload with `?minLibs=no` or hard refresh |
 | Maven build fails at `check` | Formatting drift after code edit | Run `npm run format` before committing |

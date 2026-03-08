@@ -134,5 +134,5 @@ Both the footer **Cancel** button and the modal **Cancel** button fire an HTMX G
 - **No full-page reload** — all transitions are `outerHTML` swaps within the live DOM.
 - **Sling selector pattern** — `.edit-form.html` selector routes to the edit-form script; `.html` routes to the view script.
 - **Modal portalling** — `#editor-component-modal` is moved into the global `#editor-modal-container` (in `<body>`) so it escapes any clipping `overflow` context.
-- **htmx global** — in development (`?minJs=false`) htmx is loaded as a separate `htmx.js` script tag; in production it is prepended as an esbuild banner inside `editor-bundle.min.js`.
+- **htmx global** — in development (`?minLibs=no`) htmx is loaded as a separate `htmx.js` script tag; in production it is prepended as an esbuild banner inside `editor-bundle.min.js`.
 - **Frontend build** — JS and CSS are compiled by `frontend/scripts/bundle.js` using esbuild (JS) and a custom CSS `@import` resolver (CSS). Two bundles are produced: `editor` (edit mode) and `public` (placeholder). Each has a plain and a minified output. See `frontend/FRONTEND_README.md` for full details.
