@@ -10,8 +10,8 @@
     "copy:htmx": "cpx \"node_modules/htmx.org/dist/htmx.js\" \"../src/main/content/jcr_root/apps/slingslop/zengarden/js\"",
     "copy:libs": "npm run copy:htmx",
     "prebuild": "npm run copy:htmx",
-    "lint": "eslint --config .eslintrc.js ./src/typescript --ext .ts",
-    "lint:fix": "eslint --config .eslintrc.js ./src/typescript --ext .ts --fix",
+    "lint": "eslint src/typescript",
+    "lint:fix": "eslint src/typescript --fix",
     "format": "prettier --check \"./src/typescript/**/*.ts\"",
     "format:fix": "prettier --write \"./src/typescript/**/*.ts\"",
     "check": "npm run format && npm run lint && npm run typecheck"
@@ -38,15 +38,16 @@
     "htmx.org": "^1.9.10"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/node": "^20.11.17",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
     "cpx2": "^7.0.1",
     "esbuild": "^0.25.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
+    "globals": "^15.0.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

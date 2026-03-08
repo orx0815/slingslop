@@ -232,10 +232,12 @@ The output files are inside `src/main/resources/` and packaged into the content 
 - `"module": "ESNext"` / `"moduleResolution": "bundler"` — required for esbuild-resolved imports
 - `"target": "ES2020"`
 
-### .eslintrc.js
-- TypeScript-aware linting with `@typescript-eslint`
+### eslint.config.js
+- ESLint 9 flat config (replaces legacy `.eslintrc.js`)
+- `typescript-eslint` v8 for TypeScript-aware linting
+- Ignores embedded in the config (no separate `.eslintignore`)
 - `curly` rule enforced (always use braces)
-- Prettier integration
+- Prettier integration via `eslint-plugin-prettier`
 
 ### .prettierrc
 - Single quotes, 2-space indent, 100-char line width, ES5 trailing commas
