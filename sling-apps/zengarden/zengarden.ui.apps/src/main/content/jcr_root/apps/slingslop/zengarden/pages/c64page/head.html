@@ -13,16 +13,18 @@
 <!--/*  /zengarden/home.html?minLibs=no for unminified sources */-->
 <sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
 
-  <!-- htmx for hypermedia interactions -->
-  <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
-
   <!-- Public bundle (unminified) -->
   <script src="/apps/slingslop/zengarden/js/public/public-bundle.js"></script>
   <link rel="stylesheet" href="/apps/slingslop/zengarden/css/public/public.css" />
 
-  <!-- Editor bundle (unminified) -->
-  <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.js"></script>
-  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.css" />
+  <!-- Editor bundle (unminified) — only for logged-in users -->
+  <sly data-sly-use.auth="org.motorbrot.slingslop.zengarden.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <!-- htmx for hypermedia interactions -->
+    <script src="/apps/slingslop/zengarden/js/htmx.js"></script>
+    <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.js"></script>
+    <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.css" />
+  </sly>
 
 </sly>
 <sly data-sly-test="${!noMinLibs}">
@@ -31,8 +33,11 @@
   <script src="/apps/slingslop/zengarden/js/public/public-bundle.min.js"></script>
   <link rel="stylesheet" href="/apps/slingslop/zengarden/css/public/public.min.css" />
 
-  <!-- Editor bundle (minified, htmx inlined) -->
-  <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.min.js"></script>
-  <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.min.css" />
+  <!-- Editor bundle (minified, htmx inlined) — only for logged-in users -->
+  <sly data-sly-use.auth="org.motorbrot.slingslop.zengarden.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/slingslop/zengarden/js/editor/editor-bundle.min.js"></script>
+    <link rel="stylesheet" href="/apps/slingslop/zengarden/css/editor/editor.min.css" />
+  </sly>
 
 </sly>

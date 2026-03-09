@@ -1,9 +1,9 @@
-<footer data-zen-editable="true"
-        hx-get="${resource.path}.edit-form.html"
-        hx-trigger="click"
-        hx-swap="outerHTML"
-        style="cursor: pointer;"
-        title="Click to edit footer links">
+<footer data-sly-use.auth="org.motorbrot.slingslop.zengarden.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
   <a href="${properties.footer1Link @ context='uri'}"
      title="${properties.footer1Title @ context='attribute'}"
      class="zen-validate-html">${properties.footer1Text}</a>

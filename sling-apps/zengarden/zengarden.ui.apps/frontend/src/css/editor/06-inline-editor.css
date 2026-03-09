@@ -6,6 +6,8 @@
 /* ── Hover / cursor affordance for clickable-to-edit components ──────── */
 
 [data-zen-editable] {
+  position: relative;
+  cursor: pointer;
   transition: background-color 0.2s;
   padding: 10px;
   border-radius: 4px;
@@ -13,6 +15,17 @@
   &:hover {
     background-color: var(--color-primary-hover-bg);
     outline: 2px dashed var(--color-primary-hover-outline);
+  }
+
+  &:hover::after {
+    content: "\270E  Click to edit";
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.7rem;
+    font-family: sans-serif;
+    color: var(--color-primary);
+    pointer-events: none;
   }
 }
 
