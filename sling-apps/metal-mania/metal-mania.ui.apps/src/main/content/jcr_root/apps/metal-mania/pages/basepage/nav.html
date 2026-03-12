@@ -1,0 +1,42 @@
+<header class="site-header" id="site-header">
+  <nav class="site-nav" aria-label="Main navigation">
+
+    <a class="site-nav__logo" href="/content/metal-mania/home.html">
+      <span>Metal</span> Mania
+    </a>
+
+    <ul class="site-nav__links" id="nav-menu" role="list">
+      <li>
+        <a class="site-nav__link" href="/content/metal-mania/home.html">Home</a>
+      </li>
+      <li>
+        <a class="site-nav__link" href="/content/metal-mania/bands.html">Bands</a>
+      </li>
+      <li>
+        <a class="site-nav__link" href="/content/metal-mania/tours.html">Tours</a>
+      </li>
+      <li>
+        <a class="site-nav__link" href="/content/metal-mania/about.html">About</a>
+      </li>
+      <sly data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+           data-sly-test="${auth.loggedIn}">
+        <li>
+          <a class="site-nav__link" href="/content/metal-mania/styleguide.html">Style Guide</a>
+        </li>
+      </sly>
+    </ul>
+
+    <a class="site-nav__cta" href="/content/metal-mania/tours.html">Get Tickets</a>
+
+    <button class="site-nav__toggle"
+            id="nav-toggle"
+            aria-controls="nav-menu"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+  </nav>
+</header>

@@ -1,0 +1,124 @@
+/*
+ * 00-variables.css — Metal Mania design tokens
+ *
+ * OKLCH colour system — change only the two hue values below to retheme.
+ * All other colours are derived by adjusting Lightness and Chroma.
+ *
+ * Primary hue  22  → blood red
+ * Secondary hue 245 → steel silver / blue-grey
+ *
+ * This is a DARK theme. Background and surface tokens are near-black.
+ */
+
+:root {
+  /* ── Hue wheel (change these two to retheme) ────────────────────────── */
+  --hue-primary:              22;
+  --hue-secondary:            245;
+
+  /* ── Complementary (auto-derived: +180°) ───────────────────────────── */
+  --hue-primary-complement:   calc(var(--hue-primary) + 180);
+  --hue-secondary-complement: calc(var(--hue-secondary) + 180);
+
+  /* ── Primary palette — blood red ────────────────────────────────────── */
+  --color-primary:        oklch(0.50 0.25 var(--hue-primary));
+  --color-primary-light:  oklch(0.65 0.20 var(--hue-primary));
+  --color-primary-dark:   oklch(0.33 0.20 var(--hue-primary));
+  --color-primary-hover:  oklch(0.58 0.22 var(--hue-primary));
+  --color-primary-glow:   oklch(0.50 0.25 var(--hue-primary) / 0.35);
+  --color-primary-subtle: oklch(0.18 0.06 var(--hue-primary));
+
+  /* ── Secondary palette — steel silver ──────────────────────────────── */
+  --color-secondary:       oklch(0.72 0.04 var(--hue-secondary));
+  --color-secondary-light: oklch(0.85 0.02 var(--hue-secondary));
+  --color-secondary-dark:  oklch(0.42 0.04 var(--hue-secondary));
+  --color-secondary-hover: oklch(0.65 0.05 var(--hue-secondary));
+
+  /* ── Complementary ──────────────────────────────────────────────────── */
+  --color-complement-primary:   oklch(0.55 0.12 var(--hue-primary-complement));
+  --color-complement-secondary: oklch(0.68 0.08 var(--hue-secondary-complement));
+
+  /* ── Dark background neutrals (primary-hue tinted) ─────────────────── */
+  --color-bg:          oklch(0.08 0.015 var(--hue-primary));   /* near-black */
+  --color-bg-alt:      oklch(0.11 0.015 var(--hue-primary));   /* slightly lighter */
+  --color-surface:     oklch(0.14 0.018 var(--hue-primary));   /* card / panel */
+  --color-surface-raised: oklch(0.17 0.018 var(--hue-primary)); /* raised surface */
+  --color-border:      oklch(0.24 0.025 var(--hue-primary));   /* dividers */
+  --color-border-light: oklch(0.30 0.020 var(--hue-primary));  /* lighter borders */
+
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --color-text:        oklch(0.90 0.01 var(--hue-secondary));  /* main text, off-white */
+  --color-text-muted:  oklch(0.60 0.02 var(--hue-secondary));  /* secondary text */
+  --color-text-faint:  oklch(0.40 0.015 var(--hue-secondary)); /* placeholder / disabled */
+  --color-text-heading: oklch(0.95 0.015 var(--hue-secondary)); /* heading text */
+
+  /* ── Tinted black & white ────────────────────────────────────────────── */
+  --color-black: oklch(0.05 0.012 var(--hue-primary));
+  --color-white: oklch(0.97 0.006 var(--hue-secondary));
+
+  /* ── Accent / highlight ──────────────────────────────────────────────── */
+  --color-accent:      var(--color-primary-light);
+  --color-accent-glow: var(--color-primary-glow);
+
+  /* ── Interactive states ─────────────────────────────────────────────── */
+  --color-hover-bg:    oklch(0.50 0.25 var(--hue-primary) / 0.08);
+  --color-hover-outline: oklch(0.50 0.25 var(--hue-primary) / 0.35);
+  --color-focus-ring:  oklch(0.65 0.20 var(--hue-primary) / 0.50);
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --font-heading: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --font-body:    'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:    'Courier New', Courier, monospace;
+
+  --text-xs:   clamp(0.70rem, 0.65rem + 0.25vw, 0.80rem);
+  --text-sm:   clamp(0.85rem, 0.80rem + 0.25vw, 0.95rem);
+  --text-base: clamp(1.00rem, 0.90rem + 0.50vw, 1.10rem);
+  --text-md:   clamp(1.15rem, 1.00rem + 0.75vw, 1.35rem);
+  --text-lg:   clamp(1.30rem, 1.10rem + 1.00vw, 1.65rem);
+  --text-xl:   clamp(1.60rem, 1.20rem + 2.00vw, 2.20rem);
+  --text-2xl:  clamp(2.00rem, 1.40rem + 3.00vw, 3.20rem);
+  --text-3xl:  clamp(2.60rem, 1.60rem + 5.00vw, 4.80rem);
+
+  /* ── Spacing scale ───────────────────────────────────────────────────── */
+  --space-1:  0.25rem;
+  --space-2:  0.50rem;
+  --space-3:  0.75rem;
+  --space-4:  1.00rem;
+  --space-5:  1.25rem;
+  --space-6:  1.50rem;
+  --space-8:  2.00rem;
+  --space-10: 2.50rem;
+  --space-12: 3.00rem;
+  --space-16: 4.00rem;
+  --space-20: 5.00rem;
+  --space-24: 6.00rem;
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+  --container-max:    1200px;
+  --container-narrow: 820px;
+  --container-pad:    clamp(1rem, 4vw, 2rem);
+
+  /* ── Borders & radius ────────────────────────────────────────────────── */
+  --radius-sm:  3px;
+  --radius-md:  6px;
+  --radius-lg:  12px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── */
+  --shadow-card:   0 2px 12px oklch(0 0 0 / 0.45);
+  --shadow-raised: 0 4px 24px oklch(0 0 0 / 0.55);
+  --shadow-glow:   0 0 24px var(--color-primary-glow);
+  --shadow-text:   0 0 12px var(--color-primary-glow);
+
+  /* ── Transitions ─────────────────────────────────────────────────────── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   450ms ease;
+
+  /* ── Z-index scale ───────────────────────────────────────────────────── */
+  --z-base:    1;
+  --z-nav:     100;
+  --z-overlay: 200;
+  --z-modal:   300;
+  --z-toast:   400;
+}

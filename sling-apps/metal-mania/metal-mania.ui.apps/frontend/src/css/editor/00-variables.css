@@ -1,0 +1,58 @@
+/*
+ * 00-variables.css — Metal Mania editor color tokens
+ *
+ * Reuses the same variable names as the zengarden editor so all
+ * structural editor CSS (toolbar, modal, inline) just works.
+ *
+ * Primary: blood-red  oklch(50% 0.25 22)
+ * Secondary: steel    oklch(55% 0.02 245)
+ */
+:root {
+  /* ── Primary palette ────────────────────────────────────────────────────
+   * Change --color-primary-base to retheme the entire editor.
+   * All derived tokens shift automatically via OKLCH relative color.     */
+  --color-primary-base:      oklch(50% 0.25 22);
+  --color-primary:           var(--color-primary-base);
+  --color-primary-hover:     oklch(from var(--color-primary-base) calc(l - 0.08) calc(c - 0.03) h);
+  --color-primary-accent:    oklch(from var(--color-primary-base) calc(l + 0.05) calc(c + 0.02) calc(h + 5));
+  --color-focus-ring:        oklch(from var(--color-primary-base) calc(l + 0.20) calc(c - 0.10) calc(h - 4));
+  --color-active-border:     oklch(from var(--color-primary-base) calc(l + 0.10) calc(c - 0.08) calc(h - 4));
+  --color-active-bg:         oklch(from var(--color-primary-base) calc(l + 0.38) calc(c - 0.20) calc(h - 6));
+  --color-active-text:       oklch(from var(--color-primary-base) calc(l - 0.20) calc(c - 0.10) calc(h - 4));
+  /* Alpha variants */
+  --color-primary-hover-bg:       oklch(from var(--color-primary-base) l c h / 0.06);
+  --color-primary-hover-outline:  oklch(from var(--color-primary-base) l c h / 0.30);
+  --color-primary-glow:           oklch(from var(--color-primary-base) l c h / 0.15);
+  --color-accent-glow:            oklch(from var(--color-primary-accent) l c h / 0.25);
+  --color-active-border-tint:     oklch(from var(--color-active-border) l c h / 0.15);
+
+  /* Neutrals */
+  --color-white:             #fff;
+  --color-white-soft:        #fefefe;
+  --color-black:             #000;
+
+  /* ── Secondary / neutral palette (steel silver) ───────────────────────── */
+  --color-secondary-base:    oklch(55% 0.018 245);
+  --color-secondary:         var(--color-secondary-base);
+  --color-secondary-hover:   oklch(from var(--color-secondary-base) calc(l - 0.09) c h);
+
+  --color-bg-subtle:         oklch(from var(--color-secondary-base) 98% calc(c * 0.1) h);
+  --color-border-ui:         oklch(from var(--color-secondary-base) 91% calc(c * 0.4) h);
+  --color-hover:             oklch(from var(--color-secondary-base) 88% 0 h);
+  --color-border:            oklch(from var(--color-secondary-base) 83% 0 h);
+  --color-text-placeholder:  oklch(from var(--color-secondary-base) 72% 0 h);
+  --color-text-muted:        oklch(from var(--color-secondary-base) 59% 0 h);
+  --color-text:              oklch(from var(--color-secondary-base) 27% 0 h);
+
+  /* Code editor */
+  --color-code-inline-bg:    #f0f0f0;
+  --color-code-bg:           #282828;
+  --color-code-fg:           #f8f8f2;
+  --color-source-editor-bg:  #1e1e2e;
+  --color-source-editor-fg:  #cdd6f4;
+
+  /* Error / Danger */
+  --color-error-bg:          #f8d7da;
+  --color-error-border:      #f5c2c7;
+  --color-error-text:        #842029;
+}

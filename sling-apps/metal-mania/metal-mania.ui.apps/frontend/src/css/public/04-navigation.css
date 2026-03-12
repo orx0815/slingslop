@@ -1,0 +1,233 @@
+/*
+ * 04-navigation.css — Metal Mania top-bar navigation
+ *
+ * .site-header          → fixed top bar (adds .is-scrolled class via JS when scrolled > 60px)
+ * .site-nav             → inner nav wrapper
+ * .site-nav__logo       → brand / wordmark
+ * .site-nav__links      → horizontal link list (desktop)
+ * .site-nav__toggle     → hamburger button (mobile only)
+ * #nav-menu             → the collapsible link list (adds .is-open class via JS)
+ * .site-nav__cta        → call-to-action button in nav
+ */
+
+:root {
+  --nav-height: 64px;
+}
+
+/* ── Header wrapper ───────────────────────────────────────────────────── */
+
+.site-header {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-start: 0;
+  z-index: var(--z-nav);
+  block-size: var(--nav-height);
+  background: color-mix(in oklch, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(12px) saturate(1.6);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  border-block-end: 1px solid transparent;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow   var(--transition-normal),
+    background   var(--transition-normal);
+
+  &.is-scrolled {
+    background: color-mix(in oklch, var(--color-bg) 96%, transparent);
+    border-block-end-color: var(--color-border);
+    box-shadow: 0 2px 20px oklch(0 0 0 / 0.4);
+  }
+}
+
+/* ── Inner nav ────────────────────────────────────────────────────────── */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  block-size: 100%;
+  max-inline-size: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  gap: var(--space-6);
+}
+
+/* ── Logo / wordmark ──────────────────────────────────────────────────── */
+
+.site-nav__logo {
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-heading);
+  text-decoration: none;
+  text-shadow: var(--shadow-text);
+  transition: color var(--transition-fast), text-shadow var(--transition-fast);
+
+  span {
+    color: var(--color-primary);
+  }
+
+  &:hover {
+    color: var(--color-white);
+    text-shadow: 0 0 20px var(--color-primary-glow), var(--shadow-text);
+  }
+}
+
+/* ── Link list ────────────────────────────────────────────────────────── */
+
+.site-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex: 1;
+  justify-content: center;
+}
+
+.site-nav__link {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding-block: var(--space-1);
+  border-block-end: 2px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover,
+  &.is-active {
+    color: var(--color-text-heading);
+    border-block-end-color: var(--color-primary);
+  }
+}
+
+/* ── CTA button in nav ────────────────────────────────────────────────── */
+
+.site-nav__cta {
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-5);
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    box-shadow  var(--transition-fast),
+    transform   var(--transition-fast);
+
+  &:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 0 16px var(--color-primary-glow);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* ── Hamburger toggle (visible only on mobile) ────────────────────────── */
+
+.site-nav__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: var(--radius-md);
+  background: none;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  color: var(--color-text);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: var(--color-hover-bg);
+  }
+
+  .bar {
+    display: block;
+    inline-size: 20px;
+    block-size: 2px;
+    background: currentcolor;
+    border-radius: 2px;
+    transition: transform var(--transition-normal), opacity var(--transition-normal);
+    transform-origin: center;
+  }
+}
+
+/* Hamburger → X animation */
+.site-nav__toggle[aria-expanded="true"] {
+  .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+
+/* ── Mobile nav menu ──────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .site-nav__links {
+    display: none;
+    position: fixed;
+    inset-block-start: var(--nav-height);
+    inset-inline: 0;
+    flex-direction: column;
+    gap: 0;
+    background: var(--color-bg-alt);
+    border-block-end: 2px solid var(--color-primary-dark);
+    padding-block: var(--space-4);
+    animation: slideDown var(--transition-normal) ease forwards;
+
+    &.is-open {
+      display: flex;
+    }
+  }
+
+  .site-nav__link {
+    inline-size: 100%;
+    padding: var(--space-4) var(--container-pad);
+    font-size: var(--text-base);
+    border-block-end: 1px solid var(--color-border);
+    border-inline-start: 3px solid transparent;
+    transition: all var(--transition-fast);
+
+    &:hover,
+    &.is-active {
+      border-inline-start-color: var(--color-primary);
+      border-block-end-color: transparent;
+      background: var(--color-hover-bg);
+    }
+  }
+
+  .site-nav__cta {
+    align-self: flex-start;
+    margin: var(--space-4) var(--container-pad);
+  }
+
+  .site-nav__toggle {
+    display: flex;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,10 @@
+<!--/*
+Richtext edit-form template.
+Use via sling:resourceSuperType="metal-mania/components/editable-component"
+for components that provide inline-richtext editing.
+Override this file in a concrete component to customise the wrapper element
+while keeping the form body via: <sly data-sly-include="${'edit-form-inner.html'}" />
+*/-->
+<div data-zen-editable-editing="true">
+  <sly data-sly-include="${'edit-form-inner.html'}"/>
+</div>

@@ -1,0 +1,32 @@
+<section class="hero"
+         data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+         data-sly-set.editPath="${resource.path}.edit-form.html"
+         data-zen-editable="true"
+         data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+         data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+         data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+
+  <div class="hero__bg" aria-hidden="true"></div>
+
+  <div class="hero__content container">
+    <p class="hero__eyebrow">${properties.eyebrow}</p>
+    <h1 class="hero__title">
+      ${properties.titlePart1}
+      <span class="accent">${properties.titleAccent}</span>
+      ${properties.titlePart2}
+    </h1>
+    <p class="hero__subtitle">${properties.subtitle}</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="${properties.ctaPrimaryUrl @ context='uri'}">${properties.ctaPrimaryText}</a>
+      <a class="btn btn--ghost"   href="${properties.ctaSecondaryUrl @ context='uri'}">${properties.ctaSecondaryText}</a>
+    </div>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <span>Scroll</span>
+    <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor">
+      <path d="M6 0v12M1 7l5 5 5-5"/>
+    </svg>
+  </div>
+
+</section>

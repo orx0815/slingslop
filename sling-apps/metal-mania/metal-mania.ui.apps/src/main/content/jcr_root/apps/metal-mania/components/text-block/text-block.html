@@ -1,0 +1,12 @@
+<div class="text-block"
+     data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+  <sly data-sly-test="${properties.headline}">
+    <h2>${properties.headline}</h2>
+  </sly>
+  <div class="prose">${properties.text @ context='html'}</div>
+</div>

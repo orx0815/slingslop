@@ -1,0 +1,145 @@
+/*
+ * 09-animations.css — Metal Mania entrance animations &
+ *                     reduced-motion safety
+ *
+ * Scroll-triggered: `[data-animate]` gets `is-visible` added by public.ts
+ * using IntersectionObserver. Each animation variant is set via
+ * `data-animate="fade-up"` etc.
+ *
+ * Stagger children: add `data-animate-stagger` to a parent — child
+ * `.card`, `.band-card`, `.tour-date` items animate with increasing delay.
+ */
+
+/* ── Base: hidden before reveal ───────────────────────────────────────── */
+
+[data-animate] {
+  opacity: 0;
+  transition:
+    opacity     var(--transition-slow),
+    transform   var(--transition-slow);
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+/* Default variant = fade-up */
+[data-animate],
+[data-animate="fade-up"] {
+  transform: translateY(24px);
+}
+
+[data-animate="fade-in"] {
+  transform: none;
+}
+
+[data-animate="fade-left"] {
+  transform: translateX(32px);
+}
+
+[data-animate="fade-right"] {
+  transform: translateX(-32px);
+}
+
+[data-animate="scale-up"] {
+  transform: scale(0.92);
+}
+
+/* ── Revealed state ───────────────────────────────────────────────────── */
+
+[data-animate].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Stagger children ─────────────────────────────────────────────────── */
+
+[data-animate-stagger] > *:nth-child(1)  { transition-delay: 0ms;   }
+[data-animate-stagger] > *:nth-child(2)  { transition-delay: 80ms;  }
+[data-animate-stagger] > *:nth-child(3)  { transition-delay: 160ms; }
+[data-animate-stagger] > *:nth-child(4)  { transition-delay: 240ms; }
+[data-animate-stagger] > *:nth-child(5)  { transition-delay: 320ms; }
+[data-animate-stagger] > *:nth-child(6)  { transition-delay: 400ms; }
+[data-animate-stagger] > *:nth-child(7)  { transition-delay: 480ms; }
+[data-animate-stagger] > *:nth-child(8)  { transition-delay: 560ms; }
+[data-animate-stagger] > *:nth-child(n+9) { transition-delay: 640ms; }
+
+/* ── Named keyframes ──────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulsGlow {
+  0%, 100% { box-shadow: 0 0 8px  var(--color-primary-glow); }
+  50%       { box-shadow: 0 0 24px var(--color-primary-glow); }
+}
+
+@keyframes textFlare {
+  0%, 100% { text-shadow: var(--shadow-text); }
+  50%       { text-shadow: 0 0 24px var(--color-primary-glow), var(--shadow-text); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+/* ── Loading skeleton shimmer ─────────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface)        25%,
+    var(--color-surface-raised) 37%,
+    var(--color-surface)        63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite ease;
+  border-radius: var(--radius-md);
+}
+
+/* ── Utility animation classes ────────────────────────────────────────── */
+
+.animate-pulse-glow {
+  animation: pulsGlow 2s ease-in-out infinite;
+}
+
+.animate-text-flare {
+  animation: textFlare 3s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ── Reduced-motion safety ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-animate] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-animate-stagger] > * {
+    transition-delay: 0ms;
+  }
+}

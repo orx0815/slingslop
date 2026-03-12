@@ -1,0 +1,63 @@
+<footer class="site-footer"
+        data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+
+  <div class="container">
+    <div class="site-footer__top">
+
+      <div class="site-footer__brand">
+        <a href="/content/metal-mania/home.html" class="site-footer__logo">
+          <span>Metal</span> Mania
+        </a>
+        <p class="site-footer__tagline">${properties.tagline}</p>
+      </div>
+
+      <nav class="site-footer__links" aria-label="Footer navigation">
+        <ul>
+          <sly data-sly-test="${properties.navLink1Url}">
+            <li><a href="${properties.navLink1Url @ context='uri'}" title="${properties.navLink1Title}">${properties.navLink1Text}</a></li>
+          </sly>
+          <sly data-sly-test="${properties.navLink2Url}">
+            <li><a href="${properties.navLink2Url @ context='uri'}" title="${properties.navLink2Title}">${properties.navLink2Text}</a></li>
+          </sly>
+          <sly data-sly-test="${properties.navLink3Url}">
+            <li><a href="${properties.navLink3Url @ context='uri'}" title="${properties.navLink3Title}">${properties.navLink3Text}</a></li>
+          </sly>
+          <sly data-sly-test="${properties.navLink4Url}">
+            <li><a href="${properties.navLink4Url @ context='uri'}" title="${properties.navLink4Title}">${properties.navLink4Text}</a></li>
+          </sly>
+        </ul>
+      </nav>
+
+      <div class="site-footer__social">
+        <sly data-sly-test="${properties.social1Url}">
+          <a href="${properties.social1Url @ context='uri'}" class="site-footer__social-link" aria-label="${properties.social1Label}">
+            ${properties.social1Icon @ context='html'}
+          </a>
+        </sly>
+        <sly data-sly-test="${properties.social2Url}">
+          <a href="${properties.social2Url @ context='uri'}" class="site-footer__social-link" aria-label="${properties.social2Label}">
+            ${properties.social2Icon @ context='html'}
+          </a>
+        </sly>
+        <sly data-sly-test="${properties.social3Url}">
+          <a href="${properties.social3Url @ context='uri'}" class="site-footer__social-link" aria-label="${properties.social3Label}">
+            ${properties.social3Icon @ context='html'}
+          </a>
+        </sly>
+      </div>
+
+    </div><!-- /.site-footer__top -->
+
+    <div class="site-footer__bottom">
+      <p>&copy; <sly data-sly-test="${properties.copyrightYear}">${properties.copyrightYear}</sly>
+         <sly data-sly-test="${!properties.copyrightYear}">2025</sly>
+         Metal Mania. All rights reserved.</p>
+    </div>
+  </div><!-- /.container -->
+
+</footer>

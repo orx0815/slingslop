@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <sly data-sly-include="${'head.html'}"/>
+</head>
+
+<body class="metal-mania">
+
+  <!--/* Modal container — must be in DOM before any HTMX swaps */-->
+  <div id="editor-modal-container"></div>
+
+  <!--/* Editor save-error dialog (hidden until triggered by editor.ts) */-->
+  <div class="editor-save-error" id="editor-save-error" aria-live="assertive">
+    <div class="editor-save-error__dialog">
+      <div class="editor-save-error__header">
+        <div class="hal-9000"><div class="hal-9000__eye"></div></div>
+        <div class="editor-save-error__title">I'm sorry, I can't do that.</div>
+      </div>
+      <div class="editor-save-error__body">
+        <p class="editor-save-error__message" id="editor-save-error-message">
+          An error occurred while saving your changes.
+        </p>
+      </div>
+      <div class="editor-save-error__footer">
+        <button class="editor-save-error__close" onclick="window.dismissSaveError()">
+          I understand
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--/* Top-bar navigation */-->
+  <sly data-sly-include="${'nav.html'}"/>
+
+  <!--/* Main page content — overridden per page type */-->
+  <main role="main">
+    <sly data-sly-include="${'content.html'}"/>
+  </main>
+
+  <!--/* Site footer */-->
+  <sly data-sly-include="${'footer.html'}"/>
+
+</body>
+</html>

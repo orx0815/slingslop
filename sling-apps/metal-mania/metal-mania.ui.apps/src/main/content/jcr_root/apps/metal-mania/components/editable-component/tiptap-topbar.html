@@ -1,0 +1,83 @@
+<!-- ── Tiptap Toolbar (fixed to viewport top) ─────────────────── -->
+<div id="tiptap-toolbar" class="tiptap-toolbar" role="toolbar" aria-label="Editor toolbar">
+
+  <!-- Undo / Redo -->
+  <div class="toolbar-group">
+    <button type="button" data-action="undo" title="Undo (Ctrl+Z)">↩</button>
+    <button type="button" data-action="redo" title="Redo (Ctrl+Y)">↪</button>
+  </div>
+
+  <!-- Heading level -->
+  <div class="toolbar-group">
+    <select id="heading-select" title="Paragraph / Heading">
+      <option value="0">Paragraph</option>
+      <option value="1">H1</option>
+      <option value="2">H2</option>
+      <option value="3">H3</option>
+      <option value="4">H4</option>
+      <option value="5">H5</option>
+      <option value="6">H6</option>
+    </select>
+  </div>
+
+  <!-- Inline formatting -->
+  <div class="toolbar-group">
+    <button type="button" data-action="bold"        title="Bold (Ctrl+B)"><b>B</b></button>
+    <button type="button" data-action="italic"      title="Italic (Ctrl+I)"><i>I</i></button>
+    <button type="button" data-action="underline"   title="Underline (Ctrl+U)"><u>U</u></button>
+    <button type="button" data-action="strike"      title="Strikethrough"><s>S</s></button>
+    <button type="button" data-action="code"        title="Inline code">&lt;&gt;</button>
+    <button type="button" data-action="subscript"   title="Subscript">x₂</button>
+    <button type="button" data-action="superscript" title="Superscript">x²</button>
+  </div>
+
+  <!-- Colour & highlight -->
+  <div class="toolbar-group">
+    <input type="color" id="text-color-picker" title="Text colour" value="#000000"/>
+    <button type="button" data-action="highlight"       title="Highlight">▐Hl</button>
+    <button type="button" data-action="clearFormatting" title="Clear formatting">✕fmt</button>
+  </div>
+
+  <!-- Text alignment -->
+  <div class="toolbar-group">
+    <button type="button" data-action="alignLeft"    title="Align left">⬅</button>
+    <button type="button" data-action="alignCenter"  title="Centre">↔</button>
+    <button type="button" data-action="alignRight"   title="Align right">➡</button>
+    <button type="button" data-action="alignJustify" title="Justify">☰</button>
+  </div>
+
+  <!-- Lists & blocks -->
+  <div class="toolbar-group">
+    <button type="button" data-action="bulletList"    title="Bullet list">• —</button>
+    <button type="button" data-action="orderedList"   title="Numbered list">1. —</button>
+    <button type="button" data-action="blockquote"    title="Blockquote">"…"</button>
+    <button type="button" data-action="codeBlock"     title="Code block">&lt;/&gt;</button>
+    <button type="button" data-action="horizontalRule" title="Horizontal rule">──</button>
+  </div>
+
+  <!-- Link & image -->
+  <div class="toolbar-group">
+    <button type="button" data-action="link"  title="Insert / edit link">🔗</button>
+    <button type="button" data-action="image" title="Insert image">🖼</button>
+  </div>
+
+  <!-- Table -->
+  <div class="toolbar-group">
+    <button type="button" data-action="insertTable"     title="Insert table (3×3)">⊞Tbl</button>
+    <button type="button" data-action="addColumnBefore" title="Add column before">←col</button>
+    <button type="button" data-action="addColumnAfter"  title="Add column after">col→</button>
+    <button type="button" data-action="deleteColumn"    title="Delete column">✕col</button>
+    <button type="button" data-action="addRowBefore"    title="Add row before">↑row</button>
+    <button type="button" data-action="addRowAfter"     title="Add row after">row↓</button>
+    <button type="button" data-action="deleteRow"       title="Delete row">✕row</button>
+    <button type="button" data-action="mergeCells"      title="Merge cells">⊞mrg</button>
+    <button type="button" data-action="splitCell"       title="Split cell">⊟spl</button>
+    <button type="button" data-action="deleteTable"     title="Delete table">✕tbl</button>
+  </div>
+
+  <!-- HTML source toggle -->
+  <div class="toolbar-group">
+    <button type="button" id="toggle-source" title="View HTML Source">&lt;/&gt; src</button>
+  </div>
+
+</div><!-- /.tiptap-toolbar -->

@@ -1,0 +1,8 @@
+<!--/*
+  page/html.html — thin-wrapper delegation script.
+  Sling renders the page node (sling:Folder) via this script, which delegates
+  to the jcr:content child.  That child carries the actual sling:resourceType
+  (homepage / contentpage / styleguide …) so all subsequent scripts run
+  in jcr:content context — identical to how AEM handles cq:Page nodes.
+*/-->
+<sly data-sly-resource="${'jcr:content'}"/>

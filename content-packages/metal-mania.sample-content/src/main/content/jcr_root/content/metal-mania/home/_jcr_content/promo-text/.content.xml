@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="metal-mania/components/text-block"
+    headline="Why Metal Mania?"
+    text="&lt;p&gt;Metal Mania is the definitive online resource for extreme and heavy music culture. Whether you are into the technical brutality of death metal, the atmospheric desolation of black metal, or the sludge-fuelled misery of doom — we have you covered.&lt;/p&gt;&lt;p&gt;Browse upcoming &lt;a href=&quot;/content/metal-mania/tours.html&quot;&gt;tour dates&lt;/a&gt;, discover new bands, and dive deep into the underground with our curated editorial coverage.&lt;/p&gt;"/>

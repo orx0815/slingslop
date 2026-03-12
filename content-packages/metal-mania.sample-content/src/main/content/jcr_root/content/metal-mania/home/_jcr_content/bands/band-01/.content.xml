@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="metal-mania/components/band-card"
+    bandName="Iron Shroud"
+    bandGenre="Death Metal"
+    bandBio="Crushing riffs and blast-beats from the darkest pits of the underground. Iron Shroud have been decimating ear drums since 2009."
+    bandCoverUrl=""
+    bandLinkText="Learn More"
+    bandLinkUrl="/content/metal-mania/bands/iron-shroud.html"/>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="metal-mania/components/band-card"
+    bandName="Void Reaper"
+    bandGenre="Black Metal"
+    bandBio="Atmospheric black metal shrouded in ice and misanthropy. Void Reaper conjure cosmic desolation with every tremolo-picked riff."
+    bandCoverUrl=""
+    bandLinkText="Learn More"
+    bandLinkUrl="/content/metal-mania/bands/void-reaper.html"/>

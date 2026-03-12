@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:description="Metal Mania Content Page — editorial prose page"
+    jcr:primaryType="sling:Folder"
+    jcr:title="Metal Mania Content Page"
+    sling:resourceSuperType="metal-mania/pages/basepage"/>

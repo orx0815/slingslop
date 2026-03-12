@@ -1,0 +1,11 @@
+<!--/* contentpage/content.html — Editorial article page */-->
+<article class="section container container--narrow" data-animate>
+  <header class="page-header" style="padding-block: 2rem 0;">
+    <h1>${properties['jcr:title'] @ context='html'}</h1>
+    <p class="lead">${properties['jcr:description'] @ context='html'}</p>
+    <div class="divider"></div>
+  </header>
+  <div class="prose">
+    <sly data-sly-resource="${'./body' @ resourceType='metal-mania/components/text-block'}"/>
+  </div>
+</article>

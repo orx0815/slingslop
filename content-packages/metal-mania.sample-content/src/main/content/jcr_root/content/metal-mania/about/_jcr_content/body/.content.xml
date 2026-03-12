@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="metal-mania/components/text-block"
+    headline="Our Story"
+    text="&lt;p&gt;Metal Mania was born from a simple conviction: heavy music deserves a home worthy of its power. Founded by a collective of fans, musicians, and obsessive record collectors, we set out to build the definitive platform for everything extreme.&lt;/p&gt;&lt;p&gt;From the early-nineties death metal wave to the contemporary atmospheric black metal explosion, Metal Mania documents every subgenre, every scene, every riff that matters. We cover bands from the biggest festival headliners to the most obscure bedroom black-metal projects.&lt;/p&gt;&lt;p&gt;Metal Mania runs on &lt;a href=&quot;https://sling.apache.org/&quot; target=&quot;_blank&quot;&gt;Apache Sling&lt;/a&gt; — a JCR-based web framework that lets content drive rendering. The editing experience is powered by &lt;a href=&quot;https://htmx.org/&quot; target=&quot;_blank&quot;&gt;HTMX&lt;/a&gt; and &lt;a href=&quot;https://tiptap.dev/&quot; target=&quot;_blank&quot;&gt;Tiptap&lt;/a&gt;.&lt;/p&gt;"/>

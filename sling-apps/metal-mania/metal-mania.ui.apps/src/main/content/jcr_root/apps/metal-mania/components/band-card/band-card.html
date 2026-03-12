@@ -1,0 +1,39 @@
+<article class="band-card"
+          data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+          data-sly-set.editPath="${resource.path}.edit-form.html"
+          data-zen-editable="true"
+          data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+          data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+          data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+
+  <div class="band-card__media">
+    <sly data-sly-test="${properties.bandCoverUrl}">
+      <img src="${properties.bandCoverUrl @ context='uri'}"
+           alt="${properties.bandName} band cover"
+           class="band-card__cover"
+           loading="lazy"/>
+    </sly>
+    <sly data-sly-test="${!properties.bandCoverUrl}">
+      <div class="band-card__cover-placeholder" aria-hidden="true"></div>
+    </sly>
+  </div>
+
+  <div class="band-card__body">
+    <sly data-sly-test="${properties.bandGenre}">
+      <span class="badge">${properties.bandGenre}</span>
+    </sly>
+    <h3 class="band-card__name">${properties.bandName}</h3>
+    <sly data-sly-test="${properties.bandBio}">
+      <p class="band-card__bio">${properties.bandBio}</p>
+    </sly>
+  </div>
+
+  <div class="band-card__footer">
+    <sly data-sly-test="${properties.bandLinkUrl}">
+      <a class="btn btn--outline" href="${properties.bandLinkUrl @ context='uri'}">
+        ${properties.bandLinkText ? properties.bandLinkText : 'Learn More'}
+      </a>
+    </sly>
+  </div>
+
+</article>

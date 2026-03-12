@@ -1,0 +1,88 @@
+<div class="edit-fields-list">
+  <div class="edit-fields-group">
+    <p><strong>Eyebrow / Tagline</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Eyebrow</span>
+          <small class="edit-field-description">Short uppercase text shown above the hero title (e.g. "The Premier Destination").</small>
+        </span>
+        <input type="text" name="eyebrow" value="${properties.eyebrow}" placeholder="Eyebrow text" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Hero Title</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Title Part 1</span>
+          <small class="edit-field-description">First line of the title (before the accent word).</small>
+        </span>
+        <input type="text" name="titlePart1" value="${properties.titlePart1}" placeholder="Title line 1" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Accent Word</span>
+          <small class="edit-field-description">Highlighted word displayed in blood-red.</small>
+        </span>
+        <input type="text" name="titleAccent" value="${properties.titleAccent}" placeholder="Blood" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Title Part 2</span>
+          <small class="edit-field-description">Second line of the title (after the accent word). May be left blank.</small>
+        </span>
+        <input type="text" name="titlePart2" value="${properties.titlePart2}" placeholder="Title line 2" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Subtitle</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Subtitle</span>
+          <small class="edit-field-description">One to two sentences shown beneath the title.</small>
+        </span>
+        <input type="text" name="subtitle" value="${properties.subtitle}" placeholder="Subtitle text" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Call-to-Action Buttons</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Primary CTA Text</span>
+          <small class="edit-field-description">Text for the primary (red) button.</small>
+        </span>
+        <input type="text" name="ctaPrimaryText" value="${properties.ctaPrimaryText}" placeholder="Get Tickets" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Primary CTA URL</span>
+          <small class="edit-field-description">Destination URL for the primary button.</small>
+        </span>
+        <input type="url" name="ctaPrimaryUrl" value="${properties.ctaPrimaryUrl}" placeholder="/content/metal-mania/tours.html" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Secondary CTA Text</span>
+          <small class="edit-field-description">Text for the ghost (outline) button.</small>
+        </span>
+        <input type="text" name="ctaSecondaryText" value="${properties.ctaSecondaryText}" placeholder="Explore Bands" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Secondary CTA URL</span>
+          <small class="edit-field-description">Destination URL for the ghost button.</small>
+        </span>
+        <input type="url" name="ctaSecondaryUrl" value="${properties.ctaSecondaryUrl}" placeholder="/content/metal-mania/bands.html" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+</div>

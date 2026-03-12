@@ -1,0 +1,63 @@
+<!--/* styleguide/content.html — Design system showcase */-->
+<div class="page-wrapper styleguide">
+
+  <header class="section section--sm container" data-animate>
+    <h1>Metal Mania — Style Guide</h1>
+    <p class="lead">Design tokens, typography, components, and motion.</p>
+    <div class="divider"></div>
+  </header>
+
+  <!-- Colour Swatches -->
+  <section class="styleguide__section container" data-animate>
+    <span class="styleguide__label">Colour Palette</span>
+    <div class="swatch-grid">
+      <div class="swatch swatch--primary">       <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">primary</div>      <div class="swatch__value">oklch(50% .25 22)</div></div></div>
+      <div class="swatch swatch--primary-light">  <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">primary-light</div> <div class="swatch__value">oklch(65% .20 22)</div></div></div>
+      <div class="swatch swatch--primary-dark">   <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">primary-dark</div>  <div class="swatch__value">oklch(33% .20 22)</div></div></div>
+      <div class="swatch swatch--primary-subtle"> <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">primary-subtle</div><div class="swatch__value">oklch(18% .06 22)</div></div></div>
+      <div class="swatch swatch--secondary">      <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">secondary</div>     <div class="swatch__value">oklch(72% .04 245)</div></div></div>
+      <div class="swatch swatch--secondary-light"><div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">sec-light</div>     <div class="swatch__value">oklch(85% .02 245)</div></div></div>
+      <div class="swatch swatch--bg">             <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">bg</div>            <div class="swatch__value">oklch(8% .015 22)</div></div></div>
+      <div class="swatch swatch--surface">        <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">surface</div>       <div class="swatch__value">oklch(14% .018 22)</div></div></div>
+      <div class="swatch swatch--surface-raised"> <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">surf-raised</div>  <div class="swatch__value">oklch(17% .018 22)</div></div></div>
+      <div class="swatch swatch--border">         <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">border</div>        <div class="swatch__value">oklch(24% .025 22)</div></div></div>
+      <div class="swatch swatch--text">           <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">text</div>          <div class="swatch__value">oklch(90% .01 245)</div></div></div>
+      <div class="swatch swatch--text-muted">     <div class="swatch__color"></div><div class="swatch__info"><div class="swatch__name">text-muted</div>   <div class="swatch__value">oklch(60% .02 245)</div></div></div>
+    </div>
+  </section>
+
+  <!-- Typography Scale -->
+  <section class="styleguide__section container" data-animate>
+    <span class="styleguide__label">Typography Scale</span>
+    <div class="type-specimen">
+      <div class="type-row"><div class="type-row__meta">3xl / h1</div><div class="type-row__sample"><h1>Blood &amp; Thunder</h1></div></div>
+      <div class="type-row"><div class="type-row__meta">2xl / h2</div><div class="type-row__sample"><h2>Iron Gates of Metal</h2></div></div>
+      <div class="type-row"><div class="type-row__meta">xl / h3</div> <div class="type-row__sample"><h3>Steel And Screams</h3></div></div>
+      <div class="type-row"><div class="type-row__meta">lg / h4</div> <div class="type-row__sample"><h4>Forged in Fire</h4></div></div>
+      <div class="type-row"><div class="type-row__meta">base / p</div><div class="type-row__sample"><p>The crushing weight of down-tuned guitars and thunderous percussion—metal is not a genre but a creed.</p></div></div>
+      <div class="type-row"><div class="type-row__meta">sm</div>      <div class="type-row__sample"><small>Fine print, tour dates, legal notices.</small></div></div>
+    </div>
+  </section>
+
+  <!-- Buttons -->
+  <section class="styleguide__section container" data-animate>
+    <span class="styleguide__label">Buttons</span>
+    <div class="btn-palette">
+      <a class="btn btn--primary" href="#">Primary</a>
+      <a class="btn btn--ghost"   href="#">Ghost</a>
+      <a class="btn btn--outline" href="#">Outline</a>
+      <span class="badge">Badge</span>
+      <span class="badge badge--secondary">Secondary</span>
+      <span class="badge badge--neutral">Neutral</span>
+    </div>
+  </section>
+
+  <!-- Band Card example -->
+  <section class="styleguide__section container" data-animate>
+    <span class="styleguide__label">Band Card Component</span>
+    <div class="grid-3" data-animate-stagger>
+      <sly data-sly-resource="${'./sample-band' @ resourceType='metal-mania/components/band-card'}"/>
+    </div>
+  </section>
+
+</div>

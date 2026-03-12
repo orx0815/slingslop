@@ -1,0 +1,32 @@
+<!--/* homepage/content.html — Hero section + featured bands grid */-->
+
+<!--/* Hero */-->
+<sly data-sly-resource="${'./hero' @ resourceType='metal-mania/components/hero'}"/>
+
+<!--/* Featured Bands section */-->
+<section class="section" id="bands" data-animate>
+  <div class="container">
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">The Roster</p>
+      <h2 class="section-heading__title">Featured Bands</h2>
+      <p class="section-heading__subtitle">
+        Crushing riffs, thunderous drums, and vocals forged in fire.
+        These are the acts that define the genre.
+      </p>
+    </div>
+    <div class="grid-3" data-animate-stagger>
+      <sly data-sly-resource="${'./bands/band-01' @ resourceType='metal-mania/components/band-card'}"/>
+      <sly data-sly-resource="${'./bands/band-02' @ resourceType='metal-mania/components/band-card'}"/>
+      <sly data-sly-resource="${'./bands/band-03' @ resourceType='metal-mania/components/band-card'}"/>
+    </div>
+  </div>
+</section>
+
+<!--/* Editorial text block */-->
+<section class="section section--sm">
+  <div class="container">
+    <sly data-sly-resource="${'./promo-text' @ resourceType='metal-mania/components/text-block'}"/>
+  </div>
+</section>
+
+<div class="divider container"></div>

@@ -43,6 +43,27 @@
             <type>content-package</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.metal-mania.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.metal-mania.ui.apps</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>slingslop.metal-mania.sample-content</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,6 +81,11 @@
                             <artifactId>slingslop.zengarden.core</artifactId>
                             <filter>true</filter>
                         </embedded>
+                        <embedded>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.metal-mania.core</artifactId>
+                            <filter>true</filter>
+                        </embedded>
                     </embeddeds>
                     <subPackages>
                         <subPackage>
@@ -70,6 +96,16 @@
                         <subPackage>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>slingslop.zengarden.sample-content</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.metal-mania.ui.apps</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>slingslop.metal-mania.sample-content</artifactId>
                             <filter>true</filter>
                         </subPackage>
                     </subPackages>

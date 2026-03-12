@@ -1,0 +1,36 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${properties['jcr:title'] @ context='html'} — Metal Mania</title>
+<meta name="description" content="${properties['jcr:description'] @ context='html'}">
+
+<!--/* ?minLibs=no — serve unminified bundles for development inspection */-->
+<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+
+  <!-- Public bundle (unminified) -->
+  <script src="/apps/metal-mania/js/public/public-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/metal-mania/css/public/public.css">
+
+  <!-- Editor bundle (unminified) — only for logged-in users -->
+  <sly data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <!-- htmx for hypermedia interactions -->
+    <script src="/apps/metal-mania/js/htmx.js"></script>
+    <script src="/apps/metal-mania/js/editor/editor-bundle.js"></script>
+    <link rel="stylesheet" href="/apps/metal-mania/css/editor/editor.css">
+  </sly>
+
+</sly>
+<sly data-sly-test="${!noMinLibs}">
+
+  <!-- Public bundle (minified) -->
+  <script src="/apps/metal-mania/js/public/public-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/metal-mania/css/public/public.min.css">
+
+  <!-- Editor bundle (minified, htmx inlined) — only for logged-in users -->
+  <sly data-sly-use.auth="mtl.mania.metal.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/metal-mania/js/editor/editor-bundle.min.js"></script>
+    <link rel="stylesheet" href="/apps/metal-mania/css/editor/editor.min.css">
+  </sly>
+
+</sly>

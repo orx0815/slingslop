@@ -1,0 +1,67 @@
+<div class="edit-fields-list">
+  <div class="edit-fields-group">
+    <p><strong>Band Identity</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Band Name</span>
+          <small class="edit-field-description">Full name of the band.</small>
+        </span>
+        <input type="text" name="bandName" value="${properties.bandName}" placeholder="Iron Shroud" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Genre</span>
+          <small class="edit-field-description">Short genre label shown as a badge (e.g. "Death Metal", "Black Metal").</small>
+        </span>
+        <input type="text" name="bandGenre" value="${properties.bandGenre}" placeholder="Death Metal" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Bio</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Short Bio</span>
+          <small class="edit-field-description">One or two sentences describing the band. Shown in the card body.</small>
+        </span>
+        <input type="text" name="bandBio" value="${properties.bandBio}" placeholder="Crushing riffs from the darkest pits." form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Cover Image</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Cover Image URL</span>
+          <small class="edit-field-description">Asset path or external URL for the band cover / photo. Leave blank for placeholder.</small>
+        </span>
+        <input type="text" name="bandCoverUrl" value="${properties.bandCoverUrl}" placeholder="/content/dam/metal-mania/bands/iron-shroud.jpg" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <p><strong>Call-to-Action</strong></p>
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Button Text</span>
+          <small class="edit-field-description">Label for the card's link button. Defaults to "Learn More".</small>
+        </span>
+        <input type="text" name="bandLinkText" value="${properties.bandLinkText}" placeholder="Learn More" form="editor-form" class="edit-field-input"/>
+      </label>
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Button URL</span>
+          <small class="edit-field-description">Destination page for the button. Leave blank to hide the button.</small>
+        </span>
+        <input type="text" name="bandLinkUrl" value="${properties.bandLinkUrl}" placeholder="/content/metal-mania/bands/iron-shroud.html" form="editor-form" class="edit-field-input"/>
+      </label>
+    </div>
+  </div>
+</div>

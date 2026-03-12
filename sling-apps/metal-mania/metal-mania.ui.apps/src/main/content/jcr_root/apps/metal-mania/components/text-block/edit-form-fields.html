@@ -1,0 +1,19 @@
+<div class="edit-fields-list">
+  <div class="edit-fields-group">
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Headline</span>
+          <small class="edit-field-description">Optional heading shown above the rich text. Leave blank to omit.</small>
+        </span>
+        <input type="text" id="headline-input" name="headline" value="${properties.headline}"
+               class="edit-field-input" placeholder="Headline" form="editor-form"/>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!--/* Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init */-->
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<!--/* Hidden input populated with editor HTML before htmx submit */-->
+<input type="hidden" id="content-hidden" name="text" form="editor-form"/>
