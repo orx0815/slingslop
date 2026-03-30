@@ -36,7 +36,7 @@ This BOM intentionally has **no `<parent>`**. If it inherited from `slingslop.pa
 
 - The BOM entries are generated from Sling `nosample_base` feature JSON.
 - Source (default):
-  - `~/.m2/repository/org/apache/sling/org.apache.sling.starter/14-SNAPSHOT/org.apache.sling.starter-14-SNAPSHOT-nosample_base.slingosgifeature`
+  - `~/.m2/repository/org/apache/sling/org.apache.sling.starter/14/org.apache.sling.starter-14-nosample_base.slingosgifeature`
 - Output:
   - `launcher/launcher-dependencies/pom.xml`
 
@@ -47,7 +47,7 @@ This BOM intentionally has **no `<parent>`**. If it inherited from `slingslop.pa
 From repository root:
 
 ```bash
-python3 launcher/launcher-dependencies/generate_bom.py --sling-version 14-SNAPSHOT
+python3 launcher/launcher-dependencies/generate_bom.py --sling-version 14
 ```
 
 Or with an explicit feature file:
