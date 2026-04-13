@@ -16,8 +16,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--sling-version",
-        default="14-SNAPSHOT",
-        help="Sling starter version in local m2 (default: 14-SNAPSHOT)",
+        default="14",
+        help="Sling starter version in local m2 (default: 14)",
     )
     parser.add_argument(
         "--feature-file",
@@ -93,7 +93,7 @@ def render_pom(feature_id: str, entries) -> str:
         "  <packaging>pom</packaging>",
         "",
         "  <properties>",
-        "    <sling.starter.version>14-SNAPSHOT</sling.starter.version>",
+        "    <sling.starter.version>14</sling.starter.version>",
         "  </properties>",
         "",
         "  <name>Slingslop - Launcher Dependencies BOM</name>",

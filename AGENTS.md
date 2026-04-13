@@ -23,7 +23,7 @@ docs/
 
 | Layer | Technology |
 |---|---|
-| Runtime | Apache Sling 14-SNAPSHOT on Felix OSGi + Oak JCR |
+| Runtime | Apache Sling 14 on Felix OSGi + Oak JCR |
 | Templates | HTL (Sightly) — server-side HTML rendering |
 | Hypermedia | HTMX — swaps component HTML via GET/POST |
 | Inline editing | Tiptap rich-text editor (optional per app) |

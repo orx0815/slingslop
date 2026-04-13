@@ -11,11 +11,11 @@
   <packaging>pom</packaging>
 
   <properties>
-    <sling.starter.version>14-SNAPSHOT</sling.starter.version>
+    <sling.starter.version>14</sling.starter.version>
   </properties>
 
   <name>Slingslop - Launcher Dependencies BOM</name>
-  <description>Generated dependencyManagement BOM from org.apache.sling.starter nosample_base feature (org.apache.sling:org.apache.sling.starter:slingosgifeature:nosample_base:14-SNAPSHOT).</description>
+  <description>Generated dependencyManagement BOM from org.apache.sling.starter nosample_base feature (org.apache.sling:org.apache.sling.starter:slingosgifeature:nosample_base:14).</description>
 
   <dependencyManagement>
     <dependencies>
