@@ -63,7 +63,7 @@ There are four primary ways to run the application locally:
     The `launcher/launch.sh` script starts the application directly without Docker. This is useful for quick development cycles.
 
     ```bash
-    ./launcher/launch.sh
+    cd launcher && ./launch.sh
     ```
 
     The The CSS Zen Garden can be enjoyed at: http://localhost:8080/content/slingslop/zengarden/home.html  
