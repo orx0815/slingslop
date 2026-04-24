@@ -1,0 +1,412 @@
+/*
+ * Inline editing affordances — editable hover states, active editing,
+ * fixed footer bar, headline input, htmx loading indicator
+ */
+
+/* ── Hover / cursor affordance for clickable-to-edit components ──────── */
+
+[data-zen-editable] {
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 10px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-primary-hover-bg);
+    outline: 2px dashed var(--color-primary-hover-outline);
+  }
+
+  &:hover::after {
+    content: "\270E  Click to edit";
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.7rem;
+    font-family: sans-serif;
+    color: var(--color-primary);
+    pointer-events: none;
+  }
+}
+
+/* Block editing of other components while one is already being edited */
+body[data-zen-editing] [data-zen-editable] {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* ── htmx loading indicator ──────────────────────────────────────────── */
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline-block;
+}
+
+/* ── Active editing region — replaces component in-place ─────────────── */
+
+/**
+ * Subtle focus ring; no background override so page colours / images
+ * remain fully visible.
+ */
+[data-zen-editable-editing] {
+  border-left: 3px solid var(--color-primary-accent);
+  padding-left: 5px;
+}
+
+/* ── Bottom bar — fixed to viewport bottom ───────────────────────────── */
+
+.inline-editor-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgb(248 249 250 / 0.97);
+  backdrop-filter: blur(4px);
+  border-top: 1px solid var(--color-border-ui);
+  box-shadow: 0 -2px 6px rgb(0 0 0 / 0.10);
+  flex-wrap: wrap;
+}
+
+#edit-component-btn {
+  margin-left: 0;
+}
+
+/* ── Headline input inside the modal ─────────────────────────────────── */
+
+.inline-headline-input {
+  flex: 1 1 200px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  min-width: 0;
+  background: var(--color-white);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+  }
+}
+
+/* ── Save error — centered overlay with HAL 9000 ────────────────────── */
+
+/* Full-screen backdrop + flex centering */
+.editor-save-error {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgb(0 0 0 / 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+
+  &.is-visible {
+    display: flex;
+    animation: error-backdrop-in 0.35s ease-out forwards;
+
+    .editor-save-error__dialog {
+      animation: error-dialog-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+  }
+
+  &.is-closing {
+    display: flex;
+    animation: error-backdrop-out 0.4s ease-in forwards;
+
+    .editor-save-error__dialog {
+      animation: error-dialog-out 0.4s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+    }
+  }
+}
+
+/* Dialog box */
+.editor-save-error__dialog {
+  background: #120404;
+  border: 1px solid #9b0000;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px #6a0000,
+    0 0 50px rgb(200 0 0 / 0.4),
+    0 30px 70px rgb(0 0 0 / 0.85);
+  max-width: 480px;
+  width: calc(100% - 3rem);
+  overflow: hidden;
+}
+
+/* Header: HAL eye + title */
+.editor-save-error__header {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 26px 28px 20px;
+  border-bottom: 1px solid rgb(160 0 0 / 0.35);
+  background: rgb(20 2 2 / 0.7);
+}
+
+.editor-save-error__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ff5555;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgb(255 40 40 / 0.7);
+}
+
+/* Body */
+.editor-save-error__body {
+  padding: 22px 28px;
+}
+
+.editor-save-error__message {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  color: #f0c8c8;
+}
+
+/* Footer */
+.editor-save-error__footer {
+  padding: 14px 28px 22px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgb(160 0 0 / 0.2);
+  background: rgb(15 2 2 / 0.5);
+}
+
+.editor-save-error__close {
+  background: transparent;
+  border: 1px solid rgb(180 0 0 / 0.6);
+  color: #ff9999;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgb(180 0 0 / 0.28);
+    border-color: #cc0000;
+    box-shadow: 0 0 14px rgb(220 0 0 / 0.45);
+    color: #ffbbbb;
+  }
+
+  &:focus {
+    outline: 2px solid #cc0000;
+    outline-offset: 2px;
+  }
+}
+
+/* ── HAL 9000 eye ───────────────────────────────────────────────────── */
+
+.hal-9000 {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  /* Metallic housing */
+  background:
+    radial-gradient(circle at 38% 32%,
+      #848484 0%,
+      #5a5a5a 28%,
+      #3c3c3c 55%,
+      #1e1e1e 100%);
+  box-shadow:
+    inset 0 3px 6px rgb(255 255 255 / 0.13),
+    inset 0 -2px 8px rgb(0 0 0 / 0.55),
+    0 0 0 3px #2e2e2e,
+    0 0 0 5px #4c4c4c,
+    0 0 0 7px #1a1a1a,
+    0 4px 20px rgb(0 0 0 / 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hal-9000__eye {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  /* Deep red lens — bright highlight at top-left, abyssal dark core */
+  background:
+    radial-gradient(circle at 34% 28%,
+      #ff9999 0%,
+      #ff3300 18%,
+      #cc0000 38%,
+      #880000 58%,
+      #3e0000 78%,
+      #100000 100%);
+  position: relative;
+  animation: hal-pulse 2.6s ease-in-out infinite;
+  box-shadow:
+    0 0 10px 5px rgb(220 0 0 / 0.75),
+    0 0 28px 12px rgb(180 0 0 / 0.5),
+    0 0 60px 24px rgb(140 0 0 / 0.25);
+
+  /* Inner iris ring */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    border: 1px solid rgb(80 0 0 / 0.55);
+    box-shadow:
+      inset 0 0 8px rgb(0 0 0 / 0.6),
+      0 0 4px rgb(0 0 0 / 0.3);
+  }
+
+  /* Specular highlight — the iconic white glint */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 22%;
+    width: 13px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(255 220 220 / 0.55);
+    filter: blur(1.5px);
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes hal-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px 5px rgb(220 0 0 / 0.75),
+      0 0 28px 12px rgb(180 0 0 / 0.5),
+      0 0 60px 24px rgb(140 0 0 / 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 16px 8px rgb(255 20 0 / 0.95),
+      0 0 42px 18px rgb(220 10 0 / 0.7),
+      0 0 85px 35px rgb(190 0 0 / 0.4);
+  }
+}
+
+/* ── Open / close animations ────────────────────────────────────────── */
+
+@keyframes error-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes error-backdrop-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes error-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes error-dialog-out {
+  0%   { opacity: 1; transform: scale(1)    translateY(0);    }
+  25%  { opacity: 1; transform: scale(1.04) translateY(-8px); }
+  100% { opacity: 0; transform: scale(0.7)  translateY(50px); }
+}
+
+/* ── Save / Cancel button group ──────────────────────────────────────── */
+
+.inline-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Generic edit-form field layout in modal ───────────────────────── */
+
+.edit-fields-list {
+  display: grid;
+  gap: 12px;
+}
+
+.edit-fields-group {
+  padding: 10px;
+  border: 1px solid var(--color-border-ui);
+  border-radius: 4px;
+  background: var(--color-bg-subtle);
+
+  p {
+    margin: 0 0 8px;
+  }
+}
+
+.edit-fields-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-field-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: 12px;
+  align-items: start;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+.edit-field-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.edit-field-description {
+  margin: 2px 0 6px;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.edit-field-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-white);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+  }
+}
+

@@ -1,0 +1,56 @@
+/*
+ * Color tokens — single source of truth for all editor colors
+ * Adapted for Flower Power theme
+ */
+:root {
+  /* ── Primary palette ────────────────────────────────────────────────────
+   * Using Flower Power vibrant pink as the base editor color.
+   * All derived tokens shift automatically via OKLCH relative color.     */
+  --color-primary-base:      oklch(0.70 0.20 350);  /* Vibrant pink */
+  --color-primary:           var(--color-primary-base);          /* base */
+  --color-primary-hover:     oklch(from var(--color-primary-base) calc(l - 0.138) calc(c - 0.053) h);         /* darker */
+  --color-primary-accent:    oklch(from var(--color-primary-base) calc(l - 0.027) calc(c + 0.011) calc(h + 3)); /* slightly deeper hue */
+  --color-focus-ring:        oklch(from var(--color-primary-base) calc(l + 0.178) calc(c - 0.103) calc(h - 6)); /* lighter, less saturated */
+  --color-active-border:     oklch(from var(--color-primary-base) calc(l + 0.036) calc(c - 0.086) calc(h - 6)); /* mid-tint border */
+  --color-active-bg:         oklch(from var(--color-primary-base) calc(l + 0.253) calc(c - 0.168) calc(h - 9)); /* very pale tint */
+  --color-active-text:       oklch(from var(--color-primary-base) calc(l - 0.202) calc(c - 0.121) calc(h - 6)); /* dark shade for text */
+  /* Alpha variants — derived from primary / active-border, opacity only */
+  --color-primary-hover-bg:       oklch(from var(--color-primary-base) l c h / 0.05);        /* editable hover background */
+  --color-primary-hover-outline:  oklch(from var(--color-primary-base) l c h / 0.30);        /* editable hover outline */
+  --color-primary-glow:           oklch(from var(--color-primary-base) l c h / 0.15);        /* input focus ring glow */
+  --color-accent-glow:            oklch(from var(--color-primary-accent) l c h / 0.25);      /* accent input focus ring glow */
+  --color-active-border-tint:     oklch(from var(--color-active-border) l c h / 0.15);       /* selected cell overlay */
+
+  /* Neutrals */
+  --color-white:             #fff;      /* white */
+  --color-white-soft:        #fefefe;   /* near-white */
+  --color-black:             #000;      /* black */
+
+  /* ── Secondary / neutral palette ─────────────────────────────────────────
+   * Using yellow accent as secondary base.
+   * Tinted tokens (bg-subtle, border-ui) inherit the hue.
+   * Neutral tokens (border → text) set c=0 for a clean gray.            */
+  --color-secondary-base:    oklch(0.85 0.18 95);  /* Sunny yellow */
+  --color-secondary:         var(--color-secondary-base);                                  /* base */
+  --color-secondary-hover:   oklch(from var(--color-secondary-base) calc(l - 0.09) c h);  /* darker */
+
+  --color-bg-subtle:         oklch(from var(--color-secondary-base) 98% calc(c * 0.1) h); /* near-white, faint tint */
+  --color-border-ui:         oklch(from var(--color-secondary-base) 91% calc(c * 0.4) h); /* light structural dividers, tinted */
+  --color-hover:             oklch(from var(--color-secondary-base) 88% 0            h);  /* interactive hover backgrounds */
+  --color-border:            oklch(from var(--color-secondary-base) 83% 0            h);  /* general borders / lines */
+  --color-text-placeholder:  oklch(from var(--color-secondary-base) 72% 0            h);  /* placeholder text */
+  --color-text-muted:        oklch(from var(--color-secondary-base) 59% 0            h);  /* muted / helper text */
+  --color-text:              oklch(from var(--color-secondary-base) 27% 0            h);  /* primary text */
+
+  /* Code editor */
+  --color-code-inline-bg:    #f0f0f0;   /* inline code background */
+  --color-code-bg:           #282828;   /* code block background */
+  --color-code-fg:           #f8f8f2;   /* code block text */
+  --color-source-editor-bg:  #1e1e2e;   /* source textarea background */
+  --color-source-editor-fg:  #cdd6f4;   /* source textarea text */
+
+  /* Error / Danger */
+  --color-error-bg:          #f8d7da;   /* error notification background */
+  --color-error-border:      #f5c2c7;   /* error notification border */
+  --color-error-text:        #842029;   /* error notification text */
+}

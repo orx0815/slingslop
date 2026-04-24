@@ -1,0 +1,167 @@
+/* 05-hero.css — Hero Section with Flower Power */
+
+.hero {
+  position: relative;
+  padding: var(--space-3xl) var(--space-md);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light) 0%,
+    var(--color-secondary-light) 50%,
+    var(--color-complement-primary) 100%
+  );
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Animated gradient background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    -45deg,
+    var(--color-primary-subtle),
+    var(--color-secondary-subtle),
+    var(--color-primary-light),
+    var(--color-secondary-light)
+  );
+  background-size: 400% 400%;
+  animation: gradient-flow 15s ease infinite;
+  opacity: 0.6;
+}
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating flower petals */
+.hero::after {
+  content: '🌸 🌼 🌺 🌻 🌷';
+  position: absolute;
+  top: 10%;
+  left: 0;
+  right: 0;
+  font-size: 3rem;
+  opacity: 0.2;
+  animation: float-petals 30s linear infinite;
+  letter-spacing: 5rem;
+  pointer-events: none;
+}
+
+@keyframes float-petals {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  z-index: var(--z-base);
+  max-width: var(--content-width-normal);
+  margin-inline: auto;
+}
+
+/* Hero title */
+.hero-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  margin-bottom: var(--space-md);
+  line-height: var(--line-height-tight);
+  animation: bloom-in 1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes bloom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Hero subtitle */
+.hero-subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+  line-height: var(--line-height-normal);
+  animation: bloom-in 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+}
+
+/* Hero CTA buttons */
+.hero-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: bloom-in 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+}
+
+.hero-button {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border-radius: var(--border-radius-full);
+  transition: all var(--transition-base);
+  border: var(--border-width) solid transparent;
+}
+
+.hero-button-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.hero-button-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-button-secondary {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.hero-button-secondary:hover {
+  background: var(--color-primary-subtle);
+  transform: translateY(-2px);
+}
+
+/* Compact hero variant */
+.hero-compact {
+  padding: var(--space-xl) var(--space-md);
+}
+
+.hero-compact .hero-title {
+  font-size: var(--font-size-2xl);
+}
+
+.hero-compact .hero-subtitle {
+  font-size: var(--font-size-lg);
+}
