@@ -1,0 +1,90 @@
+/*
+ * Tiptap toolbar — fixed to the top of the viewport while editing
+ */
+
+.tiptap-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9001;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 10px;
+  background: rgb(240 240 240 / 0.97);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 6px;
+  border-right: 1px solid var(--color-border);
+
+  &:last-child {
+    border-right: none;
+  }
+
+  button {
+    min-width: 28px;
+    height: 28px;
+    padding: 2px 5px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-text);
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--color-hover);
+      border-color: var(--color-border);
+    }
+
+    &.is-active {
+      background: var(--color-active-bg);
+      border-color: var(--color-active-border);
+      color: var(--color-active-text);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    height: 28px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    background: var(--color-white);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 4px;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  input[type="color"] {
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}

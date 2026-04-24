@@ -1,0 +1,34 @@
+<footer class="site-footer"
+        data-sly-use.auth="org.motorbrot.flowerpower.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}"
+        data-sly-attribute.hx-target="${auth.loggedIn ? 'this' : false}">
+
+  <div class="footer-content">
+    <div class="footer-decoration">🌸 🌼 🌺 🌻 🌷</div>
+
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h3>${properties.col1Title || 'About Flower Power'}</h3>
+        ${properties.col1Content @ context='html' || '<p>Bringing vibrant design to life.</p>'}
+      </div>
+
+      <div class="footer-section">
+        <h3>${properties.col2Title || 'Quick Links'}</h3>
+        ${properties.col2Content @ context='html' || '<ul><li><a href="#">Home</a></li><li><a href="#">About</a></li></ul>'}
+      </div>
+
+      <div class="footer-section">
+        <h3>${properties.col3Title || 'Connect'}</h3>
+        ${properties.col3Content @ context='html' || '<p>Follow us on social media.</p>'}
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>${properties.copyright @ context='html' || '&copy; 2025 Flower Power. All rights reserved.'}</p>
+    </div>
+  </div>
+</footer>

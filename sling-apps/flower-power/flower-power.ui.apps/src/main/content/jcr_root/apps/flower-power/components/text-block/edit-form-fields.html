@@ -1,0 +1,16 @@
+<div class="edit-fields-list">
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="headline">Headline</label>
+      <span class="edit-field-description">Optional heading for the text block</span>
+    </div>
+    <input type="text"
+           id="headline"
+           name="headline"
+           class="edit-field-input"
+           value="${properties.headline}"
+           placeholder="Enter a headline" />
+  </div>
+</div>
+
+<input type="hidden" id="html-content-field" name="text" value="${properties.text @ context='attribute'}" />

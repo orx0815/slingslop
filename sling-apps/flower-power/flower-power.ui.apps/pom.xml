@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>slingslop.parent</artifactId>
+    <groupId>org.motorbrot</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>flower-power.ui.apps</artifactId>
+  <packaging>content-package</packaging>
+
+  <name>Flower Power UI Apps</name>
+  <description>
+    UI Apps package for Flower Power - contains HTL templates, CSS/JS, and components
+  </description>
+
+  <build>
+
+    <!-- make 'mvn sling:fsmount' work -->
+    <resources>
+      <resource>
+        <directory>src/main/content/jcr_root</directory>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.jackrabbit</groupId>
+        <artifactId>filevault-package-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <filterSource>${basedir}/src/main/content/META-INF/vault/filter.xml</filterSource>
+          <packageType>application</packageType>
+
+          <validatorsSettings>
+            <jackrabbit-filter>
+              <options>
+                <validRoots>/apps</validRoots>
+              </options>
+            </jackrabbit-filter>
+          </validatorsSettings>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>io.wcm.maven.plugins</groupId>
+        <artifactId>wcmio-content-package-maven-plugin</artifactId>
+        <configuration>
+          <unpackDirectory>src/main/content</unpackDirectory>
+        </configuration>
+      </plugin>
+
+      <!-- Frontend Maven Plugin for TypeScript compilation and checks -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>frontend</workingDirectory>
+          <installDirectory>frontend</installDirectory>
+        </configuration>
+        <executions>
+          <!-- Install Node and NPM -->
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <nodeVersion>v24.14.0</nodeVersion>
+              <npmVersion>11.10.1</npmVersion>
+            </configuration>
+          </execution>
+
+          <!-- Install dependencies -->
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+
+          <!-- Copy libraries (htmx) from node_modules -->
+          <execution>
+            <id>npm run copy:libs</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run copy:libs</arguments>
+            </configuration>
+          </execution>
+
+          <!-- Run Prettier format check -->
+          <execution>
+            <id>npm run format</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>run format</arguments>
+            </configuration>
+          </execution>
+
+          <!-- Run ESLint -->
+          <execution>
+            <id>npm run lint</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+          </execution>
+
+          <!-- Compile TypeScript -->
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+</project>

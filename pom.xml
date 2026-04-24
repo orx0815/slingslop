@@ -18,8 +18,8 @@
   </parent>
 
   <properties>
-    
-    <java.version>25</java.version>
+
+    <java.version>17</java.version>
     <sling.starter.version>14</sling.starter.version>
     
     <sling.host>localhost</sling.host>
@@ -200,8 +200,11 @@
     <module>launcher/launcher-dependencies</module>
     <module>sling-apps/zengarden/zengarden.core</module>
     <module>sling-apps/zengarden/zengarden.ui.apps</module>
-    
+    <module>sling-apps/flower-power/flower-power.core</module>
+    <module>sling-apps/flower-power/flower-power.ui.apps</module>
+
     <module>content-packages/zengarden.sample-content</module>
+    <module>content-packages/flower-power.sample-content</module>
     <module>content-packages/complete</module>
 
     <module>launcher</module>

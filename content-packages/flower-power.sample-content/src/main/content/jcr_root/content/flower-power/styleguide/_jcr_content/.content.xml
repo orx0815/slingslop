@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Flower Power Style Guide"
+    jcr:description="Living design system documentation"
+    sling:resourceType="flower-power/pages/styleguide">
+
+    <footer
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="flower-power/components/footer"
+        col1Title="About Flower Power"
+        col1Content="&lt;p&gt;A demonstration of vibrant design patterns, built with Apache Sling and modern frontend technologies.&lt;/p&gt;"
+        col2Title="Quick Links"
+        col2Content="&lt;ul&gt;&lt;li&gt;&lt;a href='/content/flower-power/home.html'&gt;Home&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href='/content/flower-power/about.html'&gt;About&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href='/content/flower-power/styleguide.html'&gt;Style Guide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;"
+        col3Title="Connect"
+        col3Content="&lt;p&gt;Built with &lt;span style='color: var(--color-primary);'&gt;🌸&lt;/span&gt; by the Flower Power team.&lt;/p&gt;"
+        copyright="&lt;p&gt;&amp;copy; 2025 Flower Power. A Slingslop demonstration project. All rights reserved.&lt;/p&gt;"/>
+
+</jcr:root>
