@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="About Flower Power"
+    jcr:description="Learn about our vibrant design philosophy"
+    sling:resourceType="flower-power/pages/contentpage">
+
+    <main
+        jcr:primaryType="nt:unstructured">
+
+        <intro
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="flower-power/components/text-block"
+            headline="About This Project"
+            text="&lt;p&gt;Flower Power is more than just a pretty face — it's a fully-functional demonstration of modern web development patterns, built on Apache Sling with a playful, flower-themed design system.&lt;/p&gt;"/>
+
+        <technology
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="flower-power/components/text-block"
+            headline="Technology Stack"
+            text="&lt;h3&gt;Backend&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Apache Sling:&lt;/strong&gt; Content-driven application framework&lt;/li&gt;&lt;li&gt;&lt;strong&gt;OSGi:&lt;/strong&gt; Modular Java runtime&lt;/li&gt;&lt;li&gt;&lt;strong&gt;JCR:&lt;/strong&gt; Java Content Repository for hierarchical data&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Frontend&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;HTL (Sightly):&lt;/strong&gt; HTML Template Language&lt;/li&gt;&lt;li&gt;&lt;strong&gt;TypeScript:&lt;/strong&gt; Type-safe JavaScript&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Modern CSS:&lt;/strong&gt; OKLCH colors, native nesting, CSS Grid&lt;/li&gt;&lt;li&gt;&lt;strong&gt;HTMX:&lt;/strong&gt; Hypermedia-driven interactions&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Tiptap:&lt;/strong&gt; Rich-text inline editing&lt;/li&gt;&lt;/ul&gt;"/>
+
+        <philosophy
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="flower-power/components/text-block"
+            headline="Design Philosophy"
+            text="&lt;p&gt;Like a well-tended garden, good design requires patience, attention to detail, and a willingness to let things grow organically. Our OKLCH color system ensures visual harmony across all hues, while CSS animations bring movement and life to every interaction.&lt;/p&gt;&lt;blockquote&gt;&lt;p&gt;&lt;em&gt;'The Earth laughs in flowers.' — Ralph Waldo Emerson&lt;/em&gt;&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;We took that sentiment seriously. Every color, every animation, every interaction is designed to spark a moment of delight.&lt;/p&gt;"/>
+
+    </main>
+
+    <footer
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="flower-power/components/footer"
+        col1Title="About Flower Power"
+        col1Content="&lt;p&gt;A demonstration of vibrant design patterns, built with Apache Sling and modern frontend technologies.&lt;/p&gt;"
+        col2Title="Quick Links"
+        col2Content="&lt;ul&gt;&lt;li&gt;&lt;a href='/content/flower-power/home.html'&gt;Home&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href='/content/flower-power/about.html'&gt;About&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href='/content/flower-power/styleguide.html'&gt;Style Guide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;"
+        col3Title="Connect"
+        col3Content="&lt;p&gt;Built with &lt;span style='color: var(--color-primary);'&gt;🌸&lt;/span&gt; by the Flower Power team.&lt;/p&gt;"
+        copyright="&lt;p&gt;&amp;copy; 2025 Flower Power. A Slingslop demonstration project. All rights reserved.&lt;/p&gt;"/>
+
+</jcr:root>

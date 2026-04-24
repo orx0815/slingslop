@@ -1,0 +1,26 @@
+<div class="hero"
+     data-sly-use.auth="org.motorbrot.flowerpower.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}"
+     data-sly-attribute.hx-target="${auth.loggedIn ? 'this' : false}">
+
+  <div class="hero-content">
+    <h1 class="hero-title">${properties.title || 'Welcome to Flower Power'}</h1>
+    <p class="hero-subtitle">${properties.subtitle || 'Where vibrant design blooms'}</p>
+    <sly data-sly-test="${properties.showCta}">
+      <div class="hero-actions">
+        <a href="${properties.ctaLink || '#'}" class="hero-button hero-button-primary">
+          ${properties.ctaText || 'Get Started'}
+        </a>
+        <sly data-sly-test="${properties.secondaryCta}">
+          <a href="${properties.secondaryCtaLink || '#'}" class="hero-button hero-button-secondary">
+            ${properties.secondaryCtaText || 'Learn More'}
+          </a>
+        </sly>
+      </div>
+    </sly>
+  </div>
+</div>

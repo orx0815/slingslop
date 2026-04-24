@@ -1,0 +1,17 @@
+<div class="text-block"
+     role="article"
+     data-sly-use.auth="org.motorbrot.flowerpower.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+
+  <sly data-sly-test="${properties.headline}">
+    <h2>${properties.headline}</h2>
+  </sly>
+
+  <sly data-sly-test="${properties.text}">
+    ${properties.text @ context='html'}
+  </sly>
+</div>

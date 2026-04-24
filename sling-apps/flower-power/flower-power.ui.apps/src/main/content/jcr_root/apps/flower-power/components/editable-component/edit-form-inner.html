@@ -1,0 +1,72 @@
+
+  <form id="editor-form"
+        hx-trigger="submit"
+        hx-target="closest [data-zen-editable-editing]"
+        hx-swap="outerHTML"
+        hx-post="${resource.path}">
+
+    <input type="hidden" name=":redirect" value="${resource.path}.html" />
+
+        <sly data-sly-include="${'tiptap-topbar.html'}" />
+
+        
+        <!-- ── Tiptap editor mount point (renders in normal page flow) ── -->
+        <div id="tiptap-editor" class="tiptap-editor-container"></div>
+
+        <!-- ── Raw HTML source textarea (shown when source mode is active) ── -->
+        <textarea id="html-source" class="html-source-textarea" style="display:none;"
+                  aria-label="HTML source code"></textarea>
+
+        <!-- ── Character / word count ─────────────────────────────────── -->
+        <div id="char-count" class="tiptap-char-count"></div>
+
+    <div id="editor-component-modal" class="editor-component-modal" aria-hidden="true">
+      <div class="editor-component-modal-content" role="dialog" aria-modal="true" aria-labelledby="editor-component-modal-title">
+        <div class="editor-component-modal-header">
+          <h2 id="editor-component-modal-title">Edit Component</h2>
+          <button type="button" class="editor-component-modal-close" aria-label="Close" onclick="closeEditorComponentModal()">×</button>
+        </div>
+        <div class="editor-component-modal-body">
+          <sly data-sly-include="${'edit-form-fields.html'}" />
+        </div>
+        <div class="editor-component-modal-actions">
+          <button type="button" class="btn btn-secondary"
+                  hx-get="${resource.path}.html"
+                  hx-target="[data-zen-editable-editing]"
+                  hx-swap="outerHTML">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Save error notification (centered overlay) ───────────────────── -->
+    <div id="editor-save-error" class="editor-save-error" role="alertdialog" aria-modal="true" aria-live="assertive" aria-hidden="true" aria-labelledby="editor-save-error-title">
+      <div class="editor-save-error__dialog">
+        <div class="editor-save-error__header">
+          <div class="hal-9000" aria-hidden="true">
+            <div class="hal-9000__eye"></div>
+          </div>
+          <div id="editor-save-error-title" class="editor-save-error__title">Save Failed</div>
+        </div>
+        <div class="editor-save-error__body">
+          <p class="editor-save-error__message"></p>
+        </div>
+        <div class="editor-save-error__footer">
+          <button type="button" class="editor-save-error__close" aria-label="Dismiss error" onclick="dismissSaveError()">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Bottom bar: open component modal + Save / Cancel (fixed to viewport bottom) ── -->
+    <div class="inline-editor-footer">
+      <button type="button" id="edit-component-btn" class="btn btn-secondary">Edit Component</button>
+      <div class="inline-editor-actions">
+        <button type="button" class="btn btn-secondary"
+                hx-get="${resource.path}.html"
+                hx-target="closest [data-zen-editable-editing]"
+                hx-swap="outerHTML">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
+      </div>
+    </div>
+
+  </form>

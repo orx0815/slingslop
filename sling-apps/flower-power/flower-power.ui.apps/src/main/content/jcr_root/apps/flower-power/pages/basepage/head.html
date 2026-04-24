@@ -1,0 +1,36 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${properties.jcr:title @ context='text'} | Flower Power</title>
+<meta name="description" content="${properties.jcr:description @ context='text'}">
+
+<!--/* ?minLibs=no for unminified sources during development */-->
+<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+
+  <!-- Public bundle (unminified) -->
+  <script src="/apps/flower-power/js/public/public-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/flower-power/css/public/public.css" />
+
+  <!-- Editor bundle (unminified) — only for logged-in users -->
+  <sly data-sly-use.auth="org.motorbrot.flowerpower.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <!-- htmx for hypermedia interactions -->
+    <script src="/apps/flower-power/js/htmx.js"></script>
+    <script src="/apps/flower-power/js/editor/editor-bundle.js"></script>
+    <link rel="stylesheet" href="/apps/flower-power/css/editor/editor.css" />
+  </sly>
+
+</sly>
+<sly data-sly-test="${!noMinLibs}">
+
+  <!-- Public bundle (minified) -->
+  <script src="/apps/flower-power/js/public/public-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/flower-power/css/public/public.min.css" />
+
+  <!-- Editor bundle (minified, htmx inlined) — only for logged-in users -->
+  <sly data-sly-use.auth="org.motorbrot.flowerpower.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/flower-power/js/editor/editor-bundle.min.js"></script>
+    <link rel="stylesheet" href="/apps/flower-power/css/editor/editor.min.css" />
+  </sly>
+
+</sly>

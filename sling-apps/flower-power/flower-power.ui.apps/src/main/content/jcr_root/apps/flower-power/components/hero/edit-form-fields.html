@@ -1,0 +1,64 @@
+<div class="edit-fields-list">
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="title">Hero Title</label>
+      <span class="edit-field-description">Main headline displayed prominently</span>
+    </div>
+    <input type="text"
+           id="title"
+           name="title"
+           class="edit-field-input"
+           value="${properties.title}"
+           placeholder="Welcome to Flower Power" />
+  </div>
+
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="subtitle">Hero Subtitle</label>
+      <span class="edit-field-description">Supporting text beneath the title</span>
+    </div>
+    <input type="text"
+           id="subtitle"
+           name="subtitle"
+           class="edit-field-input"
+           value="${properties.subtitle}"
+           placeholder="Where vibrant design blooms" />
+  </div>
+
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="showCta">Show Call-to-Action</label>
+      <span class="edit-field-description">Display CTA buttons</span>
+    </div>
+    <input type="checkbox"
+           id="showCta"
+           name="showCta"
+           ${properties.showCta ? 'checked' : ''} />
+  </div>
+
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="ctaText">Primary CTA Text</label>
+      <span class="edit-field-description">Button label</span>
+    </div>
+    <input type="text"
+           id="ctaText"
+           name="ctaText"
+           class="edit-field-input"
+           value="${properties.ctaText}"
+           placeholder="Get Started" />
+  </div>
+
+  <div class="edit-field-row">
+    <div class="edit-field-meta">
+      <label class="edit-field-label" for="ctaLink">Primary CTA Link</label>
+      <span class="edit-field-description">Button destination URL</span>
+    </div>
+    <input type="text"
+           id="ctaLink"
+           name="ctaLink"
+           class="edit-field-input"
+           value="${properties.ctaLink}"
+           placeholder="/content/flower-power/about.html" />
+  </div>
+</div>

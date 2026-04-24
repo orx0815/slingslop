@@ -1,0 +1,6 @@
+<!--/* Thin-wrapper delegation script.
+       Sling renders the page node (sling:Folder) via this script, which immediately
+       delegates rendering to the jcr:content child node. That child carries the real
+       sling:resourceType (homepage / contentpage / styleguide …) so all subsequent scripts
+       run in the context of jcr:content. */-->
+<sly data-sly-resource="${'jcr:content'}"/>

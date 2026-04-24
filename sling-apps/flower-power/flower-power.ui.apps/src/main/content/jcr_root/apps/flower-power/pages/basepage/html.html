@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <sly data-sly-include="${'head.html'}"/>
+</head>
+<body class="page-wrapper">
+  <!-- Modal container for the editor -->
+  <!--/* IMPORTANT: leave this div completely empty in HTL. */-->
+  <!--/* The editor JS fills it via HTMX by loading edit-form.html into it. */-->
+  <div id="editor-modal-container"></div>
+
+  <sly data-sly-include="${'nav.html'}" />
+
+  <main role="main">
+    <sly data-sly-include="${'content.html'}" />
+  </main>
+
+  <sly data-sly-include="${'footer.html'}" />
+</body>
+</html>
