@@ -1,0 +1,148 @@
+name: "Agent Smith — New Sling App"
+description: "Scaffold a new Sling application inside the slingslop mono-repo via the Agent Smith cloud workflow."
+title: "Agent Smith: new Sling app — [PROJECT NAME]"
+labels: ["agent-smith"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Agent Smith — New Sling App
+        Fill in all fields below. The cloud agent will read this issue, skip the interactive conversation phase, and scaffold the complete application automatically. Leave a field blank to let Agent Smith choose ("surprise me").
+
+  - type: markdown
+    attributes:
+      value: "### Project Identity"
+
+  - type: input
+    id: project-name
+    attributes:
+      label: Project name
+      description: "Human-readable name, e.g. `Hello Sling`"
+      placeholder: "Hello Sling"
+    validations:
+      required: true
+
+  - type: input
+    id: group-id
+    attributes:
+      label: Maven groupId
+      description: "e.g. `com.mycompany` — leave blank to let Smith derive one"
+      placeholder: "org.motorbrot"
+
+  - type: input
+    id: artifact-id
+    attributes:
+      label: Maven artifactId prefix
+      description: "Lower-case-hyphenated, e.g. `hello-sling` — leave blank to derive from project name"
+      placeholder: "hello-sling"
+
+  - type: input
+    id: java-package
+    attributes:
+      label: Java package
+      description: "e.g. `com.mycompany.hellosling` — where Sling Models and OSGi services will live"
+      placeholder: "org.motorbrot.hellosling"
+
+  - type: input
+    id: rt-prefix
+    attributes:
+      label: "`sling:resourceType` prefix"
+      description: "e.g. `hello-sling` — must NOT be `slingslop`"
+      placeholder: "hello-sling"
+
+  - type: input
+    id: content-root
+    attributes:
+      label: Sample content JCR path
+      description: "e.g. `/content/hello-sling/sample-content`"
+      placeholder: "/content/hello-sling/sample-content"
+
+  - type: input
+    id: apps-root
+    attributes:
+      label: Apps path
+      description: "e.g. `/apps/hello-sling`"
+      placeholder: "/apps/hello-sling"
+
+  - type: markdown
+    attributes:
+      value: "### Design Intent"
+
+  - type: dropdown
+    id: project-kind
+    attributes:
+      label: What kind of project is this?
+      options:
+        - "Website"
+        - "Blog"
+        - "Portfolio"
+        - "Documentation site"
+        - "Dashboard"
+        - "Surprise me — Smith decides"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-it-does
+    attributes:
+      label: What does it do?
+      description: "Functional purpose, target audience, key content areas. Leave blank for 'surprise me'."
+      placeholder: "A portfolio site for a fictional cyberpunk character..."
+
+  - type: input
+    id: tone
+    attributes:
+      label: Tone & feel
+      description: "Personality of the writing and dummy text, e.g. `serious B2B`, `playful`, `dry academic`. Leave blank for 'surprise me'."
+      placeholder: "dry wit, tongue-in-cheek sci-fi"
+
+  - type: input
+    id: colours
+    attributes:
+      label: Favourite colours (max 2)
+      description: "Colour names or CSS OKLCH values, e.g. `Matrix green + amber`. Leave blank for 'surprise me'."
+      placeholder: "Matrix green + digital amber"
+
+  - type: dropdown
+    id: navigation
+    attributes:
+      label: Navigation style
+      options:
+        - "Top bar"
+        - "Left sidebar"
+        - "Hamburger menu"
+        - "Surprise me — Smith decides"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: zen-editable
+    attributes:
+      label: Zen-editable? (HTMX + Tiptap inline editing stack)
+      options:
+        - "Yes"
+        - "No"
+        - "Surprise me — Smith decides"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: visual-mood
+    attributes:
+      label: Visual mood
+      options:
+        - "Minimal"
+        - "Bold"
+        - "Editorial"
+        - "Technical"
+        - "Playful"
+        - "Surprise me — Smith decides"
+    validations:
+      required: true
+
+  - type: input
+    id: inspiration
+    attributes:
+      label: Inspiration URLs (optional)
+      description: "Design references — paste links or leave blank."
+      placeholder: "https://example.com"
