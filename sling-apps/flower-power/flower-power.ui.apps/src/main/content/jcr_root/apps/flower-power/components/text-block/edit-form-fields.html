@@ -13,4 +13,5 @@
   </div>
 </div>
 
-<input type="hidden" id="html-content-field" name="text" value="${properties.text @ context='attribute'}" />
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />
