@@ -43,6 +43,11 @@
               </options>
             </jackrabbit-filter>
           </validatorsSettings>
+          <properties>
+            <!-- We set access-control jcr:read for anonymous users via _rep_policy.xml
+                 Removing either this acHandling property or the xml alone will rightly concern the validator. -->
+            <acHandling>merge_preserve</acHandling>
+          </properties>
         </configuration>
       </plugin>
 
