@@ -331,6 +331,7 @@ Key configuration:
 - `filevault-package-maven-plugin` with `packageType: application`
 - `filterSource` pointing to `filter.xml`
 - `validRoots` set to **`/apps`** — this must be the *ancestor* of the filter root (`/apps/{RT_PREFIX}`), not the root itself. The Jackrabbit FileVault validator checks that the ancestor is declared as a known root; setting it to `/apps/{RT_PREFIX}` still triggers "Filter root's ancestor `/apps` is not covered".
+- **`<acHandling>merge_preserve</acHandling>`** in `<properties>` — required because the ui.apps package ships `_rep_policy.xml` files (see below). Must be present whenever ACL nodes exist, and absent when they don't.
 - `wcmio-content-package-maven-plugin` for download/upload
 - `frontend-maven-plugin` for node/npm (same versions as zengarden: `nodeVersion=v24.14.0`, `npmVersion=11.10.1`)
   - install node and npm
@@ -809,6 +810,26 @@ If zen-editable, also copy the two editing supertypes into the new project names
 
 When implementing a navigation, use a sling-model to build it dynamically from child-pages or sibling-pages. Create them in sample-content.
 
+### 5.6.1 Inline Editing Field Contract (zen-editable)
+
+The Tiptap editor JS expects **exact element IDs** in every richtext component's `edit-form-fields.html`. Getting these wrong silently breaks inline editing.
+
+**Required elements for a richtext (editable-component) field:**
+
+```html
+<!--/* Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init */-->
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<!--/* Hidden input populated with editor HTML before htmx submit */-->
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />
+```
+
+**Common mistakes to avoid:**
+- Using `<input type="hidden" id="html-content-field" name="text" value="...">` instead of the textarea+hidden pair — the editor JS looks for `#content-editor` (textarea) and `#content-hidden` (hidden input), not `#html-content-field`.
+- Using `context='attribute'` on the text value — rich HTML content must use `context='html'` inside the textarea, not `context='attribute'` in an input value.
+- Omitting `form="editor-form"` on the hidden input — without it the value is not submitted with the HTMX POST.
+
+See `sling-apps/zengarden/…/components/main/explanation/edit-form-fields.html` for the reference pattern.
+
 ### 5.7 Component HTL Pattern (View)
 
 For zen-editable components:
@@ -855,6 +876,49 @@ Example in basepage:
 <sly data-sly-resource="${'./hero' @ resourceType='{RT_PREFIX}/components/hero'}" /> ← resource with forced type
 ```
 Use data-sly-include, data-sly-resource and sling:resourceSuperType to avoid markup duplications.
+
+### 5.9.1 Paragraph System (parsys) Component
+
+When a page's `content.html` includes a container node (e.g. `./main`) that holds multiple child components, the container needs a **parsys component** to iterate and render those children. Without it, Sling has no script to render the intermediate node and the children are silently swallowed.
+
+**Required files:**
+
+`components/parsys/.content.xml`:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    jcr:title="Paragraph System"
+    componentGroup=".hidden"/>
+```
+
+**Important:** The parsys must **NOT** have a `sling:resourceSuperType` pointing to `editable-component`. A parsys is a structural container, not an editable component.
+
+`components/parsys/parsys.html`:
+```html
+<!--/* Paragraph system — renders each child resource using its own sling:resourceType */-->
+<sly data-sly-list="${resource.listChildren}">
+    <sly data-sly-resource="${item}"/>
+</sly>
+```
+
+**Usage in page templates:**
+
+When including a container node that has child components, always force the parsys resourceType:
+```html
+<!--/* CORRECT — forces parsys rendering on the container node */-->
+<sly data-sly-resource="${'./main' @ resourceType='{RT_PREFIX}/components/parsys'}" />
+
+<!--/* WRONG — Sling has no script to render the bare container */-->
+<sly data-sly-resource="${'./main'}" />
+```
+
+Alternatively, in a page type that knows its exact children (e.g. homepage), you may include each child explicitly:
+```html
+<sly data-sly-resource="${'./main/intro'}" />
+<sly data-sly-resource="${'./main/features'}" />
+```
+
 ### 5.10 Living Style Guide Page
 
 The style guide page (`pages/styleguide/`) should render every component used in the project, each with sample content. This serves as a visual reference and component library.
@@ -1032,6 +1096,56 @@ Common issues to check:
 - The new content path is added to the launcher's `starter.check.paths`
 - **Prettier check on generated TS:** `npm run format` uses `--check` and will fail the build if the generated TypeScript files aren't already formatted. Before the first Maven build, run `npm run format:fix` (or `node/node node_modules/.bin/prettier --write "./src/typescript/**/*.ts"` from the `frontend/` directory) to auto-format the agent-generated files.
 - **Shell script permissions:** `content-upload.sh` and `content-download.sh` must be executable. Run `chmod +x content-upload.sh content-download.sh` after creating them.
+
+### 9.1 Post-Scaffold Troubleshooting Checklist
+
+These are issues found in real scaffolding runs that were **not** caught by `mvn install` but broke the app at runtime. Check each one before opening a PR.
+
+#### 9.1.1 Pages render blank / child components missing
+
+**Symptom:** Pages load without errors but component content is invisible.
+
+**Cause:** The page `content.html` includes a container node (e.g. `<sly data-sly-resource="${'./main'}" />`) but there is no parsys component to iterate the container's children.
+
+**Fix:**
+1. Create a `components/parsys/` component with a `parsys.html` that calls `resource.listChildren` (see §5.9.1).
+2. Force the resourceType on the include: `<sly data-sly-resource="${'./main' @ resourceType='{RT_PREFIX}/components/parsys'}" />`
+3. Alternatively, for pages that know their children, include each child explicitly.
+4. The parsys `.content.xml` must **not** declare `sling:resourceSuperType` to an editable component — a parsys is a structural wrapper, not an editable component.
+
+#### 9.1.2 Inline editing does not save / Tiptap not initialising
+
+**Symptom:** Clicking an editable component opens the edit form, but the rich text editor is empty or changes are not persisted.
+
+**Cause:** The `edit-form-fields.html` uses wrong element IDs or wrong HTL context for the richtext field.
+
+**Fix:** Every richtext component's `edit-form-fields.html` must contain exactly:
+```html
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />
+```
+Do **not** use a single `<input type="hidden">` with `context='attribute'` — the editor JS reads from `#content-editor` (textarea) and writes to `#content-hidden` (hidden input). See §5.6.1.
+
+#### 9.1.3 CSS/JS not loading for anonymous users (404 on /apps/…/css/ and /apps/…/js/)
+
+**Symptom:** Logged-in users see the styled page; anonymous users get unstyled HTML or broken pages.
+
+**Cause:** By default, `/apps/` is not readable by anonymous users in Apache Sling / Oak. The CSS and JS folders need explicit `jcr:read` ACLs.
+
+**Fix:**
+1. Add `_rep_policy.xml` to **both** `jcr_root/apps/{RT_PREFIX}/css/` and `jcr_root/apps/{RT_PREFIX}/js/`:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:rep="internal"
+    jcr:primaryType="rep:ACL">
+    <allow
+        jcr:primaryType="rep:GrantACE"
+        rep:principalName="everyone"
+        rep:privileges="{Name}[jcr:read]"/>
+</jcr:root>
+```
+2. Add `<acHandling>merge_preserve</acHandling>` in the `<properties>` section of the `filevault-package-maven-plugin` configuration in the **ui.apps** `pom.xml`.
+3. Copy these from `sling-apps/zengarden/zengarden.ui.apps/src/main/content/jcr_root/apps/slingslop/zengarden/css/_rep_policy.xml` as reference.
 
 ---
 
@@ -1241,7 +1355,8 @@ Use this checklist to verify completeness:
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/src/main/content/META-INF/vault/filter.xml`
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/src/main/content/jcr_root/apps/{RT_PREFIX}/.content.xml`
 - [ ] Page scripts: `pages/page/`, `pages/basepage/`, `pages/homepage/`, `pages/contentpage/`, `pages/styleguide/`
-- [ ] Components: `hero`, `text-block`, `navigation`, `footer` (+ editable supertypes if zen-editable)
+- [ ] Components: `hero`, `text-block`, `navigation`, `footer`, `parsys` (+ editable supertypes if zen-editable)
+- [ ] ACL files: `jcr_root/apps/{RT_PREFIX}/css/_rep_policy.xml` and `jcr_root/apps/{RT_PREFIX}/js/_rep_policy.xml`
 - [ ] Frontend: `package.json`, `tsconfig.json`, `eslint.config.js`, `.prettierrc`, `.prettierignore`
 - [ ] Frontend: `scripts/bundle.js`
 - [ ] Frontend: `src/typescript/editor.ts`, `public.ts` (+ editor/ submodules if zen-editable)
