@@ -145,6 +145,10 @@ import hljs from 'highlight.js';
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
     const drops: number[] = Array(columns).fill(1);
+    // Random speed for each column (between 0.3 and 1.0)
+    const speeds: number[] = Array(columns)
+      .fill(0)
+      .map(() => 0.3 + Math.random() * 0.7);
     const chars =
       '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
 
@@ -168,12 +172,13 @@ import hljs from 'highlight.js';
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
-        drops[i]++;
+        // Each column falls at its own speed
+        drops[i] += speeds[i];
       }
     }
 
-    // Animate at 30fps
-    setInterval(draw, 33);
+    // Animate at 20fps (slower than before which was 30fps)
+    setInterval(draw, 50);
   }
 
   // ── Initialization ─────────────────────────────────────────────────────────
