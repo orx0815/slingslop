@@ -5,6 +5,11 @@
      data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
      data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
-  <h1 class="hero-title">${properties.title}</h1>
-  <p class="hero-subtitle">${properties.subtitle}</p>
+  <!-- Matrix digital rain background -->
+  <div class="matrix-rain-container"></div>
+
+  <div class="hero-content">
+    <h1 class="hero-title">${properties.title}</h1>
+    <p class="hero-subtitle">${properties.subtitle}</p>
+  </div>
 </div>
