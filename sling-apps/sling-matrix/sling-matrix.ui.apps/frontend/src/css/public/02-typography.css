@@ -86,7 +86,7 @@ pre {
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-loose);
-  background-color: oklch(from var(--color-surface) l c h / 0.7);
+  background-color: oklch(0.18 0.015 var(--hue-primary) / 0.75);
   padding: var(--space-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
