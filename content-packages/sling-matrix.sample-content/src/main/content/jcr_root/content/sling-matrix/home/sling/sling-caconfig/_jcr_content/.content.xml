@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Context-Aware Configuration"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Adaptive Configuration Framework"
+            text="&lt;p&gt;Context-Aware Configuration (CAConfig) allows different parts of your content tree to have different configurations. Like how different regions of the Matrix can have different rules of physics, CAConfig lets different content paths have different settings.&lt;/p&gt;&lt;p&gt;Configurations are inherited down the content tree and can be overridden at any level, providing flexible, context-specific settings.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="Context-Aware Configuration"
+            code="package org.example.matrix.config;&#xa;&#xa;import org.apache.sling.caconfig.annotation.Configuration;&#xa;import org.apache.sling.caconfig.annotation.Property;&#xa;&#xa;@Configuration(label = &quot;Matrix Settings&quot;, description = &quot;Configure the Matrix parameters&quot;)&#xa;public @interface MatrixConfiguration {&#xa;    &#xa;    @Property(label = &quot;Digital Rain Speed&quot;, description = &quot;Speed of falling code&quot;)&#xa;    int digitalRainSpeed() default 100;&#xa;    &#xa;    @Property(label = &quot;Enable Red Pill&quot;, description = &quot;Allow users to see the truth&quot;)&#xa;    boolean enableRedPill() default false;&#xa;    &#xa;    @Property(label = &quot;Reality Level&quot;, description = &quot;Depth of simulation&quot;)&#xa;    String realityLevel() default &quot;surface&quot;;&#xa;    &#xa;    @Property(label = &quot;Authorized Agents&quot;)&#xa;    String[] authorizedAgents() default {&quot;Neo&quot;, &quot;Trinity&quot;, &quot;Morpheus&quot;};&#xa;}&#xa;&#xa;// Using the configuration&#xa;import org.apache.sling.api.resource.Resource;&#xa;import org.apache.sling.caconfig.ConfigurationBuilder;&#xa;&#xa;public class MatrixService {&#xa;    &#xa;    public void configureMatrix(Resource resource) {&#xa;        MatrixConfiguration config = resource.adaptTo(ConfigurationBuilder.class)&#xa;            .as(MatrixConfiguration.class);&#xa;        &#xa;        int speed = config.digitalRainSpeed();&#xa;        boolean canSeeTruth = config.enableRedPill();&#xa;    }&#xa;}"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="CAConfig Benefits"
+            text="&lt;ul&gt;&lt;li&gt;Context-specific configurations per content tree&lt;/li&gt;&lt;li&gt;Configuration inheritance with override capability&lt;/li&gt;&lt;li&gt;Type-safe configuration using Java annotations&lt;/li&gt;&lt;li&gt;Support for simple properties and nested configurations&lt;/li&gt;&lt;li&gt;Built-in editor UI for authors&lt;/li&gt;&lt;li&gt;Multi-tenancy support for different sites&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

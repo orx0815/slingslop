@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="HTL (Sightly) Templating"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="The Visual Layer of the Matrix"
+            text="&lt;p&gt;HTL (HTML Template Language), formerly known as Sightly, is Sling's secure templating language for rendering content. It separates presentation from logic, ensuring that templates remain clean and maintainable.&lt;/p&gt;&lt;p&gt;HTL is the interface that translates raw data into the visual reality users perceive - like the Matrix code becoming the green-tinted world Neo sees.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="html"
+            title="HTL Template Example"
+            code="&lt;!-- component.html --&gt;&#xa;&lt;div class=&quot;matrix-agent&quot; data-sly-use.agent=&quot;org.example.matrix.models.MatrixAgent&quot;&gt;&#xa;    &#xa;    &lt;h2&gt;${agent.name @ context='text'}&lt;/h2&gt;&#xa;    &#xa;    &lt;p class=&quot;role&quot;&gt;Role: ${agent.role}&lt;/p&gt;&#xa;    &#xa;    &lt;div data-sly-test=&quot;${agent.canSeeTheMatrix}&quot; class=&quot;the-one&quot;&gt;&#xa;        &lt;span class=&quot;badge&quot;&gt;The One&lt;/span&gt;&#xa;    &lt;/div&gt;&#xa;    &#xa;    &lt;h3&gt;Abilities&lt;/h3&gt;&#xa;    &lt;ul class=&quot;abilities&quot;&gt;&#xa;        &lt;li data-sly-list.ability=&quot;${agent.abilities}&quot;&gt;&#xa;            ${ability.name} - Level: ${ability.level}&#xa;        &lt;/li&gt;&#xa;    &lt;/ul&gt;&#xa;    &#xa;    &lt;!-- Include another component --&gt;&#xa;    &lt;div data-sly-resource=&quot;${'matrix-status' @ resourceType='sling-matrix/components/status'}&quot;&gt;&lt;/div&gt;&#xa;    &#xa;&lt;/div&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="HTL Key Features"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;XSS Protection&lt;/strong&gt; - Automatic output escaping by context&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Logic-less&lt;/strong&gt; - Business logic stays in Java classes&lt;/li&gt;&lt;li&gt;&lt;strong&gt;data-sly-use&lt;/strong&gt; - Loads Sling Models or Use objects&lt;/li&gt;&lt;li&gt;&lt;strong&gt;data-sly-test&lt;/strong&gt; - Conditional rendering&lt;/li&gt;&lt;li&gt;&lt;strong&gt;data-sly-list&lt;/strong&gt; - Iteration over collections&lt;/li&gt;&lt;li&gt;&lt;strong&gt;data-sly-resource&lt;/strong&gt; - Include other resources&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

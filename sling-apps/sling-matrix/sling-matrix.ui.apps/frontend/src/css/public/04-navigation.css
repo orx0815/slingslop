@@ -1,0 +1,209 @@
+/* 04-navigation.css — Circular Matrix navigation */
+
+.matrix-nav {
+  position: fixed;
+  top: 140px; /* Enough space for upward nav items */
+  left: var(--space-lg);
+  z-index: 1000;
+  font-family: var(--font-mono);
+}
+
+.nav-toggle {
+  width: 80px;
+  height: 80px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-glow);
+  position: relative;
+  z-index: 1001;
+}
+
+.nav-toggle:hover {
+  background: var(--color-primary-subtle);
+  box-shadow: var(--shadow-glow), 0 0 30px oklch(0.75 0.25 var(--hue-primary) / 0.6);
+  transform: scale(1.05);
+}
+
+.nav-toggle::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 32px;
+  background-image:
+    linear-gradient(90deg, var(--color-primary) 2px, transparent 2px),
+    linear-gradient(0deg, var(--color-primary) 2px, transparent 2px);
+  background-size: 8px 8px;
+  background-position: 0 0;
+  opacity: 0.8;
+  animation: matrix-grid 2s linear infinite;
+}
+
+@keyframes matrix-grid {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 8px 8px;
+  }
+}
+
+.nav-toggle:hover::before {
+  opacity: 1;
+  animation: matrix-grid 0.5s linear infinite;
+}
+
+/* First-level navigation (circular layout) */
+.nav-level-1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+}
+
+.nav-level-1.nav-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-level-1 .nav-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -30px 0 0 -30px;
+  width: 60px;
+  height: 60px;
+  transition: all var(--transition-slow);
+}
+
+/* Position items in a circle (4 items - right semicircle) */
+.nav-level-1.nav-open .nav-item:nth-child(1) {
+  transform: translate(120px, 0);
+}
+
+.nav-level-1.nav-open .nav-item:nth-child(2) {
+  transform: translate(85px, 85px);
+}
+
+.nav-level-1.nav-open .nav-item:nth-child(3) {
+  transform: translate(85px, -85px);
+}
+
+.nav-level-1.nav-open .nav-item:nth-child(4) {
+  transform: translate(0, -120px);
+}
+
+.nav-item-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-secondary);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.nav-item-link:hover {
+  background: var(--color-secondary-dark);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Second-level navigation (linear list) */
+.nav-level-2 {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
+  z-index: 999;
+}
+
+.nav-level-2.nav-level-2-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-level-2 li {
+  list-style: none;
+  margin: 0;
+}
+
+.nav-level-2 a {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  border-left: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.nav-level-2 a:hover {
+  background: var(--color-primary-subtle);
+  border-left-color: var(--color-primary);
+  color: var(--color-primary-light);
+  padding-left: calc(var(--space-md) + var(--space-sm));
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .matrix-nav {
+    top: var(--space-md);
+    left: var(--space-md);
+  }
+
+  .nav-toggle {
+    width: 50px;
+    height: 50px;
+  }
+
+  .nav-level-1 .nav-item {
+    width: 50px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+  }
+
+  .nav-level-1.nav-open .nav-item:nth-child(1) { transform: translate(0, -100px); }
+  .nav-level-1.nav-open .nav-item:nth-child(2) { transform: translate(87px, -50px); }
+  .nav-level-1.nav-open .nav-item:nth-child(3) { transform: translate(87px, 50px); }
+  .nav-level-1.nav-open .nav-item:nth-child(4) { transform: translate(0, 100px); }
+  .nav-level-1.nav-open .nav-item:nth-child(5) { transform: translate(-87px, 50px); }
+  .nav-level-1.nav-open .nav-item:nth-child(6) { transform: translate(-87px, -50px); }
+
+  .nav-level-2 {
+    left: auto;
+    right: 0;
+    top: 100%;
+    transform: none;
+    margin-left: 0;
+    margin-top: var(--space-sm);
+  }
+}

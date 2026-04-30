@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Introduction to Apache Sling"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="The Web Framework That Powers the Matrix"
+            text="&lt;p&gt;Apache Sling is the RESTful web framework that brings OSGi and JCR together into a powerful content management platform. It's the interface layer that makes the Matrix accessible through the web.&lt;/p&gt;&lt;p&gt;At its core, Sling follows a simple philosophy: &lt;strong&gt;Everything is a Resource&lt;/strong&gt;. Just as every object in the Matrix has a digital representation, every piece of content in Sling is accessible as a resource with a unique path.&lt;/p&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Key Principles"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;REST-based&lt;/strong&gt; - Everything accessible via HTTP URLs&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Content-driven&lt;/strong&gt; - URL maps directly to JCR content&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Script resolution&lt;/strong&gt; - Flexible rendering based on resource type and selectors&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Resource resolution&lt;/strong&gt; - Powerful URL-to-content mapping&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Extensible&lt;/strong&gt; - Plugin architecture for custom functionality&lt;/li&gt;&lt;/ul&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="Basic Sling Servlet"
+            code="package org.example.matrix.servlets;&#xa;&#xa;import org.apache.sling.api.SlingHttpServletRequest;&#xa;import org.apache.sling.api.SlingHttpServletResponse;&#xa;import org.apache.sling.api.servlets.SlingSafeMethodsServlet;&#xa;import org.osgi.service.component.annotations.Component;&#xa;&#xa;import javax.servlet.Servlet;&#xa;import java.io.IOException;&#xa;&#xa;@Component(&#xa;    service = Servlet.class,&#xa;    property = {&#xa;        &quot;sling.servlet.resourceTypes=sling-matrix/components/oracle&quot;,&#xa;        &quot;sling.servlet.methods=GET&quot;&#xa;    }&#xa;)&#xa;public class OracleServlet extends SlingSafeMethodsServlet {&#xa;    &#xa;    @Override&#xa;    protected void doGet(SlingHttpServletRequest request, &#xa;                        SlingHttpServletResponse response) throws IOException {&#xa;        response.setContentType(&quot;text/html&quot;);&#xa;        response.getWriter().write(&quot;&lt;h1&gt;Know thyself.&lt;/h1&gt;&quot;);&#xa;    }&#xa;}"/>
+    </main>
+</jcr:root>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Sling Resource API"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Navigating the Resource Tree"
+            text="&lt;p&gt;The Sling Resource API provides a unified way to access content regardless of where it's stored. Whether data lives in JCR, a file system, or a remote service, the Resource API abstracts it all behind a consistent interface.&lt;/p&gt;&lt;p&gt;It's like being able to see the Matrix code directly - every resource exposed through a common API for traversal and manipulation.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="Using the Resource API"
+            code="package org.example.matrix.services;&#xa;&#xa;import org.apache.sling.api.resource.Resource;&#xa;import org.apache.sling.api.resource.ResourceResolver;&#xa;import org.apache.sling.api.resource.ValueMap;&#xa;&#xa;public class MatrixNavigator {&#xa;    &#xa;    public void navigateTheMatrix(ResourceResolver resolver) {&#xa;        // Get a resource by path&#xa;        Resource neo = resolver.getResource(&quot;/content/sling-matrix/agents/neo&quot;);&#xa;        &#xa;        if (neo != null) {&#xa;            // Access properties via ValueMap&#xa;            ValueMap props = neo.getValueMap();&#xa;            String role = props.get(&quot;role&quot;, String.class);&#xa;            Boolean isTheOne = props.get(&quot;isTheOne&quot;, false);&#xa;            &#xa;            // Navigate to child resources&#xa;            Resource abilities = neo.getChild(&quot;abilities&quot;);&#xa;            &#xa;            // Iterate through children&#xa;            for (Resource skill : abilities.getChildren()) {&#xa;                String skillName = skill.getName();&#xa;                System.out.println(&quot;Skill downloaded: &quot; + skillName);&#xa;            }&#xa;            &#xa;            // Adapt resource to specific type&#xa;            MatrixAgent agent = neo.adaptTo(MatrixAgent.class);&#xa;        }&#xa;    }&#xa;}"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Key Resource Methods"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;getPath()&lt;/strong&gt; - Returns the absolute path to the resource&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getResourceType()&lt;/strong&gt; - Returns the sling:resourceType&lt;/li&gt;&lt;li&gt;&lt;strong&gt;adaptTo(Class)&lt;/strong&gt; - Adapts resource to another type&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getValueMap()&lt;/strong&gt; - Accesses resource properties&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getChildren()&lt;/strong&gt; - Iterates child resources&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getParent()&lt;/strong&gt; - Navigates to parent resource&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

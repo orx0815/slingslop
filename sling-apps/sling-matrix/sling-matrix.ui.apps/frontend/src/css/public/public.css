@@ -1,0 +1,20 @@
+/* public.css — Sling Matrix public stylesheet entry point */
+
+@import './00-variables.css';
+@import './01-reset.css';
+@import './02-typography.css';
+@import './03-layout.css';
+@import './04-navigation.css';
+@import './05-hero.css';
+@import './06-components.css';
+@import './07-footer.css';
+@import './08-styleguide.css';
+@import './09-animations.css';
+
+/* Syntax highlighting theme - Matrix-inspired dark theme */
+@import 'highlight.js/styles/tokyo-night-dark.css';
+
+/* Override highlight.js background to make code blocks transparent */
+.hljs {
+  background: transparent !important;
+}
