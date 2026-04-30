@@ -1,22 +1,26 @@
 <footer class="matrix-footer"
         data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+        data-sly-set.homePath="/content/sling-matrix/home"
+        data-sly-set.isHomepage="${currentPage.path == homePath}"
+        data-sly-set.homeFooter="${resource.resourceResolver.getResource(homePath @ appendPath='/jcr:content/footer')}"
+        data-sly-set.footerData="${isHomepage ? properties : homeFooter.valueMap}"
         data-sly-set.editPath="${resource.path}.edit-form.html"
-        data-zen-editable="true"
-        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
-        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
-        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+        data-zen-editable="${isHomepage ? 'true' : false}"
+        data-sly-attribute.hx-get="${auth.loggedIn && isHomepage ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn && isHomepage ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn && isHomepage ? 'outerHTML' : false}">
   <div class="footer-content">
-    <p class="footer-text">${properties.copyrightText}</p>
+    <p class="footer-text">${footerData.copyrightText}</p>
     <div class="footer-links">
-      <a href="${properties.link1Url @ context='uri'}"
+      <a href="${footerData.link1Url @ context='uri'}"
          class="footer-link"
-         data-sly-test="${properties.link1Url}">${properties.link1Text}</a>
-      <a href="${properties.link2Url @ context='uri'}"
+         data-sly-test="${footerData.link1Url}">${footerData.link1Text}</a>
+      <a href="${footerData.link2Url @ context='uri'}"
          class="footer-link"
-         data-sly-test="${properties.link2Url}">${properties.link2Text}</a>
-      <a href="${properties.link3Url @ context='uri'}"
+         data-sly-test="${footerData.link2Url}">${footerData.link2Text}</a>
+      <a href="${footerData.link3Url @ context='uri'}"
          class="footer-link"
-         data-sly-test="${properties.link3Url}">${properties.link3Text}</a>
+         data-sly-test="${footerData.link3Url}">${footerData.link3Text}</a>
     </div>
   </div>
 </footer>
