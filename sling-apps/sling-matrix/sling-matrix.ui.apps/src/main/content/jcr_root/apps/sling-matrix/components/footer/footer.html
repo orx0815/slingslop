@@ -3,7 +3,7 @@
         data-sly-set.homePath="/content/sling-matrix/home"
         data-sly-set.isHomepage="${currentPage.path == homePath}"
         data-sly-set.homeFooter="${resource.resourceResolver.getResource(homePath @ appendPath='/jcr:content/footer')}"
-        data-sly-set.footerData="${isHomepage ? properties : homeFooter.valueMap}"
+        data-sly-set.footerData="${isHomepage ? properties : (homeFooter ? homeFooter.valueMap : properties)}"
         data-sly-set.editPath="${resource.path}.edit-form.html"
         data-zen-editable="${isHomepage ? 'true' : false}"
         data-sly-attribute.hx-get="${auth.loggedIn && isHomepage ? editPath : false}"
