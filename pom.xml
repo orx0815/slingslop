@@ -18,8 +18,8 @@
   </parent>
 
   <properties>
-    
-    <java.version>25</java.version>
+
+    <java.version>17</java.version>
     <sling.starter.version>14</sling.starter.version>
     
     <sling.host>localhost</sling.host>
