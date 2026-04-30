@@ -8,6 +8,9 @@ declare const htmx: {
 /**
  * Serialises editor content into the hidden form input and triggers an
  * htmx form submission to the Sling POST Servlet.
+ *
+ * For richtext components: serializes Tiptap content to content-hidden input.
+ * For modal-only components: directly submits the form (no serialization needed).
  */
 export function saveEditorContent(): void {
   // Clear any previous save error before attempting again
@@ -25,6 +28,7 @@ export function saveEditorContent(): void {
 
   const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement | null;
 
+  // Richtext component: serialize Tiptap content
   if (hiddenInput) {
     let content: string;
     if (state.isSourceView) {
@@ -35,9 +39,14 @@ export function saveEditorContent(): void {
     }
 
     hiddenInput.value = content;
+    console.log('saveEditorContent: serialized richtext content');
+  } else {
+    // Modal-only component: no serialization needed
+    console.log('saveEditorContent: modal-only component, submitting form directly');
   }
 
   // Trigger htmx submit
+  console.log('saveEditorContent: triggering form submit via htmx');
   htmx.trigger(form, 'submit');
   // No manual close needed — htmx outerHTML swap restores the view component
 }
