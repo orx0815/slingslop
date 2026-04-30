@@ -9,8 +9,8 @@
 }
 
 .nav-toggle {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: var(--color-surface);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-full);
@@ -33,12 +33,12 @@
 .nav-toggle::before {
   content: '';
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   background-image:
     linear-gradient(90deg, var(--color-primary) 2px, transparent 2px),
     linear-gradient(0deg, var(--color-primary) 2px, transparent 2px);
-  background-size: 6px 6px;
+  background-size: 8px 8px;
   background-position: 0 0;
   opacity: 0.8;
   animation: matrix-grid 2s linear infinite;
@@ -49,7 +49,7 @@
     background-position: 0 0;
   }
   100% {
-    background-position: 6px 6px;
+    background-position: 8px 8px;
   }
 }
 
