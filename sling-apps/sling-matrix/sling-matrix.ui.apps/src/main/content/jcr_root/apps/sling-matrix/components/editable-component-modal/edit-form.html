@@ -1,0 +1,63 @@
+<!--/*
+Modal-only edit-form template (no inline richtext / no Tiptap markup).
+Use this via sling:resourceSuperType="sling-matrix/components/editable-component-modal"
+for components edited directly in the component modal.
+For inline richtext editing, use
+sling-matrix/components/editable-component instead.
+*/-->
+<div data-zen-editable-editing="true" data-zen-modal-editing="true">
+  <!--/* Fix glitch underneath modal. HTMX swaps the html, add plain component so content does not disappear. */-->
+  <sly data-sly-resource="${@ selectors='html'}" />
+
+  <form id="editor-form"
+        hx-trigger="submit"
+        hx-target="closest [data-zen-editable-editing]"
+        hx-swap="outerHTML"
+        hx-post="${resource.path}">
+
+    <input type="hidden" name=":redirect" value="${resource.path}.html" />
+
+    <div id="editor-component-modal" class="editor-component-modal" aria-hidden="true">
+      <div class="editor-component-modal-content" role="dialog" aria-modal="true" aria-labelledby="editor-component-modal-title">
+        <div class="editor-component-modal-header">
+          <h2 id="editor-component-modal-title">Edit Component</h2>
+          <!--/* × restores the original component via HTMX — same as Cancel */-->
+          <button type="button" class="editor-component-modal-close" aria-label="Close"
+                  hx-get="${resource.path}.html"
+                  hx-target="[data-zen-editable-editing]"
+                  hx-swap="outerHTML">×</button>
+        </div>
+        <div class="editor-component-modal-body">
+          <sly data-sly-include="${'edit-form-fields.html'}" />
+        </div>
+        <div class="editor-component-modal-actions">
+          <button type="button" class="btn btn-secondary"
+                  hx-get="${resource.path}.html"
+                  hx-target="[data-zen-editable-editing]"
+                  hx-swap="outerHTML">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Save error notification (centered overlay) ───────────────────── -->
+    <div id="editor-save-error" class="editor-save-error" role="alertdialog" aria-modal="true" aria-live="assertive" aria-hidden="true" aria-labelledby="editor-save-error-title">
+      <div class="editor-save-error__dialog">
+        <div class="editor-save-error__header">
+          <div class="hal-9000" aria-hidden="true">
+            <div class="hal-9000__eye"></div>
+          </div>
+          <div id="editor-save-error-title" class="editor-save-error__title">Save Failed</div>
+        </div>
+        <div class="editor-save-error__body">
+          <p class="editor-save-error__message"></p>
+        </div>
+        <div class="editor-save-error__footer">
+          <button type="button" class="editor-save-error__close" aria-label="Dismiss error" onclick="dismissSaveError()">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</div>

@@ -1,0 +1,89 @@
+/* 00-variables.css — OKLCH colour tokens and design system variables */
+
+:root {
+  /* ── Primary hue: Matrix green ── */
+  --hue-primary: 142;
+  /* ── Secondary hue: Stiffkey Blue ── */
+  --hue-secondary: 281;
+
+  /* ── Complementary hues (auto-derived: +180°) ── */
+  --hue-primary-complement: calc(var(--hue-primary) + 180);
+  --hue-secondary-complement: calc(var(--hue-secondary) + 180);
+
+  /* ── Primary palette (Matrix green) ── */
+  --color-primary:       oklch(0.75 0.25 var(--hue-primary));      /* #00ff41 bright green */
+  --color-primary-light: oklch(0.88 0.15 var(--hue-primary));      /* lighter green */
+  --color-primary-dark:  oklch(0.35 0.18 var(--hue-primary));      /* dark green */
+  --color-primary-hover: oklch(0.68 0.28 var(--hue-primary));      /* hover state */
+  --color-primary-subtle:oklch(0.20 0.08 var(--hue-primary));      /* very dark green for backgrounds */
+
+  /* ── Secondary palette (Stiffkey Blue) ── */
+  --color-secondary:       oklch(0.50 0.12 var(--hue-secondary));  /* deep blue */
+  --color-secondary-light: oklch(0.65 0.10 var(--hue-secondary));  /* lighter blue */
+  --color-secondary-dark:  oklch(0.30 0.08 var(--hue-secondary));  /* darker blue */
+  --color-secondary-hover: oklch(0.55 0.14 var(--hue-secondary));  /* hover blue */
+
+  /* ── Complementary palette ── */
+  --color-complement-primary:   oklch(0.60 0.10 var(--hue-primary-complement));
+  --color-complement-secondary: oklch(0.60 0.10 var(--hue-secondary-complement));
+
+  /* ── Neutrals: derived from primary hue at near-zero chroma (dark theme) ── */
+  --color-bg:          oklch(0.12 0.01 var(--hue-primary));  /* very dark, almost black */
+  --color-surface:     oklch(0.18 0.015 var(--hue-primary)); /* slightly lighter surface */
+  --color-border:      oklch(0.30 0.02 var(--hue-primary));  /* border color */
+  --color-text:        oklch(0.85 0.02 var(--hue-primary));  /* light text */
+  --color-text-muted:  oklch(0.60 0.03 var(--hue-primary));  /* muted text */
+
+  /* ── Black & white: still tinted ── */
+  --color-black:       oklch(0.08 0.01 var(--hue-primary));
+  --color-white:       oklch(0.95 0.005 var(--hue-primary));
+
+  /* ── Spacing scale (geometric progression) ── */
+  --space-xs:  0.25rem;   /* 4px */
+  --space-sm:  0.5rem;    /* 8px */
+  --space-md:  1rem;      /* 16px */
+  --space-lg:  1.5rem;    /* 24px */
+  --space-xl:  2rem;      /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4.5rem;    /* 72px */
+  --space-4xl: 6rem;      /* 96px */
+
+  /* ── Typography ── */
+  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+
+  --font-size-base:   1rem;       /* 16px */
+  --font-size-sm:     0.875rem;   /* 14px */
+  --font-size-lg:     1.125rem;   /* 18px */
+  --font-size-xl:     1.5rem;     /* 24px */
+  --font-size-2xl:    2rem;       /* 32px */
+  --font-size-3xl:    3rem;       /* 48px */
+  --font-size-4xl:    4.5rem;     /* 72px */
+
+  --line-height-tight:  1.2;
+  --line-height-normal: 1.6;
+  --line-height-loose:  1.8;
+
+  /* ── Breakpoints (for reference in @media queries) ── */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+
+  /* ── Border radius ── */
+  --radius-sm:  0.25rem;  /* 4px */
+  --radius-md:  0.5rem;   /* 8px */
+  --radius-lg:  1rem;     /* 16px */
+  --radius-full: 9999px;  /* pill shape */
+
+  /* ── Shadows (subtle green glow) ── */
+  --shadow-sm:  0 1px 2px 0 oklch(0 0 0 / 0.05), 0 0 4px 0 oklch(0.75 0.25 var(--hue-primary) / 0.1);
+  --shadow-md:  0 4px 6px -1px oklch(0 0 0 / 0.1), 0 0 8px 0 oklch(0.75 0.25 var(--hue-primary) / 0.15);
+  --shadow-lg:  0 10px 15px -3px oklch(0 0 0 / 0.2), 0 0 16px 0 oklch(0.75 0.25 var(--hue-primary) / 0.2);
+  --shadow-glow: 0 0 20px 2px oklch(0.75 0.25 var(--hue-primary) / 0.4);
+}

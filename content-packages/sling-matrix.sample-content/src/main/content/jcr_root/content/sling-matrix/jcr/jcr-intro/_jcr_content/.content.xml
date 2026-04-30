@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Introduction to JCR"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="The Repository of All Truth"
+            text="&lt;p&gt;The Java Content Repository (JCR) is the data layer that stores all content in Apache Sling. Think of it as the mainframe of the Matrix - the central repository where all information resides in a hierarchical tree structure.&lt;/p&gt;&lt;p&gt;Every piece of content, every component, every configuration is stored as nodes and properties in the JCR. Understanding this structure is key to mastering the Matrix.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="xml"
+            title="JCR Node Structure Example"
+            code="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xa;&lt;jcr:root xmlns:jcr=&quot;http://www.jcp.org/jcr/1.0&quot;&#xa;          xmlns:nt=&quot;http://www.jcp.org/jcr/nt/1.0&quot;&#xa;          xmlns:sling=&quot;http://sling.apache.org/jcr/sling/1.0&quot;&#xa;    jcr:primaryType=&quot;nt:unstructured&quot;&#xa;    jcr:title=&quot;The Matrix&quot;&#xa;    sling:resourceType=&quot;sling-matrix/components/page&quot;&gt;&#xa;    &lt;content&#xa;        jcr:primaryType=&quot;nt:unstructured&quot;&#xa;        matrixColor=&quot;green&quot;&#xa;        digitalRain=&quot;true&quot;&#xa;        realityLevel=&quot;simulation&quot;/&gt;&#xa;&lt;/jcr:root&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Core JCR Concepts"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Nodes&lt;/strong&gt; - Hierarchical containers for content (like folders)&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Properties&lt;/strong&gt; - Name-value pairs attached to nodes&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Node Types&lt;/strong&gt; - Define structure and allowed properties&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Namespaces&lt;/strong&gt; - Organize property and node type names&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Workspaces&lt;/strong&gt; - Separate content areas within the repository&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>
