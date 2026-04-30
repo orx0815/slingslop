@@ -13,3 +13,8 @@
 
 /* Syntax highlighting theme - Matrix-inspired dark theme */
 @import 'highlight.js/styles/tokyo-night-dark.css';
+
+/* Override highlight.js background to make code blocks transparent */
+.hljs {
+  background: transparent !important;
+}
