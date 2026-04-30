@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Sling Internationalization"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="The Matrix in Multiple Languages"
+            text="&lt;p&gt;Sling's i18n (internationalization) support allows you to serve content in multiple languages. Just as the Matrix can be rendered in any language its inhabitants speak, Sling applications can adapt to users worldwide.&lt;/p&gt;&lt;p&gt;Dictionary entries are stored in the JCR repository under /apps or /libs, organized by language code.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="xml"
+            title="i18n Dictionary Example"
+            code="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xa;&lt;jcr:root xmlns:jcr=&quot;http://www.jcp.org/jcr/1.0&quot;&#xa;          xmlns:sling=&quot;http://sling.apache.org/jcr/sling/1.0&quot;&#xa;          xmlns:mix=&quot;http://www.jcp.org/jcr/mix/1.0&quot;&#xa;    jcr:primaryType=&quot;sling:Folder&quot;&gt;&#xa;    &lt;en&#xa;        jcr:primaryType=&quot;nt:folder&quot;&#xa;        jcr:mixinTypes=&quot;[mix:language]&quot;&#xa;        jcr:language=&quot;en&quot;&gt;&#xa;        &lt;message&#xa;            jcr:primaryType=&quot;sling:MessageEntry&quot;&#xa;            sling:key=&quot;matrix.welcome&quot;&#xa;            sling:message=&quot;Welcome to the Matrix&quot;/&gt;&#xa;        &lt;the-one&#xa;            jcr:primaryType=&quot;sling:MessageEntry&quot;&#xa;            sling:key=&quot;matrix.the-one&quot;&#xa;            sling:message=&quot;You are The One&quot;/&gt;&#xa;    &lt;/en&gt;&#xa;&lt;/jcr:root&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Using i18n in HTL"
+            text="&lt;p&gt;Access translated strings in HTL templates using the i18n expression:&lt;/p&gt;&lt;pre&gt;&lt;code&gt;&amp;lt;h1&amp;gt;${&apos;matrix.welcome&apos; @ i18n}&amp;lt;/h1&amp;gt;&#xa;&amp;lt;p&amp;gt;${&apos;matrix.the-one&apos; @ i18n, locale=&apos;de&apos;}&amp;lt;/p&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Or in Java using the ResourceBundle:&lt;/p&gt;&lt;pre&gt;&lt;code&gt;ResourceBundle bundle = request.getResourceBundle(locale);&#xa;String message = bundle.getString(&quot;matrix.welcome&quot;);&lt;/code&gt;&lt;/pre&gt;"/>
+    </main>
+</jcr:root>

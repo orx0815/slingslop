@@ -1,0 +1,22 @@
+<footer class="matrix-footer"
+        data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+  <div class="footer-content">
+    <p class="footer-text">${properties.copyrightText}</p>
+    <div class="footer-links">
+      <a href="${properties.link1Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${properties.link1Url}">${properties.link1Text}</a>
+      <a href="${properties.link2Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${properties.link2Url}">${properties.link2Text}</a>
+      <a href="${properties.link3Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${properties.link3Url}">${properties.link3Text}</a>
+    </div>
+  </div>
+</footer>

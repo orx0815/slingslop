@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Sling Components"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Building Blocks of the Interface"
+            text="&lt;p&gt;Sling components are reusable content building blocks. Each component has a resource type that determines how it's rendered. Think of them as the visible manifestations of data in the Matrix - the code translated into perceivable reality.&lt;/p&gt;&lt;p&gt;Components are organized in /apps under their application name and can include scripts (HTL, JSP), dialogs, and clientlibs.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="xml"
+            title="Component Definition"
+            code="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xa;&lt;jcr:root xmlns:jcr=&quot;http://www.jcp.org/jcr/1.0&quot;&#xa;          xmlns:sling=&quot;http://sling.apache.org/jcr/sling/1.0&quot;&#xa;    jcr:primaryType=&quot;sling:Component&quot;&#xa;    jcr:title=&quot;Matrix Code Block&quot;&#xa;    jcr:description=&quot;Displays digital rain code&quot;&#xa;    componentGroup=&quot;Sling Matrix&quot;&#xa;    sling:resourceSuperType=&quot;sling-matrix/components/base&quot;/&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Component Structure"
+            text="&lt;p&gt;A typical Sling component directory contains:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;.content.xml&lt;/strong&gt; - Component metadata and properties&lt;/li&gt;&lt;li&gt;&lt;strong&gt;component.html&lt;/strong&gt; - HTL rendering script&lt;/li&gt;&lt;li&gt;&lt;strong&gt;_cq_dialog/.content.xml&lt;/strong&gt; - Author dialog definition&lt;/li&gt;&lt;li&gt;&lt;strong&gt;clientlibs/&lt;/strong&gt; - CSS and JavaScript assets&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Java classes&lt;/strong&gt; - Sling Models or WCMUsePojo classes&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

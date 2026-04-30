@@ -35,6 +35,7 @@
     <starter.min.bundles.count>233</starter.min.bundles.count>
     <starter.check.paths>
       /content/slingslop/zengarden/home.html,
+      /content/sling-matrix/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
       /slingshot/resources/images/background.jpg,
       /slingshot/users/slingshot2/places/landing/images/landing.jpg,

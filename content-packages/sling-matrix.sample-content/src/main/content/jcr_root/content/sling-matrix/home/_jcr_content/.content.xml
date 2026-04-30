@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Welcome to Sling Matrix"
+    sling:resourceType="sling-matrix/pages/homepage">
+    <hero
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/hero"
+        title="Welcome to the Matrix"
+        subtitle="Enter the world of Apache Sling - where content meets code"/>
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="What is Sling Matrix?"
+            text="&lt;p&gt;Sling Matrix is your gateway to mastering Apache Sling. Like Neo awakening to the true nature of reality, you'll discover the power beneath the surface of web content management.&lt;/p&gt;&lt;p&gt;This documentation will guide you through the fundamental concepts of OSGi, JCR, and Sling - the three pillars that support the Matrix of modern content-driven applications.&lt;/p&gt;"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Follow the White Rabbit"
+            text="&lt;p&gt;Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;OSGi&lt;/strong&gt; - The modular foundation of the Matrix&lt;/li&gt;&lt;li&gt;&lt;strong&gt;JCR&lt;/strong&gt; - The repository that stores all truth&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Sling&lt;/strong&gt; - The framework that brings it all together&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+    <footer
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/footer"
+        copyright="© 2026 Sling Matrix"
+        link1Title="Apache Sling"
+        link1Url="https://sling.apache.org"
+        link2Title="Documentation"
+        link2Url="/content/sling-matrix/osgi/osgi-intro.html"
+        link3Title="GitHub"
+        link3Url="https://github.com/apache/sling"/>
+</jcr:root>

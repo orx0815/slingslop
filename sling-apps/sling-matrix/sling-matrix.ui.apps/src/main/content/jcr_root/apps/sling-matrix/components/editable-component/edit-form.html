@@ -1,0 +1,12 @@
+<!--/*
+Richtext edit-form template.
+Use this via sling:resourceSuperType="sling-matrix/components/editable-component"
+for components that provide inline-richtext editing.
+For modal-only components (no inline richtext), use
+sling-matrix/components/editable-component-modal instead.
+Override this file in a concrete component to customise the wrapper element
+while keeping the form body via: <sly data-sly-include="${'edit-form-inner.html'}" />
+*/-->
+<div data-zen-editable-editing="true">
+  <sly data-sly-include="${'edit-form-inner.html'}" />
+</div>

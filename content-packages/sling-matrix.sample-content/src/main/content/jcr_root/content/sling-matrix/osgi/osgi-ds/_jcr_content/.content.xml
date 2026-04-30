@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="OSGi Declarative Services"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Service Injection in the Matrix"
+            text="&lt;p&gt;OSGi Declarative Services (DS) provides a powerful annotation-based approach to dependency injection. Instead of manually wiring components together, you simply declare what you need, and the OSGi runtime handles the rest.&lt;/p&gt;&lt;p&gt;It's like having the ability to download any skill directly into your consciousness - just declare the dependency and it's there when you need it.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="Declarative Services Component"
+            code="package org.example.matrix.services;&#xa;&#xa;import org.osgi.service.component.annotations.Component;&#xa;import org.osgi.service.component.annotations.Reference;&#xa;import org.osgi.service.component.annotations.Activate;&#xa;import org.osgi.service.component.annotations.Modified;&#xa;import org.osgi.service.metatype.annotations.Designate;&#xa;&#xa;@Component(&#xa;    service = OracleService.class,&#xa;    immediate = true&#xa;)&#xa;@Designate(ocd = OracleConfiguration.class)&#xa;public class OracleServiceImpl implements OracleService {&#xa;    &#xa;    @Reference&#xa;    private MatrixNavigator navigator;&#xa;    &#xa;    private String prophecy;&#xa;    &#xa;    @Activate&#xa;    @Modified&#xa;    protected void activate(OracleConfiguration config) {&#xa;        this.prophecy = config.prophecy();&#xa;    }&#xa;    &#xa;    @Override&#xa;    public String getProphecy() {&#xa;        return &quot;I can only show you the door. You're the one that has to walk through it.&quot;;&#xa;    }&#xa;}"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Key Annotations"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;@Component&lt;/strong&gt; - Marks a class as an OSGi component&lt;/li&gt;&lt;li&gt;&lt;strong&gt;@Reference&lt;/strong&gt; - Injects service dependencies&lt;/li&gt;&lt;li&gt;&lt;strong&gt;@Activate&lt;/strong&gt; - Called when component is activated&lt;/li&gt;&lt;li&gt;&lt;strong&gt;@Deactivate&lt;/strong&gt; - Called when component is deactivated&lt;/li&gt;&lt;li&gt;&lt;strong&gt;@Modified&lt;/strong&gt; - Called when configuration changes&lt;/li&gt;&lt;li&gt;&lt;strong&gt;@Designate&lt;/strong&gt; - Links configuration interface&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

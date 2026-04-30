@@ -1,0 +1,30 @@
+<div class="edit-fields-list">
+	<div class="edit-fields-group">
+		<div class="edit-fields-grid">
+			<label class="edit-field-row">
+				<span class="edit-field-meta">
+					<span class="edit-field-label">Title</span>
+					<small class="edit-field-description">Optional title for the code block.</small>
+				</span>
+				<input type="text" name="title" value="${properties.title}"
+					class="edit-field-input" placeholder="Title (optional)" form="editor-form" />
+			</label>
+			<label class="edit-field-row">
+				<span class="edit-field-meta">
+					<span class="edit-field-label">Language</span>
+					<small class="edit-field-description">Programming language for syntax highlighting (e.g., javascript, python, java).</small>
+				</span>
+				<input type="text" name="language" value="${properties.language}"
+					class="edit-field-input" placeholder="Language" form="editor-form" />
+			</label>
+			<label class="edit-field-row">
+				<span class="edit-field-meta">
+					<span class="edit-field-label">Code</span>
+					<small class="edit-field-description">Code snippet to display.</small>
+				</span>
+				<textarea name="code" rows="15"
+					class="edit-field-input" placeholder="Code" form="editor-form">${properties.code}</textarea>
+			</label>
+		</div>
+	</div>
+</div>

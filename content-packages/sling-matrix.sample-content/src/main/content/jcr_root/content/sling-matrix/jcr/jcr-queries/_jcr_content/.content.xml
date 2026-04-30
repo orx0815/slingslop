@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="JCR Queries and Search"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Querying the Matrix"
+            text="&lt;p&gt;To navigate the vast repository of data, you need to master JCR queries. Like querying the Matrix to find specific patterns in the code, JCR provides powerful query languages to locate exactly the content you need.&lt;/p&gt;&lt;p&gt;JCR supports multiple query languages including JCR-SQL2, XPath, and the Query Builder API.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="JCR-SQL2 Query Example"
+            code="package org.example.matrix.search;&#xa;&#xa;import javax.jcr.Session;&#xa;import javax.jcr.query.Query;&#xa;import javax.jcr.query.QueryManager;&#xa;import javax.jcr.query.QueryResult;&#xa;import javax.jcr.NodeIterator;&#xa;&#xa;public class MatrixSearch {&#xa;    &#xa;    public void findTheOne(Session session) throws Exception {&#xa;        QueryManager qm = session.getWorkspace().getQueryManager();&#xa;        &#xa;        String sql = &quot;SELECT * FROM [nt:unstructured] AS node &quot; +&#xa;                     &quot;WHERE ISDESCENDANTNODE(node, '/content/sling-matrix') &quot; +&#xa;                     &quot;AND node.[matrixRole] = 'The One'&quot;;&#xa;        &#xa;        Query query = qm.createQuery(sql, Query.JCR_SQL2);&#xa;        query.setLimit(10);&#xa;        &#xa;        QueryResult result = query.execute();&#xa;        NodeIterator nodes = result.getNodes();&#xa;        &#xa;        while (nodes.hasNext()) {&#xa;            System.out.println(&quot;Found: &quot; + nodes.nextNode().getPath());&#xa;        }&#xa;    }&#xa;}"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Query Best Practices"
+            text="&lt;ul&gt;&lt;li&gt;Always set query limits to prevent performance issues&lt;/li&gt;&lt;li&gt;Use indexes for frequently queried properties&lt;/li&gt;&lt;li&gt;Prefer JCR-SQL2 over XPath for better performance&lt;/li&gt;&lt;li&gt;Use ISDESCENDANTNODE to limit search scope&lt;/li&gt;&lt;li&gt;Consider using the Query Builder API for complex queries&lt;/li&gt;&lt;li&gt;Cache query results when appropriate&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

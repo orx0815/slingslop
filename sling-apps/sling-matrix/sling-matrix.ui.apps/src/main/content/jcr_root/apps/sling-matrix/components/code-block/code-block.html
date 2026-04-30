@@ -1,0 +1,10 @@
+<div class="code-block"
+     data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+  <h4 data-sly-test="${properties.title}">${properties.title}</h4>
+  <pre><code class="language-${properties.language || 'text'}">${properties.code}</code></pre>
+</div>
