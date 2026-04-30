@@ -29,7 +29,7 @@
         link1Title="Apache Sling"
         link1Url="https://sling.apache.org"
         link2Title="Documentation"
-        link2Url="/content/sling-matrix/osgi/osgi-intro.html"
+        link2Url="/content/sling-matrix/home/osgi/osgi-intro.html"
         link3Title="GitHub"
         link3Url="https://github.com/apache/sling"/>
 </jcr:root>
