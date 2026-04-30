@@ -103,11 +103,13 @@ public class FooterContext {
       }
 
       // Move up to parent page's jcr:content
-      Resource parent = current.getParent(); // Get the page node
-      if (parent != null) {
-        parent = parent.getParent(); // Get the parent page node
-        if (parent != null) {
-          current = parent.getChild("jcr:content");
+      Resource pageNode = current.getParent(); // Get the current page node
+      if (pageNode != null) {
+        Resource parentPageNode = pageNode.getParent(); // Get the parent page node
+        if (parentPageNode != null) {
+          // Try to get jcr:content child - may be null if parent doesn't have it
+          current = parentPageNode.getChild("jcr:content");
+          // Loop continues; if current is null, loop exits
         } else {
           current = null;
         }
