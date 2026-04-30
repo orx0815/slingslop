@@ -1,7 +1,10 @@
 /*
  * Color tokens — single source of truth for all editor colors
+ * Scoped to editor UI elements to avoid overriding public site styles
  */
-:root {
+.editor-component-modal,
+.editor-component-toolbar,
+[data-zen-editable-editing="true"] {
   /* ── Primary palette ────────────────────────────────────────────────────
    * Change --color-primary-base to retheme the entire editor.
    * All derived tokens shift automatically via OKLCH relative color.     */
