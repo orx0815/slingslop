@@ -94,28 +94,18 @@ public class FooterContext {
    * @return the homepage's jcr:content resource, or null if not found
    */
   private Resource findHomepage(Resource pageContent) {
-    Resource current = pageContent;
+    // Start with the current page node (parent of jcr:content)
+    Resource currentPageNode = pageContent.getParent();
 
-    while (current != null) {
-      // Check if this jcr:content has the homepage resource type
-      if (isHomepageResourceType(current)) {
-        return current;
+    while (currentPageNode != null) {
+      // Check if this page has jcr:content with homepage resource type
+      Resource jcrContent = currentPageNode.getChild("jcr:content");
+      if (jcrContent != null && isHomepageResourceType(jcrContent)) {
+        return jcrContent;
       }
 
-      // Move up to parent page's jcr:content
-      Resource pageNode = current.getParent(); // Get the current page node
-      if (pageNode != null) {
-        Resource parentPageNode = pageNode.getParent(); // Get the parent page node
-        if (parentPageNode != null) {
-          // Try to get jcr:content child - may be null if parent doesn't have it
-          current = parentPageNode.getChild("jcr:content");
-          // Loop continues; if current is null, loop exits
-        } else {
-          current = null;
-        }
-      } else {
-        current = null;
-      }
+      // Move up to parent page node
+      currentPageNode = currentPageNode.getParent();
     }
 
     return null;
