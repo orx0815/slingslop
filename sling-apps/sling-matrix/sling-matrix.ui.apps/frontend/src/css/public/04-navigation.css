@@ -31,10 +31,31 @@
 }
 
 .nav-toggle::before {
-  content: '≡';
-  font-size: var(--font-size-2xl);
-  color: var(--color-primary);
-  line-height: 1;
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image:
+    linear-gradient(90deg, var(--color-primary) 2px, transparent 2px),
+    linear-gradient(0deg, var(--color-primary) 2px, transparent 2px);
+  background-size: 6px 6px;
+  background-position: 0 0;
+  opacity: 0.8;
+  animation: matrix-grid 2s linear infinite;
+}
+
+@keyframes matrix-grid {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 6px 6px;
+  }
+}
+
+.nav-toggle:hover::before {
+  opacity: 1;
+  animation: matrix-grid 0.5s linear infinite;
 }
 
 /* First-level navigation (circular layout) */

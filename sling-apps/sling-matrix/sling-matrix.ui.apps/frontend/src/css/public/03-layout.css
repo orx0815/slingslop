@@ -22,7 +22,14 @@ main {
   min-height: calc(100vh - 200px);
   padding-top: var(--space-2xl);
   padding-bottom: var(--space-4xl);
+  padding-left: 100px; /* Space for fixed navigation */
   position: relative;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding-left: var(--space-md);
+  }
 }
 
 /* Content wrapper */
