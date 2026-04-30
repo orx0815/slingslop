@@ -149,10 +149,10 @@ import hljs from 'highlight.js';
     highlightCode();
     initCircularNav();
     initMatrixRain();
-  });
 
-  // Re-run code highlighting after HTMX content swaps
-  document.body.addEventListener('htmx:afterSwap', () => {
-    highlightCode();
+    // Re-run code highlighting after HTMX content swaps
+    document.body.addEventListener('htmx:afterSwap', () => {
+      highlightCode();
+    });
   });
 })();
