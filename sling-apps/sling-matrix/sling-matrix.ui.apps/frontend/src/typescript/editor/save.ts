@@ -1,10 +1,5 @@
 import { state } from './state';
 
-// htmx is loaded as a global script (dev) or inlined via banner (prod)
-declare const htmx: {
-  trigger: (element: HTMLElement, eventName: string) => void;
-};
-
 /**
  * Serialises editor content into the hidden form input and triggers an
  * htmx form submission to the Sling POST Servlet.
@@ -45,8 +40,9 @@ export function saveEditorContent(): void {
     console.log('saveEditorContent: modal-only component, submitting form directly');
   }
 
-  // Trigger htmx submit
-  console.log('saveEditorContent: triggering form submit via htmx');
-  htmx.trigger(form, 'submit');
+  // Trigger form submit - use requestSubmit() instead of htmx.trigger()
+  // because the modal is portalled outside the form, breaking htmx.trigger()
+  console.log('saveEditorContent: triggering form submit via requestSubmit()');
+  form.requestSubmit();
   // No manual close needed — htmx outerHTML swap restores the view component
 }
