@@ -2,7 +2,7 @@
 
 .matrix-nav {
   position: fixed;
-  top: var(--space-lg);
+  top: 140px; /* Enough space for upward nav items */
   left: var(--space-lg);
   z-index: 1000;
   font-family: var(--font-mono);
@@ -63,29 +63,21 @@
   transition: all var(--transition-slow);
 }
 
-/* Position items in a circle (6 items max) */
+/* Position items in a circle (4 items - right semicircle) */
 .nav-level-1.nav-open .nav-item:nth-child(1) {
-  transform: translate(0, -120px);
+  transform: translate(120px, 0);
 }
 
 .nav-level-1.nav-open .nav-item:nth-child(2) {
-  transform: translate(104px, -60px);
+  transform: translate(85px, 85px);
 }
 
 .nav-level-1.nav-open .nav-item:nth-child(3) {
-  transform: translate(104px, 60px);
+  transform: translate(85px, -85px);
 }
 
 .nav-level-1.nav-open .nav-item:nth-child(4) {
-  transform: translate(0, 120px);
-}
-
-.nav-level-1.nav-open .nav-item:nth-child(5) {
-  transform: translate(-104px, 60px);
-}
-
-.nav-level-1.nav-open .nav-item:nth-child(6) {
-  transform: translate(-104px, -60px);
+  transform: translate(0, -120px);
 }
 
 .nav-item-link {

@@ -39,15 +39,19 @@ import hljs from 'highlight.js';
       return;
     }
 
+    let closeTimeout: number | undefined;
+
     // Toggle first-level navigation on mouse-over
     navToggle.addEventListener('mouseenter', () => {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+      }
       navLevel1.classList.add('nav-open');
     });
 
-    // Close navigation when mouse leaves the entire nav area
-    const navContainer = document.querySelector('.matrix-nav');
-    if (navContainer) {
-      navContainer.addEventListener('mouseleave', () => {
+    // Delayed close to allow moving to second-level menus
+    const scheduleClose = (): void => {
+      closeTimeout = window.setTimeout(() => {
         navLevel1.classList.remove('nav-open');
         // Close all second-level menus
         navItems.forEach((item) => {
@@ -56,25 +60,55 @@ import hljs from 'highlight.js';
             level2.classList.remove('nav-level-2-open');
           }
         });
-      });
-    }
+      }, 300); // 300ms delay to move mouse to submenu
+    };
 
-    // Open second-level navigation on mouse-over of first-level items
+    // Close navigation when mouse leaves toggle
+    navToggle.addEventListener('mouseleave', scheduleClose);
+
+    // Keep open when hovering over nav items or their submenus
     navItems.forEach((item) => {
       const level2 = item.querySelector('.nav-level-2');
-      if (level2) {
-        item.addEventListener('mouseenter', () => {
-          // Close other second-level menus
-          navItems.forEach((otherItem) => {
-            if (otherItem !== item) {
-              const otherLevel2 = otherItem.querySelector('.nav-level-2');
-              if (otherLevel2) {
-                otherLevel2.classList.remove('nav-level-2-open');
-              }
+
+      item.addEventListener('mouseenter', () => {
+        if (closeTimeout) {
+          clearTimeout(closeTimeout);
+        }
+
+        // Close other second-level menus
+        navItems.forEach((otherItem) => {
+          if (otherItem !== item) {
+            const otherLevel2 = otherItem.querySelector('.nav-level-2');
+            if (otherLevel2) {
+              otherLevel2.classList.remove('nav-level-2-open');
             }
-          });
-          level2.classList.add('nav-level-2-open');
+          }
         });
+
+        // Open this item's submenu if it has one
+        if (level2) {
+          level2.classList.add('nav-level-2-open');
+        }
+      });
+
+      item.addEventListener('mouseleave', (e) => {
+        // Don't close if moving to the submenu
+        const relatedTarget = e.relatedTarget as HTMLElement;
+        if (level2 && level2.contains(relatedTarget)) {
+          return;
+        }
+        scheduleClose();
+      });
+
+      // Keep open when hovering over second-level menu
+      if (level2) {
+        level2.addEventListener('mouseenter', () => {
+          if (closeTimeout) {
+            clearTimeout(closeTimeout);
+          }
+        });
+
+        level2.addEventListener('mouseleave', scheduleClose);
       }
     });
   }
