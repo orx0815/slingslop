@@ -1,0 +1,154 @@
+/* 09-animations.css — CSS animations and transitions */
+
+/* Fade in entrance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* Glow pulse */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px oklch(0.75 0.25 var(--hue-primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.75 0.25 var(--hue-primary) / 0.6);
+  }
+}
+
+.glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Text flicker */
+@keyframes textFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 10px oklch(0.75 0.25 var(--hue-primary) / 0.5);
+  }
+  20%, 24%, 55% {
+    opacity: 0.8;
+    text-shadow: none;
+  }
+}
+
+.text-flicker {
+  animation: textFlicker 4s infinite;
+}
+
+/* Scanline effect */
+@keyframes scanline {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to bottom, transparent, var(--color-primary), transparent);
+  opacity: 0.1;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
+  z-index: 9999;
+}
+
+/* Typing cursor */
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--color-primary);
+  margin-left: 2px;
+  animation: blink 1s step-start infinite;
+}
+
+/* Hover lift */
+.hover-lift {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Smooth transitions for HTMX swaps */
+[data-zen-editable="true"] {
+  transition: all var(--transition-base);
+}
+
+[data-zen-editable-editing="true"] {
+  outline: 2px dashed var(--color-primary);
+  outline-offset: var(--space-xs);
+}
+
+/* Page load animation */
+body {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scroll-driven animations (progressive enhancement) */
+@supports (animation-timeline: scroll()) {
+  .scroll-fade-in {
+    animation: fadeIn linear;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+}
+
+/* Reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .scanline {
+    display: none;
+  }
+}

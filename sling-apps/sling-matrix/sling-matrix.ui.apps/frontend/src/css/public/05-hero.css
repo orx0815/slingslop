@@ -1,0 +1,101 @@
+/* 05-hero.css — Hero section with Matrix rain effect */
+
+.hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-subtle) 100%);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--space-2xl);
+  max-width: 800px;
+}
+
+.hero h1 {
+  margin-bottom: var(--space-lg);
+  animation: glitch 3s infinite;
+}
+
+.hero p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  margin: 0 auto var(--space-xl);
+  max-width: 60ch;
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-primary);
+  color: var(--color-black);
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-glow);
+  text-decoration: none;
+}
+
+.hero-cta:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow), 0 0 40px oklch(0.75 0.25 var(--hue-primary) / 0.8);
+}
+
+/* Matrix rain background */
+.matrix-rain-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.3;
+}
+
+.matrix-rain-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Glitch animation */
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+    text-shadow: 0 0 10px oklch(0.75 0.25 var(--hue-primary) / 0.5);
+  }
+  91% {
+    transform: translate(-2px, 2px);
+    text-shadow: 2px 0 oklch(0.75 0.25 var(--hue-primary)),
+                 -2px 0 oklch(0.50 0.12 var(--hue-secondary));
+  }
+  93% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 0 oklch(0.75 0.25 var(--hue-primary)),
+                 2px 0 oklch(0.50 0.12 var(--hue-secondary));
+  }
+  95% {
+    transform: translate(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 50vh;
+  }
+
+  .hero-content {
+    padding: var(--space-lg);
+  }
+}
