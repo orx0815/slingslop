@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Sling Testing Frameworks"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys">
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Training in the Simulation"
+            text="&lt;p&gt;Sling provides comprehensive testing frameworks including Sling Mocks and the AEM Mocks library. These allow you to test your components, models, and servlets without requiring a full Sling instance.&lt;/p&gt;&lt;p&gt;Just as the training programs in the Matrix simulate reality, these mocks simulate the Sling environment for fast, reliable unit tests.&lt;/p&gt;"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            title="Sling Model Unit Test"
+            code="package org.example.matrix.models;&#xa;&#xa;import io.wcm.testing.mock.aem.junit5.AemContext;&#xa;import io.wcm.testing.mock.aem.junit5.AemContextExtension;&#xa;import org.apache.sling.api.resource.Resource;&#xa;import org.junit.jupiter.api.BeforeEach;&#xa;import org.junit.jupiter.api.Test;&#xa;import org.junit.jupiter.api.extension.ExtendWith;&#xa;&#xa;import static org.junit.jupiter.api.Assertions.*;&#xa;&#xa;@ExtendWith(AemContextExtension.class)&#xa;class MatrixAgentTest {&#xa;    &#xa;    private final AemContext context = new AemContext();&#xa;    &#xa;    @BeforeEach&#xa;    void setUp() {&#xa;        // Create test content&#xa;        context.create().resource(&quot;/content/agents/neo&quot;,&#xa;            &quot;name&quot;, &quot;Neo&quot;,&#xa;            &quot;role&quot;, &quot;The One&quot;,&#xa;            &quot;isTheOne&quot;, true);&#xa;    }&#xa;    &#xa;    @Test&#xa;    void testMatrixAgent() {&#xa;        Resource resource = context.resourceResolver().getResource(&quot;/content/agents/neo&quot;);&#xa;        MatrixAgent agent = resource.adaptTo(MatrixAgent.class);&#xa;        &#xa;        assertNotNull(agent, &quot;Agent should not be null&quot;);&#xa;        assertEquals(&quot;Neo&quot;, agent.getName());&#xa;        assertEquals(&quot;The One&quot;, agent.getRole());&#xa;        assertTrue(agent.canSeeTheMatrix(), &quot;Neo can see the Matrix!&quot;);&#xa;    }&#xa;}"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            title="Testing Capabilities"
+            text="&lt;ul&gt;&lt;li&gt;Mock ResourceResolver and Resource objects&lt;/li&gt;&lt;li&gt;Create test content structure programmatically&lt;/li&gt;&lt;li&gt;Register OSGi services and configurations&lt;/li&gt;&lt;li&gt;Test Sling Models adaptation&lt;/li&gt;&lt;li&gt;Test servlets with mock request/response&lt;/li&gt;&lt;li&gt;Integration with JUnit 5&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

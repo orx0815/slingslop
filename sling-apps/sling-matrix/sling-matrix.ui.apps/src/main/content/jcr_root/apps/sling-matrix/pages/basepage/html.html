@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <sly data-sly-include="${'head.html'}"/>
+</head>
+
+<body class="matrix-page">
+  <!-- Modal container for the editor -->
+  <div id="editor-modal-container"></div>
+
+  <div class="page-wrapper">
+    <sly data-sly-include="${'nav.html'}" />
+
+    <main class="main-content" role="main">
+      <sly data-sly-include="${'content.html'}" />
+      <sly data-sly-include="${'footer.html'}" />
+    </main>
+  </div>
+
+</body>
+</html>
