@@ -17,7 +17,12 @@ export function saveEditorContent(): void {
     errorEl.setAttribute('aria-hidden', 'true');
   }
 
-  const form = document.getElementById('editor-form') as HTMLElement;
+  const form = document.getElementById('editor-form') as HTMLFormElement | null;
+  if (!form) {
+    console.error('saveEditorContent: form#editor-form not found');
+    return;
+  }
+
   const hiddenInput = document.getElementById('content-hidden') as HTMLInputElement | null;
 
   if (hiddenInput) {
@@ -32,6 +37,7 @@ export function saveEditorContent(): void {
     hiddenInput.value = content;
   }
 
+  // Trigger htmx submit
   htmx.trigger(form, 'submit');
   // No manual close needed — htmx outerHTML swap restores the view component
 }
