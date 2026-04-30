@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-subtle) 100%);
+  background: linear-gradient(135deg, oklch(from var(--color-bg) l c h / 0.7) 0%, oklch(from var(--color-primary-subtle) l c h / 0.5) 100%);
   border-bottom: 2px solid var(--color-primary);
 }
 
