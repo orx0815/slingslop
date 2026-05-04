@@ -5,8 +5,11 @@
      data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
      data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
-  <!-- Matrix digital rain background -->
-  <div class="matrix-rain-container"></div>
+  <!-- Three.js 3D floating geometry -->
+  <div class="hero-3d-container"></div>
+
+  <!-- Spacer that matches the 3D square's width so flex centres the content in the right half -->
+  <div class="hero-3d-spacer" aria-hidden="true"></div>
 
   <div class="hero-content">
     <h1 class="hero-title">${properties.title}</h1>
