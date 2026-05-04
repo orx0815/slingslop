@@ -5,7 +5,9 @@
   min-height: 60vh;
   display: flex;
   align-items: center;
+  /* content centres itself within the space to the right of the 3D spacer */
   justify-content: center;
+  gap: var(--space-4xl);
   overflow: hidden;
   background: linear-gradient(135deg, oklch(from var(--color-bg) l c h / 0.7) 0%, oklch(from var(--color-primary-subtle) l c h / 0.5) 100%);
   border-bottom: 2px solid var(--color-primary);
@@ -16,7 +18,9 @@
   z-index: 2;
   text-align: center;
   padding: var(--space-2xl);
-  max-width: 800px;
+  /* flex: 1 fills the right column; align-self centres within it */
+  flex: 1;
+  align-self: center;
 }
 
 .hero h1 {
@@ -52,22 +56,6 @@
   box-shadow: var(--shadow-glow), 0 0 40px oklch(0.75 0.25 var(--hue-primary) / 0.8);
 }
 
-/* Matrix rain background */
-.matrix-rain-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  opacity: 0.3;
-}
-
-.matrix-rain-canvas {
-  width: 100%;
-  height: 100%;
-}
-
 /* Glitch animation */
 @keyframes glitch {
   0%, 90%, 100% {
@@ -93,9 +81,54 @@
 @media (max-width: 768px) {
   .hero {
     min-height: 50vh;
+    /* Stack vertically on mobile */
+    justify-content: center;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .hero-3d-container {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    flex-shrink: 0;
   }
 
   .hero-content {
     padding: var(--space-lg);
+    flex: unset;
   }
+}
+
+/* ── 3D spacer — mirrors the absolutely-positioned canvas so flex can compute the right column ── */
+.hero-3d-spacer {
+  /* Same square as the canvas: height = 100% of hero, width matches via aspect-ratio */
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* ── Three.js 3D hero layer ──────────────────────────────────────────────── */
+.hero-3d-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Square: width = height of the hero section */
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  /* In front of hero-content (z-index: 2) so the fractal receives pointer events */
+  z-index: 3;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.hero-3d-container:active {
+  cursor: grabbing;
+}
+
+.hero-3d-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }

@@ -88,7 +88,20 @@ import { initHero3D } from './hero3d';
 
         // Open this item's submenu if it has one
         if (level2) {
-          level2.classList.add('nav-level-2-open');
+          const el = level2 as HTMLElement;
+          // Reset any previous correction instantly (no transform transition) so
+          // getBoundingClientRect() measures the true final position.
+          el.style.transform = '';
+          el.classList.add('nav-level-2-open');
+          // Clamp dropdown within viewport synchronously — transform has no
+          // CSS transition so the measurement is always accurate.
+          const rect = el.getBoundingClientRect();
+          const margin = 8;
+          if (rect.top < margin) {
+            el.style.transform = `translateY(calc(-50% + ${margin - rect.top}px))`;
+          } else if (rect.bottom > window.innerHeight - margin) {
+            el.style.transform = `translateY(calc(-50% - ${rect.bottom - (window.innerHeight - margin)}px))`;
+          }
         }
       });
 
