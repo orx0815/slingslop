@@ -6,21 +6,126 @@
     <main
         jcr:primaryType="nt:unstructured"
         sling:resourceType="sling-matrix/components/parsys">
+        <slide-headline-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="ResourceResolver"/>
         <text-block-1
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="Navigating the Resource Tree"
-            text="&lt;p&gt;The Sling Resource API provides a unified way to access content regardless of where it's stored. Whether data lives in JCR, a file system, or a remote service, the Resource API abstracts it all behind a consistent interface.&lt;/p&gt;&lt;p&gt;It's like being able to see the Matrix code directly - every resource exposed through a common API for traversal and manipulation.&lt;/p&gt;"/>
+            text="&lt;p&gt;The entry point for any resource access is the &lt;code&gt;ResourceResolver&lt;/code&gt;. How to get one:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;getResourceResolver()&lt;/code&gt; on a &lt;code&gt;SlingHttpServletRequest&lt;/code&gt; (Sling automatically creates one per request)&lt;/li&gt;&lt;li&gt;&lt;code&gt;getResourceResolver()&lt;/code&gt; on any Resource instance&lt;/li&gt;&lt;li&gt;Inject via &lt;code&gt;@SlingObject&lt;/code&gt; in a Sling Model&lt;/li&gt;&lt;li&gt;In an OSGi background service: create via &lt;code&gt;ResourceResolverFactory&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt; A resource resolver is &lt;em&gt;not&lt;/em&gt; thread-safe. Never share across threads. Always properly close if you created it yourself. Keep lifetime as short as possible.&lt;/p&gt;"/>
+        <slide-headline-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Getting Resources"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Main method: &lt;code&gt;getResource(path)&lt;/code&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Absolute path used directly&lt;/li&gt;&lt;li&gt;Relative path: configured search paths (&lt;code&gt;/apps&lt;/code&gt;, &lt;code&gt;/libs&lt;/code&gt;) are prepended&lt;/li&gt;&lt;li&gt;Returns a valid Resource or &lt;code&gt;null&lt;/code&gt; if not found (no way to distinguish &amp;quot;not found&amp;quot; from &amp;quot;no access&amp;quot;)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Alternative: &lt;code&gt;getResource(baseResource, path)&lt;/code&gt; — relative to a base resource.&lt;/p&gt;&lt;p&gt;Also: &lt;code&gt;resolve(path)&lt;/code&gt; — resolves an external URL to a resource. Normally you should never use this (resolving already happened when Sling accepted the request).&lt;/p&gt;"/>
+        <slide-headline-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Navigating the Resource Hierarchy"/>
+        <text-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;&lt;code&gt;getChildren()&lt;/code&gt; — returns &lt;code&gt;Iterable&amp;lt;Resource&amp;gt;&lt;/code&gt; (usable in for-each)&lt;/li&gt;&lt;li&gt;&lt;code&gt;listChildren()&lt;/code&gt; — returns &lt;code&gt;Iterator&amp;lt;Resource&amp;gt;&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;hasChildren()&lt;/code&gt; — check if children exist&lt;/li&gt;&lt;li&gt;&lt;code&gt;getChild(path)&lt;/code&gt; — get specific child (direct or via relative path). Returns null if not found.&lt;/li&gt;&lt;li&gt;&lt;code&gt;getParent()&lt;/code&gt; — returns null for root resource&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Inspecting a Resource"/>
+        <text-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;&lt;code&gt;getValueMap()&lt;/code&gt; — get properties (never returns null)&lt;/li&gt;&lt;li&gt;&lt;code&gt;getPath()&lt;/code&gt; — full path&lt;/li&gt;&lt;li&gt;&lt;code&gt;getName()&lt;/code&gt; — path part after last &amp;quot;/&amp;quot;&lt;/li&gt;&lt;li&gt;&lt;code&gt;getResourceType()&lt;/code&gt; / &lt;code&gt;isResourceType()&lt;/code&gt; — resource type (stored in &lt;code&gt;sling:resourceType&lt;/code&gt; property)&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Reading ValueMap Properties"/>
+        <text-block-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;A ValueMap is also a &lt;code&gt;Map&amp;lt;String,Object&amp;gt;&lt;/code&gt;. Additionally provides typed access with automatic conversion:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;get(name, Class&amp;lt;T&amp;gt; type)&lt;/code&gt; — returns null if not found or can't convert&lt;/li&gt;&lt;li&gt;&lt;code&gt;get(name, T defaultValue)&lt;/code&gt; — returns default value if not found. Default also defines the target type.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Always use these typed methods to get properties from a ValueMap.&lt;/p&gt;"/>
+        <slide-headline-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Querying for Resources"/>
+        <text-block-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Two methods:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;findResources(query, lang)&lt;/code&gt; — returns &lt;code&gt;Iterator&amp;lt;Resource&amp;gt;&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;queryResources(query, lang)&lt;/code&gt; — returns &lt;code&gt;Iterator&amp;lt;Map&amp;lt;String,Object&amp;gt;&amp;gt;&lt;/code&gt; (for non-resource results mapped to rows/columns)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This API does not provide a query abstraction — the query language depends on the underlying resource provider(s). The underlying JCR API provides more control (e.g. limiting results, setting query parameters).&lt;/p&gt;"/>
+        <slide-headline-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="CRUD on Resources"/>
         <code-block-1
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/code-block"
             language="java"
-            title="Using the Resource API"
-            code="package org.example.matrix.services;&#xa;&#xa;import org.apache.sling.api.resource.Resource;&#xa;import org.apache.sling.api.resource.ResourceResolver;&#xa;import org.apache.sling.api.resource.ValueMap;&#xa;&#xa;public class MatrixNavigator {&#xa;    &#xa;    public void navigateTheMatrix(ResourceResolver resolver) {&#xa;        // Get a resource by path&#xa;        Resource neo = resolver.getResource(&quot;/content/sling-matrix/agents/neo&quot;);&#xa;        &#xa;        if (neo != null) {&#xa;            // Access properties via ValueMap&#xa;            ValueMap props = neo.getValueMap();&#xa;            String role = props.get(&quot;role&quot;, String.class);&#xa;            Boolean isTheOne = props.get(&quot;isTheOne&quot;, false);&#xa;            &#xa;            // Navigate to child resources&#xa;            Resource abilities = neo.getChild(&quot;abilities&quot;);&#xa;            &#xa;            // Iterate through children&#xa;            for (Resource skill : abilities.getChildren()) {&#xa;                String skillName = skill.getName();&#xa;                System.out.println(&quot;Skill downloaded: &quot; + skillName);&#xa;            }&#xa;            &#xa;            // Adapt resource to specific type&#xa;            MatrixAgent agent = neo.adaptTo(MatrixAgent.class);&#xa;        }&#xa;    }&#xa;}"/>
-        <text-block-2
+            code="// Create a resource&#xa;Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();&#xa;props.put(&quot;prop1&quot;, &quot;abc&quot;);&#xa;props.put(&quot;prop2&quot;, 25);&#xa;Resource matrixNode = resourceResolver.create(parentResource, &quot;resource1&quot;, props);&#xa;resourceResolver.commit();&#xa;&#xa;// Update a resource&#xa;Resource matrixNode = resourceResolver.getResource(&quot;/content/resource1&quot;);&#xa;ModifiableValueMap mvp = matrixNode.adaptTo(ModifiableValueMap.class);&#xa;mvp.put(&quot;prop1&quot;, &quot;def&quot;);&#xa;mvp.put(&quot;prop2&quot;, 33);&#xa;resourceResolver.commit();&#xa;&#xa;// Delete a resource&#xa;Resource matrixNode = resourceResolver.getResource(&quot;/content/resource1&quot;);&#xa;resourceResolver.delete(matrixNode);&#xa;resourceResolver.commit();"/>
+        <slide-headline-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Transaction Handling"/>
+        <text-block-7
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="Key Resource Methods"
-            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;getPath()&lt;/strong&gt; - Returns the absolute path to the resource&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getResourceType()&lt;/strong&gt; - Returns the sling:resourceType&lt;/li&gt;&lt;li&gt;&lt;strong&gt;adaptTo(Class)&lt;/strong&gt; - Adapts resource to another type&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getValueMap()&lt;/strong&gt; - Accesses resource properties&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getChildren()&lt;/strong&gt; - Iterates child resources&lt;/li&gt;&lt;li&gt;&lt;strong&gt;getParent()&lt;/strong&gt; - Navigates to parent resource&lt;/li&gt;&lt;/ul&gt;"/>
+            text="&lt;p&gt;ResourceResolver uses implicit transaction handling (started automatically):&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;commit()&lt;/code&gt; — permanently save pending changes&lt;/li&gt;&lt;li&gt;&lt;code&gt;revert()&lt;/code&gt; — revert all changes&lt;/li&gt;&lt;li&gt;&lt;code&gt;hasChanges()&lt;/code&gt; — check if unsaved changes exist&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Decorating and Providing Resources"/>
+        <text-block-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Sling supports advanced resource features:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;ResourceDecorator&lt;/strong&gt; OSGi service — decorate (e.g. manipulate metadata/properties) all resources before serving them&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ResourceWrapper&lt;/strong&gt; — overlay methods with other behavior&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ResourceProvider&lt;/strong&gt; OSGi service — provide additional resources in a virtual resource tree from another data source (e.g. Sling NoSQL resource providers). Can be combined with JCR resource provider.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ResourceUtil&lt;/strong&gt; — useful utility methods&lt;/li&gt;&lt;li&gt;&lt;strong&gt;SyntheticResource&lt;/strong&gt; — create virtual resources on-the-fly&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-10
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="The adaptTo() Concept"/>
+        <text-block-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;&lt;code&gt;adaptTo()&lt;/code&gt; allows to &amp;quot;get a view of the same object in terms of another class&amp;quot;. Content is kept encapsulated, functionality is abstracted from content, classes are not constrained by inheritance hierarchy.&lt;/p&gt;&lt;p&gt;This is used everywhere in Sling — it's the backbone of Sling Models where &lt;code&gt;adaptTo()&lt;/code&gt; creates model instances from a context object.&lt;/p&gt;"/>
+        <slide-headline-11
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Adapter Examples"/>
+        <text-block-10
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;&lt;strong&gt;Resource adapts to:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;JCR Node — if JCR-node-based&lt;/li&gt;&lt;li&gt;ValueMap — to get properties&lt;/li&gt;&lt;li&gt;ModifiableValueMap — to write properties&lt;/li&gt;&lt;li&gt;InputStream — binary content of file resource (nt:file/nt:resource)&lt;/li&gt;&lt;li&gt;Any Sling Model adapting from Resource&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;ResourceResolver adapts to:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;JCR Session — if JCR-based&lt;/li&gt;&lt;li&gt;Any Sling Model adapting from ResourceResolver&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;New adaptions can be added dynamically at runtime through OSGi bundles. Usually you use Sling Models for this (generates AdapterFactory internally).&lt;/p&gt;"/>
+        <slide-headline-12
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Sling Request API"/>
+        <text-block-11
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;&lt;strong&gt;SlingHttpServletRequest:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;getResourceResolver()&lt;/code&gt; — resource resolver for this request&lt;/li&gt;&lt;li&gt;&lt;code&gt;getResource()&lt;/code&gt; — current resource addressed in the URL&lt;/li&gt;&lt;li&gt;&lt;code&gt;getRequestPathInfo()&lt;/code&gt; — URL decomposition information&lt;/li&gt;&lt;li&gt;&lt;code&gt;getRequestDispatcher(…)&lt;/code&gt; — include/forward another resource&lt;/li&gt;&lt;li&gt;&lt;code&gt;getRequestProgressTracker()&lt;/code&gt; — write to request progress log&lt;/li&gt;&lt;li&gt;&lt;code&gt;adaptTo(…)&lt;/code&gt; — adapt to another class&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-13
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="RequestPathInfo"/>
+        <text-block-12
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;&lt;code&gt;getResourcePath()&lt;/code&gt; — &amp;quot;resource path&amp;quot; part of URL (before selectors, extension, suffix)&lt;/li&gt;&lt;li&gt;&lt;code&gt;getExtension()&lt;/code&gt; — extension or null&lt;/li&gt;&lt;li&gt;&lt;code&gt;getSelectorString()&lt;/code&gt; — selectors as string (dot-separated) or null&lt;/li&gt;&lt;li&gt;&lt;code&gt;getSelectors()&lt;/code&gt; — selectors as array (split on dots) or empty array&lt;/li&gt;&lt;li&gt;&lt;code&gt;getSuffix()&lt;/code&gt; — suffix part or null&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-14
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="SlingRequestDispatcher"/>
+        <text-block-13
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Sling-specific RequestDispatcher that accepts &lt;code&gt;RequestDispatcherOptions&lt;/code&gt;:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;forward()&lt;/code&gt; — server-side redirect, control handed to another resource&lt;/li&gt;&lt;li&gt;&lt;code&gt;include()&lt;/code&gt; — server-side include, output included in response&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Options allow: forcing a different resource type, adding/replacing selectors, replacing suffix. Most times you won't use this directly — use HTL/JSP resource include mechanisms instead.&lt;/p&gt;"/>
+        <slide-headline-15
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Namespace Mangling"/>
+        <text-block-14
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Paths in Sling often contain colons (used for JCR namespacing). Some systems don't handle colons in URL paths properly. Sling applies &lt;strong&gt;Namespace Mangling&lt;/strong&gt;:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Encloses namespace prefix in underscores and removes the colon&lt;/li&gt;&lt;li&gt;Only registered JCR namespaces are processed&lt;/li&gt;&lt;li&gt;Mangling in &lt;code&gt;map()&lt;/code&gt; methods (outgoing), unmangling in &lt;code&gt;resolve()&lt;/code&gt; (incoming)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Example: &lt;code&gt;/content/_a_sample/jcr:content/jcr:data.png&lt;/code&gt; → &lt;code&gt;/content/_a_sample/_jcr_content/_jcr_data.png&lt;/code&gt;&lt;/p&gt;"/>
     </main>
 </jcr:root>

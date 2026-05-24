@@ -1,26 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="nt:unstructured"
-    jcr:title="OSGi Unit Testing"
+    jcr:title="Unit Testing with OSGi"
     sling:resourceType="sling-matrix/pages/contentpage">
     <main
         jcr:primaryType="nt:unstructured"
         sling:resourceType="sling-matrix/components/parsys">
+        <slide-headline-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Approaches for Testing OSGi Applications"/>
         <text-block-1
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="Testing in the Construct"
-            text="&lt;p&gt;Just as Morpheus trained Neo in the Construct - a safe simulation environment - we use unit testing to verify our OSGi components work correctly before deploying them to production.&lt;/p&gt;&lt;p&gt;OSGi Mocks and JUnit provide the testing framework to simulate the OSGi environment without requiring a full runtime.&lt;/p&gt;"/>
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Sling OSGi Mocks&lt;/strong&gt; — very lightweight, emulates all core features of an OSGi container in-memory. Covers 90% of what is required.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;OPS4J PAX Exam&lt;/strong&gt; — integration tests, complicated and heavy-weight&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Sling Launchpad with Testing Tools&lt;/strong&gt; — heavy-weight, for complex scenarios beyond OSGi Mocks&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Goals for OSGi Unit Tests"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;Startup/Teardown of OSGi environment for each test run&lt;/li&gt;&lt;li&gt;Allow parallel execution of unit tests&lt;/li&gt;&lt;li&gt;Support basic OSGi features and all Declarative Services features&lt;/li&gt;&lt;li&gt;Control which OSGi services should be used in the test context&lt;/li&gt;&lt;li&gt;Allow combination with Mockito mocks&lt;/li&gt;&lt;li&gt;Visualize code coverage in IDE and CI&lt;/li&gt;&lt;li&gt;Maximum execution speed!&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="OsgiContext — JUnit 5"/>
         <code-block-1
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/code-block"
             language="java"
-            title="OSGi Mock Unit Test"
-            code="package org.example.matrix.services;&#xa;&#xa;import org.junit.jupiter.api.BeforeEach;&#xa;import org.junit.jupiter.api.Test;&#xa;import org.junit.jupiter.api.extension.ExtendWith;&#xa;import io.wcm.testing.mock.aem.junit5.AemContext;&#xa;import io.wcm.testing.mock.aem.junit5.AemContextExtension;&#xa;&#xa;import static org.junit.jupiter.api.Assertions.*;&#xa;&#xa;@ExtendWith(AemContextExtension.class)&#xa;class OracleServiceImplTest {&#xa;    &#xa;    private final AemContext context = new AemContext();&#xa;    private OracleServiceImpl oracleService;&#xa;    &#xa;    @BeforeEach&#xa;    void setUp() {&#xa;        // Register the service in the mock OSGi context&#xa;        oracleService = context.registerInjectActivateService(new OracleServiceImpl());&#xa;    }&#xa;    &#xa;    @Test&#xa;    void testProphecy() {&#xa;        String prophecy = oracleService.getProphecy();&#xa;        assertNotNull(prophecy, &quot;The Oracle must speak!&quot;);&#xa;        assertTrue(prophecy.contains(&quot;door&quot;), &quot;Follow the white rabbit...&quot;);&#xa;    }&#xa;}"/>
-        <text-block-2
+            code="@ExtendWith(OsgiContextExtension.class)&#xa;class MatrixServiceTest {&#xa;&#xa;    private final OsgiContext context = new OsgiContext();&#xa;&#xa;    @BeforeEach&#xa;    void setUp() {&#xa;        // setup test&#xa;    }&#xa;}&#xa;&#xa;// Can combine with Mockito:&#xa;@ExtendWith(OsgiContextExtension.class)&#xa;@ExtendWith(MockitoExtension.class)&#xa;class MatrixServiceTest {&#xa;    private final OsgiContext context = new OsgiContext();&#xa;    // ...&#xa;}&#xa;&#xa;// Context convenience methods:&#xa;// context.bundleContext()&#xa;// context.componentContext()&#xa;// context.getService(Class)&#xa;// context.getServices(Class, filter)"/>
+        <slide-headline-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Register Declarative Services"/>
+        <code-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@BeforeEach&#xa;void setUp() {&#xa;    // registerInjectActivateService:&#xa;    // 1. Injects all dependencies (register them beforehand)&#xa;    // 2. Activates the service&#xa;    // 3. Registers the service in OSGi service registry&#xa;    // 4. Deactivates when unit test completes&#xa;    underTest = context.registerInjectActivateService(&#xa;        new OracleServiceImpl());&#xa;}&#xa;&#xa;// With service properties:&#xa;underTest = context.registerInjectActivateService(&#xa;    new OracleServiceImpl(),&#xa;    &quot;prop1&quot;, &quot;value1&quot;,&#xa;    &quot;prop2&quot;, 55);&#xa;&#xa;// Dynamic references and configuration changes are supported"/>
+        <slide-headline-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Register Mocked Services"/>
+        <code-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@ExtendWith(OsgiContextExtension.class)&#xa;@ExtendWith(MockitoExtension.class)&#xa;class SentinelServiceTest {&#xa;&#xa;    private final OsgiContext context = new OsgiContext();&#xa;&#xa;    @Mock&#xa;    private GatekeeperService gatekeeperService;&#xa;&#xa;    @BeforeEach&#xa;    void setUp() {&#xa;        context.registerService(GatekeeperService.class,&#xa;            gatekeeperService);&#xa;        when(gatekeeperService.checkAccess(anyString()))&#xa;            .thenReturn(true);&#xa;    }&#xa;}"/>
+        <slide-headline-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Built-in OSGi Services"/>
+        <text-block-3
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="Testing Best Practices"
-            text="&lt;ul&gt;&lt;li&gt;Use OSGi Mocks to simulate the OSGi runtime&lt;/li&gt;&lt;li&gt;Test component activation and configuration&lt;/li&gt;&lt;li&gt;Verify service dependencies are properly injected&lt;/li&gt;&lt;li&gt;Test lifecycle methods (@Activate, @Deactivate, @Modified)&lt;/li&gt;&lt;li&gt;Mock external dependencies for isolated testing&lt;/li&gt;&lt;/ul&gt;"/>
+            text="&lt;p&gt;OSGi Mock provides mock implementations of:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;OSGi LogService&lt;/strong&gt; — logs events to SLF4J/Console&lt;/li&gt;&lt;li&gt;&lt;strong&gt;OSGi EventAdmin&lt;/strong&gt; — sending events with topics between components (whiteboard)&lt;/li&gt;&lt;li&gt;&lt;strong&gt;OSGi ConfigAdmin&lt;/strong&gt; — publish configurations for services&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Hints and Pitfalls"/>
+        <text-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;Register services in the correct dependency order (take care of hierarchy yourself)&lt;/li&gt;&lt;li&gt;IDE must support Maven build plugins to generate SCR metadata before executing tests&lt;/li&gt;&lt;li&gt;If you see &amp;quot;No OSGi SCR metadata found in classpath&amp;quot; — use Project → Clean to recompile&lt;/li&gt;&lt;li&gt;Bundle configuration from POM is ignored by OSGi Mocks&lt;/li&gt;&lt;li&gt;Use Infinitest plugin (Eclipse/IntelliJ) to run tests automatically on each change&lt;/li&gt;&lt;li&gt;Constantly check code coverage in your IDE&lt;/li&gt;&lt;/ul&gt;"/>
     </main>
 </jcr:root>

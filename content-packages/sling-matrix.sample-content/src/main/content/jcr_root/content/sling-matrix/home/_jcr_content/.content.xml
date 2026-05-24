@@ -11,15 +11,21 @@
     <main
         jcr:primaryType="nt:unstructured"
         sling:resourceType="sling-matrix/components/parsys">
+        <slide-headline-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="What is Sling Matrix?"/>
         <text-block-1
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="What is Sling Matrix?"
             text="&lt;p&gt;Sling Matrix is your gateway to mastering Apache Sling. Like Neo awakening to the true nature of reality, you'll discover the power beneath the surface of web content management.&lt;/p&gt;&lt;p&gt;This documentation will guide you through the fundamental concepts of OSGi, JCR, and Sling - the three pillars that support the Matrix of modern content-driven applications.&lt;/p&gt;"/>
+        <slide-headline-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Follow the White Rabbit"/>
         <text-block-2
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/text-block"
-            title="Follow the White Rabbit"
             text="&lt;p&gt;Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;OSGi&lt;/strong&gt; - The modular foundation of the Matrix&lt;/li&gt;&lt;li&gt;&lt;strong&gt;JCR&lt;/strong&gt; - The repository that stores all truth&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Sling&lt;/strong&gt; - The framework that brings it all together&lt;/li&gt;&lt;/ul&gt;"/>
     </main>
     <footer
