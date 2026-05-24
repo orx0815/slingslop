@@ -53,6 +53,8 @@ export function initHero3D(): void {
     uniform vec3  u_fold;
     uniform float u_glow_intensity;
     uniform float u_glow_base;
+    uniform sampler2D u_textTex;
+    uniform float u_hasText;
 
     out vec4 fragColor;
 
@@ -168,6 +170,17 @@ export function initHero3D(): void {
       return accumulatedLight;
     }
 
+    // Sample the text texture projected onto the fractal's front face
+    float sampleText(vec3 p) {
+      if (u_hasText < 0.5) return 0.0;
+      // Project onto XY plane, map to [0,1] UV range
+      vec2 textUV = p.xy / u_shape_size * 0.5 + 0.5;
+      // Flip Y for canvas coordinate system
+      textUV.y = 1.0 - textUV.y;
+      if (textUV.x < 0.0 || textUV.x > 1.0 || textUV.y < 0.0 || textUV.y > 1.0) return 0.0;
+      return texture(u_textTex, textUV).r;
+    }
+
     vec3 getPixelColor(vec2 fragCoord) {
       vec2 uv = (2.0 * fragCoord.xy - u_resolution.xy) / u_resolution.y;
       float jitter = hash(uv) * 0.1;
@@ -181,7 +194,24 @@ export function initHero3D(): void {
       rayDirection.xz *= g_camRotX;
 
       vec3 finalColor = renderRay(cameraOrigin, rayDirection, jitter);
-      return finalColor * finalColor; // contrast boost
+      finalColor = finalColor * finalColor; // contrast boost
+
+      // Etch text: cast a secondary ray to find the surface point and sample text there
+      float t = jitter;
+      for (int i = 0; i < 80; i++) {
+        vec3 pos = cameraOrigin + rayDirection * t;
+        float d = evaluateSceneSDF(pos);
+        if (d < 0.001) {
+          float textVal = sampleText(pos);
+          // Brighten where text is — etch a glowing imprint
+          finalColor += textVal * vec3(0.4, 0.8, 1.0) * 1.5;
+          break;
+        }
+        t += d * 0.8;
+        if (t > u_zoom + 4.0) break;
+      }
+
+      return finalColor;
     }
 
     void main() {
@@ -246,6 +276,45 @@ export function initHero3D(): void {
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
+  // ── Text Texture ───────────────────────────────────────────────────────────
+  const heroText = container.dataset.heroText || '';
+
+  function createTextTexture(text: string): WebGLTexture | null {
+    const tex = gl!.createTexture();
+    gl!.activeTexture(gl!.TEXTURE0);
+    gl!.bindTexture(gl!.TEXTURE_2D, tex);
+
+    const size = 512;
+    const offscreen = document.createElement('canvas');
+    offscreen.width = size;
+    offscreen.height = size;
+    const ctx2d = offscreen.getContext('2d')!;
+
+    // Black background, white text
+    ctx2d.fillStyle = '#000';
+    ctx2d.fillRect(0, 0, size, size);
+
+    if (text) {
+      ctx2d.fillStyle = '#fff';
+      ctx2d.textAlign = 'center';
+      ctx2d.textBaseline = 'middle';
+      // Scale font to fit width
+      const fontSize = Math.min((size * 0.8) / (text.length * 0.55), size * 0.4);
+      ctx2d.font = `bold ${fontSize}px monospace`;
+      ctx2d.fillText(text, size / 2, size / 2);
+    }
+
+    gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, gl!.RGBA, gl!.UNSIGNED_BYTE, offscreen);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
+
+    return tex;
+  }
+
+  createTextTexture(heroText);
+
   // ── Uniform locations ──────────────────────────────────────────────────────
   const loc = {
     u_time: gl.getUniformLocation(program, 'u_time'),
@@ -259,6 +328,8 @@ export function initHero3D(): void {
     u_fold: gl.getUniformLocation(program, 'u_fold'),
     u_glow_intensity: gl.getUniformLocation(program, 'u_glow_intensity'),
     u_glow_base: gl.getUniformLocation(program, 'u_glow_base'),
+    u_textTex: gl.getUniformLocation(program, 'u_textTex'),
+    u_hasText: gl.getUniformLocation(program, 'u_hasText'),
   };
 
   // Set static uniforms once
@@ -269,6 +340,8 @@ export function initHero3D(): void {
   gl.uniform3f(loc.u_fold, 1.7, 0.5, 0.7);
   gl.uniform1f(loc.u_glow_intensity, 0.028);
   gl.uniform1f(loc.u_glow_base, 0.282);
+  gl.uniform1i(loc.u_textTex, 0);
+  gl.uniform1f(loc.u_hasText, heroText ? 1.0 : 0.0);
 
   // Enable alpha blending
   gl.enable(gl.BLEND);

@@ -6,7 +6,7 @@
      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
      data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
   <!-- Three.js 3D floating geometry -->
-  <div class="hero-3d-container"></div>
+  <div class="hero-3d-container" data-hero-text="${properties.heroText || ''}"></div>
 
   <!-- Spacer that matches the 3D square's width so flex centres the content in the right half -->
   <div class="hero-3d-spacer" aria-hidden="true"></div>
