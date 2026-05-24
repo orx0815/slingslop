@@ -8,7 +8,6 @@
  */
 
 import hljs from 'highlight.js';
-import { initHero3D } from './hero3d';
 
 (function (): void {
   'use strict';
@@ -202,7 +201,6 @@ import { initHero3D } from './hero3d';
     highlightCode();
     initCircularNav();
     initMatrixRain();
-    initHero3D();
 
     // Re-run code highlighting after HTMX content swaps
     document.body.addEventListener('htmx:afterSwap', () => {

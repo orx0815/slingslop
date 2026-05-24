@@ -63,6 +63,15 @@ const BUNDLES = [
   },
 ];
 
+// JS-only bundles (no CSS counterpart)
+const JS_ONLY_BUNDLES = [
+  {
+    name:     'hero3d',
+    jsEntry:  path.join(ROOT, 'src/typescript/hero3d-entry.ts'),
+    jsOutDir: path.join(JS_ROOT, 'public'),
+  },
+];
+
 function mkdirp(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -98,8 +107,8 @@ function cssBanner(name) {
 async function build() {
   console.log('Building Sling Matrix UI assets…\n');
 
-  await Promise.all(
-    BUNDLES.flatMap(({ name, jsEntry, cssEntry, jsOutDir, cssOutDir, inlineHtmx }) => {
+  await Promise.all([
+    ...BUNDLES.flatMap(({ name, jsEntry, cssEntry, jsOutDir, cssOutDir, inlineHtmx }) => {
       mkdirp(jsOutDir);
       mkdirp(cssOutDir);
       const htmxBanner = inlineHtmx ? fs.readFileSync(HTMX_SRC, 'utf8') : '';
@@ -145,8 +154,35 @@ async function build() {
           sourcemap:   false,
         }),
       ];
-    })
-  );
+    }),
+    // JS-only bundles (no CSS)
+    ...JS_ONLY_BUNDLES.flatMap(({ name, jsEntry, jsOutDir }) => {
+      mkdirp(jsOutDir);
+      return [
+        // JS — dev (unminified, inline source map)
+        esbuild.build({
+          entryPoints: [jsEntry],
+          bundle:      true,
+          format:      'iife',
+          outfile:     path.join(jsOutDir, `${name}-bundle.js`),
+          minify:      false,
+          sourcemap:   'inline',
+          target:      'es2020',
+          banner:      { js: jsBanner(name) },
+        }),
+        // JS — prod (minified)
+        esbuild.build({
+          entryPoints: [jsEntry],
+          bundle:      true,
+          format:      'iife',
+          outfile:     path.join(jsOutDir, `${name}-bundle.min.js`),
+          minify:      true,
+          sourcemap:   false,
+          target:      'es2020',
+        }),
+      ];
+    }),
+  ]);
 
   console.log('✓ Build complete!');
 }
@@ -161,8 +197,8 @@ async function watch() {
   console.log('Watching Sling Matrix UI assets (dev builds only)…');
   console.log('Open pages with ?minLibs=no to load the unminified files.\n');
 
-  const contexts = await Promise.all(
-    BUNDLES.flatMap(({ name, jsEntry, cssEntry, jsOutDir, cssOutDir }) => {
+  const contexts = await Promise.all([
+    ...BUNDLES.flatMap(({ name, jsEntry, cssEntry, jsOutDir, cssOutDir }) => {
       mkdirp(jsOutDir);
       mkdirp(cssOutDir);
 
@@ -186,8 +222,24 @@ async function watch() {
           banner:      { css: cssBanner(name) },
         }),
       ];
-    })
-  );
+    }),
+    // JS-only bundles (no CSS)
+    ...JS_ONLY_BUNDLES.flatMap(({ name, jsEntry, jsOutDir }) => {
+      mkdirp(jsOutDir);
+      return [
+        esbuild.context({
+          entryPoints: [jsEntry],
+          bundle:      true,
+          format:      'iife',
+          outfile:     path.join(jsOutDir, `${name}-bundle.js`),
+          minify:      false,
+          sourcemap:   'inline',
+          target:      'es2020',
+          banner:      { js: jsBanner(name) },
+        }),
+      ];
+    }),
+  ]);
 
   await Promise.all(contexts.map((ctx) => ctx.watch()));
   console.log(`Watching ${contexts.length} targets. Ctrl+C to stop.\n`);

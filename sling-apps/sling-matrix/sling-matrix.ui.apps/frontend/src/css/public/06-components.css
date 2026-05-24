@@ -185,3 +185,91 @@
 .toc li li a:hover {
   padding-left: calc(var(--space-md) + var(--space-sm));
 }
+
+/* Slide headline component */
+.slide-headline {
+  position: relative;
+  margin: var(--space-3xl) 0 var(--space-xl);
+  padding: var(--space-md) 0;
+  overflow: hidden;
+}
+
+.slide-headline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.75 0.25 var(--hue-primary) / 0.6) 15%,
+    var(--color-primary) 50%,
+    oklch(0.75 0.25 var(--hue-primary) / 0.6) 85%,
+    transparent 100%
+  );
+  animation: slideHeadlineScan 3s ease-in-out infinite;
+}
+
+.slide-headline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 60px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 12px oklch(0.75 0.25 var(--hue-primary) / 0.8);
+  animation: slideHeadlineGlide 3s ease-in-out infinite;
+}
+
+.slide-headline__text {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-primary-light);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+.slide-headline__text span {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light) 0%,
+    var(--color-primary) 50%,
+    oklch(0.65 0.18 var(--hue-secondary)) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.slide-headline__text::before {
+  content: '//';
+  color: var(--color-primary-dark);
+  margin-right: var(--space-sm);
+  font-weight: 400;
+  opacity: 0.6;
+  -webkit-text-fill-color: initial;
+  background: none;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+}
+
+@keyframes slideHeadlineScan {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideHeadlineGlide {
+  0% { left: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: calc(100% - 60px); opacity: 0; }
+}

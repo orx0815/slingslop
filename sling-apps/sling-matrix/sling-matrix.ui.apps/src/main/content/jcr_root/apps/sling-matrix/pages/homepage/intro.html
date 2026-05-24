@@ -1,3 +1,11 @@
+<!--/* Hero 3D — Three.js loaded only on homepage */-->
+<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+  <script src="/apps/sling-matrix/js/public/hero3d-bundle.js"></script>
+</sly>
+<sly data-sly-test="${!noMinLibs}">
+  <script src="/apps/sling-matrix/js/public/hero3d-bundle.min.js"></script>
+</sly>
+
 <section class="hero-section">
   <sly data-sly-resource="${'./hero' @ resourceType='sling-matrix/components/hero'}" />
 </section>
