@@ -273,3 +273,13 @@
   90% { opacity: 1; }
   100% { left: calc(100% - 60px); opacity: 0; }
 }
+
+/* Stagger animations so multiple headlines don't pulse in sync */
+.slide-headline:nth-child(2n)::before { animation-duration: 3.7s; animation-delay: -0.8s; }
+.slide-headline:nth-child(2n)::after  { animation-duration: 3.7s; animation-delay: -0.8s; }
+.slide-headline:nth-child(3n)::before { animation-duration: 4.2s; animation-delay: -1.6s; }
+.slide-headline:nth-child(3n)::after  { animation-duration: 4.2s; animation-delay: -1.6s; }
+.slide-headline:nth-child(5n)::before { animation-duration: 2.8s; animation-delay: -2.3s; }
+.slide-headline:nth-child(5n)::after  { animation-duration: 2.8s; animation-delay: -2.3s; }
+.slide-headline:nth-child(7n)::before { animation-duration: 3.4s; animation-delay: -0.4s; }
+.slide-headline:nth-child(7n)::after  { animation-duration: 3.4s; animation-delay: -0.4s; }
