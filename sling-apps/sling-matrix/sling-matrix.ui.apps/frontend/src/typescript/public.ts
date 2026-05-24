@@ -7,7 +7,35 @@
  * - Matrix digital rain effect (optional)
  */
 
-import hljs from 'highlight.js';
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+import css from 'highlight.js/lib/languages/css';
+import xml from 'highlight.js/lib/languages/xml';
+import ini from 'highlight.js/lib/languages/ini';
+import javascript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+import plaintext from 'highlight.js/lib/languages/plaintext';
+import shell from 'highlight.js/lib/languages/shell';
+import stylus from 'highlight.js/lib/languages/stylus';
+import java from 'highlight.js/lib/languages/java';
+import typescript from 'highlight.js/lib/languages/typescript';
+
+hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('sh', bash);
+hljs.registerLanguage('css', css);
+hljs.registerLanguage('html', xml);
+hljs.registerLanguage('xml', xml);
+hljs.registerLanguage('ini', ini);
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('js', javascript);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('plaintext', plaintext);
+hljs.registerLanguage('text', plaintext);
+hljs.registerLanguage('shell', shell);
+hljs.registerLanguage('stylus', stylus);
+hljs.registerLanguage('java', java);
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('ts', typescript);
 
 (function (): void {
   'use strict';
