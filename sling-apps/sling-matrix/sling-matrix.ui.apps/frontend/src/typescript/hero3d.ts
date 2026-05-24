@@ -6,55 +6,40 @@
  * Inspired by: https://codepen.io/sabosugi/pen/jEVPrOx
  *
  * Drag on the hero canvas to rotate the fractal.
+ *
+ * Uses raw WebGL2 instead of Three.js to keep the bundle tiny (~3 KB vs 500 KB).
  */
-
-import * as THREE from 'three';
 
 export function initHero3D(): void {
   const maybeContainer = document.querySelector<HTMLElement>('.hero-3d-container');
   if (!maybeContainer) {
     return;
   }
-  // Re-assign to an explicitly typed const so the non-null type carries into closures.
   const container: HTMLElement = maybeContainer;
 
-  // ── Scene & Camera ────────────────────────────────────────────────────────
-  // Orthographic camera: the shader handles its own perspective internally.
-  const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  // ── Canvas & WebGL2 Context ────────────────────────────────────────────────
+  const canvas = document.createElement('canvas');
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  container.appendChild(canvas);
 
-  // ── Renderer ──────────────────────────────────────────────────────────────
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(1.0); // keep at 1× for hero-section performance
-  renderer.setClearColor(0x000000, 0); // fully transparent clear
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
-
-  // ── Uniforms ───────────────────────────────────────────────────────────────
-  const uniforms = {
-    u_time: { value: 0.0 },
-    u_resolution: {
-      value: new THREE.Vector2(container.clientWidth, container.clientHeight),
-    },
-    u_mouse_rot: { value: new THREE.Vector2(0.0, 0.0) },
-    u_zoom: { value: 5.0 },
-    u_perspective: { value: 2.2 },
-    u_anim_speed: { value: 0.15 },
-    u_shape_size: { value: 1.6 },
-    u_iterations: { value: 5 },
-    u_fold: { value: new THREE.Vector3(1.7, 0.5, 0.7) },
-    u_glow_intensity: { value: 0.028 },
-    u_glow_base: { value: 0.282 },
-  };
+  const gl = canvas.getContext('webgl2', { alpha: true, antialias: true });
+  if (!gl) {
+    return;
+  }
 
   // ── Shaders ────────────────────────────────────────────────────────────────
-  const vertexShader = /* glsl */ `
+  const vertexSrc = /* glsl */ `#version 300 es
+    in vec2 a_position;
     void main() {
-      gl_Position = vec4(position, 1.0);
+      gl_Position = vec4(a_position, 0.0, 1.0);
     }
   `;
 
-  const fragmentShader = /* glsl */ `
+  const fragmentSrc = /* glsl */ `#version 300 es
+    precision highp float;
     #define MAX_ITERATIONS 10
 
     uniform float u_time;
@@ -68,6 +53,8 @@ export function initHero3D(): void {
     uniform vec3  u_fold;
     uniform float u_glow_intensity;
     uniform float u_glow_base;
+
+    out vec4 fragColor;
 
     // Global fractal tint accumulated during SDF evaluation
     vec3 g_fractalTint;
@@ -209,27 +196,96 @@ export function initHero3D(): void {
       vec3 color = getPixelColor(gl_FragCoord.xy);
       // Use luminance as alpha so the black background is transparent
       float alpha = clamp(dot(color, vec3(0.299, 0.587, 0.114)) * 4.0, 0.0, 1.0);
-      gl_FragColor = vec4(color, alpha);
+      fragColor = vec4(color, alpha);
     }
   `;
 
-  // ── Full-screen quad ───────────────────────────────────────────────────────
-  const geometry = new THREE.PlaneGeometry(2, 2);
-  const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
-  scene.add(new THREE.Mesh(geometry, material));
+  // ── Compile & Link ─────────────────────────────────────────────────────────
+  function compileShader(type: number, src: string): WebGLShader | null {
+    const s = gl!.createShader(type);
+    if (!s) {
+      return null;
+    }
+    gl!.shaderSource(s, src);
+    gl!.compileShader(s);
+    if (!gl!.getShaderParameter(s, gl!.COMPILE_STATUS)) {
+      console.error(gl!.getShaderInfoLog(s));
+      gl!.deleteShader(s);
+      return null;
+    }
+    return s;
+  }
+
+  const vs = compileShader(gl.VERTEX_SHADER, vertexSrc);
+  const fs = compileShader(gl.FRAGMENT_SHADER, fragmentSrc);
+  if (!vs || !fs) {
+    return;
+  }
+
+  const program = gl.createProgram()!;
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(program));
+    return;
+  }
+  gl.useProgram(program);
+
+  // ── Fullscreen quad (two triangles) ────────────────────────────────────────
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  // prettier-ignore
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1, -1,  1, -1,  -1, 1,
+    -1,  1,  1, -1,   1, 1,
+  ]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(program, 'a_position');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  // ── Uniform locations ──────────────────────────────────────────────────────
+  const loc = {
+    u_time: gl.getUniformLocation(program, 'u_time'),
+    u_resolution: gl.getUniformLocation(program, 'u_resolution'),
+    u_mouse_rot: gl.getUniformLocation(program, 'u_mouse_rot'),
+    u_zoom: gl.getUniformLocation(program, 'u_zoom'),
+    u_perspective: gl.getUniformLocation(program, 'u_perspective'),
+    u_anim_speed: gl.getUniformLocation(program, 'u_anim_speed'),
+    u_shape_size: gl.getUniformLocation(program, 'u_shape_size'),
+    u_iterations: gl.getUniformLocation(program, 'u_iterations'),
+    u_fold: gl.getUniformLocation(program, 'u_fold'),
+    u_glow_intensity: gl.getUniformLocation(program, 'u_glow_intensity'),
+    u_glow_base: gl.getUniformLocation(program, 'u_glow_base'),
+  };
+
+  // Set static uniforms once
+  gl.uniform1f(loc.u_perspective, 2.2);
+  gl.uniform1f(loc.u_anim_speed, 0.15);
+  gl.uniform1f(loc.u_shape_size, 1.6);
+  gl.uniform1i(loc.u_iterations, 5);
+  gl.uniform3f(loc.u_fold, 1.7, 0.5, 0.7);
+  gl.uniform1f(loc.u_glow_intensity, 0.028);
+  gl.uniform1f(loc.u_glow_base, 0.282);
+
+  // Enable alpha blending
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(0, 0, 0, 0);
 
   // ── Drag-to-rotate ────────────────────────────────────────────────────────
   let isDragging = false;
   const prevPos = { x: 0, y: 0 };
-  const targetRot = new THREE.Vector2(0, 0);
-  const currentRot = new THREE.Vector2(0, 0);
+  const targetRot = { x: 0, y: 0 };
+  const currentRot = { x: 0, y: 0 };
 
   // ── Scroll-to-zoom ────────────────────────────────────────────────────────
-  let targetZoom = uniforms.u_zoom.value;
+  let zoom = 5.0;
+  let targetZoom = 5.0;
   const ZOOM_MIN = 3.0;
   const ZOOM_MAX = 14.0;
-
-  const canvas = renderer.domElement;
 
   canvas.addEventListener('mousedown', (e: MouseEvent) => {
     isDragging = true;
@@ -267,8 +323,9 @@ export function initHero3D(): void {
   function onResize(): void {
     const w = container.clientWidth;
     const h = container.clientHeight;
-    renderer.setSize(w, h);
-    uniforms.u_resolution.value.set(w, h);
+    canvas.width = w;
+    canvas.height = h;
+    gl!.viewport(0, 0, w, h);
   }
 
   window.addEventListener('resize', onResize);
@@ -278,12 +335,25 @@ export function initHero3D(): void {
 
   function animate(): void {
     requestAnimationFrame(animate);
-    uniforms.u_time.value = (performance.now() - startTime) / 1000;
-    currentRot.lerp(targetRot, 0.08);
-    uniforms.u_mouse_rot.value.copy(currentRot);
-    uniforms.u_zoom.value += (targetZoom - uniforms.u_zoom.value) * 0.08;
-    renderer.render(scene, camera);
+
+    const time = (performance.now() - startTime) / 1000;
+
+    // Lerp rotation & zoom
+    currentRot.x += (targetRot.x - currentRot.x) * 0.08;
+    currentRot.y += (targetRot.y - currentRot.y) * 0.08;
+    zoom += (targetZoom - zoom) * 0.08;
+
+    // Set dynamic uniforms
+    gl!.uniform1f(loc.u_time, time);
+    gl!.uniform2f(loc.u_resolution, canvas.width, canvas.height);
+    gl!.uniform2f(loc.u_mouse_rot, currentRot.x, currentRot.y);
+    gl!.uniform1f(loc.u_zoom, zoom);
+
+    // Draw
+    gl!.clear(gl!.COLOR_BUFFER_BIT);
+    gl!.drawArrays(gl!.TRIANGLES, 0, 6);
   }
 
+  gl.viewport(0, 0, canvas.width, canvas.height);
   animate();
 }
