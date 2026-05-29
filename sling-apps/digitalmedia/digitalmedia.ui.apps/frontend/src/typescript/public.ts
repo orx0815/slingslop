@@ -16,6 +16,32 @@
   document.body.addEventListener('htmx:afterSwap', (event: Event) => {
     const htmxEvent = event as CustomEvent;
     console.log('HTMX swap completed', htmxEvent.detail);
+
+    // After successful upload, trigger asset list reload
+    if (htmxEvent.detail.target && htmxEvent.detail.target.classList.contains('dml-asset-grid')) {
+      console.log('Assets updated');
+    }
+  });
+
+  // After successful upload form submission, trigger reload
+  document.body.addEventListener('htmx:afterRequest', (event: Event) => {
+    const htmxEvent = event as CustomEvent;
+
+    if (htmxEvent.detail.successful && htmxEvent.detail.elt.classList.contains('dml-upload-form')) {
+      console.log('Upload successful, triggering asset reload');
+      // Dispatch custom event to reload assets
+      document.body.dispatchEvent(new CustomEvent('assetUploaded'));
+
+      // Reset the form
+      const form = htmxEvent.detail.elt as HTMLFormElement;
+      form.reset();
+
+      // Clear file info
+      const fileInfo = document.querySelector('.upload-file-info');
+      if (fileInfo) {
+        fileInfo.textContent = '';
+      }
+    }
   });
 
   // Asset selection handler

@@ -82,12 +82,14 @@
 
       <section>
         <h2 style="margin-bottom: var(--space-md);">Assets</h2>
-        <div class="dml-asset-grid dml-stagger">
-          <!--/* Assets will be loaded here via HTMX or rendered server-side */-->
+        <div class="dml-asset-grid dml-stagger"
+             hx-get="${resource.path}.assets.html"
+             hx-trigger="load, assetUploaded from:body"
+             hx-swap="innerHTML">
+          <!--/* Assets will be loaded here via HTMX */-->
           <div class="dml-empty-state" style="grid-column: 1 / -1;">
             <div class="dml-empty-state-icon">📂</div>
-            <h3>No assets yet</h3>
-            <p>Upload your first asset to get started</p>
+            <h3>Loading assets...</h3>
           </div>
         </div>
       </section>
