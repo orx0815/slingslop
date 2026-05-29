@@ -1,0 +1,112 @@
+/**
+ * 08-upload.css — File upload component styles
+ */
+
+.dml-upload-area {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  text-align: center;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  background-color: var(--color-white);
+}
+
+.dml-upload-area:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+.dml-upload-area.drag-over {
+  border-color: var(--color-secondary);
+  background-color: oklch(from var(--color-secondary) l c h / 0.1);
+  transform: scale(1.02);
+}
+
+.dml-upload-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto var(--space-md);
+  color: var(--color-text-muted);
+}
+
+.dml-upload-text {
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+}
+
+.dml-upload-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.dml-upload-input {
+  display: none;
+}
+
+.upload-file-info {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-info);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.dml-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.dml-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.dml-form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.dml-form-input {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  transition: border-color var(--transition-fast);
+}
+
+.dml-form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
+}
+
+.dml-upload-progress {
+  margin-top: var(--space-md);
+}
+
+.dml-progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  background-color: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.dml-progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-secondary),
+    var(--color-secondary-light)
+  );
+  transition: width var(--transition-slow);
+  border-radius: var(--radius-full);
+}

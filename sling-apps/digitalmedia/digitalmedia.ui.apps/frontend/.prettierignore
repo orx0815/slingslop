@@ -1,0 +1,6 @@
+node_modules/
+target/
+src/main/content/jcr_root/apps/motorbrot/dma/js/htmx.js
+src/main/content/jcr_root/apps/motorbrot/dma/js/htmx.min.js
+*.xml
+*.md
