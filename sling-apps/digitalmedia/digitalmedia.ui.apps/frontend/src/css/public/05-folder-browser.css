@@ -1,0 +1,79 @@
+/**
+ * 05-folder-browser.css — Folder tree navigation styles
+ */
+
+.dml-folder-tree {
+  padding: var(--space-md);
+}
+
+.dml-folder-tree-item {
+  position: relative;
+}
+
+.dml-folder-tree-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.dml-folder-tree-button:hover {
+  background-color: var(--color-primary-subtle);
+}
+
+.dml-folder-tree-button.active {
+  background-color: var(--color-primary-light);
+  color: var(--color-white);
+  font-weight: 500;
+}
+
+.dml-folder-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.dml-folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dml-folder-children {
+  margin-left: var(--space-lg);
+  margin-top: var(--space-xs);
+}
+
+.dml-folder-create {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.dml-folder-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.dml-folder-create-form input {
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.dml-folder-create-form input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.dml-folder-create-actions {
+  display: flex;
+  gap: var(--space-sm);
+}

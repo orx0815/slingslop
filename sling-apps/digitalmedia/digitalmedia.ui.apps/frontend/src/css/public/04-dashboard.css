@@ -1,0 +1,114 @@
+/**
+ * 04-dashboard.css — Dashboard-specific styles (buttons, toolbar, etc.)
+ */
+
+.dml-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.dml-btn-primary {
+  background-color: var(--color-secondary);
+  color: var(--color-primary-dark);
+  border-color: var(--color-secondary);
+}
+
+.dml-btn-primary:hover {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.dml-btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.dml-btn-secondary:hover {
+  background-color: var(--color-primary-subtle);
+  border-color: var(--color-primary-light);
+}
+
+.dml-btn-ghost {
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.dml-btn-ghost:hover {
+  background-color: var(--color-primary-subtle);
+}
+
+.dml-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dml-toolbar {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-md);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.dml-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dml-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.dml-breadcrumb-item a {
+  color: var(--color-primary);
+  transition: color var(--transition-fast);
+}
+
+.dml-breadcrumb-item a:hover {
+  color: var(--color-primary-hover);
+}
+
+.dml-breadcrumb-separator {
+  color: var(--color-text-muted);
+}
+
+.dml-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  max-width: 400px;
+}
+
+.dml-search input {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  transition: border-color var(--transition-fast);
+}
+
+.dml-search input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
+}

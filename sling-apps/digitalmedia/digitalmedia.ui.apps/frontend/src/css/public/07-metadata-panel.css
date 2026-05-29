@@ -1,0 +1,146 @@
+/**
+ * 07-metadata-panel.css — Asset metadata display panel
+ */
+
+.dml-metadata-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  min-height: 300px;
+}
+
+.dml-metadata-empty p {
+  margin-top: var(--space-md);
+}
+
+.dml-metadata-header {
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dml-metadata-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dml-metadata-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dml-metadata-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  word-break: break-word;
+}
+
+.dml-metadata-section {
+  margin-bottom: var(--space-lg);
+}
+
+.dml-metadata-section h3 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.dml-metadata-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dml-metadata-row:last-child {
+  border-bottom: none;
+}
+
+.dml-metadata-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.dml-metadata-value {
+  font-size: var(--font-size-sm);
+  text-align: right;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.dml-renditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.dml-rendition-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.dml-rendition-item:hover {
+  background-color: var(--color-primary-subtle);
+}
+
+.dml-rendition-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dml-rendition-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.dml-rendition-dimensions {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.dml-rendition-download {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  background-color: var(--color-secondary);
+  color: var(--color-primary-dark);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.dml-rendition-download:hover {
+  background-color: var(--color-secondary-hover);
+  transform: scale(1.05);
+}
+
+.dml-metadata-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
