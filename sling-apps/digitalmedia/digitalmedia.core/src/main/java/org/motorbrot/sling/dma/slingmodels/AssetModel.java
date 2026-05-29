@@ -30,6 +30,8 @@ public class AssetModel {
     private String mimeType;
     private String assetPath;
     private List<String> renditionNames;
+    private String createdDate;
+    private String modifiedDate;
 
     public AssetModel() {
         // Default constructor required by Sling Models
@@ -61,6 +63,15 @@ public class AssetModel {
                 this.mimeType = contentNode.hasProperty("jcr:mimeType")
                         ? contentNode.getProperty("jcr:mimeType").getString()
                         : "application/octet-stream";
+
+                // Load created and modified dates
+                this.createdDate = contentNode.hasProperty("jcr:created")
+                        ? contentNode.getProperty("jcr:created").getString()
+                        : "";
+
+                this.modifiedDate = contentNode.hasProperty("jcr:lastModified")
+                        ? contentNode.getProperty("jcr:lastModified").getString()
+                        : "";
 
                 // Load rendition names
                 this.renditionNames = new ArrayList<>();
@@ -138,5 +149,37 @@ public class AssetModel {
             case "text": return "📝";
             default: return "📁";
         }
+    }
+
+    public String getPath() {
+        return assetPath;
+    }
+
+    public String getName() {
+        if (assetPath != null) {
+            int lastSlash = assetPath.lastIndexOf('/');
+            return lastSlash >= 0 ? assetPath.substring(lastSlash + 1) : assetPath;
+        }
+        return "";
+    }
+
+    public String getPreviewUrl() {
+        return assetPath + "/renditions/preview/jcr:content";
+    }
+
+    public String getFormattedSize() {
+        return getFormattedFileSize();
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public String getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public boolean getSupportsImageRenditions() {
+        return "image".equals(fileType);
     }
 }

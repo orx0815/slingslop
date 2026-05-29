@@ -52,6 +52,7 @@
     if (target.closest('[data-asset-id]')) {
       const assetElement = target.closest('[data-asset-id]') as HTMLElement;
       const assetId = assetElement.dataset.assetId;
+      const assetPath = assetElement.dataset.assetPath;
 
       // Remove previous selection
       document.querySelectorAll('[data-asset-id].selected').forEach((el) => {
@@ -61,7 +62,20 @@
       // Add selection to clicked asset
       assetElement.classList.add('selected');
 
-      console.log('Asset selected:', assetId);
+      console.log('Asset selected:', assetId, assetPath);
+
+      // Load metadata in the metadata panel
+      if (assetPath) {
+        const metadataPanel = document.querySelector('.dml-metadata-panel');
+        if (metadataPanel) {
+          // Use HTMX to load the metadata panel for this asset
+          // We'll use htmx.ajax() to load the component
+          (window as any).htmx.ajax('GET', `${assetPath}.metadata-panel.html`, {
+            target: '.dml-metadata-panel',
+            swap: 'innerHTML'
+          });
+        }
+      }
     }
 
     // Handle folder clicks

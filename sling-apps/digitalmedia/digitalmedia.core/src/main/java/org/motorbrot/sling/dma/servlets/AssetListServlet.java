@@ -117,7 +117,7 @@ public class AssetListServlet extends SlingSafeMethodsServlet {
                 : String.format("<span class=\"dml-asset-preview-icon\">%s</span>", iconEmoji);
 
         return String.format(
-            "<div class=\"dml-asset-item\" data-asset-id=\"%s\">" +
+            "<div class=\"dml-asset-item\" data-asset-id=\"%s\" data-asset-path=\"%s\">" +
             "  <div class=\"dml-asset-preview\">%s" +
             "    <span class=\"dml-asset-type-badge\">%s</span>" +
             "  </div>" +
@@ -128,7 +128,7 @@ public class AssetListServlet extends SlingSafeMethodsServlet {
             "    </div>" +
             "  </div>" +
             "</div>",
-            assetPath, previewHtml, fileType, assetName, assetName, formattedSize
+            assetPath, assetPath, previewHtml, fileType, assetName, assetName, formattedSize
         );
     }
 
