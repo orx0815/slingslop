@@ -102,11 +102,7 @@
 
 .dml-progress-fill {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--color-secondary),
-    var(--color-secondary-light)
-  );
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-secondary-light));
   transition: width var(--transition-slow);
   border-radius: var(--radius-full);
 }

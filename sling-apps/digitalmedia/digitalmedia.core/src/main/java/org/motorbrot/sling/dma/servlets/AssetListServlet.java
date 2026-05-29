@@ -1,10 +1,10 @@
 package org.motorbrot.sling.dma.servlets;
 
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
-import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -27,12 +27,12 @@ import java.io.IOException;
     selectors = "assets",
     extensions = "html"
 )
-public class AssetListServlet extends SlingSafeMethodsServlet {
+public class AssetListServlet extends SlingJakartaSafeMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetListServlet.class);
 
     @Override
-    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
+    protected void doGet(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
             throws ServletException, IOException {
 
         ResourceResolver resolver = request.getResourceResolver();

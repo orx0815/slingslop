@@ -39,7 +39,7 @@
           <validatorsSettings>
             <jackrabbit-filter>
               <options>
-                <validRoots>/apps</validRoots>
+                <validRoots>/apps/motorbrot</validRoots>
               </options>
             </jackrabbit-filter>
           </validatorsSettings>

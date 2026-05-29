@@ -70,9 +70,15 @@
         if (metadataPanel) {
           // Use HTMX to load the metadata panel for this asset
           // We'll use htmx.ajax() to load the component
-          (window as any).htmx.ajax('GET', `${assetPath}.metadata-panel.html`, {
+          (
+            window as Window & {
+              htmx: {
+                ajax: (method: string, url: string, opts: { target: string; swap: string }) => void;
+              };
+            }
+          ).htmx.ajax('GET', `${assetPath}.metadata-panel.html`, {
             target: '.dml-metadata-panel',
-            swap: 'innerHTML'
+            swap: 'innerHTML',
           });
         }
       }
@@ -115,6 +121,6 @@
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   }
 })();

@@ -1,8 +1,6 @@
 package org.motorbrot.sling.dma.services;
 
 import org.apache.tika.Tika;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.TikaCoreProperties;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +29,8 @@ public class MetadataExtractionService {
         Map<String, Object> metadata = new HashMap<>();
 
         try {
-            Metadata tikaMetadata = new Metadata();
-            tikaMetadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, filename);
-
-            // Detect MIME type
-            String mimeType = tika.detect(inputStream, tikaMetadata);
+            // Detect MIME type using filename hint
+            String mimeType = tika.detect(inputStream, filename);
             metadata.put("mimeType", mimeType);
             metadata.put("filename", filename);
 
