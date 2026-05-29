@@ -2,7 +2,12 @@
  * 02-typography.css — Typography styles
  */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: var(--line-height-tight);
   color: var(--color-primary-dark);
@@ -26,7 +31,8 @@ h4 {
   font-size: var(--font-size-md);
 }
 
-h5, h6 {
+h5,
+h6 {
   font-size: var(--font-size-base);
 }
 
@@ -67,11 +73,13 @@ pre code {
   background-color: transparent;
 }
 
-strong, b {
+strong,
+b {
   font-weight: 600;
 }
 
-em, i {
+em,
+i {
   font-style: italic;
 }
 

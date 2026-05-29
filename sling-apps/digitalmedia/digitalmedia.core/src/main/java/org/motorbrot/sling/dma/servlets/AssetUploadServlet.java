@@ -1,11 +1,11 @@
 package org.motorbrot.sling.dma.servlets;
 
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
-import org.apache.sling.api.servlets.SlingAllMethodsServlet;
+import org.apache.sling.api.servlets.SlingJakartaAllMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.motorbrot.sling.dma.services.MetadataExtractionService;
 import org.motorbrot.sling.dma.services.RenditionService;
@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ import java.util.Map;
     selectors = "upload",
     extensions = "html"
 )
-public class AssetUploadServlet extends SlingAllMethodsServlet {
+public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetUploadServlet.class);
 
@@ -46,7 +46,7 @@ public class AssetUploadServlet extends SlingAllMethodsServlet {
     private RenditionService renditionService;
 
     @Override
-    protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response)
+    protected void doPost(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
             throws ServletException, IOException {
 
         ResourceResolver resolver = request.getResourceResolver();

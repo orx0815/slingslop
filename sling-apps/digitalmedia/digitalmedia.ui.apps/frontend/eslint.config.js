@@ -1,19 +1,15 @@
 'use strict';
 
-const eslint       = require('@eslint/js');
-const tseslint     = require('typescript-eslint');
-const prettier     = require('eslint-plugin-prettier');
+const eslint = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const prettier = require('eslint-plugin-prettier');
 const prettierConf = require('eslint-config-prettier');
-const globals      = require('globals');
+const globals = require('globals');
 
 module.exports = tseslint.config(
   // Paths never linted (replaces .eslintignore)
   {
-    ignores: [
-      'target/**',
-      'scripts/**',
-      '../src/main/content/**',
-    ],
+    ignores: ['target/**', 'scripts/**', '../src/main/content/**'],
   },
 
   eslint.configs.recommended,
@@ -45,7 +41,7 @@ module.exports = tseslint.config(
       ],
       'no-console': ['warn', { allow: ['warn', 'error', 'log'] }],
       eqeqeq: ['error', 'always'],
-      curly:  ['error', 'all'],
+      curly: ['error', 'all'],
     },
   }
 );

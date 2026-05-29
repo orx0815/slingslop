@@ -1,14 +1,14 @@
 package org.motorbrot.sling.dma.servlets;
 
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.osgi.service.component.annotations.Component;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -22,10 +22,10 @@ import java.io.IOException;
     selectors = "metadata-panel",
     extensions = "html"
 )
-public class MetadataPanelServlet extends SlingSafeMethodsServlet {
+public class MetadataPanelServlet extends SlingJakartaSafeMethodsServlet {
 
     @Override
-    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
+    protected void doGet(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("text/html");
@@ -36,7 +36,7 @@ public class MetadataPanelServlet extends SlingSafeMethodsServlet {
                 .getResource("/apps/motorbrot/dma/components/metadata-panel");
 
         if (componentResource != null) {
-            request.getRequestDispatcher(componentResource, "metadata-panel.html")
+            request.getRequestDispatcher(componentResource)
                     .include(request, response);
         } else {
             response.getWriter().write("<div class=\"dml-metadata-empty\">" +

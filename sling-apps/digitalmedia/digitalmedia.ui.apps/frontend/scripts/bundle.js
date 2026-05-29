@@ -27,23 +27,23 @@
 'use strict';
 
 const esbuild = require('esbuild');
-const fs      = require('fs');
-const path    = require('path');
+const fs = require('fs');
+const path = require('path');
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
-const ROOT     = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..');
 const JCR_BASE = path.resolve(ROOT, '../src/main/content/jcr_root/apps/motorbrot/dma');
-const JS_ROOT  = path.join(JCR_BASE, 'js');
+const JS_ROOT = path.join(JCR_BASE, 'js');
 const CSS_ROOT = path.join(JCR_BASE, 'css');
 
 const BUNDLES = [
   {
-    name:       'public',
-    jsEntry:    path.join(ROOT, 'src/typescript/public.ts'),
-    cssEntry:   path.join(ROOT, 'src/css/public/public.css'),
-    jsOutDir:   path.join(JS_ROOT,  'public'),
-    cssOutDir:  path.join(CSS_ROOT, 'public'),
+    name: 'public',
+    jsEntry: path.join(ROOT, 'src/typescript/public.ts'),
+    cssEntry: path.join(ROOT, 'src/css/public/public.css'),
+    jsOutDir: path.join(JS_ROOT, 'public'),
+    cssOutDir: path.join(CSS_ROOT, 'public'),
   },
 ];
 
@@ -91,40 +91,40 @@ async function build() {
         // JS — dev (unminified, inline source map)
         esbuild.build({
           entryPoints: [jsEntry],
-          bundle:      true,
-          format:      'iife',
-          outfile:     path.join(jsOutDir, `${name}-bundle.js`),
-          minify:      false,
-          sourcemap:   'inline',
-          target:      'es2020',
-          banner:      { js: jsBanner(name) },
+          bundle: true,
+          format: 'iife',
+          outfile: path.join(jsOutDir, `${name}-bundle.js`),
+          minify: false,
+          sourcemap: 'inline',
+          target: 'es2020',
+          banner: { js: jsBanner(name) },
         }),
         // JS — prod (minified)
         esbuild.build({
           entryPoints: [jsEntry],
-          bundle:      true,
-          format:      'iife',
-          outfile:     path.join(jsOutDir, `${name}-bundle.min.js`),
-          minify:      true,
-          sourcemap:   false,
-          target:      'es2020',
+          bundle: true,
+          format: 'iife',
+          outfile: path.join(jsOutDir, `${name}-bundle.min.js`),
+          minify: true,
+          sourcemap: false,
+          target: 'es2020',
         }),
         // CSS — dev (unminified, inline source map)
         esbuild.build({
           entryPoints: [cssEntry],
-          bundle:      true,
-          outfile:     path.join(cssOutDir, `${name}.css`),
-          minify:      false,
-          sourcemap:   'inline',
-          banner:      { css: cssBanner(name) },
+          bundle: true,
+          outfile: path.join(cssOutDir, `${name}.css`),
+          minify: false,
+          sourcemap: 'inline',
+          banner: { css: cssBanner(name) },
         }),
         // CSS — prod (minified)
         esbuild.build({
           entryPoints: [cssEntry],
-          bundle:      true,
-          outfile:     path.join(cssOutDir, `${name}.min.css`),
-          minify:      true,
-          sourcemap:   false,
+          bundle: true,
+          outfile: path.join(cssOutDir, `${name}.min.css`),
+          minify: true,
+          sourcemap: false,
         }),
       ];
     })
@@ -151,21 +151,21 @@ async function watch() {
       return [
         esbuild.context({
           entryPoints: [jsEntry],
-          bundle:      true,
-          format:      'iife',
-          outfile:     path.join(jsOutDir, `${name}-bundle.js`),
-          minify:      false,
-          sourcemap:   'inline',
-          target:      'es2020',
-          banner:      { js: jsBanner(name) },
+          bundle: true,
+          format: 'iife',
+          outfile: path.join(jsOutDir, `${name}-bundle.js`),
+          minify: false,
+          sourcemap: 'inline',
+          target: 'es2020',
+          banner: { js: jsBanner(name) },
         }),
         esbuild.context({
           entryPoints: [cssEntry],
-          bundle:      true,
-          outfile:     path.join(cssOutDir, `${name}.css`),
-          minify:      false,
-          sourcemap:   'inline',
-          banner:      { css: cssBanner(name) },
+          bundle: true,
+          outfile: path.join(cssOutDir, `${name}.css`),
+          minify: false,
+          sourcemap: 'inline',
+          banner: { css: cssBanner(name) },
         }),
       ];
     })

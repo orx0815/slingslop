@@ -1,9 +1,9 @@
 package org.motorbrot.sling.dma.servlets;
 
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.motorbrot.sling.dma.models.MediaFormat;
 import org.motorbrot.sling.dma.services.MediaFormatService;
@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.List;
     selectors = "renditions",
     extensions = "html"
 )
-public class RenditionListServlet extends SlingSafeMethodsServlet {
+public class RenditionListServlet extends SlingJakartaSafeMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RenditionListServlet.class);
 
@@ -38,7 +38,7 @@ public class RenditionListServlet extends SlingSafeMethodsServlet {
     private MediaFormatService mediaFormatService;
 
     @Override
-    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
+    protected void doGet(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("text/html");
@@ -63,7 +63,8 @@ public class RenditionListServlet extends SlingSafeMethodsServlet {
             Node renditionsNode = assetNode.getNode("renditions");
             List<String> renditionNames = new ArrayList<>();
 
-            renditionsNode.getNodes().forEachRemaining(renditionNode -> {
+            renditionsNode.getNodes().forEachRemaining(obj -> {
+                Node renditionNode = (Node) obj;
                 try {
                     renditionNames.add(renditionNode.getName());
                 } catch (Exception e) {

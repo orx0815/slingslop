@@ -1,10 +1,10 @@
 package org.motorbrot.sling.dma.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.SlingJakartaHttpServletRequest;
+import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.motorbrot.sling.dma.slingmodels.AssetModel;
 import org.osgi.service.component.annotations.Component;
@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +28,13 @@ import java.util.Map;
     selectors = "metadata",
     extensions = "json"
 )
-public class AssetMetadataServlet extends SlingSafeMethodsServlet {
+public class AssetMetadataServlet extends SlingJakartaSafeMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetMetadataServlet.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
+    protected void doGet(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
             throws ServletException, IOException {
 
         Resource resource = request.getResource();
