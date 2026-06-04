@@ -50,11 +50,19 @@ public class FolderCreationServlet extends SlingJakartaAllMethodsServlet {
                 return;
             }
 
-            // Create folder under assets
-            String assetsPath = "/content/motorbrot/dma/assets";
+            // Determine parent: use the selected folder if provided and valid
+            String defaultAssetsPath = "/content/motorbrot/dma/assets";
+            String parentParam = request.getParameter("folder");
+            String assetsPath;
+            if (parentParam != null && !parentParam.trim().isEmpty()
+                    && parentParam.startsWith(defaultAssetsPath)) {
+                assetsPath = parentParam.trim();
+            } else {
+                assetsPath = defaultAssetsPath;
+            }
             Node assetsFolder = session.nodeExists(assetsPath)
                     ? session.getNode(assetsPath)
-                    : session.getRootNode().addNode("content/motorbrot/dma/assets", "sling:Folder");
+                    : session.getRootNode().addNode(assetsPath.substring(1), "sling:Folder");
 
             // Check if folder already exists
             if (assetsFolder.hasNode(folderName)) {
@@ -71,10 +79,10 @@ public class FolderCreationServlet extends SlingJakartaAllMethodsServlet {
             String folderPath = newFolder.getPath();
             LOG.info("Created folder: {}", folderPath);
 
-            // Return folder tree item HTML
+            // Fire HX-Trigger so the folder tree container reloads via HTMX
             response.setStatus(200);
-            response.setContentType("text/html");
-            response.getWriter().write(generateFolderTreeItem(folderPath, folderName));
+            response.setHeader("HX-Trigger", "folderCreated");
+            response.getWriter().write("");
 
         } catch (Exception e) {
             LOG.error("Error creating folder", e);
@@ -83,18 +91,5 @@ public class FolderCreationServlet extends SlingJakartaAllMethodsServlet {
         }
     }
 
-    /**
-     * Generates HTML for a folder tree item.
-     */
-    private String generateFolderTreeItem(String folderPath, String folderName) {
-        return String.format(
-            "<div class=\"dml-folder-tree-item dml-fade-in\">" +
-            "  <button class=\"dml-folder-tree-button\" data-folder-path=\"%s\">" +
-            "    <span class=\"dml-folder-icon\">📁</span>" +
-            "    <span class=\"dml-folder-name\">%s</span>" +
-            "  </button>" +
-            "</div>",
-            folderPath, folderName
-        );
-    }
+
 }

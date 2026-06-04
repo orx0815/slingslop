@@ -4,41 +4,115 @@
 
 .dml-app {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr 320px;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'header header header'
     'sidebar main metadata';
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   background-color: var(--color-bg);
 }
 
 .dml-header {
   grid-area: header;
-  background-color: var(--color-primary);
+  /* Deep directional gradient: near-black blue → mid primary with a hue twist */
+  background:
+    linear-gradient(
+      108deg,
+      oklch(0.18 0.055 245) 0%,
+      oklch(0.34 0.09 240) 55%,
+      oklch(0.26 0.11 233) 100%
+    );
   color: var(--color-white);
-  padding: var(--space-md) var(--space-lg);
-  box-shadow: var(--shadow-md);
+  padding: 0 var(--space-lg);
+  height: 3.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
+  /* India Yellow accent line at bottom + deep drop shadow */
+  border-bottom: 2px solid oklch(0.78 0.15 80 / 0.65);
+  box-shadow:
+    0 1px 0 oklch(0.78 0.15 80 / 0.12),
+    0 8px 32px oklch(0.10 0.05 240 / 0.65);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Atmospheric depth: left radial glow + faint right India Yellow whisper */
+.dml-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      oklch(1 0 0 / 0.015) 0px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(
+      ellipse 50% 140% at 8% 50%,
+      oklch(0.48 0.12 235 / 0.4) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 35% 120% at 92% 50%,
+      oklch(0.78 0.15 80 / 0.07) 0%,
+      transparent 65%
+    );
 }
 
 .dml-header h1 {
   font-size: var(--font-size-lg);
-  color: var(--color-white);
   margin: 0;
   font-weight: 700;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  /* White → warm India-Yellow gradient on the glyphs */
+  background: linear-gradient(
+    90deg,
+    oklch(0.99 0.005 240) 20%,
+    oklch(0.93 0.08 80) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Soft India-Yellow halo around the text */
+  filter: drop-shadow(0 0 10px oklch(0.78 0.15 80 / 0.28));
+}
+
+/* India Yellow accent bar — the brand mark before the title */
+.dml-header h1::before {
+  content: '';
+  display: block;
+  flex-shrink: 0;
+  width: 3px;
+  height: 1.4em;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    180deg,
+    oklch(0.88 0.15 80) 0%,
+    oklch(0.62 0.14 80) 100%
+  );
+  box-shadow: 0 0 10px oklch(0.78 0.15 80 / 0.65);
 }
 
 .dml-header-actions {
   display: flex;
   gap: var(--space-md);
   align-items: center;
+  font-size: var(--font-size-sm);
+  color: oklch(0.80 0.03 240);
 }
 
 .dml-sidebar {
@@ -51,17 +125,19 @@
 
 .dml-main {
   grid-area: main;
-  padding: var(--space-lg);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 .dml-metadata-panel {
   grid-area: metadata;
   background-color: var(--color-surface);
-  border-left: 1px solid var(--color-border);
-  width: 320px;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
-  padding: var(--space-lg);
+  padding: var(--space-xs);
 }
 
 /* Responsive layout */
@@ -87,8 +163,8 @@
   }
 
   .dml-metadata-panel {
-    border-left: none;
     border-top: 1px solid var(--color-border);
+    padding-left: var(--space-lg);
   }
 }
 

@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Component(service = Servlet.class)
 @SlingServletResourceTypes(
-    resourceTypes = "nt:file",
+    resourceTypes = "motorbrot/dma/components/asset",
     methods = "GET",
     selectors = "metadata",
     extensions = "json"

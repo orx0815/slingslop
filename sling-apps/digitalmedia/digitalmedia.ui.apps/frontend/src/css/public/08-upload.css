@@ -2,64 +2,87 @@
  * 08-upload.css — File upload component styles
  */
 
+/* ── Upload section wrapper ── */
+.dml-upload-section {
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* ── Upload form: horizontal row ── */
+.dml-upload-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* ── Drop zone (compact horizontal) ── */
 .dml-upload-area {
-  border: 2px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  border: 1.5px dashed var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  text-align: center;
-  transition: all var(--transition-base);
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   background-color: var(--color-white);
+  transition: all var(--transition-base);
+  min-width: 0;
 }
 
 .dml-upload-area:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-light);
   background-color: var(--color-primary-subtle);
 }
 
 .dml-upload-area.drag-over {
   border-color: var(--color-secondary);
-  background-color: oklch(from var(--color-secondary) l c h / 0.1);
-  transform: scale(1.02);
+  background-color: oklch(0.78 0.15 80 / 0.08);
+  transform: scale(1.01);
 }
 
 .dml-upload-icon {
-  width: 4rem;
-  height: 4rem;
-  margin: 0 auto var(--space-md);
-  color: var(--color-text-muted);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.dml-upload-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .dml-upload-text {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  margin-bottom: var(--space-xs);
   color: var(--color-text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dml-upload-hint {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  margin-bottom: var(--space-md);
+  line-height: 1.2;
 }
 
 .dml-upload-input {
   display: none;
 }
 
-.upload-file-info {
-  margin-top: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--color-info);
-  color: var(--color-white);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-}
-
-.dml-upload-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
+/* ── Dynamic upload submit button ── */
+.dml-upload-submit {
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dml-form-group {

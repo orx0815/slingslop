@@ -59,6 +59,9 @@ public class MetadataExtractionService {
         }
 
         if (mimeType.startsWith("image/")) {
+            if (mimeType.equals("image/svg+xml")) {
+                return "svg";
+            }
             return "image";
         } else if (mimeType.startsWith("video/")) {
             return "video";
@@ -68,8 +71,19 @@ public class MetadataExtractionService {
             return "pdf";
         } else if (mimeType.startsWith("text/")) {
             return "text";
-        } else if (mimeType.contains("zip") || mimeType.contains("compressed")) {
+        } else if (mimeType.contains("zip") || mimeType.contains("compressed")
+                || mimeType.contains("tar") || mimeType.contains("rar")
+                || mimeType.equals("application/x-7z-compressed")) {
             return "archive";
+        } else if (mimeType.contains("spreadsheet") || mimeType.contains("excel")
+                || mimeType.equals("application/vnd.ms-excel")
+                || mimeType.contains("sheet")) {
+            return "spreadsheet";
+        } else if (mimeType.contains("presentation") || mimeType.contains("powerpoint")
+                || mimeType.equals("application/vnd.ms-powerpoint")) {
+            return "presentation";
+        } else if (mimeType.contains("word") || mimeType.contains("msword")) {
+            return "document";
         }
 
         return "document";
@@ -79,6 +93,9 @@ public class MetadataExtractionService {
      * Checks if the file type supports image rendition generation.
      */
     public boolean supportsImageRenditions(String mimeType) {
-        return mimeType != null && mimeType.startsWith("image/");
+        // SVG is vector — ImageIO cannot decode it; skip rendition generation for it
+        return mimeType != null
+                && mimeType.startsWith("image/")
+                && !mimeType.equals("image/svg+xml");
     }
 }

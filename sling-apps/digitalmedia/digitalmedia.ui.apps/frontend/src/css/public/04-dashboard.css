@@ -48,6 +48,19 @@
   background-color: var(--color-primary-subtle);
 }
 
+.dml-btn-danger {
+  background-color: oklch(0.55 0.22 25);
+  color: var(--color-white);
+  border-color: oklch(0.45 0.22 25);
+}
+
+.dml-btn-danger:hover {
+  background-color: oklch(0.45 0.22 25);
+  border-color: oklch(0.38 0.2 25);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
 .dml-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -55,39 +68,76 @@
 
 .dml-toolbar {
   display: flex;
-  gap: var(--space-md);
   align-items: center;
-  padding: var(--space-md);
-  background-color: var(--color-surface);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(
+    180deg,
+    oklch(0.94 0.007 240) 0%,
+    var(--color-white) 100%
+  );
   border-bottom: 1px solid var(--color-border);
-  flex-wrap: wrap;
+  min-height: 2.75rem;
+  gap: var(--space-md);
 }
 
+/* ── Breadcrumb pill ── */
 .dml-breadcrumb {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0;
+  padding: 0.15rem 0.4rem;
+  background: var(--color-white);
+  border: 1px solid oklch(0.80 0.015 240);
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 3px oklch(0.18 0.05 240 / 0.08);
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  line-height: 1;
 }
 
-.dml-breadcrumb-item {
-  display: flex;
+.dml-bc-icon {
+  font-size: 0.85em;
+  margin-right: 0.3em;
+  display: inline-block;
+  vertical-align: -0.05em;
+}
+
+.dml-bc-link {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  padding: 0.25rem 0.55rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-primary-light);
+  font-size: inherit;
+  font-family: inherit;
+  border-radius: var(--radius-full);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
 }
 
-.dml-breadcrumb-item a {
-  color: var(--color-primary);
-  transition: color var(--transition-fast);
+.dml-bc-link:hover {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-dark);
 }
 
-.dml-breadcrumb-item a:hover {
-  color: var(--color-primary-hover);
+.dml-bc-sep {
+  color: oklch(0.72 0.02 240);
+  padding: 0 0.05rem;
+  user-select: none;
+  font-size: 1.1em;
+  font-weight: 300;
 }
 
-.dml-breadcrumb-separator {
-  color: var(--color-text-muted);
+.dml-bc-current {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
 }
 
 .dml-search {

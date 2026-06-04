@@ -64,8 +64,8 @@ public class AssetListServlet extends SlingJakartaSafeMethodsServlet {
             while (children.hasNext()) {
                 Node child = children.nextNode();
 
-                // Only show files (assets), not folders
-                if ("nt:file".equals(child.getPrimaryNodeType().getName())) {
+                // Only show asset nodes (marked with isAsset=true), not sub-folders
+                if (child.hasProperty("isAsset") && child.getProperty("isAsset").getBoolean()) {
                     hasAssets = true;
                     html.append(generateAssetCard(child));
                 }
@@ -97,24 +97,28 @@ public class AssetListServlet extends SlingJakartaSafeMethodsServlet {
         String assetPath = assetNode.getPath();
         String assetName = assetNode.getName();
 
-        Node contentNode = assetNode.getNode("jcr:content");
-        String fileType = contentNode.hasProperty("dma:fileType")
-                ? contentNode.getProperty("dma:fileType").getString()
+        Node metaNode = assetNode.hasNode("metadata") ? assetNode.getNode("metadata") : null;
+        String fileType = (metaNode != null && metaNode.hasProperty("fileType"))
+                ? metaNode.getProperty("fileType").getString()
                 : "unknown";
 
-        long fileSize = contentNode.hasProperty("dma:fileSize")
-                ? contentNode.getProperty("dma:fileSize").getLong()
+        long fileSize = (metaNode != null && metaNode.hasProperty("fileSize"))
+                ? metaNode.getProperty("fileSize").getLong()
                 : 0;
 
         String iconEmoji = getIconForFileType(fileType);
         String formattedSize = formatFileSize(fileSize);
 
-        // Check if preview rendition exists
+        // Check if preview rendition exists; SVG renders natively
         boolean hasPreview = assetNode.hasNode("renditions/preview");
+        boolean isSvg = "svg".equals(fileType);
         String previewHtml = hasPreview
                 ? String.format("<img src=\"%s/renditions/preview/jcr:content\" alt=\"%s\" />",
                         assetPath, assetName)
-                : String.format("<span class=\"dml-asset-preview-icon\">%s</span>", iconEmoji);
+                : isSvg
+                        ? String.format("<img src=\"%s/jcr:content\" alt=\"%s\" class=\"dml-svg-preview\" />",
+                                assetPath, assetName)
+                        : String.format("<span class=\"dml-asset-preview-icon\">%s</span>", iconEmoji);
 
         return String.format(
             "<div class=\"dml-asset-item\" data-asset-id=\"%s\" data-asset-path=\"%s\">" +
@@ -137,13 +141,17 @@ public class AssetListServlet extends SlingJakartaSafeMethodsServlet {
      */
     private String getIconForFileType(String fileType) {
         switch (fileType) {
-            case "image": return "🖼️";
-            case "video": return "🎬";
-            case "audio": return "🎵";
-            case "pdf": return "📄";
-            case "archive": return "📦";
-            case "text": return "📝";
-            default: return "📁";
+            case "image":        return "🖼️";
+            case "svg":          return "🎨";
+            case "video":        return "🎬";
+            case "audio":        return "🎵";
+            case "pdf":          return "📕";
+            case "spreadsheet":  return "📊";
+            case "presentation": return "📋";
+            case "document":     return "📝";
+            case "archive":      return "📦";
+            case "text":         return "📄";
+            default:             return "📁";
         }
     }
 

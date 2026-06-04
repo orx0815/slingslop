@@ -46,7 +46,7 @@
     <div class="dml-metadata-section" data-sly-test="${asset.supportsImageRenditions}">
       <h3>Renditions</h3>
       <div class="dml-renditions-list"
-           id="rendition-list-${asset.name}"
+           id="dml-current-rendition-list"
            hx-get="${asset.path}.renditions.html"
            hx-trigger="load"
            hx-swap="innerHTML">
@@ -54,37 +54,78 @@
       </div>
     </div>
 
-    <div class="dml-metadata-actions" data-sly-test="${asset.supportsImageRenditions}">
+    <div class="dml-metadata-section dml-generate-section" data-sly-test="${asset.supportsImageRenditions && asset.missingRenditions}">
       <h3>Generate Renditions</h3>
-      <div class="dml-generate-renditions" id="generate-renditions-${asset.name}">
-        <button class="dml-btn dml-btn-secondary"
+      <div class="dml-generate-renditions">
+        <button class="dml-btn dml-btn-generate"
+                data-sly-test="${!asset.renditionExists['thumbnail']}"
                 hx-post="${asset.path}.generate-rendition.html"
                 hx-vals='{"format": "thumbnail"}'
-                hx-target="#rendition-list-${asset.name}"
-                hx-swap="beforeend">
-          Generate Thumbnail (150x150)
+                hx-target="#dml-current-rendition-list"
+                hx-swap="beforeend"
+                hx-indicator=".dml-generate-section"
+                hx-on::before-request="dmlSpinner(true,'Generating thumbnail…')"
+                hx-on::after-request="dmlSpinner(false);if(event.detail.successful) this.remove()">
+          <span class="dml-btn-icon">🖼</span>
+          <span>Thumbnail <small>150×150</small></span>
         </button>
-        <button class="dml-btn dml-btn-secondary"
+        <button class="dml-btn dml-btn-generate"
+                data-sly-test="${!asset.renditionExists['web']}"
                 hx-post="${asset.path}.generate-rendition.html"
                 hx-vals='{"format": "web"}'
-                hx-target="#rendition-list-${asset.name}"
-                hx-swap="beforeend">
-          Generate Web (800x600)
+                hx-target="#dml-current-rendition-list"
+                hx-swap="beforeend"
+                hx-indicator=".dml-generate-section"
+                hx-on::before-request="dmlSpinner(true,'Generating web rendition…')"
+                hx-on::after-request="dmlSpinner(false);if(event.detail.successful) this.remove()">
+          <span class="dml-btn-icon">🌐</span>
+          <span>Web <small>800×600</small></span>
         </button>
-        <button class="dml-btn dml-btn-secondary"
+        <button class="dml-btn dml-btn-generate"
+                data-sly-test="${!asset.renditionExists['large']}"
                 hx-post="${asset.path}.generate-rendition.html"
                 hx-vals='{"format": "large"}'
-                hx-target="#rendition-list-${asset.name}"
-                hx-swap="beforeend">
-          Generate Large (1200x1200)
+                hx-target="#dml-current-rendition-list"
+                hx-swap="beforeend"
+                hx-indicator=".dml-generate-section"
+                hx-on::before-request="dmlSpinner(true,'Generating large rendition…')"
+                hx-on::after-request="dmlSpinner(false);if(event.detail.successful) this.remove()">
+          <span class="dml-btn-icon">📐</span>
+          <span>Large <small>1200×1200</small></span>
         </button>
       </div>
     </div>
 
     <div class="dml-metadata-actions">
-      <a href="${asset.downloadUrl}" class="dml-btn dml-btn-primary" download>
-        Download Original
+      <a href="${asset.downloadUrl}" class="dml-btn dml-btn-primary dml-btn-download" download>
+        ⬇ Download Original
       </a>
+      <button class="dml-btn dml-btn-danger dml-btn-download"
+              onclick="document.getElementById('dml-delete-modal').showModal()">
+        🗑 Delete Asset
+      </button>
     </div>
+
+    <dialog id="dml-delete-modal" class="dml-modal">
+      <div class="dml-modal-content">
+        <div class="dml-modal-icon">🗑</div>
+        <h3 class="dml-modal-title">Delete Asset?</h3>
+        <p class="dml-modal-body">
+          <strong>${asset.filename}</strong> will be permanently deleted along with all its renditions. This cannot be undone.
+        </p>
+        <div class="dml-modal-actions">
+          <button class="dml-btn dml-btn-secondary"
+                  onclick="document.getElementById('dml-delete-modal').close()">
+            Cancel
+          </button>
+          <button class="dml-btn dml-btn-danger"
+                  hx-post="${asset.path}.delete.html"
+                  hx-target="body"
+                  onclick="document.getElementById('dml-delete-modal').close()">
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </dialog>
   </sly>
 </div>

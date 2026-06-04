@@ -3,13 +3,16 @@ package org.motorbrot.sling.dma.slingmodels;
 import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
-import org.apache.sling.models.annotations.injectorspecific.Self;
+import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 
-import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Sling Model for a media asset.
@@ -18,11 +21,8 @@ import java.util.List;
 @Model(adaptables = {SlingJakartaHttpServletRequest.class, Resource.class})
 public class AssetModel {
 
-    @Self
+    @SlingObject
     private Resource resource;
-
-    @Inject
-    private SlingJakartaHttpServletRequest request;
 
     private String filename;
     private String fileType;
@@ -32,6 +32,7 @@ public class AssetModel {
     private List<String> renditionNames;
     private String createdDate;
     private String modifiedDate;
+    private String uploadedBy;
 
     public AssetModel() {
         // Default constructor required by Sling Models
@@ -46,18 +47,19 @@ public class AssetModel {
             Node assetNode = resource.adaptTo(Node.class);
             if (assetNode != null && assetNode.hasNode("jcr:content")) {
                 Node contentNode = assetNode.getNode("jcr:content");
+                Node metaNode = assetNode.hasNode("metadata") ? assetNode.getNode("metadata") : null;
 
                 this.assetPath = assetNode.getPath();
-                this.filename = contentNode.hasProperty("dma:filename")
-                        ? contentNode.getProperty("dma:filename").getString()
+                this.filename = (metaNode != null && metaNode.hasProperty("filename"))
+                        ? metaNode.getProperty("filename").getString()
                         : assetNode.getName();
 
-                this.fileType = contentNode.hasProperty("dma:fileType")
-                        ? contentNode.getProperty("dma:fileType").getString()
+                this.fileType = (metaNode != null && metaNode.hasProperty("fileType"))
+                        ? metaNode.getProperty("fileType").getString()
                         : "unknown";
 
-                this.fileSize = contentNode.hasProperty("dma:fileSize")
-                        ? contentNode.getProperty("dma:fileSize").getLong()
+                this.fileSize = (metaNode != null && metaNode.hasProperty("fileSize"))
+                        ? metaNode.getProperty("fileSize").getLong()
                         : 0;
 
                 this.mimeType = contentNode.hasProperty("jcr:mimeType")
@@ -65,12 +67,17 @@ public class AssetModel {
                         : "application/octet-stream";
 
                 // Load created and modified dates
-                this.createdDate = contentNode.hasProperty("jcr:created")
-                        ? contentNode.getProperty("jcr:created").getString()
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                this.createdDate = assetNode.hasProperty("jcr:created")
+                        ? sdf.format(assetNode.getProperty("jcr:created").getDate().getTime())
                         : "";
 
                 this.modifiedDate = contentNode.hasProperty("jcr:lastModified")
-                        ? contentNode.getProperty("jcr:lastModified").getString()
+                        ? sdf.format(contentNode.getProperty("jcr:lastModified").getDate().getTime())
+                        : "";
+
+                this.uploadedBy = assetNode.hasProperty("uploadedBy")
+                        ? assetNode.getProperty("uploadedBy").getString()
                         : "";
 
                 // Load rendition names
@@ -131,6 +138,27 @@ public class AssetModel {
         return renditionNames != null && !renditionNames.isEmpty();
     }
 
+    /** Returns a map of format name → true so HTL can do asset.renditionExists['thumbnail']. */
+    public Map<String, Boolean> getRenditionExists() {
+        Map<String, Boolean> map = new HashMap<>();
+        if (renditionNames != null) {
+            for (String name : renditionNames) {
+                map.put(name, Boolean.TRUE);
+            }
+        }
+        return map;
+    }
+
+    /** True when at least one of the known generate formats is not yet present. */
+    public boolean isMissingRenditions() {
+        List<String> known = Arrays.asList("thumbnail", "web", "large");
+        if (renditionNames == null) return true;
+        for (String fmt : known) {
+            if (!renditionNames.contains(fmt)) return true;
+        }
+        return false;
+    }
+
     public String getRenditionUrl(String renditionName) {
         return assetPath + "/renditions/" + renditionName + "/jcr:content";
     }
@@ -177,6 +205,10 @@ public class AssetModel {
 
     public String getModifiedDate() {
         return modifiedDate;
+    }
+
+    public String getUploadedBy() {
+        return uploadedBy;
     }
 
     public boolean getSupportsImageRenditions() {

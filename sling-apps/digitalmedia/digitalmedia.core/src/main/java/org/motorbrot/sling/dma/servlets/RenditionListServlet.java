@@ -5,14 +5,12 @@ import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
-import org.motorbrot.sling.dma.models.MediaFormat;
-import org.motorbrot.sling.dma.services.MediaFormatService;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
@@ -25,7 +23,7 @@ import java.util.List;
  */
 @Component(service = Servlet.class)
 @SlingServletResourceTypes(
-    resourceTypes = "nt:file",
+    resourceTypes = "motorbrot/dma/components/asset",
     methods = "GET",
     selectors = "renditions",
     extensions = "html"
@@ -33,9 +31,6 @@ import java.util.List;
 public class RenditionListServlet extends SlingJakartaSafeMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RenditionListServlet.class);
-
-    @Reference
-    private MediaFormatService mediaFormatService;
 
     @Override
     protected void doGet(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
@@ -77,30 +72,16 @@ public class RenditionListServlet extends SlingJakartaSafeMethodsServlet {
                 return;
             }
 
-            // Generate HTML for each rendition
+            // Render each rendition via shared HTL script
             for (String renditionName : renditionNames) {
-                MediaFormat format = mediaFormatService.getFormat(renditionName).orElse(null);
-
-                String dimensions = "";
-                if (format != null) {
-                    dimensions = String.format("(%dx%d)", format.getWidth(), format.getHeight());
-                } else {
-                    dimensions = "(custom)";
+                request.setAttribute("renditionFormat", renditionName);
+                RequestDispatcher dispatcher = request.getRequestDispatcher(
+                    resource.getPath() + ".rendition-item.html");
+                if (dispatcher != null) {
+                    dispatcher.include(request, response);
                 }
-
-                String renditionPath = assetNode.getPath() + "/renditions/" + renditionName;
-
-                out.write(String.format(
-                    "<div class=\"dml-rendition-item\">" +
-                    "  <div class=\"dml-rendition-info\">" +
-                    "    <span class=\"dml-rendition-name\">%s</span>" +
-                    "    <span class=\"dml-rendition-dimensions\">%s</span>" +
-                    "  </div>" +
-                    "  <a href=\"%s\" download class=\"dml-rendition-download\">Download</a>" +
-                    "</div>",
-                    renditionName, dimensions, renditionPath
-                ));
             }
+            request.removeAttribute("renditionFormat");
 
         } catch (Exception e) {
             LOG.error("Error listing renditions", e);

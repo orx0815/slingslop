@@ -1,5 +1,10 @@
 package org.motorbrot.sling.dma.servlets;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+
 import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
@@ -15,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
-import jakarta.servlet.Servlet;
-import jakarta.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,7 @@ import java.util.Optional;
  */
 @Component(service = Servlet.class)
 @SlingServletResourceTypes(
-    resourceTypes = "nt:file",
+    resourceTypes = "motorbrot/dma/components/asset",
     methods = "POST",
     selectors = "generate-rendition",
     extensions = "html"
@@ -126,12 +129,19 @@ public class RenditionGenerationServlet extends SlingJakartaAllMethodsServlet {
 
             response.setStatus(200);
             response.setContentType("text/html");
-            response.getWriter().write(String.format(
-                "<div class=\"dml-rendition-item dml-fade-in\">" +
-                "  <strong>%s</strong> (%dx%d) - Generated" +
-                "</div>",
-                format.getName(), format.getWidth(), format.getHeight()
-            ));
+            request.setAttribute("renditionFormat", formatName);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(
+                resource.getPath() + ".rendition-item.html");
+            if (dispatcher != null) {
+                // Use a GET wrapper so Sling resolves the HTL script (not the POST servlet)
+                dispatcher.include(new HttpServletRequestWrapper(request) {
+                    @Override
+                    public String getMethod() { return "GET"; }
+                }, response);
+            } else {
+                response.getWriter().write("<div class=\"dml-rendition-item\">" + formatName + " - Generated</div>");
+            }
+            request.removeAttribute("renditionFormat");
 
         } catch (Exception e) {
             LOG.error("Error generating rendition", e);

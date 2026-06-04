@@ -1,6 +1,9 @@
 <!--/* Dashboard page content */-->
 <sly data-sly-use.auth="org.motorbrot.sling.dma.slingmodels.UserIsLoggedIn">
   <div class="dml-app dml-fade-in">
+    <!--/* Single source of truth for the selected folder path */-->
+    <input type="hidden" id="dml-current-folder" name="folder" value="/content/motorbrot/dma/assets" />
+
     <header class="dml-header">
       <h1>Digital Media Library</h1>
       <div class="dml-header-actions">
@@ -15,22 +18,20 @@
 
     <aside class="dml-sidebar">
       <div class="dml-folder-tree">
-        <h2 style="font-size: var(--font-size-md); margin-bottom: var(--space-md); padding: 0 var(--space-md);">Folders</h2>
-
-        <div class="dml-folder-tree-item">
-          <button class="dml-folder-tree-button active" data-folder-path="/">
-            <span class="dml-folder-icon">📁</span>
-            <span class="dml-folder-name">Root</span>
-          </button>
+        <div class="dml-folder-tree-items"
+             data-sly-attribute.hx-get="${resource.path}.folder-tree.html"
+             hx-trigger="load, folderCreated from:body"
+             hx-swap="innerHTML">
         </div>
 
         <sly data-sly-test="${auth.loggedIn}">
           <div class="dml-folder-create">
             <h3 style="font-size: var(--font-size-sm); margin-bottom: var(--space-sm);">Create Folder</h3>
             <form class="dml-folder-create-form"
-                  hx-post="${resource.path}.create-folder.html"
-                  hx-target=".dml-folder-tree"
-                  hx-swap="beforeend">
+                  data-sly-attribute.hx-post="${resource.path}.create-folder.html"
+                  hx-swap="none"
+                  hx-include="#dml-current-folder"
+                  hx-on::after-request="if(event.detail.successful) this.querySelector('[name=folderName]').value=''">
               <input type="text" name="folderName" placeholder="Folder name" required />
               <div class="dml-folder-create-actions">
                 <button type="submit" class="dml-btn dml-btn-primary">Create</button>
@@ -43,56 +44,46 @@
 
     <main class="dml-main">
       <div class="dml-toolbar">
-        <div class="dml-breadcrumb">
-          <div class="dml-breadcrumb-item">
-            <a href="${resource.path}.html">Home</a>
-          </div>
-          <span class="dml-breadcrumb-separator">/</span>
-          <div class="dml-breadcrumb-item">
-            <span>Assets</span>
-          </div>
-        </div>
-
-        <div style="flex: 1;"></div>
-
-        <div class="dml-search">
-          <input type="search" placeholder="Search assets..." name="query" />
-        </div>
+        <nav id="dml-breadcrumb" class="dml-breadcrumb" aria-label="Current location">
+          <span class="dml-bc-current"><span class="dml-bc-icon">🗄️</span>Library</span>
+        </nav>
       </div>
 
       <sly data-sly-test="${auth.loggedIn}">
-        <section style="margin-bottom: var(--space-xl);">
-          <h2 style="margin-bottom: var(--space-md);">Upload Asset</h2>
+        <div class="dml-upload-section">
           <form class="dml-upload-form"
                 hx-post="${resource.path}.upload.html"
                 hx-encoding="multipart/form-data"
                 hx-target=".dml-asset-grid"
-                hx-swap="afterbegin">
-            <div class="dml-upload-area" onclick="document.querySelector('.dml-upload-input').click()">
-              <div class="dml-upload-icon">📤</div>
-              <p class="dml-upload-text">Click to upload or drag and drop</p>
-              <p class="dml-upload-hint">Supported: Images, PDFs, Videos, Audio files</p>
-              <input type="file" name="asset" class="dml-upload-input" accept="image/*,video/*,audio/*,application/pdf" required />
-            </div>
-            <div class="upload-file-info" style="display: none;"></div>
-            <button type="submit" class="dml-btn dml-btn-primary">Upload</button>
+                hx-swap="afterbegin"
+                hx-include="#dml-current-folder"
+                hx-on::before-request="dmlSpinner(true,'Uploading…')"
+                hx-on::after-request="dmlSpinner(false);this.reset();this.querySelector('.dml-upload-submit').style.display='none';">
+            <label class="dml-upload-area">
+              <span class="dml-upload-icon">📤</span>
+              <span class="dml-upload-copy">
+                <span class="dml-upload-text">Drop files here or click to browse</span>
+                <span class="dml-upload-hint">Images · PDFs · Videos · Audio</span>
+              </span>
+              <input type="file" name="asset" class="dml-upload-input" multiple
+                     accept="image/*,video/*,audio/*,application/pdf" required
+                     onchange="var n=this.files.length,btn=this.closest('form').querySelector('.dml-upload-submit');btn.style.display=n?'inline-flex':'none';if(n)btn.textContent=n===1?'Upload \u2192 '+this.files[0].name:'Upload '+n+' files';" />
+            </label>
+            <button type="submit" class="dml-btn dml-btn-primary dml-upload-submit" style="display:none;">Upload</button>
           </form>
-        </section>
+        </div>
       </sly>
 
-      <section>
-        <h2 style="margin-bottom: var(--space-md);">Assets</h2>
-        <div class="dml-asset-grid dml-stagger"
-             hx-get="${resource.path}.assets.html"
-             hx-trigger="load, assetUploaded from:body"
-             hx-swap="innerHTML">
-          <!--/* Assets will be loaded here via HTMX */-->
-          <div class="dml-empty-state" style="grid-column: 1 / -1;">
-            <div class="dml-empty-state-icon">📂</div>
-            <h3>Loading assets...</h3>
-          </div>
+      <div class="dml-asset-grid dml-stagger"
+           hx-get="${resource.path}.assets.html"
+           hx-trigger="load, assetUploaded from:body, folderSelected from:body"
+           hx-include="#dml-current-folder"
+           hx-swap="innerHTML">
+        <div class="dml-empty-state" style="grid-column: 1 / -1;">
+          <div class="dml-empty-state-icon">📂</div>
+          <h3>Loading assets...</h3>
         </div>
-      </section>
+      </div>
     </main>
 
     <aside class="dml-metadata-panel">
@@ -100,5 +91,84 @@
         <p>Select an asset to view its details</p>
       </div>
     </aside>
+
+    <!--/* Global loading overlay */-->
+    <div class="dml-spinner-overlay" id="dml-spinner-overlay" aria-hidden="true" aria-live="polite">
+      <div class="dml-spinner-card">
+        <svg class="dml-spinner-svg" viewBox="0 0 50 50">
+          <circle class="dml-spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"/>
+          <circle class="dml-spinner-arc"   cx="25" cy="25" r="20" fill="none" stroke-width="3"
+                  stroke-linecap="round" stroke-dasharray="80 200" stroke-dashoffset="0"/>
+        </svg>
+        <span class="dml-spinner-label" id="dml-spinner-label">Working…</span>
+      </div>
+    </div>
+
+    <script>
+(function () {
+  var ASSETS_ROOT = '/content/motorbrot/dma/assets';
+
+  function folderLabel(segment) {
+    try { return decodeURIComponent(segment.replace(/\+/g, ' ')); } catch (e) { return segment; }
+  }
+
+  function updateBreadcrumb(folderPath) {
+    var bc = document.getElementById('dml-breadcrumb');
+    if (!bc) return;
+
+    var items = [{ label: 'Library', path: ASSETS_ROOT, icon: '🗄️' }];
+
+    if (folderPath && folderPath !== ASSETS_ROOT) {
+      var rel = folderPath.slice(ASSETS_ROOT.length).replace(/^\//, '');
+      var segments = rel.split('/').filter(Boolean);
+      var acc = ASSETS_ROOT;
+      segments.forEach(function (seg) {
+        acc += '/' + seg;
+        items.push({ label: folderLabel(seg), path: acc });
+      });
+    }
+
+    var html = items.map(function (item, i) {
+      var isLast = i === items.length - 1;
+      var sep = i > 0 ? '<span class="dml-bc-sep" aria-hidden="true">›</span>' : '';
+      var icon = item.icon ? '<span class="dml-bc-icon">' + item.icon + '</span>' : '';
+      var safePath = item.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      if (isLast) {
+        return sep + '<span class="dml-bc-current">' + icon + item.label + '</span>';
+      }
+      return sep + '<button class="dml-bc-link" type="button" onclick="dmlBcNav(\'' + safePath + '\')">' + icon + item.label + '</button>';
+    }).join('');
+
+    bc.innerHTML = html;
+  }
+
+  window.dmlBcNav = function (path) {
+    var fi = document.getElementById('dml-current-folder');
+    if (fi) fi.value = path;
+    document.querySelectorAll('.dml-folder-tree-button').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.folderPath === path);
+    });
+    htmx.trigger(document.body, 'folderSelected');
+  };
+
+  document.body.addEventListener('folderSelected', function () {
+    var fi = document.getElementById('dml-current-folder');
+    if (fi) updateBreadcrumb(fi.value);
+  });
+
+  // Initialise on load (default = root)
+  updateBreadcrumb(ASSETS_ROOT);
+
+  // ── Global spinner helper ──────────────────────────────────────────────
+  window.dmlSpinner = function (show, label) {
+    var overlay = document.getElementById('dml-spinner-overlay');
+    var labelEl = document.getElementById('dml-spinner-label');
+    if (!overlay) return;
+    if (label && labelEl) labelEl.textContent = label;
+    overlay.classList.toggle('dml-spinner-visible', !!show);
+    overlay.setAttribute('aria-hidden', show ? 'false' : 'true');
+  };
+})();
+    </script>
   </div>
 </sly>

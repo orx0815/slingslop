@@ -2,8 +2,6 @@ package org.motorbrot.sling.dma.servlets;
 
 import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.SlingJakartaHttpServletResponse;
-import org.apache.sling.api.resource.ModifiableValueMap;
-import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingJakartaAllMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
@@ -52,35 +50,40 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
         ResourceResolver resolver = request.getResourceResolver();
 
         try {
-            // Get the uploaded file
-            org.apache.sling.api.request.RequestParameter fileParam = request.getRequestParameter("asset");
-            if (fileParam == null) {
+            // Get all uploaded files (multi-file support)
+            org.apache.sling.api.request.RequestParameter[] fileParams = request.getRequestParameters("asset");
+            if (fileParams == null || fileParams.length == 0
+                    || (fileParams.length == 1 && fileParams[0].getFileName().isEmpty())) {
                 response.setStatus(400);
                 response.getWriter().write("No file uploaded");
                 return;
             }
 
-            String filename = fileParam.getFileName();
-            InputStream fileData = fileParam.getInputStream();
+            String parentPath = request.getParameter("folder");
+            StringBuilder html = new StringBuilder();
 
-            // Read file data once (we need it for metadata and rendition)
-            byte[] fileBytes = fileData.readAllBytes();
+            for (org.apache.sling.api.request.RequestParameter fileParam : fileParams) {
+                if (fileParam.getFileName() == null || fileParam.getFileName().isEmpty()) {
+                    continue;
+                }
 
-            // Extract metadata
-            Map<String, Object> metadata = metadataService.extractMetadata(
-                    new ByteArrayInputStream(fileBytes), filename);
+                String filename = fileParam.getFileName();
+                byte[] fileBytes = fileParam.getInputStream().readAllBytes();
 
-            // Create asset node
-            String assetPath = createAssetNode(resolver, filename, fileBytes, metadata);
+                Map<String, Object> metadata = metadataService.extractMetadata(
+                        new ByteArrayInputStream(fileBytes), filename);
 
-            if (assetPath != null) {
-                response.setStatus(200);
-                response.setContentType("text/html");
-                response.getWriter().write(generateAssetCard(assetPath, filename, metadata));
-            } else {
-                response.setStatus(500);
-                response.getWriter().write("Failed to create asset");
+                String assetPath = createAssetNode(resolver, filename, fileBytes, metadata, parentPath);
+                if (assetPath != null) {
+                    html.append(generateAssetCard(assetPath, filename, metadata));
+                } else {
+                    LOG.warn("Failed to create asset node for {}", filename);
+                }
             }
+
+            response.setStatus(200);
+            response.setContentType("text/html");
+            response.getWriter().write(html.toString());
 
         } catch (Exception e) {
             LOG.error("Error uploading asset", e);
@@ -93,24 +96,36 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
      * Creates an asset node in JCR with file data and metadata.
      */
     private String createAssetNode(ResourceResolver resolver, String filename, byte[] fileBytes,
-                                     Map<String, Object> metadata) {
+                                     Map<String, Object> metadata, String parentPath) {
         try {
             Session session = resolver.adaptTo(Session.class);
             if (session == null) {
                 return null;
             }
 
-            // Create assets folder if it doesn't exist
-            String assetsPath = "/content/motorbrot/dma/assets";
+            // Resolve target folder — use selected parentPath when valid
+            String defaultAssetsPath = "/content/motorbrot/dma/assets";
+            String assetsPath;
+            if (parentPath != null && !parentPath.trim().isEmpty()
+                    && parentPath.startsWith(defaultAssetsPath)) {
+                assetsPath = parentPath.trim();
+            } else {
+                assetsPath = defaultAssetsPath;
+            }
             Node assetsFolder = session.nodeExists(assetsPath)
                     ? session.getNode(assetsPath)
-                    : session.getRootNode().addNode("content/motorbrot/dma/assets", "sling:Folder");
+                    : session.getRootNode().addNode(assetsPath.substring(1), "sling:Folder");
 
             // Create unique asset name
             String assetName = generateUniqueAssetName(assetsFolder, filename);
 
-            // Create asset node
-            Node assetNode = assetsFolder.addNode(assetName, "nt:file");
+            // Create asset node as nt:unstructured so it can hold jcr:content,
+            // metadata, and renditions as siblings. nt:file only permits jcr:content.
+            Node assetNode = assetsFolder.addNode(assetName, "nt:unstructured");
+            assetNode.setProperty("sling:resourceType", "motorbrot/dma/components/asset");
+            assetNode.setProperty("isAsset", true);
+            assetNode.setProperty("jcr:created", Calendar.getInstance());
+            assetNode.setProperty("uploadedBy", session.getUserID());
 
             // Create jcr:content node with file data
             Node contentNode = assetNode.addNode("jcr:content", "nt:resource");
@@ -119,10 +134,12 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
             contentNode.setProperty("jcr:mimeType", (String) metadata.get("mimeType"));
             contentNode.setProperty("jcr:lastModified", Calendar.getInstance());
 
-            // Add metadata
-            contentNode.setProperty("dma:filename", filename);
-            contentNode.setProperty("dma:fileType", (String) metadata.get("fileType"));
-            contentNode.setProperty("dma:fileSize", fileBytes.length);
+            // Add metadata on a dedicated nt:unstructured child node.
+            // nt:resource does not allow custom properties, and dma: namespace is not registered.
+            Node metaNode = assetNode.addNode("metadata", "nt:unstructured");
+            metaNode.setProperty("filename", filename);
+            metaNode.setProperty("fileType", (String) metadata.get("fileType"));
+            metaNode.setProperty("fileSize", (long) fileBytes.length);
 
             // Generate preview rendition for images
             if (metadataService.supportsImageRenditions((String) metadata.get("mimeType"))) {
@@ -174,10 +191,14 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
         String fileType = (String) metadata.get("fileType");
         String iconEmoji = getIconForFileType(fileType);
 
+        String previewHtml = "svg".equals(fileType)
+                ? String.format("<img src=\"%s/jcr:content\" alt=\"%s\" class=\"dml-svg-preview\" />",
+                        assetPath, filename)
+                : String.format("<span class=\"dml-asset-preview-icon\">%s</span>", iconEmoji);
+
         return String.format(
             "<div class=\"dml-asset-item dml-fade-in\" data-asset-id=\"%s\">" +
-            "  <div class=\"dml-asset-preview\">" +
-            "    <span class=\"dml-asset-preview-icon\">%s</span>" +
+            "  <div class=\"dml-asset-preview\">%s" +
             "    <span class=\"dml-asset-type-badge\">%s</span>" +
             "  </div>" +
             "  <div class=\"dml-asset-info\">" +
@@ -187,7 +208,7 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
             "    </div>" +
             "  </div>" +
             "</div>",
-            assetPath, iconEmoji, fileType, filename
+            assetPath, previewHtml, fileType, filename
         );
     }
 
@@ -196,13 +217,17 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
      */
     private String getIconForFileType(String fileType) {
         switch (fileType) {
-            case "image": return "🖼️";
-            case "video": return "🎬";
-            case "audio": return "🎵";
-            case "pdf": return "📄";
-            case "archive": return "📦";
-            case "text": return "📝";
-            default: return "📁";
+            case "image":        return "🖼️";
+            case "svg":          return "🎨";
+            case "video":        return "🎬";
+            case "audio":        return "🎵";
+            case "pdf":          return "📕";
+            case "spreadsheet":  return "📊";
+            case "presentation": return "📋";
+            case "document":     return "📝";
+            case "archive":      return "📦";
+            case "text":         return "📄";
+            default:             return "📁";
         }
     }
 }
