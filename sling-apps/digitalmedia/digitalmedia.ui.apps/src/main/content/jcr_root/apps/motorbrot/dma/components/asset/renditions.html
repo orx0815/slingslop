@@ -1,0 +1,20 @@
+<!--/* Rendition list — rendered via selector "renditions" on asset resource type */-->
+<sly data-sly-use.model="org.motorbrot.sling.dma.slingmodels.RenditionListModel">
+
+  <sly data-sly-test="${model.empty}">
+    <div class="dml-rendition-item">No renditions generated yet</div>
+  </sly>
+
+  <sly data-sly-test="${!model.empty}">
+    <sly data-sly-list.item="${model.renditions}">
+      <div class="dml-rendition-item dml-fade-in">
+        <div class="dml-rendition-info">
+          <span class="dml-rendition-name">${item.formatName}</span>
+          <span class="dml-rendition-dimensions">(${item.width}x${item.height})</span>
+        </div>
+        <a href="${item.downloadPath}" download class="dml-rendition-download">Download</a>
+      </div>
+    </sly>
+  </sly>
+
+</sly>

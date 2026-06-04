@@ -2,6 +2,7 @@ package org.motorbrot.sling.dma.servlets;
 
 import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.SlingJakartaHttpServletResponse;
+import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingJakartaAllMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
@@ -14,17 +15,21 @@ import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Servlet for uploading assets to the Digital Media Library.
  * Handles file upload, metadata extraction, and preview generation.
+ * Renders the response HTML via HTL using the GET-wrapper dispatcher pattern.
  */
 @Component(service = Servlet.class)
 @SlingServletResourceTypes(
@@ -60,7 +65,7 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
             }
 
             String parentPath = request.getParameter("folder");
-            StringBuilder html = new StringBuilder();
+            List<String> createdPaths = new ArrayList<>();
 
             for (org.apache.sling.api.request.RequestParameter fileParam : fileParams) {
                 if (fileParam.getFileName() == null || fileParam.getFileName().isEmpty()) {
@@ -75,15 +80,29 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
 
                 String assetPath = createAssetNode(resolver, filename, fileBytes, metadata, parentPath);
                 if (assetPath != null) {
-                    html.append(generateAssetCard(assetPath, filename, metadata));
+                    createdPaths.add(assetPath);
                 } else {
                     LOG.warn("Failed to create asset node for {}", filename);
                 }
             }
 
+            // Render each created asset via its HTL asset-card script (GET-wrapper pattern)
             response.setStatus(200);
             response.setContentType("text/html");
-            response.getWriter().write(html.toString());
+
+            for (String assetPath : createdPaths) {
+                Resource assetResource = resolver.getResource(assetPath);
+                if (assetResource != null) {
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(
+                            assetPath + ".asset-card.html");
+                    if (dispatcher != null) {
+                        dispatcher.include(new HttpServletRequestWrapper(request) {
+                            @Override
+                            public String getMethod() { return "GET"; }
+                        }, response);
+                    }
+                }
+            }
 
         } catch (Exception e) {
             LOG.error("Error uploading asset", e);
@@ -182,52 +201,5 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
         }
 
         return assetName;
-    }
-
-    /**
-     * Generates HTML for an asset card to be inserted into the grid.
-     */
-    private String generateAssetCard(String assetPath, String filename, Map<String, Object> metadata) {
-        String fileType = (String) metadata.get("fileType");
-        String iconEmoji = getIconForFileType(fileType);
-
-        String previewHtml = "svg".equals(fileType)
-                ? String.format("<img src=\"%s/jcr:content\" alt=\"%s\" class=\"dml-svg-preview\" />",
-                        assetPath, filename)
-                : String.format("<span class=\"dml-asset-preview-icon\">%s</span>", iconEmoji);
-
-        return String.format(
-            "<div class=\"dml-asset-item dml-fade-in\" data-asset-id=\"%s\">" +
-            "  <div class=\"dml-asset-preview\">%s" +
-            "    <span class=\"dml-asset-type-badge\">%s</span>" +
-            "  </div>" +
-            "  <div class=\"dml-asset-info\">" +
-            "    <div class=\"dml-asset-name\">%s</div>" +
-            "    <div class=\"dml-asset-meta\">" +
-            "      <span class=\"dml-asset-size\">Just uploaded</span>" +
-            "    </div>" +
-            "  </div>" +
-            "</div>",
-            assetPath, previewHtml, fileType, filename
-        );
-    }
-
-    /**
-     * Returns an appropriate icon emoji for the file type.
-     */
-    private String getIconForFileType(String fileType) {
-        switch (fileType) {
-            case "image":        return "🖼️";
-            case "svg":          return "🎨";
-            case "video":        return "🎬";
-            case "audio":        return "🎵";
-            case "pdf":          return "📕";
-            case "spreadsheet":  return "📊";
-            case "presentation": return "📋";
-            case "document":     return "📝";
-            case "archive":      return "📦";
-            case "text":         return "📄";
-            default:             return "📁";
-        }
     }
 }

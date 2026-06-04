@@ -79,9 +79,10 @@ public class FolderCreationServlet extends SlingJakartaAllMethodsServlet {
             String folderPath = newFolder.getPath();
             LOG.info("Created folder: {}", folderPath);
 
-            // Fire HX-Trigger so the folder tree container reloads via HTMX
+            // Fire HX-Trigger so the folder tree container reloads via HTMX.
+            // Include the path as event detail so the client can auto-select the new folder.
             response.setStatus(200);
-            response.setHeader("HX-Trigger", "folderCreated");
+            response.setHeader("HX-Trigger", "{\"folderCreated\":{\"path\":\"" + folderPath + "\"}}");
             response.getWriter().write("");
 
         } catch (Exception e) {

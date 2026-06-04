@@ -1,0 +1,96 @@
+<!--/* Folder info panel — rendered via selector "folder-info" on dashboard resource type */-->
+<sly data-sly-use.model="org.motorbrot.sling.dma.slingmodels.FolderInfoModel">
+
+  <sly data-sly-test="${!model.valid}">
+    <div class="dml-metadata-empty"><p>Folder not found.</p></div>
+  </sly>
+
+  <sly data-sly-test="${model.valid}">
+    <div class="dml-folder-info">
+
+      <!--/* Header */-->
+      <div class="dml-metadata-header">
+        <div class="dml-folder-info-icon">📁</div>
+        <h2 class="dml-metadata-title">${model.displayName}</h2>
+      </div>
+
+      <!--/* Contents summary */-->
+      <div class="dml-metadata-section">
+        <h3>Contents</h3>
+        <div class="dml-metadata-row">
+          <span class="dml-metadata-label">Assets</span>
+          <span class="dml-metadata-value">${model.assetCount}</span>
+        </div>
+        <div class="dml-metadata-row" data-sly-test="${model.hasSubfolders}">
+          <span class="dml-metadata-label">Subfolders</span>
+          <span class="dml-metadata-value">${model.subfolderCount}</span>
+        </div>
+      </div>
+
+      <!--/* File list */-->
+      <div class="dml-metadata-section" data-sly-test="${model.hasAssets}">
+        <h3>Files</h3>
+        <ul class="dml-folder-file-list">
+          <sly data-sly-list.name="${model.assetNames}">
+            <li>${name}</li>
+          </sly>
+        </ul>
+      </div>
+
+      <!--/* Delete action (not shown for root) */-->
+      <sly data-sly-test="${!model.root}">
+        <div class="dml-metadata-actions">
+          <button class="dml-btn dml-btn-danger dml-btn-download"
+                  onclick="document.getElementById('dml-folder-delete-modal').showModal()">
+            🗑 Delete Folder
+          </button>
+        </div>
+
+        <dialog id="dml-folder-delete-modal" class="dml-modal">
+          <div class="dml-modal-content">
+            <div class="dml-modal-icon">🗑</div>
+
+            <!--/* Refusal state: has subfolders */-->
+            <sly data-sly-test="${model.hasSubfolders}">
+              <h3 class="dml-modal-title">Cannot Delete Folder</h3>
+              <p class="dml-modal-body">
+                <strong>${model.displayName}</strong> contains ${model.subfolderLabel}.
+                Remove all subfolders first before deleting this folder.
+              </p>
+              <div class="dml-modal-actions">
+                <button class="dml-btn dml-btn-primary"
+                        onclick="document.getElementById('dml-folder-delete-modal').close()">
+                  OK
+                </button>
+              </div>
+            </sly>
+
+            <!--/* Confirmation state: no subfolders */-->
+            <sly data-sly-test="${!model.hasSubfolders}">
+              <h3 class="dml-modal-title">Delete Folder?</h3>
+              <p class="dml-modal-body">
+                Sure you want to delete <strong>${model.displayName}</strong>${model.hasAssets ? ' and its ' : ''}${model.hasAssets ? model.assetLabel : ''}${model.hasAssets ? '?' : '? The folder is empty.'} This cannot be undone.
+              </p>
+              <div class="dml-modal-actions">
+                <button class="dml-btn dml-btn-secondary"
+                        onclick="document.getElementById('dml-folder-delete-modal').close()">
+                  Cancel
+                </button>
+                <button class="dml-btn dml-btn-danger"
+                        hx-post="${model.deleteUrl}"
+                        data-sly-attribute.hx-vals="${model.deleteHxVals}"
+                        hx-target="body"
+                        onclick="document.getElementById('dml-folder-delete-modal').close()">
+                  Yes, Delete
+                </button>
+              </div>
+            </sly>
+
+          </div>
+        </dialog>
+      </sly>
+
+    </div>
+  </sly>
+
+</sly>
