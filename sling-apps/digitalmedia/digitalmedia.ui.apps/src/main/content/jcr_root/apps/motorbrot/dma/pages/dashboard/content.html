@@ -1,0 +1,104 @@
+<!--/* Dashboard page content */-->
+<sly data-sly-use.auth="org.motorbrot.sling.dma.slingmodels.UserIsLoggedIn">
+  <div class="dml-app dml-fade-in">
+    <header class="dml-header">
+      <h1>Digital Media Library</h1>
+      <div class="dml-header-actions">
+        <sly data-sly-test="${auth.loggedIn}">
+          <span style="font-size: var(--font-size-sm);">Logged in</span>
+        </sly>
+        <sly data-sly-test="${!auth.loggedIn}">
+          <a href="/system/sling/login" class="dml-btn dml-btn-primary">Login</a>
+        </sly>
+      </div>
+    </header>
+
+    <aside class="dml-sidebar">
+      <div class="dml-folder-tree">
+        <h2 style="font-size: var(--font-size-md); margin-bottom: var(--space-md); padding: 0 var(--space-md);">Folders</h2>
+
+        <div class="dml-folder-tree-item">
+          <button class="dml-folder-tree-button active" data-folder-path="/">
+            <span class="dml-folder-icon">📁</span>
+            <span class="dml-folder-name">Root</span>
+          </button>
+        </div>
+
+        <sly data-sly-test="${auth.loggedIn}">
+          <div class="dml-folder-create">
+            <h3 style="font-size: var(--font-size-sm); margin-bottom: var(--space-sm);">Create Folder</h3>
+            <form class="dml-folder-create-form"
+                  hx-post="${resource.path}.create-folder.html"
+                  hx-target=".dml-folder-tree"
+                  hx-swap="beforeend">
+              <input type="text" name="folderName" placeholder="Folder name" required />
+              <div class="dml-folder-create-actions">
+                <button type="submit" class="dml-btn dml-btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        </sly>
+      </div>
+    </aside>
+
+    <main class="dml-main">
+      <div class="dml-toolbar">
+        <div class="dml-breadcrumb">
+          <div class="dml-breadcrumb-item">
+            <a href="${resource.path}.html">Home</a>
+          </div>
+          <span class="dml-breadcrumb-separator">/</span>
+          <div class="dml-breadcrumb-item">
+            <span>Assets</span>
+          </div>
+        </div>
+
+        <div style="flex: 1;"></div>
+
+        <div class="dml-search">
+          <input type="search" placeholder="Search assets..." name="query" />
+        </div>
+      </div>
+
+      <sly data-sly-test="${auth.loggedIn}">
+        <section style="margin-bottom: var(--space-xl);">
+          <h2 style="margin-bottom: var(--space-md);">Upload Asset</h2>
+          <form class="dml-upload-form"
+                hx-post="${resource.path}.upload.html"
+                hx-encoding="multipart/form-data"
+                hx-target=".dml-asset-grid"
+                hx-swap="afterbegin">
+            <div class="dml-upload-area" onclick="document.querySelector('.dml-upload-input').click()">
+              <div class="dml-upload-icon">📤</div>
+              <p class="dml-upload-text">Click to upload or drag and drop</p>
+              <p class="dml-upload-hint">Supported: Images, PDFs, Videos, Audio files</p>
+              <input type="file" name="asset" class="dml-upload-input" accept="image/*,video/*,audio/*,application/pdf" required />
+            </div>
+            <div class="upload-file-info" style="display: none;"></div>
+            <button type="submit" class="dml-btn dml-btn-primary">Upload</button>
+          </form>
+        </section>
+      </sly>
+
+      <section>
+        <h2 style="margin-bottom: var(--space-md);">Assets</h2>
+        <div class="dml-asset-grid dml-stagger"
+             hx-get="${resource.path}.assets.html"
+             hx-trigger="load, assetUploaded from:body"
+             hx-swap="innerHTML">
+          <!--/* Assets will be loaded here via HTMX */-->
+          <div class="dml-empty-state" style="grid-column: 1 / -1;">
+            <div class="dml-empty-state-icon">📂</div>
+            <h3>Loading assets...</h3>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="dml-metadata-panel">
+      <div class="dml-metadata-empty">
+        <p>Select an asset to view its details</p>
+      </div>
+    </aside>
+  </div>
+</sly>
