@@ -96,7 +96,8 @@
           <aggregates>
             <aggregate>
               <classifier>slingslop_aggregate</classifier>
-              <filesInclude>*.json</filesInclude>
+              <!-- launcher.json only; composite-nodestore.json is reserved for the composite aggregate. -->
+              <filesInclude>launcher.json</filesInclude>
               <includeArtifact>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>org.apache.sling.starter</artifactId>
@@ -147,11 +148,85 @@
               </includeArtifact>
               
             </aggregate>
+            
+            <!--
+              Composite NodeStore aggregate (production Docker image).
+              Identical to slingslop_aggregate, plus the composite-nodestore
+              feature which flips persistence into composite mode:
+                - /apps and /libs come from a read-only SegmentNodeStore that
+                  lives in the image at /opt/sling/seed-repository
+                - everything else lives in the read-write SegmentNodeStore
+                  at /opt/sling/launcher/repository (the Docker volume)
+              See docs/composite-nodestore.md for the rationale, the seeding
+              workflow and the verification steps.
+            -->
+            <aggregate>
+              <classifier>slingslop_composite_aggregate</classifier>
+              <filesInclude>launcher.json</filesInclude>
+              <filesInclude>composite-nodestore.json</filesInclude>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>nosample_base</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>oak_persistence_sns</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>composum</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>starter</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>slingshot</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              <includeArtifact>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.starter</artifactId>
+                <classifier>htl_repl</classifier>
+                <version>${sling.starter.version}</version>
+                <type>slingosgifeature</type>
+              </includeArtifact>
+              
+              <!--
+                The composite-nodestore feature itself is brought in via the
+                <filesInclude> above. We tell the slingfeature aggregator to
+                merge the SegmentNodeStoreService config of both contributors
+                (oak_persistence_sns provides "name" etc., composite-nodestore
+                contributes "role=composite-global"). Latest wins for any
+                clashing property keys.
+              -->
+              <configurationOverrides>
+                <configurationOverride>org.apache.jackrabbit.oak.segment.SegmentNodeStoreService=MERGE_LATEST</configurationOverride>
+              </configurationOverrides>
+            </aggregate>
           </aggregates>
           
           <scans>
             <scan>
               <includeClassifier>slingslop_aggregate</includeClassifier>
+            </scan>
+            <scan>
+              <includeClassifier>slingslop_composite_aggregate</includeClassifier>
             </scan>
           </scans>
           
@@ -180,6 +255,7 @@
               <repositories>
                 <repository>
                   <includeClassifier>slingslop_aggregate</includeClassifier>
+                  <includeClassifier>slingslop_composite_aggregate</includeClassifier>
                   <includeArtifact>
                     <groupId>org.apache.sling</groupId>
                     <artifactId>org.apache.sling.starter</artifactId>
@@ -348,4 +424,51 @@
             
     </plugins>
   </build>
+
+  <profiles>
+    <!--
+      Activated by '-Pcomposite-image'. Builds a derived Docker image with a
+      pre-seeded read-only segment store for /apps and /libs (composite
+      NodeStore mode). Requires -Ddocker.skip=false so the base image exists.
+      See docs/composite-nodestore.md.
+
+      Usage:
+        mvn clean install -Ddocker.skip=false -Pcomposite-image
+
+      Produces:
+        ${docker.image.name}:${docker.image.tag}             (base, single-store, unchanged)
+        ${docker.image.name}:${docker.image.tag}-composite   (composite NodeStore)
+    -->
+    <profile>
+      <id>composite-image</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>seed-and-bake-composite-image</id>
+                <!-- After docker-maven-plugin's 'build' execution (also bound to package). -->
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <skip>${docker.skip}</skip>
+                  <executable>${project.basedir}/seed_and_bake.sh</executable>
+                  <workingDirectory>${project.basedir}</workingDirectory>
+                  <environmentVariables>
+                    <IMAGE_BASE>${docker.image.name}:${docker.image.tag}</IMAGE_BASE>
+                    <IMAGE_OUT>${docker.image.name}:${docker.image.tag}-composite</IMAGE_OUT>
+                  </environmentVariables>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
