@@ -55,6 +55,29 @@ To build the Docker image as well, including integration-tests, use:
 mvn clean install -Ddocker.skip=false
 ```
 
+This produces the standard image where **everything** (code under `/apps`,
+`/libs` and content under `/content`, `/home`, `/var`, …) lives in a single
+read-write Segment NodeStore inside the Docker volume `/opt/sling/launcher`.
+That is the original mode and remains the default.
+
+#### Composite NodeStore image (immutable `/apps` and `/libs`)
+
+To additionally produce a **composite-mode** image - where `/apps` and `/libs`
+are baked into the image as a read-only Segment NodeStore and only the
+mutable content sits in the Docker volume - add `-Pcomposite-image`:
+
+```bash
+mvn clean install -Ddocker.skip=false -Pcomposite-image
+```
+
+This runs the base build first, then `launcher/seed_and_bake.sh` which boots
+the base image once to seed `/apps` and `/libs`, freezes that segment store
+and bakes it into a derived image tagged
+`ghcr.io/orx0815/slingslop:snapshot-composite`.
+
+The why, how and verification steps live in
+[`docs/composite-nodestore.md`](docs/composite-nodestore.md).
+
 ### Running the Application
 
 There are four primary ways to run the application locally:
@@ -107,6 +130,26 @@ There are four primary ways to run the application locally:
     ```
 
     Then open http://localhost:8080/content/slingslop/zengarden/home.html
+
+5.  **Run the composite-NodeStore variant** (immutable `/apps` and `/libs`,
+    only content sits in the volume - see
+    [`docs/composite-nodestore.md`](docs/composite-nodestore.md)):
+
+    ```bash
+    docker run --rm -p 8080:8080 \
+      -v slingslop-content:/opt/sling/launcher \
+      ghcr.io/orx0815/slingslop:snapshot-composite
+    ```
+
+    The same image, started with the default aggregate, also runs in
+    classic single-store mode - so you can roll back without rebuilding:
+
+    ```bash
+    docker run --rm -p 8080:8080 \
+      -v slingslop-volume:/opt/sling/launcher \
+      ghcr.io/orx0815/slingslop:snapshot \
+      slingslop_aggregate
+    ```
 
 ### Developing the Application
 

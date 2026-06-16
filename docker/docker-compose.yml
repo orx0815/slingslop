@@ -1,5 +1,15 @@
 services:
   slingslop:
+    # Default: single-store image. Everything (incl. /apps, /libs) lives in
+    # the slingslop-volume.
+    #
+    # To run the composite-NodeStore variant instead (/apps and /libs come
+    # from a read-only segment store baked into the image; only mutable
+    # content sits in the volume) swap the image tag below for the
+    # '-composite' one and rebuild it once with:
+    #     cd ../launcher && mvn install -Ddocker.skip=false -Pcomposite-image
+    #
+    # image: ghcr.io/orx0815/slingslop:snapshot-composite
     image: ghcr.io/orx0815/slingslop:snapshot
     build:
       context: ../launcher

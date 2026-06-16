@@ -1,0 +1,23 @@
+{
+  "description": "Slingslop - Composite NodeStore. Demotes the default SegmentNodeStore to the 'composite-global' (read-write) role, adds a second SegmentNodeStore on /opt/sling/seed-repository as the 'composite-mount-libs' (read-only) role, and routes /apps + /libs to that read-only mount. See docs/composite-nodestore.md for the full story.",
+  "configurations": {
+    "org.apache.jackrabbit.oak.segment.SegmentNodeStoreService": {
+      "name": "Global NodeStore",
+      "role": "composite-global"
+    },
+    "org.apache.jackrabbit.oak.segment.SegmentNodeStoreService~libs": {
+      "name": "Libs NodeStore (read-only)",
+      "role": "composite-mount-libs",
+      "repository.home": "/opt/sling/seed-repository"
+    },
+    "org.apache.jackrabbit.oak.spi.mount.impl.MountInfoProviderService": {
+      "mountedPaths": ["/libs", "/apps"],
+      "mountName": "libs",
+      "readOnlyMount:Boolean": true
+    },
+    "org.apache.jackrabbit.oak.composite.CompositeNodeStoreService": {
+      "ignoreMissingMount:Boolean": false,
+      "partialReadOnly:Boolean": true
+    }
+  }
+}
