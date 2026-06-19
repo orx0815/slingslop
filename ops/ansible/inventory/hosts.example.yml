@@ -1,0 +1,15 @@
+---
+# Inventory template. Copy to hosts.yml and edit, then keep hosts.yml gitignored.
+all:
+  hosts:
+    slingslop-prod:
+      # Public IPv4 of the VPS (or DNS name).
+      ansible_host: 203.0.113.10
+      # Initial bootstrap runs as root; site.yml runs as `deploy`.
+      ansible_user: deploy
+      ansible_port: 22
+      ansible_python_interpreter: /usr/bin/python3
+  children:
+    slingslop:
+      hosts:
+        slingslop-prod: {}

@@ -1,0 +1,71 @@
+---
+- name: Create monitoring data dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "{{ slingslop_root }}/data/prometheus"
+    - "{{ slingslop_root }}/data/grafana/provisioning/datasources"
+    - "{{ slingslop_root }}/data/grafana/provisioning/dashboards"
+    - "{{ slingslop_root }}/data/grafana/dashboards"
+
+- name: Render prometheus config
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ slingslop_root }}/data/prometheus/prometheus.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart prometheus
+
+- name: Render grafana datasources
+  ansible.builtin.template:
+    src: grafana-datasources.yml.j2
+    dest: "{{ slingslop_root }}/data/grafana/provisioning/datasources/datasources.yml"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Render grafana dashboards provider
+  ansible.builtin.copy:
+    dest: "{{ slingslop_root }}/data/grafana/provisioning/dashboards/dashboards.yml"
+    owner: root
+    group: root
+    mode: "0640"
+    content: |
+      apiVersion: 1
+      providers:
+        - name: 'default'
+          folder: ''
+          type: file
+          options:
+            path: /var/lib/grafana/dashboards
+
+- name: Ship starter dashboards
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ slingslop_root }}/data/grafana/dashboards/{{ item }}"
+    owner: root
+    group: root
+    mode: "0640"
+  loop:
+    - node.json
+    - docker.json
+
+- name: Render grafana env file
+  ansible.builtin.copy:
+    dest: "{{ slingslop_secrets_dir }}/grafana.env"
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      GF_SECURITY_ADMIN_USER=admin
+      GF_SECURITY_ADMIN_PASSWORD={{ vault_grafana_admin_password }}
+      GF_USERS_ALLOW_SIGN_UP=false
+      GF_USERS_DEFAULT_THEME=dark
+      GF_SERVER_ROOT_URL=https://grafana.{{ domain }}/
+      GF_AUTH_ANONYMOUS_ENABLED=false
+      GF_INSTALL_PLUGINS=

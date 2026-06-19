@@ -1,0 +1,52 @@
+# Managed by Ansible — slingslop/traefik role.
+# Dynamic config: middlewares + file-provider routers for the obs stack.
+# Container-attached labels (slingslop, webcache) handle their own routers.
+
+http:
+  middlewares:
+
+    sec-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: strict-origin-when-cross-origin
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+
+    editor-basicauth:
+      basicAuth:
+        usersFile: /run/secrets/editor.htpasswd
+        realm: "Slingslop editor"
+        removeHeader: true
+
+    grafana-basicauth:
+      basicAuth:
+        usersFile: /run/secrets/grafana.htpasswd
+        realm: "Slingslop ops"
+        removeHeader: true
+
+{% if editor_allowlist_cidrs | length > 0 %}
+    editor-allowlist:
+      ipAllowList:
+        sourceRange:
+{% for cidr in editor_allowlist_cidrs %}
+          - "{{ cidr }}"
+{% endfor %}
+{% endif %}
+
+  routers:
+
+    grafana:
+      rule: "Host(`grafana.{{ domain }}`) || Host(`logs.{{ domain }}`)"
+      entryPoints: [websecure]
+      service: grafana@docker
+      middlewares:
+        - sec-headers
+        - grafana-basicauth
+{% if editor_allowlist_cidrs | length > 0 %}
+        - editor-allowlist
+{% endif %}
+      tls:
+        certResolver: letsencrypt

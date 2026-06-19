@@ -1,0 +1,40 @@
+---
+- name: Ensure backup root exists
+  ansible.builtin.file:
+    path: "{{ backup_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Install backup script
+  ansible.builtin.template:
+    src: backup.sh.j2
+    dest: /usr/local/sbin/slingslop-backup
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Schedule nightly backup
+  ansible.builtin.cron:
+    name: slingslop-backup
+    hour: "3"
+    minute: "17"
+    user: root
+    job: "/usr/local/sbin/slingslop-backup >> /var/log/slingslop-backup.log 2>&1"
+
+- name: Install logrotate rule for backup log
+  ansible.builtin.copy:
+    dest: /etc/logrotate.d/slingslop-backup
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      /var/log/slingslop-backup.log {
+          weekly
+          rotate 4
+          compress
+          missingok
+          notifempty
+          create 0640 root adm
+      }

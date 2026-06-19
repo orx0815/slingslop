@@ -1,0 +1,69 @@
+---
+# ---------------------------------------------------------------------------
+# Non-secret configuration. Override per-host in host_vars/<host>.yml.
+# Secrets live in vault.yml (encrypted with ansible-vault).
+# ---------------------------------------------------------------------------
+
+# Base domain. The deployment publishes three sub-domains under it:
+#   www.<domain>      → public, cached
+#   editor.<domain>   → Sling author, basicAuth-gated
+#   grafana.<domain>  → Grafana, basicAuth-gated
+#   logs.<domain>     → (alias to Grafana → Explore)
+domain: example.org
+
+# Trusted source ranges for the gated (editor / grafana) endpoints.
+# Leave empty to disable IP-allow-listing (basicAuth is still enforced).
+editor_allowlist_cidrs: []
+# Example:
+# editor_allowlist_cidrs:
+#   - 203.0.113.0/24
+#   - 198.51.100.42/32
+
+# OS / host basics
+timezone: Etc/UTC
+locale:   en_US.UTF-8
+ipv6_enabled: false
+
+# Linux login user that Ansible uses for non-bootstrap runs.
+deploy_user: deploy
+
+# SSH hardening
+ssh_port: 22                 # change to something non-standard if you wish
+ssh_allowed_users:
+  - "{{ deploy_user }}"
+
+# Optional: enable auditd. Cheap on a single-app VPS; adds ~30 MB RAM.
+enable_auditd: false
+
+# Docker
+docker_compose_project_name: slingslop
+docker_network_name: slingslop_net
+
+# Images (override per-environment if you fork)
+slingslop_image: ghcr.io/orx0815/slingslop:snapshot-composite
+webcache_image:  ghcr.io/orx0815/slingslop-webcache:latest
+traefik_image:   traefik:v3.2
+prometheus_image: prom/prometheus:v2.55.1
+grafana_image:    grafana/grafana:11.3.1
+loki_image:       grafana/loki:3.2.1
+promtail_image:   grafana/promtail:3.2.1
+node_exporter_image: prom/node-exporter:v1.8.2
+cadvisor_image:      gcr.io/cadvisor/cadvisor:v0.49.1
+
+# Filesystem layout on the VPS
+slingslop_root: /opt/slingslop
+slingslop_secrets_dir: "{{ slingslop_root }}/secrets"
+backup_root: /var/backups/slingslop
+backup_retention_days: 14
+
+# Retention windows (the disk-fill cap)
+loki_retention_days: 14
+prometheus_retention_time: 14d
+prometheus_retention_size: 2GB
+docker_log_max_size: 10m
+docker_log_max_files: 3
+
+# Slingslop runtime settings
+slingslop_java_heap_max: 1g
+slingslop_container_memory_limit: 2g    # docker --memory
+slingslop_container_cpu_limit:    "1.5" # docker --cpus

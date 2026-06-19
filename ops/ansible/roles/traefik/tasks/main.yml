@@ -1,0 +1,69 @@
+---
+- name: Create traefik data dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "{{ slingslop_root }}/data/traefik"
+    - "{{ slingslop_root }}/data/traefik/dynamic"
+
+- name: Render traefik static config
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ slingslop_root }}/data/traefik/traefik.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart traefik
+
+- name: Render traefik dynamic config (middlewares + routers)
+  ansible.builtin.template:
+    src: dynamic.yml.j2
+    dest: "{{ slingslop_root }}/data/traefik/dynamic/dynamic.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: reload traefik
+
+- name: Write editor basicAuth users file
+  ansible.builtin.copy:
+    dest: "{{ slingslop_secrets_dir }}/editor.htpasswd"
+    owner: root
+    group: root
+    mode: "0640"
+    content: "{{ vault_editor_basicauth_users_htpasswd }}"
+
+- name: Write grafana basicAuth users file
+  ansible.builtin.copy:
+    dest: "{{ slingslop_secrets_dir }}/grafana.htpasswd"
+    owner: root
+    group: root
+    mode: "0640"
+    content: "{{ vault_grafana_basicauth_users_htpasswd }}"
+
+- name: Touch ACME storage file (Traefik requires existing file, 0600)
+  ansible.builtin.file:
+    path: "{{ slingslop_root }}/data/traefik/acme.json"
+    state: touch
+    owner: root
+    group: root
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+
+- name: Render edge compose file
+  ansible.builtin.template:
+    src: compose.edge.yml.j2
+    dest: "{{ slingslop_root }}/compose.edge.yml"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Bring up edge stack
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --no-deps traefik webcache"
+  register: edge_up
+  changed_when: "'Started' in edge_up.stderr or 'Recreated' in edge_up.stderr or 'Created' in edge_up.stderr"

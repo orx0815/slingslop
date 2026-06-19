@@ -1,0 +1,10 @@
+---
+- name: restart traefik
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --force-recreate --no-deps traefik"
+  changed_when: true
+
+- name: reload traefik
+  # Dynamic config is hot-reloaded by Traefik's file provider; nothing to do.
+  ansible.builtin.debug:
+    msg: "Traefik dynamic config updated — file provider will pick it up within seconds."

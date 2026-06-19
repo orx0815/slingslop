@@ -1,0 +1,38 @@
+---
+# ---------------------------------------------------------------------------
+# vault.example.yml — copy to vault.yml, fill in, then:
+#   ansible-vault encrypt inventory/group_vars/all/vault.yml
+#
+# Helpers to compute htpasswd values:
+#   docker run --rm httpd:2.4 htpasswd -nbB admin '<password>'
+# (Use $$ instead of $ when storing the result inside a docker-compose env-file.)
+# ---------------------------------------------------------------------------
+
+# Sling admin user password (replaces the default `admin/admin`).
+vault_sling_admin_password: "ChangeMe-SlingAdmin-Long-Random"
+
+# Public key (Ed25519 preferred) installed into deploy user's authorized_keys.
+vault_ssh_admin_pubkey: |
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx you@laptop
+
+# Let's Encrypt account email
+vault_acme_email: ops@example.org
+
+# Traefik dashboard (optional — only exposed if traefik_dashboard_enabled=true)
+# htpasswd-style entry, e.g.: admin:$apr1$XXX...
+vault_traefik_dashboard_htpasswd: "admin:$apr1$REPLACEME$REPLACEME"
+
+# basicAuth gate in front of editor.<domain>. One htpasswd line per user.
+vault_editor_basicauth_users_htpasswd: |
+  editor:$apr1$REPLACEME$REPLACEME
+
+# basicAuth gate in front of grafana.<domain> / logs.<domain>.
+vault_grafana_basicauth_users_htpasswd: |
+  ops:$apr1$REPLACEME$REPLACEME
+
+# Grafana built-in admin (used for the first login + provisioning API).
+vault_grafana_admin_password: "ChangeMe-Grafana-Long-Random"
+
+# OPTIONAL — GHCR pull credentials for private images. Leave empty for public.
+vault_ghcr_pull_user: ""
+vault_ghcr_pull_token: ""

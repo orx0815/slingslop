@@ -1,0 +1,54 @@
+# Managed by Ansible — slingslop/slingslop role.
+# App stack: the Sling container backed by a named volume holding /content,
+# /conf, /var, /home (composite NodeStore — /apps & /libs are baked into the
+# image). See docs/composite-nodestore.md.
+
+networks:
+  default:
+    name: {{ docker_network_name }}
+    external: true
+
+volumes:
+  slingslop-content:
+
+services:
+
+  slingslop:
+    image: {{ slingslop_image }}
+    container_name: slingslop
+    restart: unless-stopped
+    env_file:
+      - {{ slingslop_secrets_dir }}/slingslop.env
+    volumes:
+      - slingslop-content:/opt/sling/launcher
+    # Loopback-publish on a non-standard port so backup/probe scripts and
+    # update playbooks can hit the app directly without going through Traefik.
+    ports:
+      - "127.0.0.1:18080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "{{ slingslop_container_cpu_limit }}"
+          memory: {{ slingslop_container_memory_limit }}
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:8080/starter.html >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+    labels:
+      traefik.enable: "true"
+      # editor.<domain> → Sling author UI, gated by basicAuth + (optional) ipAllowList
+      traefik.http.routers.editor.rule: "Host(`editor.{{ domain }}`)"
+      traefik.http.routers.editor.entrypoints: "websecure"
+      traefik.http.routers.editor.tls.certresolver: "letsencrypt"
+      traefik.http.routers.editor.service: "editor"
+      traefik.http.routers.editor.middlewares: "sec-headers@file,editor-basicauth@file{% if editor_allowlist_cidrs | length > 0 %},editor-allowlist@file{% endif %}"
+      traefik.http.services.editor.loadbalancer.server.port: "8080"

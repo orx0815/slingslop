@@ -1,0 +1,21 @@
+---
+# Full convergence run. Idempotent. Run after bootstrap.yml.
+#
+#   ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass
+
+- hosts: slingslop
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: common
+    - role: users
+    - role: security
+    - role: firewall
+    - role: docker
+    - role: webcache    # render vhost config files (bind-mount sources) FIRST
+    - role: traefik     # brings up traefik + webcache containers
+    - role: slingslop
+    - role: monitoring  # render prometheus/grafana config files FIRST
+    - role: logging     # brings up obs stack
+    - role: backup

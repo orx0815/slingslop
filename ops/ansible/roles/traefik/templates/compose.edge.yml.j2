@@ -1,0 +1,78 @@
+# Managed by Ansible — slingslop/traefik role.
+# Edge stack: Traefik + webcache.
+
+networks:
+  default:
+    name: {{ docker_network_name }}
+    external: true
+
+volumes:
+  webcache-cache:
+
+services:
+
+  traefik:
+    image: {{ traefik_image }}
+    container_name: slingslop-traefik
+    restart: unless-stopped
+    # Traefik needs to bind low ports; running with default user works fine in
+    # Docker. read_only is OFF because the file provider watches a mounted dir.
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ slingslop_root }}/data/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - {{ slingslop_root }}/data/traefik/dynamic:/etc/traefik/dynamic:ro
+      - {{ slingslop_root }}/data/traefik/acme.json:/etc/traefik/acme.json
+      - {{ slingslop_root }}/data/traefik:/var/log/traefik
+      - {{ slingslop_secrets_dir }}/editor.htpasswd:/run/secrets/editor.htpasswd:ro
+      - {{ slingslop_secrets_dir }}/grafana.htpasswd:/run/secrets/grafana.htpasswd:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:80/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+
+  webcache:
+    image: {{ webcache_image }}
+    container_name: slingslop-webcache
+    restart: unless-stopped
+    environment:
+      AUTHOR_URL:   slingslop
+      RENDERER_URL: slingslop
+    volumes:
+      - webcache-cache:/var/cache/httpd
+      # bind-mounts replace the *.conf files baked into the image so we can
+      # parameterise the domain. See roles/webcache.
+      - {{ slingslop_root }}/data/webcache/www.conf:/etc/apache2/sites-enabled/www.conf:ro
+      - {{ slingslop_root }}/data/webcache/editor_motor.conf:/etc/apache2/sites-enabled/editor_motor.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "apache2ctl status >/dev/null 2>&1 || curl -sf http://127.0.0.1/ >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.www.rule: "Host(`www.{{ domain }}`) || Host(`{{ domain }}`)"
+      traefik.http.routers.www.entrypoints: "websecure"
+      traefik.http.routers.www.tls.certresolver: "letsencrypt"
+      traefik.http.routers.www.service: "www"
+      traefik.http.routers.www.middlewares: "sec-headers@file"
+      traefik.http.services.www.loadbalancer.server.port: "80"

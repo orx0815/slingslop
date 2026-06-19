@@ -1,0 +1,33 @@
+---
+# Render webcache vhost configs that get bind-mounted *over* the ones baked
+# into the published webcache image. This lets us reuse the upstream image
+# without rebuilding it per deployment, and parameterise the domain.
+
+- name: Create webcache config dir
+  ansible.builtin.file:
+    path: "{{ slingslop_root }}/data/webcache"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Render www vhost
+  ansible.builtin.template:
+    src: www.conf.j2
+    dest: "{{ slingslop_root }}/data/webcache/www.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart webcache
+
+- name: Drop empty placeholder that replaces the image's editor_motor.conf
+  ansible.builtin.copy:
+    dest: "{{ slingslop_root }}/data/webcache/editor_motor.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # placeholder — replaces editor_motor.conf shipped in the upstream
+      # webcache image. editor.{{ '{{' }} domain {{ '}}' }} is served directly by Traefik
+      # -> slingslop (no cache, basicAuth gate); no Apache vhost needed here.
+  notify: restart webcache

@@ -1,0 +1,5 @@
+---
+- name: restart webcache
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --force-recreate --no-deps webcache"
+  changed_when: true

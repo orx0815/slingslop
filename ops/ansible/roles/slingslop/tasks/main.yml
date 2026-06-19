@@ -1,0 +1,43 @@
+---
+- name: Render slingslop env file
+  ansible.builtin.copy:
+    dest: "{{ slingslop_secrets_dir }}/slingslop.env"
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      # Managed by Ansible
+      EXTRA_JAVA_OPTS=-Xmx{{ slingslop_java_heap_max }} -Dsling.run.modes=oak_tar,prod
+
+- name: Render app compose file
+  ansible.builtin.template:
+    src: compose.app.yml.j2
+    dest: "{{ slingslop_root }}/compose.app.yml"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Pull slingslop image
+  community.docker.docker_image:
+    name: "{{ slingslop_image }}"
+    source: pull
+    force_source: false
+
+- name: Bring up slingslop container
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --no-deps slingslop"
+  register: app_up
+  changed_when: "'Started' in app_up.stderr or 'Recreated' in app_up.stderr or 'Created' in app_up.stderr"
+
+- name: Wait for Sling to respond
+  ansible.builtin.uri:
+    url: "{{ sling_internal_url }}/starter.html"
+    status_code: [200, 401, 302]
+    timeout: 5
+  register: health
+  until: health.status in [200, 401, 302]
+  retries: 60
+  delay: 5
+
+- name: Rotate Sling admin password
+  ansible.builtin.include_tasks: rotate-password.yml

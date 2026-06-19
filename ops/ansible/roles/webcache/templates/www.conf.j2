@@ -1,0 +1,69 @@
+# Managed by Ansible — slingslop/webcache role.
+# Adapted from docker/webcache/www.conf — domain parameterised.
+
+<VirtualHost *:80>
+
+   ServerName www.{{ domain }}
+   ServerAlias {{ domain }}
+   DocumentRoot /var/www/vhosts/www
+   ErrorLog /var/log/apache2/wwwerr.log
+   TransferLog /var/log/apache2/www-access.log
+   DirectoryIndex index.html
+
+   RewriteEngine on
+   RewriteRule "^/content/slingslop/zengarden(.*)$" "$1" [PT]
+
+   # Configure mod_cache
+   CacheEnable disk /
+   CacheIgnoreNoLastMod On
+   CacheIgnoreCacheControl On
+   CacheRoot /var/cache/httpd/slingslop
+   CacheDefaultExpire 10
+   CacheHeader On
+   CacheDetailHeader On
+
+   # Configure mod_expire
+   ExpiresActive On
+   ExpiresDefault "access plus 1 month"
+   ExpiresByType text/html "access plus 5 seconds"
+   ExpiresByType application/json "access plus 10 seconds"
+   ExpiresByType image/gif "access plus 1 year"
+   ExpiresByType image/jpeg "access plus 1 year"
+   ExpiresByType image/png "access plus 1 year"
+   ExpiresByType text/css "access plus 1 month"
+   ExpiresByType text/javascript "access plus 1 month"
+   ExpiresByType application/javascript "access plus 1 month"
+
+   # Configure Proxy
+   ProxyPassInterpolateEnv On
+   ProxyPass /.well-known !
+   ProxyPass /ERROR !
+
+   # Well-known paths that need to pass through unmolested
+   ProxyPass /apps/slingslop/zengarden/ http://${RENDERER_URL}:8080/apps/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPass /favicon.ico http://${RENDERER_URL}:8080/apps/slingslop/zengarden/favicon.ico connectiontimeout=10 timeout=60 retry=0 interpolate
+
+   # Without path -> home.html
+   ProxyPassMatch "^/$" "http://${RENDERER_URL}:8080/content/slingslop/zengarden/home.html" connectiontimeout=10 timeout=60 retry=0 interpolate
+
+   # When path does NOT start with /content/slingslop/zengarden, assume URL
+   # shortening has worked and make it long again before requesting Sling
+   ProxyPassMatch "^(?!(\/content)?\/slingslop/zengarden)/(.*)" "http://${RENDERER_URL}:8080/content/slingslop/zengarden/$2" connectiontimeout=10 timeout=60 retry=0 interpolate
+
+   ProxyPass /content/slingslop/zengarden/ http://${RENDERER_URL}:8080/content/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPass /slingslop/zengarden/         http://${RENDERER_URL}:8080/content/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPassReverse /content/slingslop/zengarden/ http://${RENDERER_URL}:8080/content/slingslop/zengarden/ interpolate
+   ProxyPassReverse /home.html/404 http://${RENDERER_URL}:8080/system/sling/form/login interpolate
+
+   # Security / Hardening
+   AllowEncodedSlashes on
+   RewriteRule "^.+\..*\.json" - [F,L]
+   RewriteCond %{REQUEST_METHOD} ^(delete|post|trace|track) [NC]
+   RewriteRule .* - [F,L]
+   Header set X-Frame-Options SAMEORIGIN
+   Header set X-XSS-Protection "1; mode=block"
+   Header set X-Content-Type-Options "nosniff"
+
+   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+
+</VirtualHost>

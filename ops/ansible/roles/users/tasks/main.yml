@@ -1,0 +1,29 @@
+---
+- name: Ensure deploy group exists
+  ansible.builtin.group:
+    name: "{{ deploy_user }}"
+    state: present
+
+- name: Ensure deploy user exists
+  ansible.builtin.user:
+    name: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Install authorized_keys for deploy user
+  ansible.posix.authorized_key:
+    user: "{{ deploy_user }}"
+    state: present
+    exclusive: true
+    key: "{{ vault_ssh_admin_pubkey }}"
+
+- name: Allow deploy user passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/10-{{ deploy_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    content: "{{ deploy_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    validate: "visudo -cf %s"

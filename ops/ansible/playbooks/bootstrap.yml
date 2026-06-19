@@ -1,0 +1,26 @@
+---
+# Bootstrap a fresh VPS:
+#   * runs as root over password or initial cloud-init SSH key
+#   * creates the deploy user, installs its key, hardens SSH
+#   * after this play, site.yml runs as the deploy user
+#
+# Usage:
+#   ansible-playbook -i inventory/hosts.yml playbooks/bootstrap.yml \
+#       -u root -k --ask-vault-pass
+#
+# Re-runnable: it is idempotent. Once SSH is locked down to deploy@key,
+# subsequent root-password runs will fail — that's the point.
+
+- hosts: slingslop
+  gather_facts: true
+  become: true
+
+  vars:
+    bootstrap_phase: true   # tells the security role to also keep the
+                            # root-SSH key alive on the very first run
+
+  roles:
+    - role: common
+    - role: users
+    - role: security
+    - role: firewall

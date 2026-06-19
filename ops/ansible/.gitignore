@@ -1,0 +1,4 @@
+.ansible-facts/
+inventory/hosts.yml
+inventory/group_vars/all/vault.yml
+*.retry

@@ -1,0 +1,146 @@
+# Managed by Ansible — slingslop/logging role.
+# Observability stack: prometheus + grafana + loki + promtail + node-exporter + cadvisor.
+
+networks:
+  default:
+    name: {{ docker_network_name }}
+    external: true
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  loki-data:
+
+services:
+
+  prometheus:
+    image: {{ prometheus_image }}
+    container_name: slingslop-prometheus
+    restart: unless-stopped
+    user: "65534:65534"   # nobody — read-only data dir owner irrelevant; emptyDir-style volume
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time={{ prometheus_retention_time }}
+      - --storage.tsdb.retention.size={{ prometheus_retention_size }}
+      - --web.enable-lifecycle
+    volumes:
+      - {{ slingslop_root }}/data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+
+  grafana:
+    image: {{ grafana_image }}
+    container_name: slingslop-grafana
+    restart: unless-stopped
+    env_file:
+      - {{ slingslop_secrets_dir }}/grafana.env
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - {{ slingslop_root }}/data/grafana/provisioning:/etc/grafana/provisioning:ro
+      - {{ slingslop_root }}/data/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
+      # Router itself is declared in the file-provider dynamic.yml (we need
+      # the basicAuth middleware which only the file provider can read).
+
+  loki:
+    image: {{ loki_image }}
+    container_name: slingslop-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - {{ slingslop_root }}/data/loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+
+  promtail:
+    image: {{ promtail_image }}
+    container_name: slingslop-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - {{ slingslop_root }}/data/promtail/config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+
+  node-exporter:
+    image: {{ node_exporter_image }}
+    container_name: slingslop-node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|var/lib/docker/.+)($|/)
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"
+
+  cadvisor:
+    image: {{ cadvisor_image }}
+    container_name: slingslop-cadvisor
+    restart: unless-stopped
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "{{ docker_log_max_size }}"
+        max-file: "{{ docker_log_max_files | string }}"

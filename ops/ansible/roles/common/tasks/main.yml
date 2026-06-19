@@ -1,0 +1,59 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - apt-transport-https
+      - software-properties-common
+      - unattended-upgrades
+      - jq
+      - htop
+      - vim-tiny
+      - rsync
+      - cron
+      - logrotate
+      - python3
+      - python3-apt
+      - python3-passlib
+      - python3-requests
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Generate locale
+  community.general.locale_gen:
+    name: "{{ locale }}"
+    state: present
+
+- name: Set default locale
+  ansible.builtin.copy:
+    dest: /etc/default/locale
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      LANG={{ locale }}
+      LC_ALL={{ locale }}
+
+- name: Weekly housekeeping cron (apt autoremove + journal vacuum)
+  ansible.builtin.copy:
+    dest: /etc/cron.weekly/slingslop-housekeeping
+    owner: root
+    group: root
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      set -e
+      apt-get -y autoremove --purge >/dev/null
+      apt-get -y clean         >/dev/null
+      journalctl --vacuum-time=14d >/dev/null

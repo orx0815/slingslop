@@ -1,0 +1,32 @@
+---
+# Pull a newer Slingslop image and restart only that container.
+# Webcache, Traefik and the observability stack are not touched.
+#
+#   ansible-playbook -i inventory/hosts.yml playbooks/update-slingslop.yml --ask-vault-pass
+
+- hosts: slingslop
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Pull slingslop image
+      ansible.builtin.command:
+        cmd: "{{ slingslop_root }}/dc pull slingslop"
+      register: pull_result
+      changed_when: "'Downloaded newer image' in pull_result.stdout or 'Pull complete' in pull_result.stdout"
+
+    - name: Recreate slingslop container (no-deps)
+      ansible.builtin.command:
+        cmd: "{{ slingslop_root }}/dc up -d --no-deps slingslop"
+      register: up_result
+      changed_when: "'Started' in up_result.stderr or 'Recreated' in up_result.stderr or 'Created' in up_result.stderr"
+
+    - name: Wait for Sling to be healthy
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:18080/starter.html"
+        status_code: [200, 401]
+        timeout: 5
+      register: health
+      until: health.status in [200, 401]
+      retries: 60
+      delay: 5

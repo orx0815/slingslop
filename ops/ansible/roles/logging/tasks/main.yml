@@ -1,0 +1,43 @@
+---
+- name: Create logging data dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "{{ slingslop_root }}/data/loki"
+    - "{{ slingslop_root }}/data/promtail"
+
+- name: Render loki config
+  ansible.builtin.template:
+    src: loki-config.yml.j2
+    dest: "{{ slingslop_root }}/data/loki/config.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart loki
+
+- name: Render promtail config
+  ansible.builtin.template:
+    src: promtail-config.yml.j2
+    dest: "{{ slingslop_root }}/data/promtail/config.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart promtail
+
+- name: Render obs compose file
+  ansible.builtin.template:
+    src: compose.obs.yml.j2
+    dest: "{{ slingslop_root }}/compose.obs.yml"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Bring up obs stack
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d prometheus grafana loki promtail node-exporter cadvisor"
+  register: obs_up
+  changed_when: "'Started' in obs_up.stderr or 'Recreated' in obs_up.stderr or 'Created' in obs_up.stderr"

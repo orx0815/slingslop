@@ -13,7 +13,8 @@ sling-apps/           ← Sling applications (each = ui.apps + core bundle)
   zengarden/          ← CSS Zen Garden demo app (reference implementation)
 content-packages/     ← Sample content (VLT zips) + 'complete' container package
 launcher/             ← Feature-model launcher, Docker image, integration tests
-docker/               ← docker-compose + web cache proxy configs
+docker/               ← docker-compose + web cache proxy configs (local dev)
+ops/                  ← Production Ansible deployment (single-VPS, GitOps-ready)
 docs/
   agent-skills/       ← Executable agent skill files (invoke via VS Code Copilot)
   editing-patterns.md ← Component editing supertypes and contracts
@@ -77,4 +78,6 @@ Some modules have their own `AGENTS.md` with module-specific context:
 | Document | Description |
 |---|---|
 | `docs/editing-patterns.md` | Editing supertypes, component contract, new-component checklist |
+| `docs/composite-nodestore.md` | Composite NodeStore: immutable `/apps`+`/libs` from image, mutable content in volume |
+| `ops/README.md` | **Production Ansible deployment** — full single-VPS setup with Traefik+ACME, Grafana, Loki, hardening |
 | `ReadMe.md` | Project overview, prerequisites, build & run instructions |

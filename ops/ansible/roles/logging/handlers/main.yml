@@ -1,0 +1,10 @@
+---
+- name: restart loki
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --force-recreate --no-deps loki"
+  changed_when: true
+
+- name: restart promtail
+  ansible.builtin.command:
+    cmd: "{{ slingslop_root }}/dc up -d --force-recreate --no-deps promtail"
+  changed_when: true

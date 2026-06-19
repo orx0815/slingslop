@@ -1,0 +1,31 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Container CPU (cores)",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[2m]))", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Container RSS (MiB)",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "container_memory_rss{name!=\"\"} / 1024 / 1024", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "type": "logs",
+      "title": "Slingslop logs (Loki)",
+      "datasource": "Loki",
+      "targets": [{"expr": "{compose_service=\"slingslop\"}", "refId": "A"}],
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 8}
+    }
+  ],
+  "schemaVersion": 39,
+  "title": "Slingslop — Containers",
+  "uid": "slingslop-containers",
+  "version": 1
+}

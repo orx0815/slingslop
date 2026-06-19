@@ -1,0 +1,36 @@
+#!/bin/bash
+# Managed by Ansible — slingslop/backup role.
+# Nightly hot snapshot of the slingslop-content volume + retention.
+# Sling is stopped briefly (graceful) to checkpoint the SegmentNodeStore.
+
+set -euo pipefail
+umask 077
+
+PROJECT=slingslop
+SERVICE=slingslop
+VOLUME=${PROJECT}_slingslop-content
+DEST=$(date +/var/backups/slingslop/slingslop-content-%Y%m%dT%H%M%S.tar.gz)
+RETENTION_DAYS={{ backup_retention_days }}
+DC=/opt/slingslop/dc
+
+log() { printf '[%s] %s\n' "$(date -Is)" "$*"; }
+
+log "Stopping ${SERVICE} (graceful shutdown for clean SegmentNodeStore checkpoint)…"
+${DC} stop -t 60 ${SERVICE}
+
+log "Snapshotting volume ${VOLUME} → ${DEST}"
+# Use a throw-away alpine container to tar up the volume.
+docker run --rm \
+    -v ${VOLUME}:/data:ro \
+    -v /var/backups/slingslop:/backup \
+    alpine:3 \
+    tar czf "/backup/$(basename "${DEST}")" -C /data .
+
+log "Starting ${SERVICE}…"
+${DC} up -d --no-deps ${SERVICE}
+
+log "Pruning backups older than ${RETENTION_DAYS} days"
+find /var/backups/slingslop -maxdepth 1 -type f -name 'slingslop-content-*.tar.gz' \
+    -mtime +${RETENTION_DAYS} -print -delete || true
+
+log "Done."

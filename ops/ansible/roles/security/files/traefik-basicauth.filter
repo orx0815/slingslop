@@ -1,0 +1,8 @@
+# Managed by Ansible — slingslop/security role.
+# Fail2ban filter for Traefik access.log lines that contain a 401 response
+# from a basicAuth-protected route. We match on the access log's combined
+# format that Traefik emits when accessLog.format = "common".
+
+[Definition]
+failregex = ^<HOST> .* "POST|GET|HEAD .*" 401 .*$
+ignoreregex =

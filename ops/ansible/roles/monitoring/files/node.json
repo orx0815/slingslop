@@ -1,0 +1,38 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Host load (1m)",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "node_load1", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Mem used %",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Root FS used %",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "100 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"} * 100)", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU usage by mode",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sum by (mode) (rate(node_cpu_seconds_total[2m]))", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4}
+    }
+  ],
+  "schemaVersion": 39,
+  "title": "Slingslop — Host",
+  "uid": "slingslop-host",
+  "version": 1
+}
