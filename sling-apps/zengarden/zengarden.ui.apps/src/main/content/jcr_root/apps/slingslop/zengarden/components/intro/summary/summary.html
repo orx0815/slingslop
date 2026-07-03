@@ -4,6 +4,6 @@
      data-zen-editable="true"
      data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
-     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
   ${properties.text @ context='html'}
 </div>

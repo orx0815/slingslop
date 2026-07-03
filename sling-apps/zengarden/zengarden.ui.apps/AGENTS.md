@@ -29,13 +29,15 @@ Each editable component renders with HTMX attributes:
 <div data-zen-editable="true"
      hx-get="${resource.path}.edit-form.html"
      hx-trigger="click"
-     hx-swap="outerHTML">
+     hx-swap="outerMorph">
   …rendered content…
 </div>
 ```
 
-A click fires an **HTMX GET** to `<resource>.edit-form.html` (Sling selector).  
-The response replaces the component's `outerHTML` with the edit form.
+A click fires an **HTMX GET** to `<resource>.edit-form.html` (Sling selector).
+The response **morphs** the component in place with the edit form — htmx 4's
+`outerMorph` diffs the old and new DOM and patches only what changed, preserving
+focus, scroll position and any transient state instead of tearing the node out.
 
 ---
 
@@ -43,7 +45,7 @@ The response replaces the component's `outerHTML` with the edit form.
 
 `edit-form.html` is rendered by Sling/HTL and contains:
 
-- `<form id="editor-form" hx-post="${resource.path}" hx-target="…" hx-swap="outerHTML">`
+- `<form id="editor-form" hx-post="${resource.path}" hx-target="…" hx-swap="outerMorph">`
 - `<textarea id="content-editor" style="display:none;">` — seeded with current JCR `text` property via HTL `${properties.text @ context='html'}`.
 - `<div id="tiptap-editor">` — Tiptap mount point.
 - `<input type="hidden" id="content-hidden" name="text">` — populated on save.
@@ -54,10 +56,10 @@ Because the form is injected dynamically, `htmx.process(form)` is called after s
 
 ---
 
-### 3 – Tiptap initialisation (`htmx:afterSwap`)
+### 3 – Tiptap initialisation (`htmx:after:swap`)
 
 ```
-htmx:afterSwap  (registered in editor.ts)
+htmx:after:swap  (registered in editor.ts)
   └─ #tiptap-editor present?
        ├─ htmx.process(#editor-form)   ← register dynamic HTMX attrs
        ├─ initializeTiptap()           ← editor/tiptap.ts
@@ -106,32 +108,34 @@ Sling stores `text` and `headline` as JCR properties and then returns the update
 
 ---
 
-### 6 – Teardown (`htmx:beforeSwap`)
+### 6 – Teardown (`htmx:before:swap`)
 
 When the POST response is about to swap in the view-mode HTML:
 
 ```
-htmx:beforeSwap  (target has data-zen-editable-editing)
+htmx:before:swap  (detail.ctx.target has data-zen-editable-editing)
   ├─ hideComponentModal()
   ├─ unmountComponentModal()    ← remove modal DOM node
   ├─ destroyEditor()            ← editor.destroy(); editor = null
   └─ document.body.removeAttribute('data-zen-editing')
 ```
 
-The view-mode component is swapped back via `outerHTML`, completing the round-trip.
+Morphing patches the DOM but does not destroy the Tiptap (ProseMirror) JS
+instance, so this teardown must still run to release the editor before the
+view-mode component is morphed back in via `outerMorph`, completing the round-trip.
 
 ---
 
 ## Cancel path
 
-Both the footer **Cancel** button and the modal **Cancel** button fire an HTMX GET back to `resource.path.html`.  
-`htmx:beforeSwap` still fires and cleans up identically — no manual teardown needed.
+Both the footer **Cancel** button and the modal **Cancel** button fire an HTMX GET back to `resource.path.html`.
+`htmx:before:swap` still fires and cleans up identically — no manual teardown needed.
 
 ---
 
 ## Design notes
 
-- **No full-page reload** — all transitions are `outerHTML` swaps within the live DOM.
+- **No full-page reload** — all transitions are htmx 4 `outerMorph` swaps that diff and patch the live DOM in place.
 - **Sling selector pattern** — `.edit-form.html` selector routes to the edit-form script; `.html` routes to the view script.
 - **Modal portalling** — `#editor-component-modal` is moved into the global `#editor-modal-container` (in `<body>`) so it escapes any clipping `overflow` context.
 - **htmx global** — in development (`?minLibs=no`) htmx is loaded as a separate `htmx.js` script tag; in production it is prepended as an esbuild banner inside `editor-bundle.min.js`.

@@ -25,7 +25,7 @@ import org.apache.sling.models.annotations.injectorspecific.Self;
  *      data-sly-set.editPath="${resource.path}.edit-form.html"
  *      data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
  *      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
- *      data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+ *      data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
  * }
  * </pre>
  * 

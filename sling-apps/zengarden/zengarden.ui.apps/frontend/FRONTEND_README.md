@@ -183,11 +183,16 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 - `@tiptap/extension-typography` — smart quotes, em-dashes, ellipsis
 
 ### htmx
-- **v2.x** (`htmx.org ^2.0.0`) — no IE11, cleaner defaults, extensions separated
+- **v4.x** (`htmx.org 4.0.0-beta5`) — built-in DOM morphing, namespaced events, `fetch`-based requests
 - Copied from `node_modules/htmx.org/dist/htmx.js` by `copy:htmx`
 - In prod (`editor-bundle.min.js`) htmx is prepended as an esbuild banner so it is available before the editor IIFE runs
 - In dev (`?minLibs=no`) htmx is loaded as a separate `<script>` tag
-- All APIs used by this project (`htmx.process()`, `htmx.trigger()`, event names, event detail properties) are unchanged from v1
+- Inline edit swaps use the built-in `hx-swap="outerMorph"` — the response is diffed against the live DOM and only changed nodes are patched (preserves scroll/focus/animation on unchanged parts)
+- **v4 API notes** used by this project (see [migration guide](https://four.htmx.org/docs#migration)):
+  - Events are namespaced: `htmx:before:swap`, `htmx:after:swap`, `htmx:response:error`
+  - Event detail carries a `ctx` object: target is `detail.ctx.target`, response status is `detail.ctx.response.status`
+  - `htmx.process()` and `htmx.trigger()` signatures are unchanged
+  - `htmx.config.noSwap` lists status codes that must not swap; error codes (401/404/422/500) are added so the save-error overlay keeps working
 
 ---
 

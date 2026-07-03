@@ -2,7 +2,7 @@
   <form id="editor-form"
         hx-trigger="submit"
         hx-target="closest [data-zen-editable-editing]"
-        hx-swap="outerHTML"
+        hx-swap="outerMorph"
         hx-post="${resource.path}">
 
     <input type="hidden" name=":redirect" value="${resource.path}.html" />
@@ -33,7 +33,7 @@
           <button type="button" class="btn btn-secondary"
                   hx-get="${resource.path}.html"
                   hx-target="[data-zen-editable-editing]"
-                  hx-swap="outerHTML">Cancel</button>
+                  hx-swap="outerMorph">Cancel</button>
           <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
         </div>
       </div>
@@ -64,7 +64,7 @@
         <button type="button" class="btn btn-secondary"
                 hx-get="${resource.path}.html"
                 hx-target="closest [data-zen-editable-editing]"
-                hx-swap="outerHTML">Cancel</button>
+                hx-swap="outerMorph">Cancel</button>
         <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
       </div>
     </div>

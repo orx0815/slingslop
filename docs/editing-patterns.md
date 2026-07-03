@@ -97,7 +97,7 @@ This regenerates:
 2. Add view HTL (for clickable editing):
 	- `data-zen-editable="true"`
 	- `hx-get="${resource.path}.edit-form.html"`
-	- `hx-swap="outerHTML"`
+	- `hx-swap="outerMorph"`
 3. Add `edit-form-fields.html` only (reuse supertype `edit-form.html`).
 4. Choose mode:
 	- Richtext: add `#content-editor` and `#content-hidden`.
@@ -160,7 +160,7 @@ npm run build
 <div data-zen-editable="true"
 		 hx-get="${resource.path}.edit-form.html"
 		 hx-trigger="click"
-		 hx-swap="outerHTML"
+		 hx-swap="outerMorph"
 		 style="cursor: pointer;"
 		 title="Click to edit">
 	...rendered output...

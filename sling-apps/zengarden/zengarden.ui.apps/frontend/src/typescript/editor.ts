@@ -18,7 +18,17 @@ import { saveEditorContent } from './editor/save';
 declare const htmx: {
   process: (element: HTMLElement) => void;
   trigger: (element: HTMLElement, eventName: string) => void;
+  config: { noSwap: number[] };
 };
+
+// htmx 4 event detail: swap/response events carry a `ctx` object.
+// target is the resolved swap target; response holds the fetch status.
+interface HtmxSwapDetail {
+  ctx: { target: HTMLElement };
+}
+interface HtmxResponseErrorDetail {
+  ctx: { response: { status: number } };
+}
 
 // Window API called from HTL onclick attributes
 declare global {
@@ -34,10 +44,21 @@ declare global {
   'use strict';
 
   function initializeEventListeners(): void {
-    // Destroy editor before any swap that removes the active editing region
-    document.body.addEventListener('htmx:beforeSwap', function (event: Event): void {
-      const htmxEvent = event as CustomEvent<{ target: HTMLElement }>;
-      if (htmxEvent.detail.target.hasAttribute('data-zen-editable-editing')) {
+    // htmx 4 swaps 4xx/5xx responses by default (v2 did not). The save-error
+    // overlay relies on error responses NOT being swapped into the page, so the
+    // handled status codes are added to noSwap to restore the v2 behaviour.
+    for (const status of [401, 404, 422, 500]) {
+      if (!htmx.config.noSwap.includes(status)) {
+        htmx.config.noSwap.push(status);
+      }
+    }
+
+    // Destroy editor before any swap that removes the active editing region.
+    // With outerMorph htmx diffs the response into the live DOM, so the
+    // Tiptap-managed DOM must be torn down here to avoid a dangling instance.
+    document.body.addEventListener('htmx:before:swap', function (event: Event): void {
+      const htmxEvent = event as CustomEvent<HtmxSwapDetail>;
+      if (htmxEvent.detail.ctx.target.hasAttribute('data-zen-editable-editing')) {
         hideComponentModal();
         unmountComponentModal();
         destroyEditor();
@@ -48,7 +69,7 @@ declare global {
     // Init editing UI after htmx swaps in an edit form.
     // Richtext supertype renders #tiptap-editor.
     // Modal-only supertype omits it and opens the modal directly.
-    document.body.addEventListener('htmx:afterSwap', function (): void {
+    document.body.addEventListener('htmx:after:swap', function (): void {
       const form = document.getElementById('editor-form') as HTMLElement | null;
       if (!form) {
         return;
@@ -69,9 +90,9 @@ declare global {
     });
 
     // Show a user-friendly message for save errors (401/422 = not logged in, 404, 500)
-    document.body.addEventListener('htmx:responseError', function (event: Event): void {
-      const htmxEvent = event as CustomEvent<{ xhr: XMLHttpRequest }>;
-      const status = htmxEvent.detail.xhr.status;
+    document.body.addEventListener('htmx:response:error', function (event: Event): void {
+      const htmxEvent = event as CustomEvent<HtmxResponseErrorDetail>;
+      const status = htmxEvent.detail.ctx.response.status;
 
       let message: string;
       if (status === 422) {
