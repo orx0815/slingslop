@@ -4,7 +4,7 @@
         data-zen-editable="true"
         data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
         data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
-        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
   <h1>${properties.title}</h1>
   <h2>${properties.subtitle}</h2>
 </header>

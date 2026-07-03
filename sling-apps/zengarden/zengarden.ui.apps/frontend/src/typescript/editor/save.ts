@@ -33,5 +33,5 @@ export function saveEditorContent(): void {
   }
 
   htmx.trigger(form, 'submit');
-  // No manual close needed — htmx outerHTML swap restores the view component
+  // No manual close needed — htmx outerMorph swap restores the view component
 }
