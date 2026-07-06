@@ -525,7 +525,7 @@ Replicate the zengarden frontend build pattern exactly. The build produces **two
     "check": "npm run format && npm run lint && npm run typecheck"
   },
   "dependencies": {
-    "htmx.org": "^2.0.0"
+    "htmx.org": "4.0.0-beta5"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -840,7 +840,7 @@ For zen-editable components:
      data-zen-editable="true"
      data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
      data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
-     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerHTML' : false}">
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
   <h3>${properties.headline}</h3>
   ${properties.text @ context='html'}
 </div>
