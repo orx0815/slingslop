@@ -492,6 +492,10 @@ for `infra.yml` when the box itself (Traefik, monitoring, users, …) changes.
 
 ### Required GitHub config
 
+> **One-time github.com setup — secrets, variables, the `production`
+> environment, and GHCR package access/visibility — is documented step-by-step
+> in [`github-setup.md`](github-setup.md).** Summary:
+
 | Kind | Name | Purpose |
 |---|---|---|
 | secret | `DEPLOY_SSH_KEY` | private key allow-listed for the `deploy` user |
@@ -503,8 +507,8 @@ for `infra.yml` when the box itself (Traefik, monitoring, users, …) changes.
 The deploy jobs generate the (gitignored) inventory at runtime via
 `.github/scripts/write-inventory.sh` from `DEPLOY_HOST` / `DEPLOY_DOMAIN`.
 
-> **Images must be public** on GHCR for the host's anonymous pull to work —
-> otherwise set `vault_ghcr_pull_token`. Flip each package to **Public** once
-> after the first push: `slingslop`, `slingslop-webcache`.
+> **Images must be public** on GHCR for the host's anonymous pull to work, and
+> each package must grant this repo **Write** access or the push is `denied` —
+> see [`github-setup.md`](github-setup.md#4-ghcr-package-access--visibility-fixes-denied-on-push).
 > `deploy/motorbrot_prod` is a protected `production` environment — add required
 > reviewers in the repo settings if you want a manual approval gate.
