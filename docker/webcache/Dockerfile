@@ -21,7 +21,8 @@ RUN a2enmod expires
 RUN a2enmod headers
 
 # Configure sites
-RUN mkdir -p /var/www/vhosts/editor.motorbrot &&  mkdir -p /var/www/vhosts/www && \
+RUN mkdir -p /var/www/vhosts/editor.motorbrot && mkdir -p /var/www/vhosts/www && \
+    mkdir -p /var/www/vhosts/zengarden && \
     mkdir -p /var/cache/httpd/slingslop && \
     chown -R www-data:www-data /var/cache/httpd
 

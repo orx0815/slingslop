@@ -4,11 +4,12 @@
 # Secrets live in vault.yml (encrypted with ansible-vault).
 # ---------------------------------------------------------------------------
 
-# Base domain. The deployment publishes three sub-domains under it:
-#   www.<domain>      → public, cached
-#   editor.<domain>   → Sling author, basicAuth-gated
-#   grafana.<domain>  → Grafana, basicAuth-gated
-#   logs.<domain>     → same Grafana (alias host); browse logs via Explore → Loki
+# Base domain. The deployment publishes these sub-domains under it:
+#   www.<domain>       → public (sling-matrix), cached
+#   zengarden.<domain> → public (legacy CSS Zen Garden app), cached
+#   editor.<domain>    → Sling author, basicAuth-gated
+#   grafana.<domain>   → Grafana, basicAuth-gated
+#   logs.<domain>      → same Grafana (alias host); browse logs via Explore → Loki
 domain: example.org
 
 # Let's Encrypt / ACME. Keep true for real deployments (public DNS + ports

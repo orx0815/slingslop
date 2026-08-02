@@ -35,9 +35,10 @@ This Docker Compose setup creates a volume _slingslop-volume_ for the Apache Sli
 
 ## Host config
 
-Then map the URLs *www.motorbrot.local* and *editor.motorbrot.local* to your docker host. On local hosts, you can add the following entries into your /etc/hosts file:
+Then map the URLs *www.motorbrot.local*, *zengarden.motorbrot.local* and *editor.motorbrot.local* to your docker host. On local hosts, you can add the following entries into your /etc/hosts file:
 
     127.0.0.1 www.motorbrot.local
+    127.0.0.1 zengarden.motorbrot.local
     127.0.0.1 editor.motorbrot.local
 
 

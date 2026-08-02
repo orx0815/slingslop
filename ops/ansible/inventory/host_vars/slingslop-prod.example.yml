@@ -7,9 +7,10 @@
 # win over the committed defaults. Non-secret only — secrets stay in vault.yml.
 # ---------------------------------------------------------------------------
 
-# Real public domain for this host. Publishes: www / editor / grafana / logs /
-# traefik sub-domains. DNS A records for each must point at this host's
-# ansible_host, and ports 80/443 must be reachable (Let's Encrypt validation).
+# Real public domain for this host. Publishes: www / zengarden / editor /
+# grafana / logs / traefik sub-domains. DNS A records for each must point at
+# this host's ansible_host, and ports 80/443 must be reachable (Let's Encrypt
+# validation).
 domain: example.org
 
 # Restrict the gated endpoints (editor / grafana / logs / traefik) to trusted

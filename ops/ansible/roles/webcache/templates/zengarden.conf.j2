@@ -1,17 +1,17 @@
 # Managed by Ansible — slingslop/webcache role.
-# Adapted from docker/webcache/www.conf — domain parameterised.
+# Adapted from docker/webcache/zengarden.conf — domain parameterised.
+# Serves the legacy CSS Zen Garden app on zengarden.{{ domain }}.
 
 <VirtualHost *:80>
 
-   ServerName www.{{ domain }}
-   ServerAlias {{ domain }}
-   DocumentRoot /var/www/vhosts/www
-   ErrorLog /var/log/apache2/wwwerr.log
-   TransferLog /var/log/apache2/www-access.log
+   ServerName zengarden.{{ domain }}
+   DocumentRoot /var/www/vhosts/zengarden
+   ErrorLog /var/log/apache2/zengarden-err.log
+   TransferLog /var/log/apache2/zengarden-access.log
    DirectoryIndex index.html
 
    RewriteEngine on
-   RewriteRule "^/content/sling-matrix(.*)$" "$1" [PT]
+   RewriteRule "^/content/slingslop/zengarden(.*)$" "$1" [PT]
 
    # Configure mod_cache
    CacheEnable disk /
@@ -40,19 +40,19 @@
    ProxyPass /ERROR !
 
    # Well-known paths that need to pass through unmolested
-   ProxyPass /apps/sling-matrix/ http://${RENDERER_URL}:8080/apps/sling-matrix/ connectiontimeout=10 timeout=60 retry=0 interpolate
-   ProxyPass /favicon.ico http://${RENDERER_URL}:8080/apps/sling-matrix/favicon.ico connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPass /apps/slingslop/zengarden/ http://${RENDERER_URL}:8080/apps/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPass /favicon.ico http://${RENDERER_URL}:8080/apps/slingslop/zengarden/favicon.ico connectiontimeout=10 timeout=60 retry=0 interpolate
 
-   # Without path -> home.html  (homepage node is /content/sling-matrix/home)
-   ProxyPassMatch "^/$" "http://${RENDERER_URL}:8080/content/sling-matrix/home.html" connectiontimeout=10 timeout=60 retry=0 interpolate
+   # Without path -> home.html
+   ProxyPassMatch "^/$" "http://${RENDERER_URL}:8080/content/slingslop/zengarden/home.html" connectiontimeout=10 timeout=60 retry=0 interpolate
 
-   # When path does NOT start with /content/sling-matrix, assume URL
+   # When path does NOT start with /content/slingslop/zengarden, assume URL
    # shortening has worked and make it long again before requesting Sling
-   ProxyPassMatch "^(?!(\/content)?\/sling-matrix)/(.*)" "http://${RENDERER_URL}:8080/content/sling-matrix/$2" connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPassMatch "^(?!(\/content)?\/slingslop/zengarden)/(.*)" "http://${RENDERER_URL}:8080/content/slingslop/zengarden/$2" connectiontimeout=10 timeout=60 retry=0 interpolate
 
-   ProxyPass /content/sling-matrix/ http://${RENDERER_URL}:8080/content/sling-matrix/ connectiontimeout=10 timeout=60 retry=0 interpolate
-   ProxyPass /sling-matrix/         http://${RENDERER_URL}:8080/content/sling-matrix/ connectiontimeout=10 timeout=60 retry=0 interpolate
-   ProxyPassReverse /content/sling-matrix/ http://${RENDERER_URL}:8080/content/sling-matrix/ interpolate
+   ProxyPass /content/slingslop/zengarden/ http://${RENDERER_URL}:8080/content/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPass /slingslop/zengarden/         http://${RENDERER_URL}:8080/content/slingslop/zengarden/ connectiontimeout=10 timeout=60 retry=0 interpolate
+   ProxyPassReverse /content/slingslop/zengarden/ http://${RENDERER_URL}:8080/content/slingslop/zengarden/ interpolate
    ProxyPassReverse /home.html/404 http://${RENDERER_URL}:8080/system/sling/form/login interpolate
 
    # Security / Hardening

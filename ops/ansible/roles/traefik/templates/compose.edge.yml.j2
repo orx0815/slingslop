@@ -59,6 +59,7 @@ services:
       # bind-mounts replace the *.conf files baked into the image so we can
       # parameterise the domain. See roles/webcache.
       - {{ slingslop_root }}/data/webcache/www.conf:/etc/apache2/sites-enabled/www.conf:ro
+      - {{ slingslop_root }}/data/webcache/zengarden.conf:/etc/apache2/sites-enabled/zengarden.conf:ro
       - {{ slingslop_root }}/data/webcache/editor_motor.conf:/etc/apache2/sites-enabled/editor_motor.conf:ro
     healthcheck:
       test: ["CMD-SHELL", "apache2ctl status >/dev/null 2>&1 || curl -sf http://127.0.0.1/ >/dev/null"]
@@ -83,3 +84,13 @@ services:
       traefik.http.routers.www.service: "www"
       traefik.http.routers.www.middlewares: "sec-headers@file"
       traefik.http.services.www.loadbalancer.server.port: "80"
+      # zengarden.<domain> — legacy CSS Zen Garden app, same webcache container
+      traefik.http.routers.zengarden.rule: "Host(`zengarden.{{ domain }}`)"
+      traefik.http.routers.zengarden.entrypoints: "websecure"
+{% if traefik_acme_enabled | default(true) | bool %}
+      traefik.http.routers.zengarden.tls.certresolver: "letsencrypt"
+{% else %}
+      traefik.http.routers.zengarden.tls: "true"
+{% endif %}
+      traefik.http.routers.zengarden.service: "www"
+      traefik.http.routers.zengarden.middlewares: "sec-headers@file"

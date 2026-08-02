@@ -20,6 +20,15 @@
     mode: "0644"
   notify: restart webcache
 
+- name: Render zengarden vhost
+  ansible.builtin.template:
+    src: zengarden.conf.j2
+    dest: "{{ slingslop_root }}/data/webcache/zengarden.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart webcache
+
 - name: Drop empty placeholder that replaces the image's editor_motor.conf
   ansible.builtin.copy:
     dest: "{{ slingslop_root }}/data/webcache/editor_motor.conf"

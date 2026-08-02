@@ -27,6 +27,25 @@ cat ~/.ssh/id_ed25519
 Notes:
 - Secret values are write-only — you can overwrite but never view them again.
 - Names are case-sensitive and must match the workflows exactly.
+- **The key must have NO passphrase.** The deploy workflows load it via
+  `webfactory/ssh-agent`, which runs `ssh-add -` non-interactively; a
+  passphrase-protected key makes CI fail with
+  `Command failed: ssh-add -  /  Enter passphrase for (stdin):`.
+  Generate a dedicated CI deploy key without a passphrase:
+
+  ```bash
+  # dedicated, passphrase-less CI deploy key
+  ssh-keygen -t ed25519 -N '' -C 'ci-deploy@slingslop' -f ~/.ssh/slingslop_ci_deploy
+
+  # authorise it for the deploy user on the VPS
+  ssh-copy-id -i ~/.ssh/slingslop_ci_deploy.pub deploy@motorbrot.org
+
+  # paste this into the DEPLOY_SSH_KEY secret (whole file, incl. BEGIN/END)
+  cat ~/.ssh/slingslop_ci_deploy
+  ```
+
+  (Already have a passphrased key you want to reuse? Strip the passphrase into a
+  copy first: `cp ~/.ssh/id_ed25519 ~/.ssh/slingslop_ci_deploy && ssh-keygen -p -N '' -f ~/.ssh/slingslop_ci_deploy` — never remove the passphrase from your personal key in place.)
 
 ---
 
