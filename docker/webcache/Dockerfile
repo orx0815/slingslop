@@ -4,8 +4,9 @@ FROM ubuntu:latest
 # Avoid interaction with tzdata
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install Apache
-RUN apt-get -y update && apt-get -y install apache2
+# Install Apache (curl is used by the compose healthcheck and deploy readiness probe)
+RUN apt-get -y update && apt-get -y install apache2 curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Configure mod_rewrite
 RUN a2enmod rewrite
