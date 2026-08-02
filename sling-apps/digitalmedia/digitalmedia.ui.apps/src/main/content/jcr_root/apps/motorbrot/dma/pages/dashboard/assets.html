@@ -1,0 +1,76 @@
+<!--/* Asset list — rendered via selector "assets" on dashboard resource type */-->
+<sly data-sly-use.model="org.motorbrot.sling.dma.slingmodels.AssetListModel">
+
+  <sly data-sly-test="${!model.folderFound}">
+    <div class="dml-empty-state" style="grid-column: 1 / -1;">
+      <p>Folder not found</p>
+    </div>
+  </sly>
+
+  <!--/* Folder navigation (picker only — includeFolders=true). Breadcrumb + up + subfolders. */-->
+  <sly data-sly-test="${model.folderFound && model.includeFolders}">
+    <nav class="dml-picker-breadcrumb" aria-label="Folder path" style="grid-column: 1 / -1;">
+      <sly data-sly-list.crumb="${model.breadcrumb}">
+        <button type="button" class="dml-picker-crumb"
+                data-folder-path="${crumb.path}"
+                data-sly-test="${!crumbList.last}">${crumb.name}</button>
+        <span class="dml-picker-crumb-sep" data-sly-test="${!crumbList.last}">/</span>
+        <span class="dml-picker-crumb dml-picker-crumb-current"
+              data-sly-test="${crumbList.last}">${crumb.name}</span>
+      </sly>
+    </nav>
+
+    <button type="button" class="dml-folder-item dml-folder-up"
+            data-sly-test="${model.hasParent}"
+            data-folder-path="${model.parentPath}">
+      <span class="dml-folder-icon">↩</span>
+      <span class="dml-folder-name">Up one level</span>
+    </button>
+
+    <sly data-sly-list.folder="${model.folders}">
+      <button type="button" class="dml-folder-item"
+              data-folder-path="${folder.path}">
+        <span class="dml-folder-icon">📁</span>
+        <span class="dml-folder-name" title="${folder.name}">${folder.name}</span>
+        <span class="dml-folder-count">${folder.childCount} item${folder.childCount == 1 ? '' : 's'}</span>
+      </button>
+    </sly>
+  </sly>
+
+  <sly data-sly-test="${model.folderFound && model.includeFolders && model.emptyAll}">
+    <div class="dml-empty-state" style="grid-column: 1 / -1;">
+      <div class="dml-empty-state-icon">📂</div>
+      <h3>Empty folder</h3>
+      <p>No images or sub-folders here</p>
+    </div>
+  </sly>
+
+  <sly data-sly-test="${model.folderFound && !model.includeFolders && model.empty}">
+    <div class="dml-empty-state" style="grid-column: 1 / -1;">
+      <div class="dml-empty-state-icon">📂</div>
+      <h3>No assets yet</h3>
+      <p>Upload your first asset to get started</p>
+    </div>
+  </sly>
+
+  <sly data-sly-test="${model.folderFound && !model.empty}">
+    <sly data-sly-list.asset="${model.assets}">
+      <div class="dml-asset-item" data-asset-id="${asset.path}" data-asset-path="${asset.path}">
+        <div class="dml-asset-preview">
+          <img src="${asset.previewUrl}" alt="${asset.name}" data-sly-test="${asset.hasPreview}"/>
+          <img src="${asset.svgUrl}" alt="${asset.name}" class="dml-svg-preview"
+               data-sly-test="${!asset.hasPreview && asset.svg}"/>
+          <span class="dml-asset-preview-icon" data-sly-test="${!asset.hasPreview && !asset.svg}">${asset.iconEmoji}</span>
+          <span class="dml-asset-type-badge">${asset.fileType}</span>
+        </div>
+        <div class="dml-asset-info">
+          <div class="dml-asset-name" title="${asset.name}">${asset.name}</div>
+          <div class="dml-asset-meta">
+            <span class="dml-asset-size">${asset.formattedSize}</span>
+          </div>
+        </div>
+      </div>
+    </sly>
+  </sly>
+
+</sly>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    jcr:primaryType="sling:Folder"
+    jcr:title="DML Picker Widget"
+    jcr:description="Reusable picker for selecting a DML asset and choosing a focus point."/>

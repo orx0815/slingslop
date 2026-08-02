@@ -1,0 +1,8 @@
+# Digital Media Library (DML) - RepoInit
+#
+# Shipped as part of the releasable "digitalmedia" Sling Feature Model so that a
+# downstream launcher gets the AEM-specific node types the DML content relies on
+# WITHOUT having to add them to its own launcher repoinit. Registration is
+# idempotent, so it is safe even if another feature registers the same types.
+
+# Empty for now

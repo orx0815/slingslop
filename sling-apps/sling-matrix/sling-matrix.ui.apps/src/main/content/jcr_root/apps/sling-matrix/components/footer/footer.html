@@ -1,0 +1,23 @@
+<footer class="matrix-footer"
+        data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+        data-sly-use.footerCtx="org.motorbrot.slingmatrix.slingmodels.FooterContext"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="${footerCtx.homepage ? 'true' : false}"
+        data-sly-attribute.hx-get="${auth.loggedIn && footerCtx.homepage ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn && footerCtx.homepage ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn && footerCtx.homepage ? 'outerMorph' : false}">
+  <div class="footer-content">
+    <p class="footer-text">${footerCtx.footerData.copyrightText}</p>
+    <div class="footer-links">
+      <a href="${footerCtx.footerData.link1Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${footerCtx.footerData.link1Url}">${footerCtx.footerData.link1Text}</a>
+      <a href="${footerCtx.footerData.link2Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${footerCtx.footerData.link2Url}">${footerCtx.footerData.link2Text}</a>
+      <a href="${footerCtx.footerData.link3Url @ context='uri'}"
+         class="footer-link"
+         data-sly-test="${footerCtx.footerData.link3Url}">${footerCtx.footerData.link3Text}</a>
+    </div>
+  </div>
+</footer>

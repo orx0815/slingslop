@@ -1,0 +1,30 @@
+<!--/*
+  Circular site navigation, built dynamically from the content tree.
+
+  NavigationModel walks up to the homepage, then lists its child sections
+  (level 1) and their child pages (level 2). Every href is externalized through
+  the LinkBuilder service. A trailing "Home" entry links back to the homepage.
+
+  The public-bundle JS arranges the level-1 items in a circle and reveals each
+  level-2 list on hover.
+*/-->
+<sly data-sly-use.nav="org.motorbrot.slingmatrix.slingmodels.NavigationModel">
+<nav class="matrix-nav" role="navigation">
+  <div class="nav-toggle"></div>
+  <ul class="nav-level-1">
+    <li class="nav-item" data-sly-repeat.item="${nav.items}"
+        data-sly-attribute.aria-current="${item.active ? 'page' : ''}">
+      <a href="${item.url}" class="nav-item-link" title="${item.title}">${item.title}</a>
+      <ul class="nav-level-2" data-sly-test="${item.hasChildren}">
+        <li data-sly-repeat.child="${item.children}">
+          <a href="${child.url}"
+             data-sly-attribute.aria-current="${child.active ? 'page' : ''}">${child.title}</a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item" data-sly-attribute.aria-current="${nav.homeActive ? 'page' : ''}">
+      <a href="${nav.homeUrl}" class="nav-item-link" title="${nav.homeTitle}">Home</a>
+    </li>
+  </ul>
+</nav>
+</sly>

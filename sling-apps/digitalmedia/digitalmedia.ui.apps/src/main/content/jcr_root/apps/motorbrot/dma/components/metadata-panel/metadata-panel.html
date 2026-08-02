@@ -1,0 +1,90 @@
+<div class="dml-metadata-panel" data-sly-use.asset="org.motorbrot.sling.dma.slingmodels.AssetModel">
+  <sly data-sly-test="${!asset.path}">
+    <div class="dml-metadata-empty">
+      <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <p>Select an asset to view metadata</p>
+    </div>
+  </sly>
+
+  <sly data-sly-test="${asset.path}">
+    <div class="dml-metadata-header">
+      <div class="dml-metadata-preview">
+        <img src="${asset.previewUrl}" alt="${asset.filename}" data-sly-test="${asset.previewUrl}"/>
+        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-sly-test="${!asset.previewUrl}">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <h2 class="dml-metadata-title">${asset.filename}</h2>
+    </div>
+
+    <div class="dml-metadata-section">
+      <h3>File Information</h3>
+      <div class="dml-metadata-row">
+        <span class="dml-metadata-label">Type</span>
+        <span class="dml-metadata-value">${asset.mimeType}</span>
+      </div>
+      <div class="dml-metadata-row">
+        <span class="dml-metadata-label">Size</span>
+        <span class="dml-metadata-value">${asset.formattedSize}</span>
+      </div>
+      <div class="dml-metadata-row">
+        <span class="dml-metadata-label">Created</span>
+        <span class="dml-metadata-value">${asset.createdDate}</span>
+      </div>
+      <div class="dml-metadata-row" data-sly-test="${asset.modifiedDate}">
+        <span class="dml-metadata-label">Modified</span>
+        <span class="dml-metadata-value">${asset.modifiedDate}</span>
+      </div>
+      <div class="dml-metadata-row" data-sly-test="${asset.uploadedBy}">
+        <span class="dml-metadata-label">Uploaded by</span>
+        <span class="dml-metadata-value">${asset.uploadedBy}</span>
+      </div>
+    </div>
+
+    <div class="dml-metadata-section" data-sly-test="${asset.supportsImageRenditions}">
+      <h3>Renditions</h3>
+      <div class="dml-renditions-list"
+           id="rendition-list-${asset.name}"
+           hx-get="${asset.path}.renditions.html"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+        <div class="dml-rendition-item">Loading renditions...</div>
+      </div>
+    </div>
+
+    <div class="dml-metadata-actions" data-sly-test="${asset.supportsImageRenditions}">
+      <h3>Generate Renditions</h3>
+      <div class="dml-generate-renditions" id="generate-renditions-${asset.name}">
+        <button class="dml-btn dml-btn-secondary"
+                hx-post="${asset.path}.generate-rendition.html"
+                hx-vals='{"format": "thumbnail"}'
+                hx-target="#rendition-list-${asset.name}"
+                hx-swap="beforeend">
+          Generate Thumbnail (150x150)
+        </button>
+        <button class="dml-btn dml-btn-secondary"
+                hx-post="${asset.path}.generate-rendition.html"
+                hx-vals='{"format": "web"}'
+                hx-target="#rendition-list-${asset.name}"
+                hx-swap="beforeend">
+          Generate Web (800x600)
+        </button>
+        <button class="dml-btn dml-btn-secondary"
+                hx-post="${asset.path}.generate-rendition.html"
+                hx-vals='{"format": "large"}'
+                hx-target="#rendition-list-${asset.name}"
+                hx-swap="beforeend">
+          Generate Large (1200x1200)
+        </button>
+      </div>
+    </div>
+
+    <div class="dml-metadata-actions">
+      <a href="${asset.downloadUrl}" class="dml-btn dml-btn-primary" download>
+        Download Original
+      </a>
+    </div>
+  </sly>
+</div>

@@ -1,0 +1,61 @@
+<!--/*
+  Paragraph system.
+
+  Anonymous visitors get a plain, unwrapped list of child components.
+
+  Logged-in editors additionally get, per child, a hover toolbar to move the
+  component up / down or delete it, plus an "Add component" control at the end.
+  Move and delete go straight to the default Sling POST servlet (:order /
+  :operation=delete) with a :redirect back to the parsys, so HTMX follows the
+  302 and outerMorph-swaps the re-rendered parsys. The allow-list of addable
+  components comes from the multi-value `allowedComponents` property on this
+  parsys node (bare component names or full resource types).
+
+  See ParsysModel in sling-matrix.core.
+*/-->
+<sly data-sly-use.parsys="org.motorbrot.slingmatrix.slingmodels.ParsysModel">
+  <div class="parsys">
+
+    <!--/* Anonymous: plain children, no editor chrome. */-->
+    <sly data-sly-test="${!parsys.loggedIn}">
+      <sly data-sly-list.child="${resource.listChildren}">
+        <sly data-sly-resource="${child}" />
+      </sly>
+    </sly>
+
+    <!--/* Editors: each child wrapped with a move / delete toolbar.
+           data-sly-repeat (not -list) so the .parsys-item wrapper itself is
+           repeated per child — each component gets its own positioned bar. */-->
+    <sly data-sly-test="${parsys.loggedIn}">
+      <div class="parsys-item" data-sly-repeat.item="${parsys.items}">
+        <div class="parsys-item__toolbar" role="toolbar" aria-label="Component actions">
+          <button type="button" class="parsys-item__btn" title="Move up" aria-label="Move up"
+                  data-sly-attribute.disabled="${item.first}"
+                  hx-post="${item.path}"
+                  hx-vals='{":order": "before ${item.prevName}", ":redirect": "${resource.path}.html"}'
+                  hx-target="closest .parsys"
+                  hx-swap="outerMorph">&uarr;</button>
+          <button type="button" class="parsys-item__btn" title="Move down" aria-label="Move down"
+                  data-sly-attribute.disabled="${item.last}"
+                  hx-post="${item.path}"
+                  hx-vals='{":order": "after ${item.nextName}", ":redirect": "${resource.path}.html"}'
+                  hx-target="closest .parsys"
+                  hx-swap="outerMorph">&darr;</button>
+          <button type="button" class="parsys-item__btn parsys-item__btn--delete" title="Delete" aria-label="Delete"
+                  hx-post="${item.path}"
+                  hx-vals='{":operation": "delete", ":redirect": "${resource.path}.html"}'
+                  hx-confirm="This component will be permanently removed. This can’t be undone."
+                  hx-target="closest .parsys"
+                  hx-swap="outerMorph">&times;</button>
+        </div>
+        <sly data-sly-resource="${item.path}" />
+      </div>
+    </sly>
+
+    <sly data-sly-test="${parsys.loggedIn && parsys.hasAllowedComponents}">
+      <div class="parsys__add">
+        <sly data-sly-include="parsys-add-bar.html" />
+      </div>
+    </sly>
+  </div>
+</sly>

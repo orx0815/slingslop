@@ -1,0 +1,386 @@
+/* DML picker widget — companion to widget/picker/picker.html */
+
+.dma-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dma-picker-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dma-picker-thumb {
+  width: 96px;
+  height: 96px;
+  border: 1px dashed var(--border-color, #aaa);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2, #f5f5f5);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.dma-picker-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dma-picker-thumb-placeholder {
+  font-size: 0.75rem;
+  color: var(--muted, #666);
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.dma-picker-open,
+.dma-picker-clear {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border-color, #aaa);
+  background: var(--surface-1, #fff);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.dma-picker-open:hover,
+.dma-picker-clear:hover {
+  background: var(--surface-2, #f0f0f0);
+}
+
+/* Dialog */
+
+.dma-picker-dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  width: 96vw;
+  max-width: 1400px;
+  height: 92vh;
+  max-height: 92vh;
+  background: var(--surface-1, #fff);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+/* A native <dialog> is display:none until opened. Only apply the flex layout
+   when actually open so it never shows up on its own inside the edit modal. */
+.dma-picker-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.dma-picker-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.dma-picker-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  background: var(--surface-2, #f7f7f9);
+  flex: 0 0 auto;
+}
+.dma-picker-dialog-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.dma-picker-close {
+  background: transparent;
+  border: 0;
+  font-size: 1.6rem;
+  cursor: pointer;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  transition: background 120ms ease;
+}
+.dma-picker-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.dma-picker-dialog-body {
+  padding: 1.25rem 1.5rem;
+  overflow: auto;
+  flex: 1 1 auto;
+}
+
+.dma-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+
+/* Breadcrumb bar */
+
+.dml-picker-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem 0.85rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border-color, #ececec);
+  font-size: 0.9rem;
+}
+.dml-picker-crumb {
+  background: transparent;
+  border: 0;
+  padding: 0.2rem 0.45rem;
+  border-radius: 5px;
+  color: var(--accent, #3163d0);
+  cursor: pointer;
+  font: inherit;
+}
+.dml-picker-crumb:hover {
+  background: var(--surface-2, #eef2fb);
+}
+.dml-picker-crumb-current {
+  color: var(--text, #222);
+  font-weight: 600;
+  cursor: default;
+}
+.dml-picker-crumb-sep {
+  color: var(--muted, #999);
+}
+
+/* Folder cards */
+
+.dma-picker-grid .dml-folder-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-color, #e2e2e6);
+  border-radius: 10px;
+  background: var(--surface-2, #f7f7fb);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+.dma-picker-grid .dml-folder-item:hover {
+  border-color: var(--accent, #4a8cff);
+  background: #fff;
+  transform: translateY(-1px);
+}
+.dml-folder-item.dml-folder-up {
+  background: transparent;
+  border-style: dashed;
+}
+.dml-folder-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.dml-folder-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.dml-folder-count {
+  font-size: 0.75rem;
+  color: var(--muted, #777);
+}
+.dma-picker-grid .dml-asset-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface-2, #f5f5f5);
+  transition: border-color 120ms ease;
+}
+.dma-picker-grid .dml-asset-item:hover {
+  border-color: var(--accent, #4a8cff);
+}
+.dma-picker-grid .dml-asset-item.is-selected {
+  border-color: var(--accent, #4a8cff);
+  outline: 2px solid var(--accent, #4a8cff);
+  outline-offset: -2px;
+}
+.dma-picker-loading {
+  color: var(--muted, #666);
+  padding: 1rem;
+}
+
+/* Focus-point overlay */
+
+.dma-focus-section {
+  margin-top: 0.5rem;
+}
+
+.dma-focus-stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  /* Replaced at runtime with the selected asset's ratio (picker.js). */
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border-color, #aaa);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+  user-select: none;
+  touch-action: none;
+}
+
+.dma-focus-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.dma-focus-crop {
+  position: absolute;
+  border: 2px dashed rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.dma-focus-dot {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent, #4a8cff);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+}
+.dma-focus-dot.is-dragging {
+  cursor: grabbing;
+}
+
+/* Per-format crop boxes (one per too-small format). No full-screen dim overlay
+   so overlapping boxes stay readable; each box gets a distinct hue by index. */
+.dma-focus-crop[data-format] {
+  box-shadow: none;
+  border-width: 2px;
+  border-style: dashed;
+  border-color: hsl(calc(var(--crop-idx, 0) * 85deg + 45deg) 90% 60%);
+}
+.dma-focus-crop[data-format]::after {
+  content: attr(data-format);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 0.65rem;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Component-local crop generator inside the edit modal */
+.dma-picker-crop {
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-color, #e0d3cf);
+  border-radius: 8px;
+  background: var(--surface-2, #fbf6f4);
+}
+.dma-picker-crop[hidden] {
+  display: none;
+}
+.dma-picker-crop-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted, #6f5b55);
+}
+.dma-picker-crop-list {
+  margin: 0 0 0.6rem;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+.dma-picker-crop-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.dma-picker-crop-generate {
+  padding: 0.45rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--color-primary, oklch(0.38 0.08 240));
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+.dma-picker-crop-generate:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.dma-picker-crop-generate:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.dma-picker-crop-result {
+  font-size: 0.8rem;
+  color: var(--muted, #555);
+}
+
+/* Responsive image — invalid/missing badges (used by responsive-image.html) */
+
+.dma-responsive-image picture,
+.dma-responsive-image img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.dma-image-placeholder {
+  background: var(--surface-2, #f5f5f5);
+  color: var(--muted, #666);
+  padding: 2rem 1rem;
+  text-align: center;
+  border: 1px dashed var(--border-color, #aaa);
+  border-radius: 6px;
+}
+
+.dma-image-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+.dma-rendition-status {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.dma-rendition {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+.dma-rendition.is-ok       { background: #e8f5e9; color: #1b5e20; }
+.dma-rendition.is-missing  { background: #fff8e1; color: #6d4c00; }
+.dma-rendition.is-invalid  { background: #ffebee; color: #b71c1c; }
+.dma-rendition-error       { font-weight: bold; }
+.dma-generate-rendition {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  border-radius: 4px;
+  padding: 0.1rem 0.5rem;
+  cursor: pointer;
+}

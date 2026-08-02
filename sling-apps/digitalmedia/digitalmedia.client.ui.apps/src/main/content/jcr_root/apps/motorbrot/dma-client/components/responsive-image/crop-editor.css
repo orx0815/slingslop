@@ -1,0 +1,95 @@
+/* Focus-point crop editor styles for the responsive-image component.
+ * Self-contained (the responsive-image component does not load picker.css). */
+
+.dma-crop-editor {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #d0d0d0);
+  border-radius: 8px;
+  background: var(--surface-2, #f7f7f7);
+}
+
+.dma-crop-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted, #555);
+}
+
+/* Stage carries the ORIGINAL image's aspect ratio (set inline by JS). */
+.dma-crop-editor .dma-focus-stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  border: 1px solid var(--border-color, #aaa);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+  user-select: none;
+  touch-action: none;
+}
+
+.dma-crop-editor .dma-focus-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* One dashed box per invalid MediaFormat, each with that format's aspect ratio.
+ * Alternating hues so overlapping boxes stay distinguishable. */
+.dma-crop-editor .dma-focus-crop {
+  position: absolute;
+  border: 2px dashed oklch(0.85 0.14 240);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.dma-crop-editor .dma-focus-crop:nth-of-type(2n) {
+  border-color: oklch(0.85 0.16 90);
+  border-style: dotted;
+}
+.dma-crop-editor .dma-focus-crop:nth-of-type(3n) {
+  border-color: oklch(0.82 0.15 20);
+}
+
+.dma-crop-editor .dma-focus-dot {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: oklch(0.55 0.14 240);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  z-index: 2;
+}
+.dma-crop-editor .dma-focus-dot.is-dragging {
+  cursor: grabbing;
+}
+
+.dma-crop-actions {
+  margin-top: 0.6rem;
+}
+
+.dma-crop-generate {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid oklch(0.38 0.08 240);
+  background: oklch(0.38 0.08 240);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.dma-crop-generate:hover {
+  background: oklch(0.45 0.09 240);
+}
+.dma-crop-generate:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Extra status colours used alongside picker.css's badge palette. */
+.dma-rendition.is-cropped { background: oklch(0.92 0.03 240); color: oklch(0.32 0.07 240); }
+.dma-rendition-note { font-style: italic; }

@@ -35,6 +35,8 @@
     <starter.min.bundles.count>233</starter.min.bundles.count>
     <starter.check.paths>
       /content/slingslop/zengarden/home.html,
+      /content/sling-matrix/home.html,
+      /content/motorbrot/dma/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
       /slingshot/resources/images/background.jpg,
       /slingshot/users/slingshot2/places/landing/images/landing.jpg,
@@ -98,6 +100,14 @@
               <classifier>slingslop_aggregate</classifier>
               <!-- launcher.json only; composite-nodestore.json is reserved for the composite aggregate. -->
               <filesInclude>launcher.json</filesInclude>
+              <!--
+                The Digital Media Library ships as a standalone, releasable Sling
+                Feature Model. Here we dogfood the intended consumption pattern:
+                a Sling-Starter-based launcher composes the DML feature in. A
+                downstream project would instead reference the released artifact via
+                <includeArtifact>org.motorbrot:slingslop.launcher:slingosgifeature:digitalmedia:VERSION</includeArtifact>.
+              -->
+              <filesInclude>digitalmedia.json</filesInclude>
               <includeArtifact>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>org.apache.sling.starter</artifactId>
@@ -164,6 +174,8 @@
               <classifier>slingslop_composite_aggregate</classifier>
               <filesInclude>launcher.json</filesInclude>
               <filesInclude>composite-nodestore.json</filesInclude>
+              <!-- Digital Media Library feature model (see slingslop_aggregate above). -->
+              <filesInclude>digitalmedia.json</filesInclude>
               <includeArtifact>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>org.apache.sling.starter</artifactId>

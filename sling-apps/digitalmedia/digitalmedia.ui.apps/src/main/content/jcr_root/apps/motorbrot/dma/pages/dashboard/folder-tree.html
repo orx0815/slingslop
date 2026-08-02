@@ -1,0 +1,65 @@
+<!--/* Folder tree — rendered via selector "folder-tree" on dashboard resource type */-->
+<sly data-sly-use.model="org.motorbrot.sling.dma.slingmodels.FolderTreeModel">
+
+  <!--/* Library root entry */-->
+  <div class="dml-folder-tree-item">
+    <button class="dml-folder-tree-button active" data-folder-path="${model.assetsPath}"
+            hx-get="${model.libraryInfoUrl}"
+            hx-target=".dml-metadata-panel"
+            hx-swap="innerHTML">
+      <span class="dml-folder-icon">🗄️</span>
+      <span class="dml-folder-name">Library</span>
+    </button>
+  </div>
+
+  <!--/* Recursive folder items */-->
+  <sly data-sly-list.folder="${model.rootFolders}">
+    <sly data-sly-call="${folderTemplate @ folder=folder}"/>
+  </sly>
+
+  <!--/* Recursive template for folder items */-->
+  <sly data-sly-template.folderTemplate="${@ folder}">
+    <div class="dml-folder-tree-item">
+      <button class="dml-folder-tree-button" data-folder-path="${folder.path}"
+              hx-get="${folder.infoUrl}"
+              hx-target=".dml-metadata-panel"
+              hx-swap="innerHTML">
+        <span class="dml-folder-icon">📁</span>
+        <span class="dml-folder-name">${folder.name}</span>
+      </button>
+      <sly data-sly-test="${folder.hasChildren}">
+        <div class="dml-folder-children">
+          <sly data-sly-list.child="${folder.children}">
+            <sly data-sly-call="${folderTemplate @ folder=child}"/>
+          </sly>
+        </div>
+      </sly>
+    </div>
+  </sly>
+
+  <!--/* Delegated click handler — avoids HTL XSS filtering of expressions in onclick */-->
+  <script>
+  (function() {
+    document.querySelector('.dml-folder-tree-items').addEventListener('click', function(e) {
+      var btn = e.target.closest('.dml-folder-tree-button');
+      if (!btn) return;
+      document.querySelectorAll('.dml-folder-tree-button').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('dml-current-folder').value = btn.dataset.folderPath;
+      htmx.trigger(document.body, 'folderSelected');
+    });
+
+    // Auto-select new folder after tree reloads
+    document.body.addEventListener('folderCreated', function(e) {
+      var path = e.detail && e.detail.path;
+      if (!path) return;
+      // Small delay to let the tree HTML swap complete
+      setTimeout(function() {
+        var btn = document.querySelector('.dml-folder-tree-button[data-folder-path="' + path + '"]');
+        if (btn) btn.click();
+      }, 100);
+    });
+  })();
+  </script>
+
+</sly>

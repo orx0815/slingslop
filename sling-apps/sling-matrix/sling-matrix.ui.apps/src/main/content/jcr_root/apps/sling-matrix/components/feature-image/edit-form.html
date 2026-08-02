@@ -1,0 +1,26 @@
+<!--/*
+  Inline-edit wrapper for feature-image.
+
+  Overrides the richtext supertype's edit-form.html so the 2-column layout and
+  the image stay visible while the body richtext is edited inline. Without this
+  override the whole <section class="feature-image"> — including the image media
+  column — is replaced by the supertype's plain <div data-zen-editable-editing>,
+  so the image disappears on the first click to edit.
+
+  The image itself is edited through the "Edit Component" modal (DML picker);
+  here it is shown read-only just to preserve context and layout.
+*/-->
+<section class="feature-image feature-image--${properties.imagePosition || 'left'}"
+         data-zen-editable-editing="true">
+
+  <div class="feature-image__media">
+    <img data-sly-test="${properties.fileReference}"
+         src="${properties.fileReference}/renditions/preview"
+         alt="${properties.dmaAlt}"/>
+  </div>
+
+  <div class="feature-image__body">
+    <sly data-sly-include="${'edit-form-inner.html'}" />
+  </div>
+
+</section>

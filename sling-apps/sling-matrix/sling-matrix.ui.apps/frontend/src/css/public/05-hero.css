@@ -1,0 +1,134 @@
+/* 05-hero.css — Hero section with Matrix rain effect */
+
+.hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  /* content centres itself within the space to the right of the 3D spacer */
+  justify-content: center;
+  gap: var(--space-4xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, oklch(from var(--color-bg) l c h / 0.7) 0%, oklch(from var(--color-primary-subtle) l c h / 0.5) 100%);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--space-2xl);
+  /* flex: 1 fills the right column; align-self centres within it */
+  flex: 1;
+  align-self: center;
+}
+
+.hero h1 {
+  margin-bottom: var(--space-lg);
+  animation: glitch 3s infinite;
+}
+
+.hero p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  margin: 0 auto var(--space-xl);
+  max-width: 60ch;
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-primary);
+  color: var(--color-black);
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-glow);
+  text-decoration: none;
+}
+
+.hero-cta:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow), 0 0 40px oklch(0.75 0.25 var(--hue-primary) / 0.8);
+}
+
+/* Glitch animation */
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+    text-shadow: 0 0 10px oklch(0.75 0.25 var(--hue-primary) / 0.5);
+  }
+  91% {
+    transform: translate(-2px, 2px);
+    text-shadow: 2px 0 oklch(0.75 0.25 var(--hue-primary)),
+                 -2px 0 oklch(0.50 0.12 var(--hue-secondary));
+  }
+  93% {
+    transform: translate(2px, -2px);
+    text-shadow: -2px 0 oklch(0.75 0.25 var(--hue-primary)),
+                 2px 0 oklch(0.50 0.12 var(--hue-secondary));
+  }
+  95% {
+    transform: translate(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 50vh;
+    /* Stack vertically on mobile */
+    justify-content: center;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .hero-3d-container {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    flex-shrink: 0;
+  }
+
+  .hero-content {
+    padding: var(--space-lg);
+    flex: unset;
+  }
+}
+
+/* ── 3D spacer — mirrors the absolutely-positioned canvas so flex can compute the right column ── */
+.hero-3d-spacer {
+  /* Same square as the canvas: height = 100% of hero, width matches via aspect-ratio */
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* ── Three.js 3D hero layer ──────────────────────────────────────────────── */
+.hero-3d-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Square: width = height of the hero section */
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  /* In front of hero-content (z-index: 2) so the fractal receives pointer events */
+  z-index: 3;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.hero-3d-container:active {
+  cursor: grabbing;
+}
+
+.hero-3d-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

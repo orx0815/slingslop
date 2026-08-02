@@ -1,0 +1,36 @@
+<!--/*
+  Component picker (step 2) — the inner content of `.parsys__add` once the
+  editor clicks "Add component". Lists every entry from the parsys
+  `allowedComponents` allow-list.
+
+  Choosing one POSTs straight to the default Sling POST servlet at
+  `{parsys}/*` (auto-generated node name), setting sling:resourceType and a
+  `:redirect` back to the parsys view. On success the POST servlet answers
+  302 → {parsys}.html; HTMX transparently follows the redirect and swaps the
+  re-rendered parsys (with the new child) into place via outerMorph.
+*/-->
+<sly data-sly-use.parsys="org.motorbrot.slingmatrix.slingmodels.ParsysModel"
+     data-sly-test="${parsys.loggedIn}">
+  <div class="parsys-picker" role="group" aria-label="Add component">
+    <div class="parsys-picker__head">
+      <span class="parsys-picker__title">Add component</span>
+      <button type="button" class="parsys-picker__close" aria-label="Cancel"
+              hx-get="${resource.path}.parsys-add-bar.html"
+              hx-target="closest .parsys__add"
+              hx-swap="innerHTML">&times;</button>
+    </div>
+    <ul class="parsys-picker__list">
+      <li data-sly-list.comp="${parsys.allowedComponents}">
+        <button type="button" class="parsys-picker__item"
+                hx-post="${resource.path}/*"
+                hx-vals='{"jcr:primaryType": "nt:unstructured", "sling:resourceType": "${comp.resourceType}", ":nameHint": "${comp.name}", ":redirect": "${resource.path}.html"}'
+                hx-target="closest .parsys"
+                hx-swap="outerMorph">
+          <span class="parsys-picker__item-title">${comp.title}</span>
+          <small class="parsys-picker__item-desc"
+                 data-sly-test="${comp.description}">${comp.description}</small>
+        </button>
+      </li>
+    </ul>
+  </div>
+</sly>

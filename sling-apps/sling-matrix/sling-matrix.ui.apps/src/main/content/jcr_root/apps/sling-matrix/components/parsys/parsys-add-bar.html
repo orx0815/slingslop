@@ -1,0 +1,17 @@
+<!--/*
+  Collapsed "Add component" button — the inner content of `.parsys__add`.
+
+  Rendered on initial page load (via data-sly-include from parsys.html) and
+  fetched again via HTMX when the picker is cancelled. Clicking it swaps the
+  component picker into `.parsys__add`.
+*/-->
+<sly data-sly-use.parsys="org.motorbrot.slingmatrix.slingmodels.ParsysModel"
+     data-sly-test="${parsys.loggedIn && parsys.hasAllowedComponents}">
+  <button type="button" class="parsys__add-btn"
+          hx-get="${resource.path}.parsys-picker.html"
+          hx-target="closest .parsys__add"
+          hx-swap="innerHTML">
+    <span class="parsys__add-plus" aria-hidden="true">+</span>
+    <span>Add component</span>
+  </button>
+</sly>

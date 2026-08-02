@@ -1,0 +1,35 @@
+{
+  "description": "Digital Media Library (DML) - a releasable Apache Sling Feature Model (https://github.com/apache/sling-org-apache-sling-feature). It bundles, by Maven coordinates, the DML server bundle and the slim client bundle, the ui.apps / client-ui.apps / sample-content packages, the FFM rendition-service OSGi configuration and the RepoInit that registers the AEM (dam:/cq:) node types the DML content relies on. A downstream project running its own Sling Starter can consume this as a single artifact in its launcher aggregate, e.g. <includeArtifact> org.motorbrot:slingslop.launcher:slingosgifeature:digitalmedia:VERSION </includeArtifact>, while depending on org.motorbrot:digitalmedia.client.core (jar) in its own bundles/apps. The full DML app then lives only in the launcher; the consumer's code only needs the slim client bundle.",
+
+  "bundles": [
+    {
+      "id": "org.motorbrot/digitalmedia.client.core/${slingslop.launcher.version}",
+      "start-order": "20"
+    },
+    {
+      "id": "org.motorbrot/digitalmedia.core/${slingslop.launcher.version}",
+      "start-order": "20"
+    }
+  ],
+
+  "configurations": {
+    "org.motorbrot.sling.dma.services.FfmRenditionService": {
+      "enabled": true,
+      "library_path": ""
+    }
+  },
+
+  "content-packages:ARTIFACTS|required": [
+    {
+      "id": "org.motorbrot/digitalmedia.client.ui.apps/${slingslop.launcher.version}/zip"
+    },
+    {
+      "id": "org.motorbrot/digitalmedia.ui.apps/${slingslop.launcher.version}/zip"
+    },
+    {
+      "id": "org.motorbrot/digitalmedia.sample-content/${slingslop.launcher.version}/zip"
+    }
+  ],
+
+  "repoinit:TEXT|true": "@file"
+}

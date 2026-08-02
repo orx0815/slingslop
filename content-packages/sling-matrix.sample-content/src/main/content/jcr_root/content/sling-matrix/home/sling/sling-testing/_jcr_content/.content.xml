@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Unit Testing with Sling"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys"
+        allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+        <slide-headline-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Approaches for Testing Sling Applications"/>
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Mockito&lt;/strong&gt; — tasty mocking framework for unit tests in Java&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Sling Mocks&lt;/strong&gt; — very lightweight, emulates all core features of Sling API and resource resolving. Covers 90% of what is required for typical Sling applications.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Integration Tests&lt;/strong&gt; (Sling Launchpad with Sling Testing Tools) — heavy-weight, for complex scenarios beyond scope of Sling Mocks&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Goals for Sling Unit Tests"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;Startup/Teardown of Sling environment for each test run&lt;/li&gt;&lt;li&gt;Allow parallel execution of unit tests&lt;/li&gt;&lt;li&gt;Support basic OSGi features (via OSGi mocks)&lt;/li&gt;&lt;li&gt;Support Sling request, response and resource handling&lt;/li&gt;&lt;li&gt;Support Sling Models&lt;/li&gt;&lt;li&gt;Support simple loading and creating of content&lt;/li&gt;&lt;li&gt;Allow combination with Mockito mocks&lt;/li&gt;&lt;li&gt;Visualize code coverage in IDE and CI&lt;/li&gt;&lt;li&gt;Maximum execution speed!&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Example: Controller with Mocked Business Class"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@Model(adaptables = SlingHttpServletRequest.class)&#xa;public class MatrixNavLink {&#xa;&#xa;    private MatrixNavigator root;&#xa;&#xa;    @Inject&#xa;    public MatrixNavLink(@Self MatrixNavigator navigator) {&#xa;        root = navigator.getMatrixNavigation();&#xa;    }&#xa;&#xa;    public MatrixNavigator getRoot() {&#xa;        return root;&#xa;    }&#xa;}"/>
+        <slide-headline-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Testing with Mockito"/>
+        <code-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@ExtendWith(MockitoExtension.class)&#xa;class MatrixNavLinkTest {&#xa;&#xa;    @Mock&#xa;    private MatrixNavigator matrixNavigator;&#xa;&#xa;    private MatrixNavLink underTest;&#xa;&#xa;    @BeforeEach&#xa;    void setUp() {&#xa;        when(matrixNavigator.getMatrixNavigation())&#xa;            .thenReturn(new NavigationPageItem(&quot;dummy&quot;));&#xa;        underTest = new MatrixNavLink(matrixNavigator);&#xa;    }&#xa;&#xa;    @Test&#xa;    void testGetRoot() {&#xa;        assertNotNull(underTest.getRoot());&#xa;    }&#xa;}"/>
+        <slide-headline-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="When Mockito Gets Problematic"/>
+        <text-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Pure Mockito becomes difficult when:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Iterating over resource or page hierarchies&lt;/li&gt;&lt;li&gt;Interaction with objects that have many methods for similar things (e.g. request params, Resource properties)&lt;/li&gt;&lt;li&gt;Code that needs a complex content structure as test fixture&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Result: 75% mocking code, 25% test code — risk of error in mocking is higher than in production code.&lt;/p&gt;"/>
+        <slide-headline-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Introducing Sling Mocks"/>
+        <text-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Sling Mocks is a mock implementation of the most important parts of Sling API and resource resolving. Builds on OSGi Mocks, JCR Mocks, and ResourceResolver Mocks.&lt;/p&gt;&lt;p&gt;A &lt;code&gt;SlingContext&lt;/code&gt; object gives easy access to all Sling context objects:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Registering OSGi services and Sling Models&lt;/li&gt;&lt;li&gt;Loading content from JSON files&lt;/li&gt;&lt;li&gt;Creating test content with simplified builder API&lt;/li&gt;&lt;li&gt;Manipulating request state / investigating response state&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Targets everything &lt;em&gt;below&lt;/em&gt; the presentation layer — HTL scripts are not tested, but controllers and business logic are.&lt;/p&gt;"/>
+        <slide-headline-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="SlingContext — JUnit 5"/>
+        <code-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@ExtendWith(SlingContextExtension.class)&#xa;class MatrixTest {&#xa;&#xa;    private final SlingContext context = new SlingContext();&#xa;&#xa;    @Test&#xa;    void testSomething() {&#xa;        Resource resource = context.resourceResolver()&#xa;            .getResource(&quot;/content/matrix/en&quot;);&#xa;        // further testing&#xa;    }&#xa;}&#xa;&#xa;// Available context methods:&#xa;// context.bundleContext()&#xa;// context.resourceResolver()&#xa;// context.currentResource()&#xa;// context.request()&#xa;// context.requestPathInfo()&#xa;// context.response()&#xa;// context.slingScriptHelper()&#xa;// context.runMode(&quot;author&quot;)"/>
+        <slide-headline-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Resource Resolver Types"/>
+        <text-block-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;&lt;strong&gt;RESOURCERESOLVER_MOCK&lt;/strong&gt; (default) — fastest, mocked resolver from Sling Testing. No JCR, eventing support, no search.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;RESOURCEPROVIDER_MOCK&lt;/strong&gt; — same but using real Sling Resource Resolver impl. Multiple resource providers and FileVault XML loading.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;JCR_MOCK&lt;/strong&gt; — mocked JCR with real Sling resource-JCR mapping. Still fast, but mocked search, no Observation/Versioning.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;JCR_OAK&lt;/strong&gt; — real Oak with full Node Types, Search, Observation. No fulltext search (no Lucene indexes).&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Getting and Manipulating Resources"/>
+        <code-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@Test&#xa;void testSomething() {&#xa;    Resource resource = context.resourceResolver()&#xa;        .getResource(&quot;/content/matrix/en&quot;);&#xa;    ValueMap props = resource.getValueMap();&#xa;    Iterator&lt;Resource&gt; children = resource.listChildren();&#xa;}&#xa;&#xa;@Test&#xa;void testResourceOperations() throws Exception {&#xa;    Resource resource = context.resourceResolver().create(&#xa;        parentResource, &quot;sentinel&quot;,&#xa;        Map.of(&quot;prop1&quot;, &quot;value1&quot;, &quot;prop2&quot;, 123));&#xa;    // further testing&#xa;    context.resourceResolver().delete(resource);&#xa;}"/>
+        <slide-headline-10
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Simulate Sling Request"/>
+        <code-block-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="// prepare sling request&#xa;context.request().setQueryString(&quot;param1=aaa&amp;param2=bbb&quot;);&#xa;context.requestPathInfo().setSelectorString(&quot;selector1.selector2&quot;);&#xa;context.requestPathInfo().setExtension(&quot;html&quot;);&#xa;context.requestPathInfo().setSuffix(&quot;/abc.html&quot;);&#xa;&#xa;// set current resource&#xa;context.currentResource(&quot;/content/matrix/en&quot;);&#xa;&#xa;// Request Mock supports: Parameters, RequestPathInfo,&#xa;// Attributes, Session, Headers, Cookies, Methods, Server Info&#xa;// Response Mock supports: Content Type, Headers, Cookies, Response Body"/>
+        <slide-headline-11
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Sling Models in Tests"/>
+        <code-block-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@BeforeEach&#xa;void setUp() {&#xa;    // register models from package (includes all subpackages)&#xa;    context.addModelsForPackage(&quot;org.matrix.models&quot;);&#xa;}&#xa;&#xa;@Test&#xa;void testSomething() {&#xa;    SentinelModel model = context.request()&#xa;        .adaptTo(SentinelModel.class);&#xa;    assertNotNull(model);&#xa;}"/>
+        <slide-headline-12
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Loading Content from JSON"/>
+        <code-block-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@BeforeEach&#xa;void setUp() {&#xa;    // load JSON file into repository&#xa;    context.load().json(&quot;/sample-data.json&quot;, &quot;/content/matrix/en&quot;);&#xa;&#xa;    // load binary file into repository&#xa;    context.load().binaryFile(&quot;/sample-file.gif&quot;,&#xa;        &quot;/content/binary/sample-file.gif&quot;);&#xa;}&#xa;&#xa;@Test&#xa;void testSomething() {&#xa;    Resource resource = context.resourceResolver()&#xa;        .getResource(&quot;/content/matrix/en&quot;);&#xa;    // further testing&#xa;}&#xa;&#xa;// Tip: handcraft small JSON snippets per group of test cases.&#xa;// JSON download (.tidy.999.json) can be a good start,&#xa;// then remove everything not needed."/>
+        <slide-headline-13
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Building Content with Fluent API"/>
+        <code-block-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="// create resource with properties&#xa;Resource resource = context.create().resource(&quot;/content/matrix/test1&quot;,&#xa;    &quot;prop1&quot;, &quot;value1&quot;,&#xa;    &quot;prop2&quot;, 123);&#xa;&#xa;// create hierarchies using ResourceBuilder&#xa;context.build().resource(&quot;/content/matrix/test1&quot;)&#xa;    .siblingsMode()&#xa;    .resource(&quot;child1&quot;, &quot;prop1&quot;, &quot;value1&quot;)&#xa;    .resource(&quot;child2&quot;, &quot;prop2&quot;, &quot;value2&quot;)&#xa;    .resource(&quot;child3&quot;, &quot;prop3&quot;, &quot;value3&quot;);&#xa;&#xa;// Missing nodes in hierarchy are created automatically&#xa;// Properties are given as key,value,key,value... pairs or as Map"/>
+        <slide-headline-14
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Transaction Handling in Tests"/>
+        <text-block-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Normally you do not have to call &lt;code&gt;resourceResolver.commit()&lt;/code&gt; in unit tests. In most cases tests work with one resource resolver and see all changes without commit.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;context.load()&lt;/code&gt; automatically commits after import&lt;/li&gt;&lt;li&gt;&lt;code&gt;context.create()&lt;/code&gt; currently does not&lt;/li&gt;&lt;li&gt;Exception: If using JCR_OAK and JCR-specific features (Query, Observation), you must call &lt;code&gt;commit()&lt;/code&gt; first&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-15
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Sling Hamcrest Matchers"/>
+        <code-block-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="// assert resource properties via hamcrest matcher&#xa;assertThat(resource, ResourceMatchers.props(&#xa;    &quot;prop1&quot;, &quot;value1&quot;,&#xa;    &quot;prop2&quot;, 123));&#xa;&#xa;// Checks that given properties are present with given values,&#xa;// although more properties may exist.&#xa;&#xa;// Provided matchers:&#xa;// ResourceMatchers: name, properties, children, resource type&#xa;// ResourceCollectionMatchers: assert a set of resource paths&#xa;// ResourceIteratorMatchers: assert a set of resource paths"/>
+        <slide-headline-16
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Summary"/>
+        <text-block-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;There is no &amp;quot;best way&amp;quot; for all cases — use Mockito and/or Sling Mocks whatever suits best&lt;/li&gt;&lt;li&gt;Goal: Tests that are easy to write &lt;em&gt;and&lt;/em&gt; easy to maintain&lt;/li&gt;&lt;li&gt;Tests should focus on the logic of the testable, and only this&lt;/li&gt;&lt;li&gt;Goal: 80% unit test coverage for all projects&lt;/li&gt;&lt;li&gt;Constantly check test coverage in your IDE&lt;/li&gt;&lt;li&gt;Use Infinitest plugin (Eclipse/IntelliJ) to run tests automatically on each change&lt;/li&gt;&lt;/ul&gt;"/>
+    </main>
+</jcr:root>

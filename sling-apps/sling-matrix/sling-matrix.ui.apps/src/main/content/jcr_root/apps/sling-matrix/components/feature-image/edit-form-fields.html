@@ -1,0 +1,64 @@
+<!--/*
+  Edit form for feature-image. Reuses sling-matrix richtext supertype:
+    - headline    text input
+    - image       DML picker widget (writes fileReference + dmaAlt, focus point)
+    - layout      left/right select
+    - body        Tiptap richtext (#content-editor / #content-hidden)
+*/-->
+
+<div class="edit-fields-list">
+
+  <div class="edit-fields-group">
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Headline</span>
+          <small class="edit-field-description">Main heading next to the image.</small>
+        </span>
+        <input type="text" name="headline"
+               value="${properties.headline}"
+               class="edit-field-input"
+               form="editor-form"/>
+      </label>
+
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Image position</span>
+          <small class="edit-field-description">Side the image appears on (desktop).</small>
+        </span>
+        <select name="imagePosition" class="edit-field-input" form="editor-form">
+          <option value="left"  selected="${properties.imagePosition != 'right' ? 'selected' : ''}">Left</option>
+          <option value="right" selected="${properties.imagePosition == 'right' ? 'selected' : ''}">Right</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="edit-fields-group">
+    <sly data-sly-use.picker="/apps/motorbrot/dma-client/widget/picker/picker.html"
+         data-sly-call="${picker.field @
+            name='fileReference',
+            value=properties.fileReference,
+            label='Feature image',
+            altName='dmaAlt',
+            altValue=properties.dmaAlt,
+            ratio='4:3',
+            assetsRoot='/content/motorbrot/dma/assets'}"/>
+  </div>
+
+  <!--/* Persist the per-consumer format list so the embedded responsive-image
+         Sling Model picks them up via @ValueMapValue. Multi-value via repeated
+         input name + explicit @TypeHint=String[]. The trailing dmaMedia entry
+         is intentionally omitted \u2014 ResponsiveImage treats missing/empty media
+         as the <img> fallback. */-->
+  <input type="hidden" name="dmaFormats@TypeHint" value="String[]" form="editor-form"/>
+  <input type="hidden" name="dmaFormats" value="matrix-feature-desktop" form="editor-form"/>
+  <input type="hidden" name="dmaFormats" value="matrix-feature-mobile" form="editor-form"/>
+  <input type="hidden" name="dmaMedia@TypeHint" value="String[]" form="editor-form"/>
+  <input type="hidden" name="dmaMedia" value="(min-width: 768px)" form="editor-form"/>
+
+</div>
+
+<!--/* Richtext editor wiring (matches the editable-component supertype contract). */-->
+<textarea id="content-editor" style="display:none;" form="editor-form">${properties.text @ context='html'}</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form"/>

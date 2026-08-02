@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Sling Context-Aware Configuration"
+    sling:resourceType="sling-matrix/pages/contentpage">
+    <main
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-matrix/components/parsys"
+        allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+        <slide-headline-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="What is Context-Aware Configuration?"/>
+        <text-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Context-aware configurations are related to a content resource or a resource tree (e.g. a web site or tenant site). An application may need different configuration for different sites, regions, and tenants = different &lt;strong&gt;contexts&lt;/strong&gt;.&lt;/p&gt;&lt;p&gt;Inheritance for nested contexts and from global fallback values is supported.&lt;/p&gt;"/>
+        <slide-headline-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Why Not OSGi Configuration?"/>
+        <text-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;ul&gt;&lt;li&gt;OSGi configuration is targeted to &lt;em&gt;system-wide&lt;/em&gt; configuration (singleton services, factory = global list)&lt;/li&gt;&lt;li&gt;It's difficult to store context-aware configuration in OSGi config&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong&gt;Recommendation:&lt;/strong&gt; Use Sling Context-Aware Configuration for config related to content paths. Use OSGi configuration for everything else.&lt;/p&gt;"/>
+        <slide-headline-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Java API Overview"/>
+        <text-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Two levels:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;ConfigurationResourceResolver&lt;/strong&gt; (low-level) — access configuration &lt;em&gt;resources&lt;/em&gt; (e.g. workflow definitions). Methods: &lt;code&gt;getResource&lt;/code&gt;/&lt;code&gt;getResourceCollection&lt;/code&gt; for named config resources by context, &lt;code&gt;getContextPath&lt;/code&gt;/&lt;code&gt;getAllContextPaths&lt;/code&gt;.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationBuilder&lt;/strong&gt; (high-level) — access configuration &lt;em&gt;data&lt;/em&gt; (key/value pairs). Get via adapting context resource or via &lt;code&gt;ConfigurationResolver&lt;/code&gt; OSGi service.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In most cases you only use the high-level API.&lt;/p&gt;"/>
+        <slide-headline-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Configuration as ValueMap"/>
+        <code-block-1
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="// Singleton named configuration as ValueMap&#xa;ValueMap props = resource.adaptTo(ConfigurationBuilder.class)&#xa;    .name(&quot;simple-config&quot;).asValueMap();&#xa;String param1 = props.get(&quot;stringParam&quot;, String.class);&#xa;int param2 = props.get(&quot;intParam&quot;, 5);&#xa;&#xa;// Collection of configurations as ValueMaps&#xa;Collection&lt;ValueMap&gt; propsList = resource&#xa;    .adaptTo(ConfigurationBuilder.class)&#xa;    .name(&quot;simple-config&quot;).asValueMapCollection();"/>
+        <slide-headline-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Typed Configuration Class — Singleton"/>
+        <code-block-2
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@Configuration&#xa;public @interface MatrixConfig {&#xa;    String stringParam();&#xa;    int intParam() default 5;&#xa;    boolean boolParam();&#xa;}&#xa;&#xa;// Access typed singleton configuration&#xa;MatrixConfig config = resource.adaptTo(ConfigurationBuilder.class)&#xa;    .as(MatrixConfig.class);&#xa;String param1 = config.stringParam();&#xa;int param2 = config.intParam();&#xa;&#xa;// Configuration name is derived from annotation class name"/>
+        <slide-headline-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Typed Configuration Class — Collection"/>
+        <code-block-3
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@Configuration(collection = true)&#xa;public @interface SentinelListConfig {&#xa;    String stringParam();&#xa;    int intParam() default 5;&#xa;    boolean boolParam();&#xa;}&#xa;&#xa;// Access typed configuration collection&#xa;Collection&lt;SentinelListConfig&gt; configs = resource&#xa;    .adaptTo(ConfigurationBuilder.class)&#xa;    .asCollection(SentinelListConfig.class);&#xa;for (SentinelListConfig item : configs) {&#xa;    // ...&#xa;}"/>
+        <slide-headline-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Nested Configurations"/>
+        <code-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="@Configuration&#xa;public @interface ArchitectConfig {&#xa;    String sampleParam();&#xa;    MatrixConfig subConfig();&#xa;    SentinelListConfig[] subListConfig();&#xa;}&#xa;&#xa;// Access nested configuration&#xa;ArchitectConfig config = resource.adaptTo(ConfigurationBuilder.class)&#xa;    .as(ArchitectConfig.class);&#xa;String param1 = config.subConfig().stringParam();&#xa;int param2 = config.subConfig().intParam();&#xa;for (SentinelListConfig item : config.subListConfig()) {&#xa;    // ...&#xa;}"/>
+        <slide-headline-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Context-Aware Configuration in HTL"/>
+        <code-block-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="html"
+            code="&lt;!-- Accessing singleton configuration --&gt;&#xa;&lt;dl&gt;&#xa;  &lt;dt&gt;stringParam:&lt;/dt&gt;&#xa;  &lt;dd&gt;${caconfig['org.matrix.MatrixConfig'].stringParam}&lt;/dd&gt;&#xa;&lt;/dl&gt;&#xa;&#xa;&lt;!-- Accessing configuration collection --&gt;&#xa;&lt;ul data-sly-list.item=&quot;${caconfig['org.matrix.SentinelListConfig']}&quot;&gt;&#xa;  &lt;li&gt;stringParam: ${item.stringParam}&lt;/li&gt;&#xa;&lt;/ul&gt;&#xa;&#xa;&lt;!-- Nested config: use slash as separator --&gt;&#xa;${caconfig['org.matrix.ArchitectConfig']['nestedConfig/stringParam']}"/>
+        <slide-headline-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Annotation Classes and bnd Plugin"/>
+        <text-block-4
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Configuration classes are Java annotation classes (never used as annotations — the syntax is reused for configuration metadata):&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Configuration name (defaults to class name)&lt;/li&gt;&lt;li&gt;Parameters with names and types&lt;/li&gt;&lt;li&gt;Default values&lt;/li&gt;&lt;li&gt;Nested configuration structures&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;All configuration classes must be registered via bundle header &lt;code&gt;Sling-ContextAware-Configuration-Classes&lt;/code&gt;. A bnd plugin sets this automatically:&lt;/p&gt;&lt;pre&gt;&amp;lt;_plugin&amp;gt;org.apache.sling.caconfig.bndplugin.ConfigurationClassScannerPlugin&amp;lt;/_plugin&amp;gt;&lt;/pre&gt;"/>
+        <slide-headline-10
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Default Content Model"/>
+        <text-block-5
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Default implementation stores all configuration below &lt;code&gt;/conf&lt;/code&gt;. Fallback paths: &lt;code&gt;/conf/global&lt;/code&gt;, &lt;code&gt;/apps/conf&lt;/code&gt;, &lt;code&gt;/libs/conf&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;Contexts are defined by setting &lt;code&gt;sling:configRef&lt;/code&gt; property on root content resources, pointing to the associated &lt;code&gt;/conf&lt;/code&gt; path.&lt;/p&gt;&lt;pre&gt;/content/mysite&#xA;  @sling:configRef = &amp;quot;/conf/mysite&amp;quot;&#xA;&#xA;/conf/mysite/sling:configs/org.matrix.MatrixConfig&#xA;  @stringParam = &amp;quot;value1&amp;quot;&#xA;  @intParam = 123&lt;/pre&gt;"/>
+        <slide-headline-11
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Persistence Structure"/>
+        <text-block-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;&lt;strong&gt;Singleton:&lt;/strong&gt; &lt;code&gt;/conf/{site}/sling:configs/{ConfigName}/@properties&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Collection:&lt;/strong&gt; &lt;code&gt;/conf/{site}/sling:configs/{ConfigName}/item1/@properties&lt;/code&gt;, &lt;code&gt;.../item2/@properties&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Nested:&lt;/strong&gt; &lt;code&gt;/conf/{site}/sling:configs/{ConfigName}/@sampleParam&lt;/code&gt; + &lt;code&gt;/subConfig/@properties&lt;/code&gt; + &lt;code&gt;/subListConfig/item1/@properties&lt;/code&gt;&lt;/p&gt;"/>
+        <slide-headline-12
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Resource and Property Inheritance"/>
+        <text-block-7
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;&lt;strong&gt;Resource inheritance (collections):&lt;/strong&gt; Not enabled by default. Enable by setting &lt;code&gt;sling:configCollectionInherit=true&lt;/code&gt; — produces a merged list with unique collection item names from the lookup chain.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Property inheritance:&lt;/strong&gt; Not enabled by default. Enable by setting &lt;code&gt;sling:configPropertyInherit=true&lt;/code&gt; — properties not defined on current resource are inherited from the next matching resource in lookup order.&lt;/p&gt;&lt;p&gt;By setting these properties on multiple resources in the lookup order, deeper inheritance chains are formed.&lt;/p&gt;"/>
+        <slide-headline-13
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="SPI — Service Provider Interfaces"/>
+        <text-block-8
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;A set of SPIs allows overlaying, enhancing, or replacing the default implementation:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;ContextPathStrategy&lt;/strong&gt; — how context paths and config references are detected&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationResourceResolvingStrategy&lt;/strong&gt; — where config data is looked up, how inheritance works&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationInheritanceStrategy&lt;/strong&gt; — if/how resources are inherited across the chain&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationPersistenceStrategy2&lt;/strong&gt; — persistence structure of config within resources&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationMetadataProvider&lt;/strong&gt; — provide metadata about configurations&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ConfigurationOverrideProvider&lt;/strong&gt; — provide custom overrides&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Multiple strategies supported simultaneously — iterated in service ranking order. First implementation that &amp;quot;feels responsible&amp;quot; wins.&lt;/p&gt;"/>
+        <slide-headline-14
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Override Providers"/>
+        <text-block-9
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/text-block"
+            text="&lt;p&gt;Override context-aware config values globally or for specific content paths:&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Syntax:&lt;/strong&gt;&lt;/p&gt;&lt;pre&gt;\{configName}/{propertyName}={propertyJsonValue}&#xA;[{contextPath}]{configName}/{propertyName}={propertyJsonValue}&#xA;\{configName}={propertyJsonObject}&#xA;[{contextPath}]{configName}={propertyJsonObject}&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Built-in providers:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;System properties (prefixed &lt;code&gt;sling.caconfig.override.&lt;/code&gt;)&lt;/li&gt;&lt;li&gt;OSGi factory configuration (&amp;quot;Apache Sling Context-Aware OSGi Configuration Override Provider&amp;quot;)&lt;/li&gt;&lt;/ul&gt;"/>
+        <slide-headline-15
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/slide-headline"
+            headline="Unit Test Support — caconfig-mock-plugin"/>
+        <code-block-6
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/code-block"
+            language="java"
+            code="import static org.apache.sling.testing.mock.caconfig.ContextPlugins.CACONFIG;&#xa;&#xa;public class MatrixConfigTest {&#xa;&#xa;    @Rule&#xa;    public SlingContext context = new SlingContextBuilder()&#xa;        .plugin(CACONFIG)&#xa;        .build();&#xa;&#xa;    @Before&#xa;    public void setUp() {&#xa;        // register configuration annotation class&#xa;        MockContextAwareConfig.registerAnnotationClasses(&#xa;            context, MatrixConfig.class);&#xa;&#xa;        // write config values required for tests&#xa;        MockContextAwareConfig.writeConfiguration(context,&#xa;            &quot;/content/region1&quot;, MatrixConfig.class,&#xa;            &quot;stringParam&quot;, &quot;value1&quot;,&#xa;            &quot;intParam&quot;, 123);&#xa;    }&#xa;}"/>
+    </main>
+</jcr:root>

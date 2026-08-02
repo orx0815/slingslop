@@ -1,0 +1,18 @@
+<div class="hero"
+     data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <!-- Three.js 3D floating geometry -->
+  <div class="hero-3d-container" data-hero-text="${properties.heroText || ''}"></div>
+
+  <!-- Spacer that matches the 3D square's width so flex centres the content in the right half -->
+  <div class="hero-3d-spacer" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <h1 class="hero-title">${properties.title}</h1>
+    <p class="hero-subtitle">${properties.subtitle}</p>
+  </div>
+</div>

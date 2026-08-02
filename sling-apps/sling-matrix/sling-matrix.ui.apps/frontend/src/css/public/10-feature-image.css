@@ -1,0 +1,44 @@
+/* 10-feature-image.css — example DML consumer component */
+
+.feature-image {
+  display: grid;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin: clamp(1.5rem, 4vw, 3.5rem) 0;
+  align-items: center;
+}
+
+.feature-image__media {
+  min-width: 0;
+}
+
+.feature-image__media img,
+.feature-image__media picture {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--color-border, currentColor);
+  border-radius: 4px;
+}
+
+.feature-image__headline {
+  margin-bottom: 0.5em;
+  color: var(--color-primary, currentColor);
+}
+
+.feature-image__text {
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .feature-image {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .feature-image--right .feature-image__media {
+    order: 2;
+  }
+
+  .feature-image--right .feature-image__body {
+    order: 1;
+  }
+}

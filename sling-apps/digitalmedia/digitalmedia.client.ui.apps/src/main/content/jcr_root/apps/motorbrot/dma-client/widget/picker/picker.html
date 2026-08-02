@@ -1,0 +1,141 @@
+<!--/*
+  DML picker widget.
+
+  Usage from a component's edit form:
+
+    <sly data-sly-use.picker="/apps/motorbrot/dma-client/widget/picker/picker.html"
+         data-sly-call="${picker.field @
+            name='fileReference',
+            value=properties.fileReference,
+            label='Image',
+            altName='dmaAlt',
+            altValue=properties.dmaAlt,
+            ratio='4:3',
+            assetsRoot='/content/motorbrot/dma/home'}"/>
+
+  Inputs:
+    name         hidden-input name that receives the selected asset path
+    value        current value (path to selected asset, may be empty)
+    label        label shown above the widget
+    altName      hidden-input name that receives the alt text
+    altValue     current alt text (may be empty)
+    ratio        aspect ratio for the focus-point overlay, "<w>:<h>" — e.g. "4:3"
+    assetsRoot   JCR path of the DML folder to browse for asset selection
+*/-->
+
+<template data-sly-template.field="${@ name, value, label, altName, altValue, ratio, assetsRoot}">
+  <sly data-sly-use.cfmts="org.motorbrot.sling.dma.client.models.ComponentFormats"/>
+  <div class="dma-picker"
+       data-field-name="${name}"
+       data-ratio="${ratio || '4:3'}"
+       data-component-path="${resource.path}"
+       data-assets-root="${assetsRoot || '/content/motorbrot/dma/assets'}">
+
+    <link rel="stylesheet" href="/apps/motorbrot/dma-client/widget/picker/picker.css"/>
+
+    <!--/* Component crop-format geometry (read by picker.js to decide, per selected
+           image, which formats are too small and need a component-local crop). */-->
+    <div class="dma-picker-cropfmts" hidden="hidden" data-sly-list.f="${cfmts.formats}">
+      <span class="dma-picker-cropfmt"
+            data-format="${f.name}"
+            data-label="${f.label}"
+            data-w="${f.width}"
+            data-h="${f.height}"
+            data-maintain="${f.maintainAspectRatio}"></span>
+    </div>
+
+    <div class="edit-field-row">
+      <span class="edit-field-meta">
+        <span class="edit-field-label">${label || 'Image'}</span>
+        <small class="edit-field-description">Pick an asset from the Digital Media Library and set its focus point.</small>
+      </span>
+
+      <div class="edit-field-input dma-picker-preview">
+        <input type="hidden"
+               name="${name}"
+               value="${value}"
+               class="dma-picker-value"
+               form="editor-form"/>
+
+        <!--/* Focus point persisted on THIS component (per-placement), so the
+               post-processor can regenerate cropped renditions on save. */-->
+        <input type="hidden" name="dmaFocusX@TypeHint" value="Double" form="editor-form"/>
+        <input type="hidden" name="dmaFocusX" class="dma-picker-focus-x"
+               value="${properties.dmaFocusX || '50'}" form="editor-form"/>
+        <input type="hidden" name="dmaFocusY@TypeHint" value="Double" form="editor-form"/>
+        <input type="hidden" name="dmaFocusY" class="dma-picker-focus-y"
+               value="${properties.dmaFocusY || '50'}" form="editor-form"/>
+
+        <div class="dma-picker-thumb" data-empty="${!value}">
+          <img class="dma-picker-thumb-img"
+               data-sly-test="${value}"
+               src="${value}/renditions/preview"
+               alt=""/>
+          <span class="dma-picker-thumb-placeholder" data-sly-test="${!value}">No image selected</span>
+        </div>
+
+        <button type="button" class="dma-picker-open">Pick image…</button>
+        <button type="button" class="dma-picker-clear" data-sly-test="${value}">Clear</button>
+      </div>
+    </div>
+
+    <div class="edit-field-row" data-sly-test="${altName}">
+      <span class="edit-field-meta">
+        <span class="edit-field-label">Alt text</span>
+        <small class="edit-field-description">Required for accessibility — describe the image in plain text.</small>
+      </span>
+      <input type="text"
+             name="${altName}"
+             value="${altValue}"
+             class="edit-field-input"
+             form="editor-form"/>
+    </div>
+
+    <!--/* Focus-point overlay rendered inline; hidden until an asset is selected */-->
+    <div class="dma-focus-section" data-sly-test="${value}">
+      <div class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Focus point</span>
+          <small class="edit-field-description">
+            Drag the dot to mark the most important point. Crops centre around it,
+            keeping the focus visible across all renditions.
+          </small>
+        </span>
+        <div class="dma-focus-stage" data-ratio="${ratio || '4:3'}">
+          <img class="dma-focus-image" src="${value}/renditions/preview" alt=""/>
+          <div class="dma-focus-crop"></div>
+          <div class="dma-focus-dot"></div>
+        </div>
+      </div>
+
+      <!--/* Component-local crop generator: shown by picker.js when the selected
+             image is too small for one or more of the component's formats. */-->
+      <div class="dma-picker-crop" hidden="hidden">
+        <p class="dma-picker-crop-hint">
+          The picked image is too small for the format(s) below. A focus-cropped
+          rendition will be saved on this component for each:
+        </p>
+        <ul class="dma-picker-crop-list"></ul>
+        <div class="dma-picker-crop-actions">
+          <button type="button" class="dma-picker-crop-generate">Generate cropped rendition(s)</button>
+          <span class="dma-picker-crop-result" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
+    <!--/* The picker dialog. Browsers dedupe styles by URL so multiple instances are safe. */-->
+    <dialog class="dma-picker-dialog">
+      <header class="dma-picker-dialog-header">
+        <h3>Pick an image</h3>
+        <button type="button" class="dma-picker-close" aria-label="Close">×</button>
+      </header>
+      <div class="dma-picker-dialog-body">
+        <div class="dma-picker-grid dml-asset-grid">
+          <p class="dma-picker-loading">Loading…</p>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="/apps/motorbrot/dma-client/widget/picker/picker.js" defer="defer"></script>
+  </div>
+</template>

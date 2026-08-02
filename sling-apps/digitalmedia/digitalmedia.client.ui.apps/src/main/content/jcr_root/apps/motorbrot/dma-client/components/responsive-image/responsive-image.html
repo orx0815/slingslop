@@ -1,0 +1,126 @@
+<!--/*
+  Responsive image renderer for DML assets.
+
+  Resolves the configured component properties (see ResponsiveImage Sling Model):
+    - fileReference  : path to DML asset (e.g. /content/motorbrot/dma/home/assets/foo.jpg)
+    - dmaFormats     : String[] of MediaFormat names, in display order
+    - dmaMedia       : String[] of CSS media queries, same length; "" = fallback <img>
+    - dmaAlt         : alt text
+
+  Behaviour for missing/invalid renditions:
+    - Logged-in users see an "invalid" badge and a "Generate" button.
+    - Anonymous users see nothing (image is omitted entirely).
+*/-->
+<sly data-sly-use.ri="org.motorbrot.sling.dma.client.models.ResponsiveImage"
+     data-sly-use.user="org.motorbrot.sling.dma.slingmodels.UserIsLoggedIn">
+
+  <sly data-sly-test="${ri.configured}">
+
+    <!--/* Anonymous: render the picture only when every source is valid AND the fallback rendition exists. Skip silently otherwise. */-->
+    <sly data-sly-test="${!user.loggedIn && !ri.anyInvalid && ri.fallback.exists}">
+      <picture class="dma-responsive-image">
+        <sly data-sly-list.src="${ri.sources}">
+          <source data-sly-test="${!src.fallback && src.exists}"
+                  media="${src.media}"
+                  srcset="${src.url}"/>
+        </sly>
+        <img src="${ri.fallback.url}"
+             width="${ri.fallback.width}"
+             height="${ri.fallback.height}"
+             alt="${ri.alt}"
+             loading="lazy"/>
+      </picture>
+    </sly>
+
+    <!--/* Logged-in editor view: render picture + invalid/missing controls. */-->
+    <sly data-sly-test="${user.loggedIn}">
+      <figure class="dma-responsive-image dma-editor"
+              data-asset-path="${ri.assetPath}"
+              data-component-path="${ri.componentPath}"
+              data-focus-x="${ri.focusPoint.xPercent}"
+              data-focus-y="${ri.focusPoint.yPercent}">
+
+        <link rel="stylesheet" href="/apps/motorbrot/dma-client/components/responsive-image/crop-editor.css"/>
+
+        <picture data-sly-test="${ri.fallback && ri.fallback.exists}">
+          <sly data-sly-list.src="${ri.sources}">
+            <source data-sly-test="${!src.fallback && src.exists}"
+                    media="${src.media}"
+                    srcset="${src.url}"/>
+          </sly>
+          <img src="${ri.fallback.url}"
+               width="${ri.fallback.width}"
+               height="${ri.fallback.height}"
+               alt="${ri.alt}"
+               loading="lazy"/>
+        </picture>
+
+        <div class="dma-image-placeholder"
+             data-sly-test="${!ri.fallback.exists}">
+          <span>📷 ${ri.alt || 'image'}</span>
+        </div>
+
+        <figcaption class="dma-image-status" data-sly-test="${ri.anyInvalid || ri.anyMissing}">
+          <ul class="dma-rendition-status">
+            <sly data-sly-list.src="${ri.sources}">
+              <li class="dma-rendition ${src.cropped ? 'is-cropped' : (src.valid ? (src.exists ? 'is-ok' : 'is-missing') : 'is-invalid')}">
+                <span class="dma-rendition-label">${src.label} (${src.width}×${src.height})</span>
+                <sly data-sly-test="${src.cropped}">
+                  <span class="dma-rendition-note">cropped for this component</span>
+                </sly>
+                <sly data-sly-test="${src.needsCrop}">
+                  <span class="dma-rendition-error" title="${src.validationMessage}">
+                    too small — set focus &amp; crop below
+                  </span>
+                </sly>
+                <sly data-sly-test="${src.valid && !src.exists}">
+                  <button type="button"
+                          class="dma-generate-rendition"
+                          hx-post="${ri.assetPath}.generate-rendition.html?format=${src.formatName}"
+                          hx-swap="none">
+                    Generate
+                  </button>
+                </sly>
+              </li>
+            </sly>
+          </ul>
+        </figcaption>
+
+        <!--/* Focus-point crop editor: rendered when >=1 format is too small for
+               the shared DML asset. Saves component-local cropped renditions. */-->
+        <div class="dma-crop-editor"
+             data-sly-test="${ri.anyNeedsCrop}"
+             data-component-path="${ri.componentPath}"
+             data-focus-x="${ri.focusPoint.xPercent}"
+             data-focus-y="${ri.focusPoint.yPercent}"
+             data-source-width="${ri.sourceWidth}"
+             data-source-height="${ri.sourceHeight}">
+          <p class="dma-crop-hint">
+            The source image is too small for the format(s) below. Drag the dot to set the
+            focus point — each dashed box is a crop (in that format's aspect ratio) that will
+            be saved for this component.
+          </p>
+          <div class="dma-focus-stage">
+            <img class="dma-focus-image" src="${ri.assetPath}/renditions/preview" alt=""/>
+            <sly data-sly-list.src="${ri.cropSources}">
+              <div class="dma-focus-crop"
+                   data-format="${src.formatName}"
+                   data-w="${src.width}"
+                   data-h="${src.height}"></div>
+            </sly>
+            <div class="dma-focus-dot"></div>
+          </div>
+          <div class="dma-crop-actions">
+            <sly data-sly-list.src="${ri.cropSources}">
+              <input type="hidden" class="dma-crop-format" value="${src.formatName}"/>
+            </sly>
+            <button type="button" class="dma-crop-generate">Generate cropped rendition(s)</button>
+          </div>
+        </div>
+
+        <script src="/apps/motorbrot/dma-client/components/responsive-image/crop-editor.js" defer="defer"></script>
+      </figure>
+    </sly>
+
+  </sly>
+</sly>

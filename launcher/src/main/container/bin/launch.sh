@@ -19,8 +19,8 @@ if [ ! -z "${JAVA_DEBUG_PORT}" ]; then
     JAVA_DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${JAVA_DEBUG_PORT}"
 fi
 
-# add jdk25 performance benefits
-JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication ${JAVA_DEBUG_OPTS} ${EXTRA_JAVA_OPTS}"
+# add jdk25 performance benefits + FFM native access (FfmRenditionService / ImageMagick)
+JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication --enable-native-access=ALL-UNNAMED ${JAVA_DEBUG_OPTS} ${EXTRA_JAVA_OPTS}"
 
 agents=$(find agents -name "*.jar")
 for agent in ${agents}; do

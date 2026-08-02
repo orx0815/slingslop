@@ -1,0 +1,113 @@
+/* 08-styleguide.css — Living style guide page */
+
+.styleguide {
+  padding: var(--space-2xl) 0;
+}
+
+.styleguide h2 {
+  margin-top: var(--space-3xl);
+  margin-bottom: var(--space-xl);
+}
+
+.styleguide h2:first-child {
+  margin-top: 0;
+}
+
+/* Color swatches */
+.color-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.color-swatch {
+  text-align: center;
+}
+
+.color-swatch-box {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--space-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.color-swatch-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Typography specimens */
+.type-specimen {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.type-specimen h1,
+.type-specimen h2,
+.type-specimen h3,
+.type-specimen h4,
+.type-specimen h5,
+.type-specimen h6 {
+  margin-bottom: var(--space-sm);
+}
+
+/* Spacing scale */
+.spacing-scale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.spacing-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.spacing-box {
+  background: var(--color-primary);
+  height: 20px;
+  border-radius: var(--radius-sm);
+}
+
+.spacing-box.xs { width: var(--space-xs); }
+.spacing-box.sm { width: var(--space-sm); }
+.spacing-box.md { width: var(--space-md); }
+.spacing-box.lg { width: var(--space-lg); }
+.spacing-box.xl { width: var(--space-xl); }
+.spacing-box.xxl { width: var(--space-2xl); }
+.spacing-box.xxxl { width: var(--space-3xl); }
+.spacing-box.xxxxl { width: var(--space-4xl); }
+
+.spacing-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  min-width: 120px;
+}
+
+/* Component showcase */
+.component-showcase {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.component-example {
+  padding: var(--space-xl);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.component-example h4 {
+  margin-bottom: var(--space-md);
+  color: var(--color-secondary-light);
+}

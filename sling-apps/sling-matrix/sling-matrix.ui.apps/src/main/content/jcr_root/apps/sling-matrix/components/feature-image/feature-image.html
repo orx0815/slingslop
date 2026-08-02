@@ -1,0 +1,43 @@
+<!--/*
+  Feature Image — example consumer of the slim DML client.
+
+  Properties on the component node:
+    headline       String   — heading shown next to the image
+    fileReference  String   — JCR path of DML asset
+    text           String   — richtext (HTML)
+    imagePosition  String   — "left" (default) or "right"
+    dmaAlt         String   — alt text
+
+  Renders a 2-column layout. The image is delegated to the slim DML
+  responsive-image component so it picks the right rendition for the
+  viewport (4:3 desktop / 1:1 mobile) and degrades gracefully when a
+  rendition is missing or invalid.
+*/-->
+<sly data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn">
+
+  <!--/*
+    Note: dmaFormats / dmaMedia are persisted as multi-value properties on the
+    component node (seeded by sample content, kept by the edit form). The
+    embedded responsive-image Sling Model reads them via @ValueMapValue from
+    the same resource — HTL bindings do NOT propagate through data-sly-resource.
+  */-->
+  <sly data-sly-set.editUrl="${'{0}.edit-form.html' @ format=[resource.path]}"/>
+
+  <section class="feature-image feature-image--${properties.imagePosition || 'left'}"
+           data-zen-editable="true"
+           data-sly-attribute.hx-get="${auth.loggedIn ? editUrl : false}"
+           data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+           data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+
+    <div class="feature-image__media">
+      <sly data-sly-resource="${ resource.path
+            @ resourceType='motorbrot/dma-client/components/responsive-image' }"/>
+    </div>
+
+    <div class="feature-image__body">
+      <h2 class="feature-image__headline" data-sly-test="${properties.headline}">${properties.headline}</h2>
+      <div class="feature-image__text">${properties.text @ context='html'}</div>
+    </div>
+
+  </section>
+</sly>
