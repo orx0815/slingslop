@@ -32,6 +32,9 @@ services:
       - {{ slingslop_root }}/data/traefik:/var/log/traefik
       - {{ slingslop_secrets_dir }}/editor.htpasswd:/run/secrets/editor.htpasswd:ro
       - {{ slingslop_secrets_dir }}/grafana.htpasswd:/run/secrets/grafana.htpasswd:ro
+{% if traefik_dashboard_enabled | default(true) | bool %}
+      - {{ slingslop_secrets_dir }}/dashboard.htpasswd:/run/secrets/dashboard.htpasswd:ro
+{% endif %}
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:80/ping"]
       interval: 30s
@@ -72,7 +75,11 @@ services:
       traefik.enable: "true"
       traefik.http.routers.www.rule: "Host(`www.{{ domain }}`) || Host(`{{ domain }}`)"
       traefik.http.routers.www.entrypoints: "websecure"
+{% if traefik_acme_enabled | default(true) | bool %}
       traefik.http.routers.www.tls.certresolver: "letsencrypt"
+{% else %}
+      traefik.http.routers.www.tls: "true"
+{% endif %}
       traefik.http.routers.www.service: "www"
       traefik.http.routers.www.middlewares: "sec-headers@file"
       traefik.http.services.www.loadbalancer.server.port: "80"

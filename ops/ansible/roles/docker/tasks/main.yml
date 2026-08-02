@@ -75,6 +75,30 @@
       }
   notify: restart docker
 
+- name: Ensure docker.service systemd drop-in dir exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Allow older Docker API clients (Traefik's provider negotiates 1.24)
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker.service.d/10-min-api-version.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Ansible — slingslop/docker role.
+      # Docker Engine 29+ raised its minimum accepted API version to 1.40, but
+      # Traefik's docker provider still speaks 1.24 (and ignores the
+      # DOCKER_API_VERSION env when an explicit socket endpoint is set). Relax
+      # the daemon minimum so Traefik and other older-API clients keep working.
+      [Service]
+      Environment=DOCKER_MIN_API_VERSION={{ docker_min_api_version }}
+  notify: restart docker
+
 - name: Start & enable docker
   ansible.builtin.service:
     name: docker
@@ -158,3 +182,6 @@
     name: "{{ docker_network_name }}"
     state: present
     driver: bridge
+
+- name: Apply pending Docker daemon changes before dependent roles start containers
+  ansible.builtin.meta: flush_handlers

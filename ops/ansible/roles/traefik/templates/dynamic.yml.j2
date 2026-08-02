@@ -27,6 +27,14 @@ http:
         realm: "Slingslop ops"
         removeHeader: true
 
+{% if traefik_dashboard_enabled | default(true) | bool %}
+    dashboard-basicauth:
+      basicAuth:
+        usersFile: /run/secrets/dashboard.htpasswd
+        realm: "Slingslop traefik"
+        removeHeader: true
+{% endif %}
+
 {% if editor_allowlist_cidrs | length > 0 %}
     editor-allowlist:
       ipAllowList:
@@ -48,5 +56,28 @@ http:
 {% if editor_allowlist_cidrs | length > 0 %}
         - editor-allowlist
 {% endif %}
+{% if traefik_acme_enabled | default(true) | bool %}
       tls:
         certResolver: letsencrypt
+{% else %}
+      tls: {}
+{% endif %}
+{% if traefik_dashboard_enabled | default(true) | bool %}
+
+    traefik-dashboard:
+      rule: "Host(`traefik.{{ domain }}`)"
+      entryPoints: [websecure]
+      service: api@internal
+      middlewares:
+        - sec-headers
+        - dashboard-basicauth
+{% if editor_allowlist_cidrs | length > 0 %}
+        - editor-allowlist
+{% endif %}
+{% if traefik_acme_enabled | default(true) | bool %}
+      tls:
+        certResolver: letsencrypt
+{% else %}
+      tls: {}
+{% endif %}
+{% endif %}

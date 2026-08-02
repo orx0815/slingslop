@@ -26,8 +26,14 @@ entryPoints:
   websecure:
     address: ":443"
     http:
+{% if traefik_acme_enabled | default(true) | bool %}
       tls:
         certResolver: letsencrypt
+{% else %}
+      # ACME disabled (local/self-signed): Traefik serves its built-in
+      # self-signed default certificate for all websecure routers.
+      tls: {}
+{% endif %}
 
 providers:
   file:
@@ -38,6 +44,7 @@ providers:
     exposedByDefault: false
     network: {{ docker_network_name }}
 
+{% if traefik_acme_enabled | default(true) | bool %}
 certificatesResolvers:
   letsencrypt:
     acme:
@@ -45,7 +52,12 @@ certificatesResolvers:
       storage: /etc/traefik/acme.json
       httpChallenge:
         entryPoint: web
+{% endif %}
 
-# Uncomment to expose Traefik's dashboard at https://traefik.<domain>/
-# api:
-#   dashboard: true
+{% if traefik_dashboard_enabled | default(true) | bool %}
+# Dashboard exposed at https://traefik.<domain>/ via a file-provider router
+# (see dynamic.yml). insecure=false keeps it off the unauthenticated :8080 API.
+api:
+  dashboard: true
+  insecure: false
+{% endif %}

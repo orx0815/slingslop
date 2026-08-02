@@ -1,0 +1,6 @@
+# Local test harness — generated / machine-specific artifacts (never commit).
+.venv/
+.ssh/
+.runtime/
+.vagrant/
+*.retry

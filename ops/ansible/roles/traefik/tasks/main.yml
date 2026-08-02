@@ -34,7 +34,11 @@
     owner: root
     group: root
     mode: "0640"
-    content: "{{ vault_editor_basicauth_users_htpasswd }}"
+    # Strip inline '# ...' comments + trailing spaces per line: YAML block
+    # scalars keep '#' literal, and Traefik's basicAuth usersFile parser rejects
+    # annotated hashes ('error parsing BasicUser'). htpasswd hashes never use '#'.
+    content: "{{ vault_editor_basicauth_users_htpasswd | regex_replace('(?m)[ \\t]*#.*$', '') }}"
+  notify: restart traefik
 
 - name: Write grafana basicAuth users file
   ansible.builtin.copy:
@@ -42,7 +46,18 @@
     owner: root
     group: root
     mode: "0640"
-    content: "{{ vault_grafana_basicauth_users_htpasswd }}"
+    content: "{{ vault_grafana_basicauth_users_htpasswd | regex_replace('(?m)[ \\t]*#.*$', '') }}"
+  notify: restart traefik
+
+- name: Write traefik dashboard basicAuth users file
+  when: traefik_dashboard_enabled | default(true) | bool
+  ansible.builtin.copy:
+    dest: "{{ slingslop_secrets_dir }}/dashboard.htpasswd"
+    owner: root
+    group: root
+    mode: "0640"
+    content: "{{ vault_traefik_dashboard_htpasswd | regex_replace('(?m)[ \\t]*#.*$', '') }}"
+  notify: restart traefik
 
 - name: Touch ACME storage file (Traefik requires existing file, 0600)
   ansible.builtin.file:

@@ -8,8 +8,18 @@
 #   www.<domain>      → public, cached
 #   editor.<domain>   → Sling author, basicAuth-gated
 #   grafana.<domain>  → Grafana, basicAuth-gated
-#   logs.<domain>     → (alias to Grafana → Explore)
+#   logs.<domain>     → same Grafana (alias host); browse logs via Explore → Loki
 domain: example.org
+
+# Let's Encrypt / ACME. Keep true for real deployments (public DNS + ports
+# 80/443 reachable). Set false for local testing on a private VM, where ACME
+# cannot validate — Traefik then serves its built-in self-signed certificate.
+traefik_acme_enabled: true
+
+# Traefik dashboard at https://traefik.<domain>/ — protected by basicAuth
+# (vault_traefik_dashboard_htpasswd) and the same IP allow-list as the other
+# gated endpoints. Set false to not expose it at all.
+traefik_dashboard_enabled: true
 
 # Trusted source ranges for the gated (editor / grafana) endpoints.
 # Leave empty to disable IP-allow-listing (basicAuth is still enforced).
@@ -38,6 +48,12 @@ enable_auditd: false
 # Docker
 docker_compose_project_name: slingslop
 docker_network_name: slingslop_net
+
+# Lowest Docker Engine API version the daemon will accept. Docker Engine 29+
+# defaults its minimum to 1.40, but Traefik's docker provider still negotiates
+# 1.24 (and ignores DOCKER_API_VERSION when given an explicit socket endpoint).
+# Relaxing the daemon minimum lets Traefik and other older-API clients work.
+docker_min_api_version: "1.24"
 
 # Images (override per-environment if you fork)
 slingslop_image: ghcr.io/orx0815/slingslop:snapshot-composite

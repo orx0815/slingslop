@@ -1,0 +1,20 @@
+---
+# ---------------------------------------------------------------------------
+# Host-specific overrides for the production VPS (inventory host: slingslop-prod).
+# Copy to slingslop-prod.yml and edit; keep slingslop-prod.yml gitignored.
+#
+# host_vars has HIGHER precedence than group_vars/all/main.yml, so values here
+# win over the committed defaults. Non-secret only — secrets stay in vault.yml.
+# ---------------------------------------------------------------------------
+
+# Real public domain for this host. Publishes: www / editor / grafana / logs /
+# traefik sub-domains. DNS A records for each must point at this host's
+# ansible_host, and ports 80/443 must be reachable (Let's Encrypt validation).
+domain: example.org
+
+# Restrict the gated endpoints (editor / grafana / logs / traefik) to trusted
+# source ranges. basicAuth still applies regardless. Empty = allow from anywhere.
+editor_allowlist_cidrs: []
+# editor_allowlist_cidrs:
+#   - 203.0.113.0/24
+#   - 198.51.100.42/32

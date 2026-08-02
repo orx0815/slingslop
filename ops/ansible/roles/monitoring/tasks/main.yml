@@ -5,9 +5,11 @@
     state: directory
     owner: root
     group: root
-    mode: "0750"
+    mode: "0755"
   loop:
     - "{{ slingslop_root }}/data/prometheus"
+    - "{{ slingslop_root }}/data/grafana"
+    - "{{ slingslop_root }}/data/grafana/provisioning"
     - "{{ slingslop_root }}/data/grafana/provisioning/datasources"
     - "{{ slingslop_root }}/data/grafana/provisioning/dashboards"
     - "{{ slingslop_root }}/data/grafana/dashboards"
@@ -18,7 +20,7 @@
     dest: "{{ slingslop_root }}/data/prometheus/prometheus.yml"
     owner: root
     group: root
-    mode: "0640"
+    mode: "0644"
   notify: restart prometheus
 
 - name: Render grafana datasources
@@ -27,14 +29,14 @@
     dest: "{{ slingslop_root }}/data/grafana/provisioning/datasources/datasources.yml"
     owner: root
     group: root
-    mode: "0640"
+    mode: "0644"
 
 - name: Render grafana dashboards provider
   ansible.builtin.copy:
     dest: "{{ slingslop_root }}/data/grafana/provisioning/dashboards/dashboards.yml"
     owner: root
     group: root
-    mode: "0640"
+    mode: "0644"
     content: |
       apiVersion: 1
       providers:
@@ -50,7 +52,7 @@
     dest: "{{ slingslop_root }}/data/grafana/dashboards/{{ item }}"
     owner: root
     group: root
-    mode: "0640"
+    mode: "0644"
   loop:
     - node.json
     - docker.json

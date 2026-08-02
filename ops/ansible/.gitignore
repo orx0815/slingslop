@@ -1,4 +1,5 @@
 .ansible-facts/
 inventory/hosts.yml
 inventory/group_vars/all/vault.yml
+inventory/host_vars/slingslop-prod.yml
 *.retry

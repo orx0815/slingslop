@@ -5,7 +5,7 @@
 > calling the same playbooks).
 
 Target hosting: a fresh Hetzner CX22 / CPX21 (or equivalent) running
-**Debian 12** or **Ubuntu 24.04 LTS**. Single node — no Swarm, no Kubernetes.
+**Debian 12** or **Ubuntu 26.04 LTS**. Single node — no Swarm, no Kubernetes.
 
 ## Architecture on the box
 
@@ -179,6 +179,29 @@ Grafana is provisioned (datasources, two starter dashboards) from
 `roles/monitoring/files/grafana/`. Public URL: `https://grafana.<DOMAIN>/`,
 gated by Traefik basicAuth (see §10).
 
+### 7a. Traefik dashboard
+
+Enabled by default (`traefik_dashboard_enabled: true` in
+`group_vars/all/main.yml`). Reachable at:
+
+```
+https://traefik.<DOMAIN>/
+```
+
+(e.g. `https://traefik.slingslop.local/` on the local test VM.)
+
+It is gated by the same two barriers as the editor/grafana endpoints:
+
+1. **basicAuth** from `vault_traefik_dashboard_htpasswd` — generate the entry
+   with `docker run --rm httpd:2.4 htpasswd -nbB admin '<password>'`.
+2. **ipAllowList** — if `editor_allowlist_cidrs` is set, the dashboard is
+   restricted to those ranges too.
+
+The unauthenticated `:8080` insecure API is **off** (`api.insecure: false`);
+the dashboard is only served through the authenticated `traefik.<DOMAIN>`
+router (`api@internal`). Set `traefik_dashboard_enabled: false` to remove it
+entirely (router, middleware, and mounted htpasswd all disappear).
+
 ### 8. Log viewer (why **not** OpenSearch on a low-cost VPS)
 
 OpenSearch needs ≥ 2 GB RAM just to idle, ~6 GB to be comfortable, and a
@@ -217,6 +240,8 @@ Two layers, both via Traefik middlewares:
 1. **basicAuth** (`vault_editor_basicauth_users_htpasswd`,
    `vault_grafana_basicauth_users_htpasswd`) — a second login *before* Sling's
    or Grafana's own login. Failed attempts are captured by fail2ban (see §11).
+   The Traefik dashboard (§7a) is gated the same way via
+   `vault_traefik_dashboard_htpasswd`.
 2. **ipAllowList** (commented out in `roles/traefik/templates/dynamic.yml.j2`)
    — uncomment and set `editor_allowlist_cidrs` in `group_vars/all/main.yml` to
    restrict the editor URL to a VPN / office IP range.
@@ -350,9 +375,13 @@ $EDITOR ops/ansible/inventory/group_vars/all/vault.yml
 ansible-vault encrypt ops/ansible/inventory/group_vars/all/vault.yml
 
 # 3. Bootstrap (as root, once)
+# NOTE: inventory pins `ansible_user: deploy`, which outranks `-u root`, so pass
+# `-e ansible_user=root` (extra-vars win) to connect as root for this first run.
+# Add `-k` only if root accepts a PASSWORD (requires the sshpass program);
+# omit it when root accepts your SSH key (cloud-init / provider-added key).
 cd ops/ansible
 ansible-playbook -i inventory/hosts.yml playbooks/bootstrap.yml \
-    -u root -k --ask-vault-pass
+    -e ansible_user=root --ask-vault-pass
 
 # 4. Full deploy (as deploy user from then on)
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass
@@ -362,6 +391,61 @@ curl -I https://www.<your-domain>/
 curl -I -u admin:<vault-pass> https://editor.<your-domain>/
 curl -I -u admin:<vault-pass> https://grafana.<your-domain>/
 ```
+
+## Local testing (Vagrant VM)
+
+You can rehearse the **entire deployment on your laptop** against a throwaway
+Ubuntu 24.04 VM before pointing it at a real VPS. This runs the *actual*
+`bootstrap.yml` + `site.yml` — the only differences from prod are a local
+domain, self-signed TLS (no Let's Encrypt on a private box), and throwaway
+secrets. All of it lives in [`ops/ansible/local/`](ansible/local/).
+
+Requires **Vagrant + VirtualBox** on the host (Ansible itself is installed into
+a local venv by the script — nothing global needed).
+
+The `slingslop` and `webcache` images on GHCR are **private**, so the VM needs a
+pull token. Export a GitHub PAT (scope `read:packages`) before running — it is
+injected into a gitignored runtime file and never committed:
+
+```bash
+export GHCR_USER=<your-github-user>
+export GHCR_TOKEN=<PAT with read:packages>
+```
+
+```bash
+cd ops/ansible/local
+
+./test-local.sh up          # boots the VM, runs bootstrap + site end-to-end
+./test-local.sh hosts       # prints the /etc/hosts lines to add
+./test-local.sh site        # re-run site.yml only (idempotency check)
+./test-local.sh ssh         # SSH into the VM as the deploy user
+./test-local.sh destroy     # tear the VM down
+```
+
+After `up`, add the printed line to your host's `/etc/hosts`, e.g.:
+
+```
+192.168.56.50 slingslop.local www.slingslop.local editor.slingslop.local grafana.slingslop.local logs.slingslop.local
+```
+
+Then browse (accept the self-signed certificate):
+
+- `https://www.slingslop.local/` — public, cached site
+- `https://editor.slingslop.local/` — basicAuth `localtest` / `localtest`, then the Sling author UI
+- `https://grafana.slingslop.local/` — basicAuth `localtest` / `localtest`
+
+How the local mode differs from prod (all via `-e @local/vars.local.yml`):
+
+| Setting | Prod default | Local override |
+|---|---|---|
+| `domain` | your real domain | `slingslop.local` |
+| `traefik_acme_enabled` | `true` (Let's Encrypt) | `false` (Traefik self-signed cert) |
+| `ssh_allowed_users` | `[deploy]` | `[deploy, vagrant]` (so `vagrant ssh` keeps working) |
+| secrets / vault | `ansible-vault` file | throwaway plaintext in `local/vars.local.yml` |
+
+The new `traefik_acme_enabled` flag is the only change to the shared roles — it
+defaults to `true`, so **production behaviour is unchanged**. VM tuning knobs:
+`SLINGSLOP_VM_IP`, `SLINGSLOP_VM_MEM`, `SLINGSLOP_VM_CPUS` (env vars).
 
 ## GitOps later (no code changes required)
 

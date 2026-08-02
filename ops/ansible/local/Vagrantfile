@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Local test VM for the Slingslop Ansible deployment.
+# Boots a fresh Ubuntu 26.04 box that mimics a bare VPS, so `test-local.sh`
+# can run the real bootstrap.yml + site.yml against it.
+#
+#   cd ops/ansible/local
+#   ./test-local.sh up        # boots VM + runs bootstrap + site
+#   ./test-local.sh destroy   # tears the VM down
+#
+# Provider: VirtualBox (installed on this machine). No ansible provisioner is
+# wired in here on purpose — test-local.sh drives Ansible explicitly so the
+# bootstrap→deploy user switch matches production exactly.
+
+VM_IP     = ENV.fetch("SLINGSLOP_VM_IP",  "192.168.56.50")
+VM_MEMORY = ENV.fetch("SLINGSLOP_VM_MEM", "6144").to_i   # Sling + obs stack want RAM
+VM_CPUS   = ENV.fetch("SLINGSLOP_VM_CPUS", "2").to_i
+# The 26.04 bento box is EFI/NVRAM (OVF ResourceType 32768) and needs
+# VirtualBox >= 7.1 to import. On older VirtualBox, override to a box that
+# imports there, e.g. SLINGSLOP_VM_BOX=bento/ubuntu-24.04.
+VM_BOX    = ENV.fetch("SLINGSLOP_VM_BOX", "bento/ubuntu-26.04")
+
+Vagrant.configure("2") do |config|
+  config.vm.box      = VM_BOX
+  config.vm.hostname = "slingslop-local"
+
+  # Host-only private network — the host reaches the VM directly on VM_IP,
+  # so www./editor./grafana.slingslop.local can be mapped to it via /etc/hosts.
+  config.vm.network "private_network", ip: VM_IP
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name   = "slingslop-local"
+    vb.memory = VM_MEMORY
+    vb.cpus   = VM_CPUS
+    # Nested paging / larger disk cache help Sling + Docker feel less sluggish.
+    vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+  end
+
+  # Keep the default insecure-key swap; test-local.sh connects as `vagrant`
+  # for bootstrap, then as `deploy` (our generated key) for site.yml.
+  config.ssh.insert_key = true
+end

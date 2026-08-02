@@ -4,9 +4,18 @@
 #   * creates the deploy user, installs its key, hardens SSH
 #   * after this play, site.yml runs as the deploy user
 #
-# Usage:
+# Usage (connect as root — see note below):
 #   ansible-playbook -i inventory/hosts.yml playbooks/bootstrap.yml \
-#       -u root -k --ask-vault-pass
+#       -e ansible_user=root --ask-vault-pass
+#   # add -k if root only accepts a PASSWORD (needs the sshpass program);
+#   # omit -k when root accepts your SSH key (cloud-init / provider key).
+#
+# NOTE: inventory sets `ansible_user: deploy` (a host var), which OUTRANKS the
+# `-u root` CLI flag — so `-u root` alone would still try to connect as the
+# not-yet-existent deploy user and fail. Pass `-e ansible_user=root` (extra-vars
+# win over host vars) to actually connect as root for this first run. The
+# `remote_user: root` play default below is a fallback for inventories that do
+# NOT pin ansible_user.
 #
 # Re-runnable: it is idempotent. Once SSH is locked down to deploy@key,
 # subsequent root-password runs will fail — that's the point.
@@ -14,6 +23,8 @@
 - hosts: slingslop
   gather_facts: true
   become: true
+  remote_user: root   # default for this play; overridden by inventory
+                      # ansible_user, so also pass -e ansible_user=root.
 
   vars:
     bootstrap_phase: true   # tells the security role to also keep the
