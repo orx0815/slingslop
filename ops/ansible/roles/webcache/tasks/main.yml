@@ -11,6 +11,27 @@
     group: root
     mode: "0755"
 
+# If a bind-mounted vhost config source is ever missing when `dc up` runs,
+# Docker silently creates a *directory* at that path; the mount then fails with
+# "not a directory". Self-heal by removing any such stale directory before we
+# (re-)render the real files.
+- name: Stat vhost config paths (may be stale dirs left by a failed bind-mount)
+  ansible.builtin.stat:
+    path: "{{ slingslop_root }}/data/webcache/{{ item }}"
+  loop:
+    - www.conf
+    - zengarden.conf
+  register: webcache_conf_stat
+
+- name: Remove stale directories Docker auto-created at vhost config paths
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    state: absent
+  loop: "{{ webcache_conf_stat.results }}"
+  loop_control:
+    label: "{{ item.stat.path }}"
+  when: item.stat.exists and item.stat.isdir
+
 - name: Render www vhost
   ansible.builtin.template:
     src: www.conf.j2
