@@ -1,0 +1,214 @@
+name: CI/CD
+
+# Push to main             → build + test + push all images to GHCR
+# Push to deploy/motorbrot_prod → same, then deploy to motorbrot.org:
+#   * sling image is deployed only when sling-apps / launcher / content-packages / pom.xml change
+#   * webcache is deployed only when docker/webcache changes
+#   * if both change: sling first (readiness-gated), then webcache
+#   * the deployed image is the one built from THIS commit (immutable sha tag),
+#     never main's — so a branch deploy can never pull main's image.
+#
+# Required repo/org config:
+#   Secrets:
+#     DEPLOY_SSH_KEY        private key allow-listed for the `deploy` user on the VPS
+#     ANSIBLE_VAULT_PASSWORD  password for inventory/group_vars/all/vault.yml
+#   Variables (optional, sensible defaults shown):
+#     DEPLOY_HOST   (default motorbrot.org)   SSH target for the VPS
+#     DEPLOY_DOMAIN (default motorbrot.org)   public domain published by Traefik
+#
+# NOTE: images must be PUBLIC on GHCR for the anonymous pull on the host to work
+# (no vault_ghcr_pull_token needed). Flip each package to Public once after the
+# first push: slingslop, slingslop-webcache.
+
+on:
+  push:
+    branches:
+      - main
+      - deploy/motorbrot_prod
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  GHCR_IMAGE: ghcr.io/orx0815/slingslop
+  GHCR_WEBCACHE: ghcr.io/orx0815/slingslop-webcache
+
+jobs:
+  # ---------------------------------------------------------------- metadata
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_tag: ${{ steps.tags.outputs.sha_tag }}
+      branch_tag: ${{ steps.tags.outputs.branch_tag }}
+      is_deploy: ${{ steps.tags.outputs.is_deploy }}
+      sling: ${{ steps.filter.outputs.sling }}
+      webcache: ${{ steps.filter.outputs.webcache }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: tags
+        run: |
+          echo "sha_tag=sha-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "branch_tag=snapshot" >> "$GITHUB_OUTPUT"
+            echo "is_deploy=false"     >> "$GITHUB_OUTPUT"
+          else
+            # deploy/motorbrot_prod -> motorbrot_prod (docker tags can't hold '/')
+            echo "branch_tag=${GITHUB_REF_NAME##*/}" >> "$GITHUB_OUTPUT"
+            echo "is_deploy=true"                    >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            sling:
+              - 'sling-apps/**'
+              - 'launcher/**'
+              - 'content-packages/**'
+              - 'pom.xml'
+            webcache:
+              - 'docker/webcache/**'
+
+  # ---------------------------------------------------------------- build+test
+  build-test:
+    needs: meta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Build + integration tests
+        run: mvn -U clean install -Ddocker.skip=true
+
+  # ---------------------------------------------------------------- publish sling
+  publish-sling:
+    needs: [meta, build-test]
+    if: needs.meta.outputs.sling == 'true' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build + push base + composite (GHCR)
+        run: |
+          mvn -U -pl launcher -am clean install -DskipITs -Pcomposite-image \
+            -Ddocker.skip=false -Ddocker.skip.push=false \
+            -Ddocker.image.tag=${{ needs.meta.outputs.branch_tag }} \
+            -Ddocker.image.extra.tag=${{ needs.meta.outputs.sha_tag }}
+
+      - name: Push composite tags (GHCR)
+        run: |
+          docker tag  "$GHCR_IMAGE:${{ needs.meta.outputs.branch_tag }}-composite" "$GHCR_IMAGE:${{ needs.meta.outputs.sha_tag }}-composite"
+          docker push "$GHCR_IMAGE:${{ needs.meta.outputs.branch_tag }}-composite"
+          docker push "$GHCR_IMAGE:${{ needs.meta.outputs.sha_tag }}-composite"
+
+  # ---------------------------------------------------------------- publish webcache
+  publish-webcache:
+    needs: [meta, build-test]
+    if: needs.meta.outputs.webcache == 'true' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build + push webcache (GHCR)
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/webcache
+          push: true
+          tags: |
+            ${{ env.GHCR_WEBCACHE }}:${{ needs.meta.outputs.branch_tag }}
+            ${{ env.GHCR_WEBCACHE }}:${{ needs.meta.outputs.sha_tag }}
+
+  # ---------------------------------------------------------------- deploy sling
+  deploy-sling:
+    needs: [meta, publish-sling]
+    if: needs.meta.outputs.is_deploy == 'true' && needs.meta.outputs.sling == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Deploy slingslop (readiness-gated)
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST || 'motorbrot.org' }}
+          DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'motorbrot.org' }}
+          IMAGE: ${{ env.GHCR_IMAGE }}:${{ needs.meta.outputs.sha_tag }}-composite
+        run: |
+          set -euo pipefail
+          [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
+          python3 -m pip install --quiet "ansible-core>=2.17"
+          cd ops/ansible
+          ansible-galaxy collection install -r requirements.yml >/dev/null
+          printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
+          bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
+          ansible-playbook -i inventory/hosts.yml playbooks/update-slingslop.yml \
+            --vault-password-file /tmp/vp \
+            -e "slingslop_image=$IMAGE"
+          rm -f /tmp/vp
+
+  # ---------------------------------------------------------------- deploy webcache
+  deploy-webcache:
+    needs: [meta, publish-webcache, deploy-sling]
+    # Runs when webcache changed. Waits for deploy-sling if that ran (both
+    # changed → sling first), but still runs if deploy-sling was skipped
+    # (webcache-only change). Blocked if deploy-sling failed.
+    if: |
+      always() &&
+      needs.meta.outputs.is_deploy == 'true' &&
+      needs.meta.outputs.webcache == 'true' &&
+      needs.publish-webcache.result == 'success' &&
+      needs.deploy-sling.result != 'failure' &&
+      needs.deploy-sling.result != 'cancelled'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Deploy webcache (cache preserved)
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST || 'motorbrot.org' }}
+          DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'motorbrot.org' }}
+          IMAGE: ${{ env.GHCR_WEBCACHE }}:${{ needs.meta.outputs.sha_tag }}
+        run: |
+          set -euo pipefail
+          [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
+          python3 -m pip install --quiet "ansible-core>=2.17"
+          cd ops/ansible
+          ansible-galaxy collection install -r requirements.yml >/dev/null
+          printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
+          bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
+          ansible-playbook -i inventory/hosts.yml playbooks/update-webcache.yml \
+            --vault-password-file /tmp/vp \
+            -e "webcache_image=$IMAGE"
+          rm -f /tmp/vp

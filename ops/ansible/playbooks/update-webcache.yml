@@ -2,12 +2,25 @@
 # Pull a newer webcache image and restart only that container.
 #
 #   ansible-playbook -i inventory/hosts.yml playbooks/update-webcache.yml --ask-vault-pass
+#
+# CI passes the exact image built from the pushed commit, e.g.:
+#   -e webcache_image=ghcr.io/orx0815/slingslop-webcache:sha-<sha>
+# The edge compose is re-rendered so webcache switches to it; only the webcache
+# service is recreated, so Traefik keeps proxying and the disk cache survives.
 
 - hosts: slingslop
   gather_facts: true
   become: true
 
   tasks:
+    - name: Re-render edge compose with the target webcache_image
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../roles/traefik/templates/compose.edge.yml.j2"
+        dest: "{{ slingslop_root }}/compose.edge.yml"
+        owner: root
+        group: root
+        mode: "0640"
+
     - name: Pull webcache image
       ansible.builtin.command:
         cmd: "{{ slingslop_root }}/dc pull webcache"

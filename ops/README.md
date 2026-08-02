@@ -447,21 +447,64 @@ The new `traefik_acme_enabled` flag is the only change to the shared roles — i
 defaults to `true`, so **production behaviour is unchanged**. VM tuning knobs:
 `SLINGSLOP_VM_IP`, `SLINGSLOP_VM_MEM`, `SLINGSLOP_VM_CPUS` (env vars).
 
-## GitOps later (no code changes required)
+## GitOps (implemented — `.github/workflows/`)
 
-```yaml
-# .github/workflows/deploy.yml (sketch)
-- uses: actions/checkout@v4
-- run: pipx install ansible-core
-- run: ansible-galaxy collection install -r ops/ansible/requirements.yml
-- env:
-    ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-  run: |
-    echo "$ANSIBLE_VAULT_PASSWORD" > /tmp/vp
-    cd ops/ansible
-    ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
-        --vault-password-file /tmp/vp
-```
+Two workflows drive CI/CD:
 
-The runner needs an SSH key allow-listed for the `deploy` user — store it as
-a GitHub Action secret and inject with `webfactory/ssh-agent`.
+### `ci-cd.yml` — on push to `main` and `deploy/motorbrot_prod`
+
+| Stage | main | deploy/motorbrot_prod |
+|---|---|---|
+| build + integration tests | ✅ | ✅ |
+| push images (GHCR) | ✅ all | ✅ only what changed |
+| deploy to the VPS | — | ✅ path-selective |
+
+Key behaviours:
+
+- **Immutable image per commit.** Every build tags `sha-<commit>` (and a moving
+  `snapshot` / `motorbrot_prod` tag). The deploy installs the **`sha-<commit>`**
+  image, so a branch deploy can never accidentally pull `main`'s image.
+- **All images live on GHCR only** (`slingslop`, `slingslop-*composite*`,
+  `slingslop-webcache`). No Docker Hub.
+- **Path-selective deploy** (`dorny/paths-filter`):
+  - `sling-apps/**`, `launcher/**`, `content-packages/**`, `pom.xml` → deploy
+    the Sling app (`update-slingslop.yml`).
+  - `docker/webcache/**` → deploy webcache (`update-webcache.yml`).
+  - Both changed → **sling first**, gated on readiness, **then** webcache.
+- **Readiness gate.** `update-slingslop.yml` waits for
+  `/system/health.json?tags=systemalive` → `200` (the "OSGi Framework Ready" +
+  "Services Ready" checks). The overall endpoint is `503` because of the
+  non-fatal JCR-maintenance critical ("DataStoreCleanupScheduler not
+  registered"), so we deliberately filter to the `systemalive` tag.
+- **Webcache keeps serving.** Only the `webcache` service is recreated
+  (`--no-deps`); Traefik and the `webcache-cache` volume are untouched.
+
+### `infra.yml` — manual (`workflow_dispatch`)
+
+Runs the one-off infrastructure convergence, **not** on push:
+
+- `site` — full `site.yml` as `deploy` (re-run after role/config changes).
+- `bootstrap` — `bootstrap.yml` as root on a **fresh** box (needs `ROOT_SSH_KEY`;
+  normally done once from a laptop).
+
+Day-to-day app/webcache updates are automatic via `ci-cd.yml`; you only reach
+for `infra.yml` when the box itself (Traefik, monitoring, users, …) changes.
+
+### Required GitHub config
+
+| Kind | Name | Purpose |
+|---|---|---|
+| secret | `DEPLOY_SSH_KEY` | private key allow-listed for the `deploy` user |
+| secret | `ANSIBLE_VAULT_PASSWORD` | decrypts `group_vars/all/vault.yml` |
+| secret | `ROOT_SSH_KEY` | *(bootstrap only)* root key for a fresh box |
+| variable | `DEPLOY_HOST` | SSH target (default `motorbrot.org`) |
+| variable | `DEPLOY_DOMAIN` | published domain (default `motorbrot.org`) |
+
+The deploy jobs generate the (gitignored) inventory at runtime via
+`.github/scripts/write-inventory.sh` from `DEPLOY_HOST` / `DEPLOY_DOMAIN`.
+
+> **Images must be public** on GHCR for the host's anonymous pull to work —
+> otherwise set `vault_ghcr_pull_token`. Flip each package to **Public** once
+> after the first push: `slingslop`, `slingslop-webcache`.
+> `deploy/motorbrot_prod` is a protected `production` environment — add required
+> reviewers in the repo settings if you want a manual approval gate.

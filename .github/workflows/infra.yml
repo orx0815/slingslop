@@ -1,0 +1,66 @@
+name: Infra (manual)
+
+# One-off / on-demand infrastructure convergence — NOT run on push.
+#
+#   * "site"      → full site.yml as the `deploy` user (converge everything:
+#                   traefik, monitoring, logging, backup, and the app). Safe to
+#                   re-run; idempotent. Use after changing roles/config.
+#   * "bootstrap" → bootstrap.yml as root on a FRESH box (creates the deploy
+#                   user, hardens SSH). Only works before SSH is locked down;
+#                   needs a ROOT key. Normally you run this once from a laptop.
+#
+# Day-to-day app/webcache deploys happen automatically via ci-cd.yml on push to
+# deploy/motorbrot_prod — you do NOT use this workflow for those.
+#
+# Secrets: DEPLOY_SSH_KEY (deploy user), ANSIBLE_VAULT_PASSWORD,
+#          ROOT_SSH_KEY (only needed for the bootstrap play).
+# Variables: DEPLOY_HOST (default motorbrot.org), DEPLOY_DOMAIN (default motorbrot.org).
+
+on:
+  workflow_dispatch:
+    inputs:
+      play:
+        description: "Which infra play to run"
+        type: choice
+        default: site
+        options:
+          - site
+          - bootstrap
+
+permissions:
+  contents: read
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ inputs.play == 'bootstrap' && secrets.ROOT_SSH_KEY || secrets.DEPLOY_SSH_KEY }}
+
+      - name: Run infra play
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST || 'motorbrot.org' }}
+          DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'motorbrot.org' }}
+          PLAY: ${{ inputs.play }}
+        run: |
+          set -euo pipefail
+          [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
+          python3 -m pip install --quiet "ansible-core>=2.17"
+          cd ops/ansible
+          ansible-galaxy collection install -r requirements.yml >/dev/null
+          printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
+          bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
+          if [ "$PLAY" = "bootstrap" ]; then
+            ansible-playbook -i inventory/hosts.yml playbooks/bootstrap.yml \
+              --vault-password-file /tmp/vp -e ansible_user=root
+          else
+            ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
+              --vault-password-file /tmp/vp
+          fi
+          rm -f /tmp/vp

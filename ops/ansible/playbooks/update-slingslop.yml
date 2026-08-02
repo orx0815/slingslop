@@ -3,12 +3,25 @@
 # Webcache, Traefik and the observability stack are not touched.
 #
 #   ansible-playbook -i inventory/hosts.yml playbooks/update-slingslop.yml --ask-vault-pass
+#
+# CI passes the exact image built from the pushed commit, e.g.:
+#   -e slingslop_image=ghcr.io/orx0815/slingslop:sha-<sha>-composite
+# The app compose file is re-rendered so the container actually switches to it
+# (the image ref is baked into compose.app.yml, not read from an env var).
 
 - hosts: slingslop
   gather_facts: true
   become: true
 
   tasks:
+    - name: Re-render app compose with the target slingslop_image
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../roles/slingslop/templates/compose.app.yml.j2"
+        dest: "{{ slingslop_root }}/compose.app.yml"
+        owner: root
+        group: root
+        mode: "0640"
+
     - name: Pull slingslop image
       ansible.builtin.command:
         cmd: "{{ slingslop_root }}/dc pull slingslop"
@@ -21,12 +34,29 @@
       register: up_result
       changed_when: "'Started' in up_result.stderr or 'Recreated' in up_result.stderr or 'Created' in up_result.stderr"
 
-    - name: Wait for Sling to be healthy
+    - name: Wait for Sling HTTP to answer
       ansible.builtin.uri:
-        url: "http://127.0.0.1:18080/starter.html"
-        status_code: [200, 401]
+        url: "{{ sling_internal_url | default('http://127.0.0.1:18080') }}/starter.html"
+        status_code: [200, 401, 302]
         timeout: 5
-      register: health
-      until: health.status in [200, 401]
+      register: http_up
+      until: http_up.status in [200, 401, 302]
+      retries: 60
+      delay: 5
+
+    - name: Gate on readiness (systemalive), ignoring non-ready criticals
+      # /system/health.json is 503 overall because of the JCR-maintenance
+      # critical ("DataStoreCleanupScheduler not registered"). Filtering to the
+      # 'systemalive' tag isolates "OSGi Framework Ready Check" + "Services Ready
+      # Check" (both OK) → HTTP 200 once Sling is genuinely serving.
+      ansible.builtin.uri:
+        url: "{{ sling_internal_url | default('http://127.0.0.1:18080') }}/system/health.json?tags=systemalive"
+        user: admin
+        password: "{{ vault_sling_admin_password }}"
+        force_basic_auth: true
+        status_code: 200
+        timeout: 10
+      register: ready
+      until: ready.status == 200
       retries: 60
       delay: 5
