@@ -44,6 +44,16 @@
       retries: 60
       delay: 5
 
+    - name: Rotate Sling admin password to the vault value (idempotent)
+      # A reseeded composite content volume comes up with the default admin/admin.
+      # The rotate-password task list tries the target first (NOOP if already set),
+      # then the last-known password, then "admin" — so every deploy re-asserts the
+      # vault password. This MUST run before the readiness gate below, which
+      # authenticates with vault_sling_admin_password.
+      ansible.builtin.include_role:
+        name: slingslop
+        tasks_from: rotate-password
+
     - name: Gate on readiness (systemalive), ignoring non-ready criticals
       # /system/health.json is 503 overall because of the JCR-maintenance
       # critical ("DataStoreCleanupScheduler not registered"). Filtering to the
