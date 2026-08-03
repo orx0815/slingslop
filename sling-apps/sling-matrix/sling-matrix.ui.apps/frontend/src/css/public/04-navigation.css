@@ -191,19 +191,16 @@
     margin: -25px 0 0 -25px;
   }
 
-  .nav-level-1.nav-open .nav-item:nth-child(1) { transform: translate(0, -100px); }
-  .nav-level-1.nav-open .nav-item:nth-child(2) { transform: translate(87px, -50px); }
-  .nav-level-1.nav-open .nav-item:nth-child(3) { transform: translate(87px, 50px); }
-  .nav-level-1.nav-open .nav-item:nth-child(4) { transform: translate(0, 100px); }
-  .nav-level-1.nav-open .nav-item:nth-child(5) { transform: translate(-87px, 50px); }
-  .nav-level-1.nav-open .nav-item:nth-child(6) { transform: translate(-87px, -50px); }
+  /* Grip sits in the top-left corner, so fan the bubbles *downward* in a gentle
+     right-leaning column. This keeps every bubble on-screen regardless of count
+     (a circle around a corner grip pushes items off the top/left). */
+  .nav-level-1.nav-open .nav-item:nth-child(1) { transform: translate(6px, 66px); }
+  .nav-level-1.nav-open .nav-item:nth-child(2) { transform: translate(22px, 124px); }
+  .nav-level-1.nav-open .nav-item:nth-child(3) { transform: translate(32px, 184px); }
+  .nav-level-1.nav-open .nav-item:nth-child(4) { transform: translate(34px, 246px); }
+  .nav-level-1.nav-open .nav-item:nth-child(5) { transform: translate(28px, 308px); }
+  .nav-level-1.nav-open .nav-item:nth-child(6) { transform: translate(14px, 368px); }
 
-  .nav-level-2 {
-    left: auto;
-    right: 0;
-    top: 100%;
-    transform: none;
-    margin-left: 0;
-    margin-top: var(--space-sm);
-  }
+  /* Second-level list keeps the default right-of-bubble placement; the
+     public-bundle JS clamps it into the viewport on both axes. */
 }

@@ -121,6 +121,8 @@
   z-index: 3;
   pointer-events: auto;
   cursor: grab;
+  /* Let JS own drag/pinch gestures instead of the browser scrolling/zooming. */
+  touch-action: none;
 }
 
 .hero-3d-container:active {

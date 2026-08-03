@@ -10,6 +10,11 @@
  * Uses raw WebGL2 instead of Three.js to keep the bundle tiny (~3 KB vs 500 KB).
  */
 
+/** iOS 13+ gates DeviceOrientation/DeviceMotion behind a permission request. */
+interface MotionPermission {
+  requestPermission?: () => Promise<'granted' | 'denied' | 'default'>;
+}
+
 export function initHero3D(): void {
   const maybeContainer = document.querySelector<HTMLElement>('.hero-3d-container');
   if (!maybeContainer) {
@@ -354,6 +359,16 @@ export function initHero3D(): void {
   const targetRot = { x: 0, y: 0 };
   const currentRot = { x: 0, y: 0 };
 
+  // ── Device-tilt sway + shake wiggle (mobile) ──────────────────────────────
+  const orientTilt = { x: 0, y: 0 };
+  let wiggleStart = -1;
+  let wiggleAmp = 0;
+
+  function triggerWiggle(strength: number): void {
+    wiggleStart = performance.now();
+    wiggleAmp = Math.min(0.6, strength);
+  }
+
   // ── Scroll-to-zoom ────────────────────────────────────────────────────────
   let zoom = 5.0;
   let targetZoom = 5.0;
@@ -392,6 +407,150 @@ export function initHero3D(): void {
     { passive: false }
   );
 
+  // ── Desktop fallback: double-click to wiggle (no motion sensor needed) ──────
+  canvas.addEventListener('dblclick', (e: MouseEvent) => {
+    e.preventDefault();
+    triggerWiggle(0.5);
+  });
+
+  // ── Touch: single-finger drag to rotate, two-finger pinch to zoom ──────────
+  let pinchDist = 0;
+
+  function touchDistance(touches: TouchList): number {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function beginDragFromTouch(touch: Touch): void {
+    const rect = canvas.getBoundingClientRect();
+    isDragging = true;
+    prevPos.x = touch.clientX - rect.left;
+    prevPos.y = touch.clientY - rect.top;
+  }
+
+  canvas.addEventListener(
+    'touchstart',
+    (e: TouchEvent) => {
+      // First touch is a user gesture — request motion-sensor permission (iOS).
+      void enableMotion();
+      if (e.touches.length === 1) {
+        beginDragFromTouch(e.touches[0]);
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        pinchDist = touchDistance(e.touches);
+      }
+    },
+    { passive: true }
+  );
+
+  canvas.addEventListener(
+    'touchmove',
+    (e: TouchEvent) => {
+      if (e.touches.length === 1 && isDragging) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        targetRot.x += (x - prevPos.x) * 0.01;
+        targetRot.y -= (y - prevPos.y) * 0.01;
+        prevPos.x = x;
+        prevPos.y = y;
+        e.preventDefault();
+      } else if (e.touches.length === 2) {
+        const d = touchDistance(e.touches);
+        if (pinchDist > 0) {
+          targetZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, targetZoom + (pinchDist - d) * 0.02));
+        }
+        pinchDist = d;
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  canvas.addEventListener(
+    'touchend',
+    (e: TouchEvent) => {
+      if (e.touches.length === 0) {
+        isDragging = false;
+        pinchDist = 0;
+      } else if (e.touches.length === 1) {
+        // Lifted from a pinch back to a single finger — resume dragging.
+        pinchDist = 0;
+        beginDragFromTouch(e.touches[0]);
+      }
+    },
+    { passive: true }
+  );
+
+  // ── Device motion: tilt-to-sway + shake-to-wiggle (mobile only) ────────────
+  // Sensor events only fire in a secure context (HTTPS or localhost on-device),
+  // and iOS 13+ requires an explicit permission grant from a user gesture.
+  let motionEnabled = false;
+  let orientBaseline: { beta: number; gamma: number } | null = null;
+  let lastShake = 0;
+
+  function handleOrientation(e: DeviceOrientationEvent): void {
+    if (e.beta === null || e.gamma === null) {
+      return;
+    }
+    // Anchor to the pose the phone was in when sensing started.
+    if (orientBaseline === null) {
+      orientBaseline = { beta: e.beta, gamma: e.gamma };
+    }
+    const dGamma = e.gamma - orientBaseline.gamma; // left-right tilt
+    const dBeta = e.beta - orientBaseline.beta; //   front-back tilt
+    // Gentle sway, clamped so a big tilt can't fling the fractal off-screen.
+    orientTilt.x = Math.max(-0.6, Math.min(0.6, dGamma * 0.012));
+    orientTilt.y = Math.max(-0.6, Math.min(0.6, dBeta * 0.012));
+  }
+
+  function handleMotion(e: DeviceMotionEvent): void {
+    // Prefer gravity-free acceleration; fall back to the with-gravity variant.
+    const pure = e.acceleration;
+    const acc = pure && pure.x !== null ? pure : e.accelerationIncludingGravity;
+    if (!acc) {
+      return;
+    }
+    const mag = Math.hypot(acc.x ?? 0, acc.y ?? 0, acc.z ?? 0);
+    // ~9.8 baseline when gravity is included, ~0 otherwise.
+    const threshold = pure && pure.x !== null ? 16 : 26;
+    const now = performance.now();
+    if (mag > threshold && now - lastShake > 600) {
+      lastShake = now;
+      triggerWiggle(0.45);
+    }
+  }
+
+  async function enableMotion(): Promise<void> {
+    if (motionEnabled) {
+      return;
+    }
+    motionEnabled = true;
+    const orientationCtor = window.DeviceOrientationEvent as unknown as
+      | MotionPermission
+      | undefined;
+    const motionCtor = window.DeviceMotionEvent as unknown as MotionPermission | undefined;
+    try {
+      if (orientationCtor && typeof orientationCtor.requestPermission === 'function') {
+        const granted = await orientationCtor.requestPermission();
+        if (granted !== 'granted') {
+          motionEnabled = false;
+          return;
+        }
+      }
+      if (motionCtor && typeof motionCtor.requestPermission === 'function') {
+        await motionCtor.requestPermission().catch(() => 'denied');
+      }
+    } catch {
+      // Permission API rejected (e.g. not a user gesture) — leave motion off.
+      motionEnabled = false;
+      return;
+    }
+    window.addEventListener('deviceorientation', handleOrientation);
+    window.addEventListener('devicemotion', handleMotion);
+  }
+
   // ── Resize ────────────────────────────────────────────────────────────────
   function onResize(): void {
     const w = container.clientWidth;
@@ -416,10 +575,29 @@ export function initHero3D(): void {
     currentRot.y += (targetRot.y - currentRot.y) * 0.08;
     zoom += (targetZoom - zoom) * 0.08;
 
+    // Shake-triggered wiggle: a decaying oscillation on top of the base rotation.
+    let wiggleX = 0;
+    let wiggleY = 0;
+    if (wiggleStart >= 0) {
+      const wt = (performance.now() - wiggleStart) / 1000;
+      const envelope = Math.exp(-6 * wt);
+      if (envelope < 0.01) {
+        wiggleStart = -1;
+      } else {
+        const w = wiggleAmp * envelope * Math.sin(wt * 42);
+        wiggleX = w;
+        wiggleY = w * 0.5;
+      }
+    }
+
     // Set dynamic uniforms
     gl!.uniform1f(loc.u_time, time);
     gl!.uniform2f(loc.u_resolution, canvas.width, canvas.height);
-    gl!.uniform2f(loc.u_mouse_rot, currentRot.x, currentRot.y);
+    gl!.uniform2f(
+      loc.u_mouse_rot,
+      currentRot.x + orientTilt.x + wiggleX,
+      currentRot.y + orientTilt.y + wiggleY
+    );
     gl!.uniform1f(loc.u_zoom, zoom);
 
     // Draw

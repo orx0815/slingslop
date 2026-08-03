@@ -55,21 +55,108 @@ hljs.registerLanguage('ts', typescript);
   // ── Circular Navigation ────────────────────────────────────────────────────
   /**
    * Handles the circular navigation menu interaction.
-   * Top-left toggle opens first-level items in a circular layout.
-   * Hovering over first-level items opens second-level items.
+   *
+   * Fine-pointer (mouse) devices use hover: the grip opens the ring and each
+   * first-level bubble reveals its second-level list on hover.
+   *
+   * Coarse-pointer (touch) devices have no hover, so everything is tap-driven:
+   * tap the grip to open/close the ring, tap a bubble to reveal its submenu
+   * (a second tap on the same bubble follows the link), and tap outside to close.
    */
   function initCircularNav(): void {
     const navToggle = document.querySelector('.nav-toggle');
     const navLevel1 = document.querySelector('.nav-level-1');
     const navItems = document.querySelectorAll('.nav-item');
+    const nav = document.querySelector('.matrix-nav');
 
     if (!navToggle || !navLevel1) {
       return;
     }
 
+    // Clamp a second-level menu into the viewport on both axes.
+    const positionLevel2 = (el: HTMLElement): void => {
+      // Reset first so getBoundingClientRect() measures the true final position
+      // (the base CSS transform is translateY(-50%), no transition to fight).
+      el.style.transform = '';
+      const rect = el.getBoundingClientRect();
+      const margin = 8;
+      let dx = 0;
+      let dy = 0;
+      if (rect.top < margin) {
+        dy = margin - rect.top;
+      } else if (rect.bottom > window.innerHeight - margin) {
+        dy = -(rect.bottom - (window.innerHeight - margin));
+      }
+      if (rect.right > window.innerWidth - margin) {
+        dx = -(rect.right - (window.innerWidth - margin));
+      } else if (rect.left < margin) {
+        dx = margin - rect.left;
+      }
+      if (dx !== 0 || dy !== 0) {
+        el.style.transform = `translate(${dx}px, calc(-50% + ${dy}px))`;
+      }
+    };
+
+    const closeAllLevel2 = (): void => {
+      navItems.forEach((item) => {
+        const level2 = item.querySelector('.nav-level-2');
+        if (level2) {
+          level2.classList.remove('nav-level-2-open');
+        }
+      });
+    };
+
+    const closeAll = (): void => {
+      navLevel1.classList.remove('nav-open');
+      closeAllLevel2();
+    };
+
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // ── Touch / coarse-pointer: tap-driven ─────────────────────────────────
+    if (!canHover) {
+      navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (navLevel1.classList.contains('nav-open')) {
+          closeAll();
+        } else {
+          navLevel1.classList.add('nav-open');
+        }
+      });
+
+      navItems.forEach((item) => {
+        const level2 = item.querySelector('.nav-level-2') as HTMLElement | null;
+        const link = item.querySelector('.nav-item-link') as HTMLElement | null;
+        if (!level2 || !link) {
+          return; // Childless bubble — its link navigates on the first tap.
+        }
+        link.addEventListener('click', (e) => {
+          if (!level2.classList.contains('nav-level-2-open')) {
+            // First tap reveals the submenu instead of navigating.
+            e.preventDefault();
+            e.stopPropagation();
+            closeAllLevel2();
+            level2.classList.add('nav-level-2-open');
+            positionLevel2(level2);
+          }
+          // Second tap on the same bubble falls through and follows the link.
+        });
+      });
+
+      // Tap anywhere outside the nav closes it.
+      document.addEventListener('click', (e) => {
+        const target = e.target as Node | null;
+        if (nav && target && !nav.contains(target)) {
+          closeAll();
+        }
+      });
+
+      return;
+    }
+
+    // ── Fine-pointer (mouse): hover-driven ─────────────────────────────────
     let closeTimeout: number | undefined;
 
-    // Toggle first-level navigation on mouse-over
     navToggle.addEventListener('mouseenter', () => {
       if (closeTimeout) {
         clearTimeout(closeTimeout);
@@ -77,63 +164,29 @@ hljs.registerLanguage('ts', typescript);
       navLevel1.classList.add('nav-open');
     });
 
-    // Delayed close to allow moving to second-level menus
+    // Delayed close so the pointer can travel to a submenu.
     const scheduleClose = (): void => {
-      closeTimeout = window.setTimeout(() => {
-        navLevel1.classList.remove('nav-open');
-        // Close all second-level menus
-        navItems.forEach((item) => {
-          const level2 = item.querySelector('.nav-level-2');
-          if (level2) {
-            level2.classList.remove('nav-level-2-open');
-          }
-        });
-      }, 300); // 300ms delay to move mouse to submenu
+      closeTimeout = window.setTimeout(closeAll, 300);
     };
 
-    // Close navigation when mouse leaves toggle
     navToggle.addEventListener('mouseleave', scheduleClose);
 
-    // Keep open when hovering over nav items or their submenus
     navItems.forEach((item) => {
-      const level2 = item.querySelector('.nav-level-2');
+      const level2 = item.querySelector('.nav-level-2') as HTMLElement | null;
 
       item.addEventListener('mouseenter', () => {
         if (closeTimeout) {
           clearTimeout(closeTimeout);
         }
-
-        // Close other second-level menus
-        navItems.forEach((otherItem) => {
-          if (otherItem !== item) {
-            const otherLevel2 = otherItem.querySelector('.nav-level-2');
-            if (otherLevel2) {
-              otherLevel2.classList.remove('nav-level-2-open');
-            }
-          }
-        });
-
-        // Open this item's submenu if it has one
+        closeAllLevel2();
         if (level2) {
-          const el = level2 as HTMLElement;
-          // Reset any previous correction instantly (no transform transition) so
-          // getBoundingClientRect() measures the true final position.
-          el.style.transform = '';
-          el.classList.add('nav-level-2-open');
-          // Clamp dropdown within viewport synchronously — transform has no
-          // CSS transition so the measurement is always accurate.
-          const rect = el.getBoundingClientRect();
-          const margin = 8;
-          if (rect.top < margin) {
-            el.style.transform = `translateY(calc(-50% + ${margin - rect.top}px))`;
-          } else if (rect.bottom > window.innerHeight - margin) {
-            el.style.transform = `translateY(calc(-50% - ${rect.bottom - (window.innerHeight - margin)}px))`;
-          }
+          level2.classList.add('nav-level-2-open');
+          positionLevel2(level2);
         }
       });
 
       item.addEventListener('mouseleave', (e) => {
-        // Don't close if moving to the submenu
+        // Don't close if the pointer is moving into the submenu.
         const relatedTarget = e.relatedTarget as HTMLElement;
         if (level2 && level2.contains(relatedTarget)) {
           return;
@@ -141,14 +194,12 @@ hljs.registerLanguage('ts', typescript);
         scheduleClose();
       });
 
-      // Keep open when hovering over second-level menu
       if (level2) {
         level2.addEventListener('mouseenter', () => {
           if (closeTimeout) {
             clearTimeout(closeTimeout);
           }
         });
-
         level2.addEventListener('mouseleave', scheduleClose);
       }
     });
