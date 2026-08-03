@@ -117,7 +117,13 @@ jobs:
 
       - name: Build + push base + composite (GHCR)
         run: |
-          mvn -U -pl launcher -am clean install -DskipITs -Pcomposite-image \
+          # Full-reactor build (NOT -pl launcher -am): the launcher pulls
+          # slingslop.complete → sling-matrix.ui.apps via plugin GAV, not as a
+          # Maven <dependency>, so -am would rebuild only the launcher and bake
+          # the image from STALE content packages resolved out of the restored
+          # ~/.m2 cache (old frontend bundles). Building the whole reactor
+          # recompiles every content package from source first.
+          mvn -U clean install -DskipITs -Pcomposite-image \
             -Ddocker.skip=false -Ddocker.skip.push=false \
             -Ddocker.image.tag=${{ needs.meta.outputs.branch_tag }} \
             -Ddocker.image.extra.tag=${{ needs.meta.outputs.sha_tag }}

@@ -35,7 +35,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push base + composite image with Maven plugin
-        run: mvn -U -pl launcher -am clean install -DskipITs -Pcomposite-image -Ddocker.skip=false -Ddocker.skip.push=false -Ddocker.image.tag=${{ github.event.inputs.image_tag }} -Ddocker.image.extra.tag=sha-${{ github.sha }}
+        # Full-reactor build (NOT -pl launcher -am): the launcher resolves the
+        # content packages via plugin GAV, not as Maven <dependency>, so -am
+        # would bake stale content packages from the restored ~/.m2 cache.
+        run: mvn -U clean install -DskipITs -Pcomposite-image -Ddocker.skip=false -Ddocker.skip.push=false -Ddocker.image.tag=${{ github.event.inputs.image_tag }} -Ddocker.image.extra.tag=sha-${{ github.sha }}
 
       # seed_and_bake.sh (composite-image profile) builds the composite image
       # locally but does not push it, so push it explicitly here.
