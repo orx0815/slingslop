@@ -368,12 +368,103 @@ ansible-galaxy collection install -r ops/ansible/requirements.yml
 cp ops/ansible/inventory/hosts.example.yml ops/ansible/inventory/hosts.yml
 $EDITOR ops/ansible/inventory/hosts.yml      # ansible_host, ansible_user etc.
 
-# 2. Copy + fill + encrypt the secrets
+# 2. Copy the secrets template, then fill it in
 cp ops/ansible/inventory/group_vars/all/vault.example.yml \
    ops/ansible/inventory/group_vars/all/vault.yml
 $EDITOR ops/ansible/inventory/group_vars/all/vault.yml
-ansible-vault encrypt ops/ansible/inventory/group_vars/all/vault.yml
+```
 
+> ### 2a. Generate the basicAuth (htpasswd) values
+>
+> Three of the vault vars are **htpasswd entries** (`user:hash`), not plain
+> passwords — they are the basicAuth gate in front of the Traefik-fronted
+> endpoints:
+>
+> | Vault var | Protects |
+> |---|---|
+> | `vault_traefik_dashboard_htpasswd` | `traefik.<domain>` dashboard |
+> | `vault_editor_basicauth_users_htpasswd` | `editor.<domain>` (author UI) |
+> | `vault_grafana_basicauth_users_htpasswd` | `grafana.<domain>` / `logs.<domain>` |
+>
+> Generate each entry with `htpasswd` (bcrypt, `-B`) and paste the whole
+> `user:hash` line into the matching var — do this **before** you encrypt:
+>
+> ```bash
+> # local (needs: apt install apache2-utils)
+> htpasswd -nbB admin '<password>'
+> # or, no local install:
+> docker run --rm httpd:2.4 htpasswd -nbB admin '<password>'
+> ```
+>
+> The username you pass (`admin`, `editor`, `ops`, …) becomes the basicAuth
+> login. The `*_users_*` vars accept multiple lines (one `user:hash` per line,
+> under the `|` block scalar). `vault_sling_admin_password` and
+> `vault_grafana_admin_password` are **plain** passwords — do *not* run those
+> through `htpasswd`.
+
+> ### 2b. The SSH keys — get this right or you lock yourself (or CI) out
+>
+> `vault_ssh_admin_pubkey` is a **public** key (or several) that the `users`
+> role writes into the `deploy` user's `~/.ssh/authorized_keys` with
+> **`exclusive: true`** — meaning it **replaces every other key**. Only keys
+> listed here can log in as `deploy`. It is *not* derived from any GitHub
+> secret; you paste it in by hand.
+>
+> There are two different keys, and they are two halves of two different things:
+>
+> | Key | Kind | Lives in | Used by |
+> |---|---|---|---|
+> | `vault_ssh_admin_pubkey` | **public** | this vault file → box `authorized_keys` | anyone with the matching private key |
+> | `DEPLOY_SSH_KEY` | **private** | GitHub Actions secret | CI, to SSH in as `deploy` |
+> | your laptop key | private (yours) | `~/.ssh/` on your laptop | you, for manual SSH |
+>
+> Because the install is **exclusive**, `vault_ssh_admin_pubkey` must contain
+> **every** public key that should have access — at minimum the CI deploy key
+> *and* your laptop key. List only one and the other is locked out.
+>
+> Recommended: generate a **dedicated deploy keypair** (never hand your personal
+> private key to GitHub):
+>
+> ```bash
+> ssh-keygen -t ed25519 -C deploy@slingslop -f deploy_ed25519 -N ""
+> cat deploy_ed25519.pub          # → add to vault_ssh_admin_pubkey
+> cat deploy_ed25519              # → paste into the GitHub secret DEPLOY_SSH_KEY (private!)
+> ```
+>
+> Then `vault_ssh_admin_pubkey` holds both keys (newline-separated — the
+> `authorized_key` module installs them all):
+>
+> ```yaml
+> vault_ssh_admin_pubkey: |
+>   ssh-ed25519 AAAA...your-laptop-pubkey... you@laptop
+>   ssh-ed25519 AAAA...deploy-ci-pubkey...   deploy@ci
+> ```
+>
+> **Warning:** the next `site.yml` (or `infra.yml → site`) run overwrites
+> `deploy`'s `authorized_keys` with exactly this value. Make sure both keys are
+> present **before** you run it, or you drop your own access.
+
+```bash
+# ...once vault.yml is fully filled in (htpasswd + SSH keys), encrypt it in place
+ansible-vault encrypt ops/ansible/inventory/group_vars/all/vault.yml
+```
+
+> ### 2c. Commit the *encrypted* vault (this is what makes GitOps work)
+>
+> `ansible-vault`-encrypted files are safe to commit — that is the whole point.
+> The encrypted `vault.yml` **is** committed to the repo; CI decrypts it with the
+> `ANSIBLE_VAULT_PASSWORD` secret. (The `.gitignore` no longer ignores it.)
+>
+> ```bash
+> head -1 ops/ansible/inventory/group_vars/all/vault.yml   # MUST print: $ANSIBLE_VAULT;1.1;AES256
+> git add -f ops/ansible/inventory/group_vars/all/vault.yml
+> ```
+>
+> **Never** commit an unencrypted vault — always verify that first line before
+> `git add`. The `ANSIBLE_VAULT_PASSWORD` GitHub secret is only the *passphrase*;
+> without the committed encrypted file, CI has no secrets to decrypt.
+
+```bash
 # 3. Bootstrap (as root, once)
 # NOTE: inventory pins `ansible_user: deploy`, which outranks `-u root`, so pass
 # `-e ansible_user=root` (extra-vars win) to connect as root for this first run.
@@ -402,6 +493,21 @@ secrets. All of it lives in [`ops/ansible/local/`](ansible/local/).
 
 Requires **Vagrant + VirtualBox** on the host (Ansible itself is installed into
 a local venv by the script — nothing global needed).
+
+> **VirtualBox ≥ 7.1 required for the default `bento/ubuntu-26.04` box.** That
+> box is EFI/NVRAM (OVF `ResourceType 32768`); VirtualBox 7.0 and older can't
+> import it and fail with:
+>
+> ```
+> VBoxManage: error: Unknown resource type 32768 in hardware item, line 49
+> ```
+>
+> Two fixes: upgrade VirtualBox to 7.1.x, **or** stay on 7.0 and use the
+> BIOS-based 24.04 box via the override:
+>
+> ```bash
+> SLINGSLOP_VM_BOX=bento/ubuntu-24.04 ./test-local.sh up
+> ```
 
 The `slingslop` and `webcache` images on GHCR are **private**, so the VM needs a
 pull token. Export a GitHub PAT (scope `read:packages`) before running — it is
@@ -445,7 +551,9 @@ How the local mode differs from prod (all via `-e @local/vars.local.yml`):
 
 The new `traefik_acme_enabled` flag is the only change to the shared roles — it
 defaults to `true`, so **production behaviour is unchanged**. VM tuning knobs:
-`SLINGSLOP_VM_IP`, `SLINGSLOP_VM_MEM`, `SLINGSLOP_VM_CPUS` (env vars).
+`SLINGSLOP_VM_IP`, `SLINGSLOP_VM_MEM`, `SLINGSLOP_VM_CPUS`, `SLINGSLOP_VM_BOX`
+(env vars — `SLINGSLOP_VM_BOX` picks the base box, e.g. `bento/ubuntu-24.04` on
+VirtualBox 7.0).
 
 ## GitOps (implemented — `.github/workflows/`)
 

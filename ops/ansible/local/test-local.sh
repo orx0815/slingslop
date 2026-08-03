@@ -49,7 +49,13 @@ ensure_prereqs() {
 }
 
 ensure_venv() {
-  if [[ ! -x "${VENV_DIR}/bin/ansible-playbook" ]]; then
+  # Rebuild if the venv is missing OR half-installed (e.g. an interrupted pip
+  # run can leave ansible-playbook present but passlib's files/METADATA missing,
+  # which later crashes gen_secrets with "No module named 'passlib.hash'").
+  if [[ ! -x "${VENV_DIR}/bin/ansible-playbook" ]] \
+     || ! "${VENV_DIR}/bin/python" -c "import passlib.hash" >/dev/null 2>&1; then
+    [[ -d "${VENV_DIR}" ]] && warn "venv missing/incomplete — rebuilding from scratch."
+    rm -rf "${VENV_DIR}"
     log "Creating Python venv + installing ansible-core, passlib …"
     python3 -m venv "${VENV_DIR}" \
       || die "Could not create venv. Install python3-venv (e.g. apt install python3-venv)."
