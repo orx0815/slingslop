@@ -30,6 +30,14 @@ permissions:
   contents: read
   packages: write
 
+# Serialize per branch so overlapping pushes can't deploy out of order.
+# Because each run deploys its own immutable sha-<commit> image, a stale run
+# finishing last would otherwise re-deploy older code over newer. Cancelling
+# superseded runs means the newest commit on a branch always wins.
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   GHCR_IMAGE: ghcr.io/orx0815/slingslop
   GHCR_WEBCACHE: ghcr.io/orx0815/slingslop-webcache
