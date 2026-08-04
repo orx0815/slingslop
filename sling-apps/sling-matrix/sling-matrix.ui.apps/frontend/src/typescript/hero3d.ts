@@ -375,6 +375,10 @@ export function initHero3D(): void {
   const ZOOM_MIN = 3.0;
   const ZOOM_MAX = 14.0;
 
+  // Clamp vertical drag to just under the pole. Past ±90° the camera crosses to
+  // the opposite hemisphere and world-Y horizontal drag visually inverts.
+  const PITCH_LIMIT = Math.PI / 2 - 0.05;
+
   canvas.addEventListener('mousedown', (e: MouseEvent) => {
     isDragging = true;
     prevPos.x = e.offsetX;
@@ -593,6 +597,9 @@ export function initHero3D(): void {
     requestAnimationFrame(animate);
 
     const time = (performance.now() - startTime) / 1000;
+
+    // Keep vertical drag below the pole so horizontal never reverses.
+    targetRot.y = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, targetRot.y));
 
     // Lerp rotation & zoom
     currentRot.x += (targetRot.x - currentRot.x) * 0.08;
