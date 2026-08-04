@@ -63,7 +63,7 @@ src/main/resources/apps/zengarden/clientlibs/
 │   ├── public/
 │   │   ├── public-bundle.js
 │   │   └── public-bundle.min.js
-│   └── htmx.js                     ← htmx dev copy (loaded separately in ?minLibs=no mode)
+│   └── htmx.js                     ← htmx dev copy (loaded separately in .noMinLibs mode)
 └── css/
     ├── editor/
     │   ├── editor.css
@@ -80,7 +80,7 @@ src/main/resources/apps/zengarden/clientlibs/
 | Script           | What it does                                                           |
 |------------------|------------------------------------------------------------------------|
 | `npm run build`  | Full build: dev + minified JS/CSS (`prebuild` copies htmx first)       |
-| `npm run watch`  | Watch mode: rebuild dev JS/CSS on every file save (`?minLibs=no` only) |
+| `npm run watch`  | Watch mode: rebuild dev JS/CSS on every file save (`.noMinLibs` only) |
 | `npm run check`  | Prettier format check + ESLint + TypeScript typecheck                  |
 | `npm run format` | Auto-fix formatting with Prettier                                      |
 | `copy:htmx`      | Copy `htmx.js` from node_modules to output folder                     |
@@ -186,7 +186,7 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 - **v4.x** (`htmx.org 4.0.0-beta5`) — built-in DOM morphing, namespaced events, `fetch`-based requests
 - Copied from `node_modules/htmx.org/dist/htmx.js` by `copy:htmx`
 - In prod (`editor-bundle.min.js`) htmx is prepended as an esbuild banner so it is available before the editor IIFE runs
-- In dev (`?minLibs=no`) htmx is loaded as a separate `<script>` tag
+- In dev (`.noMinLibs` selector) htmx is loaded as a separate `<script>` tag
 - Inline edit swaps use the built-in `hx-swap="outerMorph"` — the response is diffed against the live DOM and only changed nodes are patched (preserves scroll/focus/animation on unchanged parts)
 - **v4 API notes** used by this project (see [migration guide](https://four.htmx.org/docs#migration)):
   - Events are namespaced: `htmx:before:swap`, `htmx:after:swap`, `htmx:response:error`
@@ -201,8 +201,8 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 `pages/basepage/head.html` uses an inline dev switch:
 
 ```html
-<!-- ?minLibs=no → load plain JS + separate htmx.js -->
-<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+<!-- .noMinLibs selector → load plain JS + separate htmx.js -->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
   <script src=".../js/htmx.js"></script>
   <script src=".../js/editor/editor-bundle.js"></script>
   <link rel="stylesheet" href=".../css/editor/editor.css">
@@ -215,7 +215,7 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 </sly>
 ```
 
-Access dev mode at: `http://localhost:8080/content/...?minLibs=no`
+Access dev mode by adding the selector: `http://localhost:8080/content/.../home.noMinLibs.html`
 
 ---
 
@@ -282,7 +282,7 @@ esbuild watches `src/typescript/` and `src/css/`, rebuilds the dev bundles in mi
 and writes them straight into the fsmounted JCR path.
 
 **Browser:**
-Open your page with `?minLibs=no` — Sling will serve the freshly rebuilt unminified files.
+Open your page with the `.noMinLibs` selector (e.g. `home.noMinLibs.html`) — Sling will serve the freshly rebuilt unminified files.
 Use DevTools → Sources to inspect/debug individual `.ts` and `.css` partials via the inline source maps.
 
 > **Note:** `npm run watch` only rebuilds the dev (unminified) bundles.
@@ -311,5 +311,5 @@ After `content-upload.sh` the running Sling instance has the fully built and pro
 | `npm run check` fails — format | Prettier violation | `npm run format` then re-check |
 | `npm run check` fails — lint | ESLint error (e.g. missing braces) | `npx eslint --fix src/typescript` then `npm run format` |
 | `npm run check` fails — typecheck | TypeScript error | Fix types; `tsc --noEmit` for details |
-| JS/CSS changes not visible in browser | Cached minified bundle | Reload with `?minLibs=no` or hard refresh |
+| JS/CSS changes not visible in browser | Cached minified bundle | Reload with the `.noMinLibs` selector or hard refresh |
 | Maven build fails at `check` | Formatting drift after code edit | Run `npm run format` before committing |

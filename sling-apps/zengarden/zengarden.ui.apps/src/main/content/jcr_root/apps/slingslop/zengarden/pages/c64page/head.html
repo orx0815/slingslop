@@ -10,8 +10,9 @@
 <link rel="stylesheet" data-sly-use.cssPicker="${'org.motorbrot.slingslop.zengarden.slingmodels.CssZenGarden' @ design_id='405'}"
       href="${cssPicker.randomCssUrl}" />
 
-<!--/*  /zengarden/home.html?minLibs=no for unminified sources */-->
-<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+<!--/*  Add the .noMinLibs selector (e.g. /zengarden/home.noMinLibs.html) for unminified sources.
+        A selector (not a query param) keeps the reverse-proxy cache key clean. */-->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
 
   <!-- Public bundle (unminified) -->
   <script src="/apps/slingslop/zengarden/js/public/public-bundle.js"></script>

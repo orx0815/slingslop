@@ -1,4 +1,6 @@
 <!--/*
-  Page wrapper — delegates to jcr:content child
+  Page wrapper — delegates to jcr:content child.
+  Selectors are forwarded so request-level selectors (e.g. ".noMinLibs") reach the
+  page scripts; a plain resource include would otherwise drop them.
 */-->
-<sly data-sly-resource="${'jcr:content'}"/>
+<sly data-sly-resource="${'jcr:content' @ selectors=request.requestPathInfo.selectors}"/>

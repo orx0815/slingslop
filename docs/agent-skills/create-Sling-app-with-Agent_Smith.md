@@ -708,9 +708,9 @@ Smith must explain:
 Sling resolves rendering scripts by `sling:resourceType`. The page rendering chain works like this:
 
 1. **Content node** (e.g. `/content/{RT_PREFIX}/home`) has `sling:resourceType="{RT_PREFIX}/pages/page"`
-2. **`pages/page/html.html`** delegates to `jcr:content` child:
+2. **`pages/page/html.html`** delegates to `jcr:content` child (forwarding selectors so a request selector like `.noMinLibs` survives the include):
    ```html
-   <sly data-sly-resource="${'jcr:content'}"/>
+   <sly data-sly-resource="${'jcr:content' @ selectors=request.requestPathInfo.selectors}"/>
    ```
 3. **`jcr:content`** has its own `sling:resourceType` (e.g. `{RT_PREFIX}/pages/homepage`)
 4. **`pages/homepage/html.html`** (if it exists) or falls through to **`pages/basepage/html.html`** via `sling:resourceSuperType`
@@ -768,8 +768,9 @@ Create from scratch based on ALF's input. Example structure:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${properties.jcr:title @ context='text'}</title>
 
-<!--/* ?minLibs=no for unminified sources during development */-->
-<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+<!--/* Add the .noMinLibs selector (e.g. /content/{RT_PREFIX}/home.noMinLibs.html) for unminified sources.
+       A selector (not a query param) keeps the reverse-proxy cache key clean. */-->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
   <script src="/apps/{RT_PREFIX}/js/public/public-bundle.js"></script>
   <link rel="stylesheet" href="/apps/{RT_PREFIX}/css/public/public.css" />
   <!--/* Editor assets: only for authenticated users */-->
@@ -1206,7 +1207,7 @@ cd sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps
 mvn sling:fsmount
 
 # Now edit frontend/src/ files → auto-rebuild → auto-sync to Sling
-# Open pages with ?minLibs=no to load unminified sources
+# Open pages with the .noMinLibs selector (e.g. home.noMinLibs.html) to load unminified sources
 
 ### Content changes
 # Download content from running Sling to your project

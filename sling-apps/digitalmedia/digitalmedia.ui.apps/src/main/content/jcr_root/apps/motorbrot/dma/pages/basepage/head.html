@@ -2,8 +2,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${properties.jcr:title @ context='text'} - Digital Media Library</title>
 
-<!--/* ?minLibs=no for unminified sources during development */-->
-<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+<!--/* Add the .noMinLibs selector (e.g. /content/motorbrot/dma/home.noMinLibs.html) for unminified sources.
+       A selector (not a query param) keeps the reverse-proxy cache key clean. */-->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
   <script src="/apps/motorbrot/dma/js/htmx.js"></script>
   <script src="/apps/motorbrot/dma/js/public/public-bundle.js"></script>
   <link rel="stylesheet" href="/apps/motorbrot/dma/css/public/public.css" />

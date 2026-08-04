@@ -3,5 +3,8 @@
        delegates rendering to the jcr:content child node.  That child carries the real
        sling:resourceType (homepage / basepage / c64page …) so all subsequent scripts
        run in the context of jcr:content — identical to how AEM handles cq:Page nodes.
-       In AEM this file can simply be deleted; cq:Page does the delegation automatically. */-->
-<sly data-sly-resource="${'jcr:content'}"/>
+       In AEM this file can simply be deleted; cq:Page does the delegation automatically.
+
+       Selectors are forwarded so request-level selectors (e.g. ".noMinLibs") reach the
+       page scripts; a plain resource include would otherwise drop them. */-->
+<sly data-sly-resource="${'jcr:content' @ selectors=request.requestPathInfo.selectors}"/>

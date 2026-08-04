@@ -3,7 +3,7 @@
  * Build script for Digital Media Library UI assets.
  *
  * Produces a single public bundle with:
- *   • a plain (unminified) version for ?minLibs=no development use
+ *   • a plain (unminified) version for .noMinLibs selector development use
  *   • a minified production version
  *
  * Both JS and CSS are handled by esbuild.
@@ -134,14 +134,14 @@ async function build() {
 }
 
 // ── Watch mode ─────────────────────────────────────────────────────────────
-// Builds only the dev (unminified) targets — use with ?minLibs=no.
+// Builds only the dev (unminified) targets — use with the .noMinLibs selector.
 // Pairs naturally with `mvn sling:fsmount` which syncs JCR content to disk;
 // esbuild writes rebuilt files into the fsmounted tree so Sling picks them up
 // on the next browser request with no Maven build needed.
 
 async function watch() {
   console.log('Watching Digital Media Library UI assets (dev builds only)…');
-  console.log('Open pages with ?minLibs=no to load the unminified files.\n');
+  console.log('Open pages with the .noMinLibs selector to load the unminified files.\n');
 
   const contexts = await Promise.all(
     BUNDLES.flatMap(({ name, jsEntry, cssEntry, jsOutDir, cssOutDir }) => {

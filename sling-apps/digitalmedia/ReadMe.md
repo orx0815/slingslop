@@ -97,7 +97,7 @@ cd ..
 mvn sling:fsmount
 
 # Now edit frontend/src/ files → auto-rebuild → auto-sync to Sling
-# Open pages with ?minLibs=no to load unminified files
+# Open pages with the .noMinLibs selector (e.g. home.noMinLibs.html) to load unminified files
 ```
 
 ### Content changes

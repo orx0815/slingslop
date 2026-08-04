@@ -108,7 +108,7 @@ mvn sling:fsmount
 ```
 
 Now edit `frontend/src/` files → auto-rebuild → auto-sync to Sling.
-Open pages with `?minLibs=no` to load unminified sources.
+Open pages with the `.noMinLibs` selector (e.g. `home.noMinLibs.html`) to load unminified sources.
 
 ### Content changes
 
@@ -211,7 +211,7 @@ TypeScript and CSS sources in `frontend/src/` are bundled by esbuild into two in
 - **`editor-bundle.js` + `editor.css`** — Loaded only for authenticated users (Tiptap + HTMX modal)
 - **`public-bundle.js` + `public.css`** — Loaded for all visitors (navigation, code highlighting, Matrix rain)
 
-Both bundles have minified production versions and unminified dev versions (use `?minLibs=no` for dev).
+Both bundles have minified production versions and unminified dev versions (add the `.noMinLibs` selector, e.g. `home.noMinLibs.html`, for dev).
 
 ### VLT Content Packages
 

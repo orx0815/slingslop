@@ -2,8 +2,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${properties.jcr:title}</title>
 
-<!--/*  /sling-matrix/home.html?minLibs=no for unminified sources */-->
-<sly data-sly-test.noMinLibs="${request.parameterMap['minLibs'][0] == 'no'}">
+<!--/*  Add the .noMinLibs selector (e.g. /sling-matrix/home.noMinLibs.html) for unminified sources.
+        A selector (not a query param) keeps the reverse-proxy cache key clean. */-->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
 
   <!-- Public bundle (unminified) -->
   <script src="/apps/sling-matrix/js/public/public-bundle.js"></script>
