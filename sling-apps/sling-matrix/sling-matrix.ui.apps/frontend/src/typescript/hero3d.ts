@@ -49,7 +49,7 @@ export function initHero3D(): void {
 
     uniform float u_time;
     uniform vec2  u_resolution;
-    uniform vec2  u_mouse_rot;
+    uniform mat3  u_camMat;
     uniform float u_zoom;
     uniform float u_perspective;
     uniform float u_anim_speed;
@@ -71,8 +71,6 @@ export function initHero3D(): void {
     mat2 g_rotAnim07;
     mat2 g_rotFractalXY;
     mat2 g_rotFractalXZ;
-    mat2 g_camRotX;
-    mat2 g_camRotY;
 
     mat2 rotate2D(float angle) {
       float c = cos(angle);
@@ -193,10 +191,8 @@ export function initHero3D(): void {
       vec3 cameraOrigin = vec3(0.0, 0.0, -u_zoom);
       vec3 rayDirection = normalize(vec3(uv, u_perspective));
 
-      cameraOrigin.yz *= g_camRotY;
-      cameraOrigin.xz *= g_camRotX;
-      rayDirection.yz *= g_camRotY;
-      rayDirection.xz *= g_camRotX;
+      cameraOrigin = u_camMat * cameraOrigin;
+      rayDirection = u_camMat * rayDirection;
 
       vec3 finalColor = renderRay(cameraOrigin, rayDirection, jitter);
       finalColor = finalColor * finalColor; // contrast boost
@@ -225,8 +221,6 @@ export function initHero3D(): void {
       g_rotAnim07    = rotate2D(t * 0.7);
       g_rotFractalXY = rotate2D(0.7 + sin(u_time * 0.05) * 0.1);
       g_rotFractalXZ = rotate2D(0.5);
-      g_camRotY      = rotate2D(-u_mouse_rot.y);
-      g_camRotX      = rotate2D(-u_mouse_rot.x);
 
       vec3 color = getPixelColor(gl_FragCoord.xy);
       // Use luminance as alpha so the black background is transparent
@@ -324,7 +318,7 @@ export function initHero3D(): void {
   const loc = {
     u_time: gl.getUniformLocation(program, 'u_time'),
     u_resolution: gl.getUniformLocation(program, 'u_resolution'),
-    u_mouse_rot: gl.getUniformLocation(program, 'u_mouse_rot'),
+    u_camMat: gl.getUniformLocation(program, 'u_camMat'),
     u_zoom: gl.getUniformLocation(program, 'u_zoom'),
     u_perspective: gl.getUniformLocation(program, 'u_perspective'),
     u_anim_speed: gl.getUniformLocation(program, 'u_anim_speed'),
@@ -353,14 +347,46 @@ export function initHero3D(): void {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.clearColor(0, 0, 0, 0);
 
+  // ── Trackball camera math (row-major 3x3) ──────────────────────────────────
+  function m3Identity(): Float32Array {
+    return new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+  }
+  function m3Mul(a: Float32Array, b: Float32Array): Float32Array {
+    const o = new Float32Array(9);
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        o[r * 3 + c] = a[r * 3] * b[c] + a[r * 3 + 1] * b[3 + c] + a[r * 3 + 2] * b[6 + c];
+      }
+    }
+    return o;
+  }
+  function m3RotX(a: number): Float32Array {
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    return new Float32Array([1, 0, 0, 0, c, -s, 0, s, c]);
+  }
+  function m3RotY(a: number): Float32Array {
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    return new Float32Array([c, 0, s, 0, 1, 0, -s, 0, c]);
+  }
+  function clampStep(v: number, max: number): number {
+    return Math.max(-max, Math.min(max, v));
+  }
+
   // ── Drag-to-rotate ────────────────────────────────────────────────────────
   let isDragging = false;
   const prevPos = { x: 0, y: 0 };
-  const targetRot = { x: 0, y: 0 };
-  const currentRot = { x: 0, y: 0 };
+  // Accumulated orientation. Each drag delta is composed in screen space, so
+  // drag directions never reverse and the fractal tumbles freely (no pole flip).
+  let orientation = m3Identity();
+  let pendingYaw = 0; //   horizontal drag → rotation about the screen-up axis
+  let pendingPitch = 0; // vertical drag   → rotation about the screen-right axis
 
   // ── Device-tilt sway + shake wiggle (mobile) ──────────────────────────────
-  const orientTilt = { x: 0, y: 0 };
+  const orientTilt = { x: 0, y: 0 }; //       smoothed value applied to the camera
+  const orientTiltTarget = { x: 0, y: 0 }; // raw sensor target, eased toward
+  let orientPauseUntil = 0; //                freeze tilt briefly after a shake
   let wiggleStart = -1;
   let wiggleAmp = 0;
 
@@ -374,10 +400,6 @@ export function initHero3D(): void {
   let targetZoom = 5.0;
   const ZOOM_MIN = 3.0;
   const ZOOM_MAX = 14.0;
-
-  // Clamp vertical drag to just under the pole. Past ±90° the camera crosses to
-  // the opposite hemisphere and world-Y horizontal drag visually inverts.
-  const PITCH_LIMIT = Math.PI / 2 - 0.05;
 
   canvas.addEventListener('mousedown', (e: MouseEvent) => {
     isDragging = true;
@@ -396,8 +418,8 @@ export function initHero3D(): void {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    targetRot.x += (x - prevPos.x) * 0.01;
-    targetRot.y -= (y - prevPos.y) * 0.01;
+    pendingYaw += (x - prevPos.x) * 0.01;
+    pendingPitch += (y - prevPos.y) * 0.01;
     prevPos.x = x;
     prevPos.y = y;
   });
@@ -455,8 +477,8 @@ export function initHero3D(): void {
         const rect = canvas.getBoundingClientRect();
         const x = e.touches[0].clientX - rect.left;
         const y = e.touches[0].clientY - rect.top;
-        targetRot.x += (x - prevPos.x) * 0.01;
-        targetRot.y -= (y - prevPos.y) * 0.01;
+        pendingYaw += (x - prevPos.x) * 0.01;
+        pendingPitch += (y - prevPos.y) * 0.01;
         prevPos.x = x;
         prevPos.y = y;
         e.preventDefault();
@@ -498,15 +520,22 @@ export function initHero3D(): void {
     if (e.beta === null || e.gamma === null) {
       return;
     }
+    // Just after a big shake the sensor spikes wildly. Freeze the tilt target and
+    // keep re-anchoring, so when the pause ends we resume from the new pose with
+    // no jump.
+    if (performance.now() < orientPauseUntil) {
+      orientBaseline = { beta: e.beta, gamma: e.gamma };
+      return;
+    }
     // Anchor to the pose the phone was in when sensing started.
     if (orientBaseline === null) {
       orientBaseline = { beta: e.beta, gamma: e.gamma };
     }
     const dGamma = e.gamma - orientBaseline.gamma; // left-right tilt
     const dBeta = e.beta - orientBaseline.beta; //   front-back tilt
-    // Gentle sway, clamped so a big tilt can't fling the fractal off-screen.
-    orientTilt.x = Math.max(-0.6, Math.min(0.6, dGamma * 0.012));
-    orientTilt.y = Math.max(-0.6, Math.min(0.6, dBeta * 0.012));
+    // Slightly punchier sway; clamped so a big tilt can't fling it off-screen.
+    orientTiltTarget.x = Math.max(-0.7, Math.min(0.7, dGamma * 0.025));
+    orientTiltTarget.y = Math.max(-0.7, Math.min(0.7, dBeta * 0.025));
   }
 
   function handleMotion(e: DeviceMotionEvent): void {
@@ -523,6 +552,8 @@ export function initHero3D(): void {
     if (mag > threshold && now - lastShake > 600) {
       lastShake = now;
       triggerWiggle(0.45);
+      // Ignore the orientation spike that rides along with the shake.
+      orientPauseUntil = now + 450;
     }
   }
 
@@ -598,12 +629,14 @@ export function initHero3D(): void {
 
     const time = (performance.now() - startTime) / 1000;
 
-    // Keep vertical drag below the pole so horizontal never reverses.
-    targetRot.y = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, targetRot.y));
-
-    // Lerp rotation & zoom
-    currentRot.x += (targetRot.x - currentRot.x) * 0.08;
-    currentRot.y += (targetRot.y - currentRot.y) * 0.08;
+    // Ease pending drag into the accumulated orientation (screen-space compose).
+    const stepYaw = pendingYaw * 0.25;
+    const stepPitch = pendingPitch * 0.25;
+    pendingYaw -= stepYaw;
+    pendingPitch -= stepPitch;
+    if (stepYaw !== 0 || stepPitch !== 0) {
+      orientation = m3Mul(m3Mul(m3RotX(stepPitch), m3RotY(stepYaw)), orientation);
+    }
     zoom += (targetZoom - zoom) * 0.08;
 
     // Shake-triggered wiggle: a decaying oscillation on top of the base rotation.
@@ -621,14 +654,22 @@ export function initHero3D(): void {
       }
     }
 
+    // Ease device-tilt toward its sensor target, capping per-frame change so a
+    // sudden sensor jump can't snap the fractal — smooth, speed-limited sway.
+    const MAX_TILT_STEP = 0.03;
+    orientTilt.x += clampStep((orientTiltTarget.x - orientTilt.x) * 0.15, MAX_TILT_STEP);
+    orientTilt.y += clampStep((orientTiltTarget.y - orientTilt.y) * 0.15, MAX_TILT_STEP);
+
+    // Transient screen-space sway (device tilt) + shake wiggle, layered on top
+    // of the accumulated orientation without permanently rotating it.
+    const swayH = orientTilt.x + wiggleX;
+    const swayV = orientTilt.y + wiggleY;
+    const camMat = m3Mul(m3Mul(m3RotX(swayV), m3RotY(-swayH)), orientation);
+
     // Set dynamic uniforms
     gl!.uniform1f(loc.u_time, time);
     gl!.uniform2f(loc.u_resolution, canvas.width, canvas.height);
-    gl!.uniform2f(
-      loc.u_mouse_rot,
-      currentRot.x + orientTilt.x + wiggleX,
-      currentRot.y + orientTilt.y + wiggleY
-    );
+    gl!.uniformMatrix3fv(loc.u_camMat, true, camMat);
     gl!.uniform1f(loc.u_zoom, zoom);
 
     // Draw

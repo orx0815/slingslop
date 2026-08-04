@@ -42,16 +42,17 @@
    rules that would otherwise win on `color` / `font-size`. */
 .hero .hero-title {
   color: var(--color-primary);
-  /* Green fill, black outline drawn behind the glyphs. */
-  -webkit-text-stroke: 3px var(--color-black);
+  /* Green fill, secondary outline drawn behind the glyphs. */
+  -webkit-text-stroke: 4px var(--color-secondary);
   paint-order: stroke fill;
 }
 
 .hero .hero-subtitle {
-  /* Bump the subtitle up a notch and give it a white fill with a dark edge. */
+  /* Bold, slightly-darker secondary fill with a green outline (matches title). */
   font-size: var(--font-size-xl);
-  color: var(--color-white, #fff);
-  -webkit-text-stroke: 4px oklch(0.15 0.02 var(--hue-primary));
+  font-weight: 700;
+  color: oklch(0.42 0.13 var(--hue-secondary));
+  -webkit-text-stroke: 3px var(--color-primary);
   paint-order: stroke fill;
 }
 
