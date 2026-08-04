@@ -522,6 +522,23 @@ export function initHero3D(): void {
     }
   }
 
+  function attachMotionListeners(): void {
+    window.addEventListener('deviceorientation', handleOrientation);
+    window.addEventListener('devicemotion', handleMotion);
+  }
+
+  /** True when the platform gates the sensors behind an explicit permission grant (iOS 13+). */
+  function motionNeedsPermission(): boolean {
+    const orientationCtor = window.DeviceOrientationEvent as unknown as
+      | MotionPermission
+      | undefined;
+    const motionCtor = window.DeviceMotionEvent as unknown as MotionPermission | undefined;
+    return (
+      (!!orientationCtor && typeof orientationCtor.requestPermission === 'function') ||
+      (!!motionCtor && typeof motionCtor.requestPermission === 'function')
+    );
+  }
+
   async function enableMotion(): Promise<void> {
     if (motionEnabled) {
       return;
@@ -547,8 +564,15 @@ export function initHero3D(): void {
       motionEnabled = false;
       return;
     }
-    window.addEventListener('deviceorientation', handleOrientation);
-    window.addEventListener('devicemotion', handleMotion);
+    attachMotionListeners();
+  }
+
+  // Platforms without a permission gate (most Android) can sense immediately —
+  // tilt-to-sway and shake-to-wiggle work from the start, no touch required.
+  // iOS defers until the first touch gesture (see the canvas 'touchstart' handler).
+  if (!motionNeedsPermission()) {
+    motionEnabled = true;
+    attachMotionListeners();
   }
 
   // ── Resize ────────────────────────────────────────────────────────────────

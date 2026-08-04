@@ -35,6 +35,26 @@
   max-width: 60ch;
 }
 
+/* The 3D fractal behind the text creates shifting dark/light patches that
+   wreck legibility. Give both lines a solid colour + contrasting outline so
+   they stay readable over any part of the animation.
+   NB: prefixed with `.hero` to out-specify the base `.hero p` / `.hero h1`
+   rules that would otherwise win on `color` / `font-size`. */
+.hero .hero-title {
+  color: var(--color-primary);
+  /* Green fill, black outline drawn behind the glyphs. */
+  -webkit-text-stroke: 3px var(--color-black);
+  paint-order: stroke fill;
+}
+
+.hero .hero-subtitle {
+  /* Bump the subtitle up a notch and give it a white fill with a dark edge. */
+  font-size: var(--font-size-xl);
+  color: var(--color-white, #fff);
+  -webkit-text-stroke: 4px oklch(0.15 0.02 var(--hue-primary));
+  paint-order: stroke fill;
+}
+
 .hero-cta {
   display: inline-block;
   padding: var(--space-md) var(--space-xl);
