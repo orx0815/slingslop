@@ -3,7 +3,9 @@
   <script src="/apps/sling-matrix/js/public/hero3d-bundle.js"></script>
 </sly>
 <sly data-sly-test="${!noMinLibs}">
-  <script src="/apps/sling-matrix/js/public/hero3d-bundle.min.js"></script>
+  <sly data-sly-use.hero3d="${'org.motorbrot.slingmatrix.slingmodels.ClientlibUrl' @ path='/apps/sling-matrix/js/public/hero3d-bundle.min.js'}">
+    <script src="${hero3d.href}"></script>
+  </sly>
 </sly>
 
 <section class="hero-section">

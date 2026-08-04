@@ -21,15 +21,21 @@
 </sly>
 <sly data-sly-test="${!noMinLibs}">
 
-  <!-- Public bundle (minified) -->
-  <script src="/apps/sling-matrix/js/public/public-bundle.min.js"></script>
-  <link rel="stylesheet" href="/apps/sling-matrix/css/public/public.min.css" />
+  <!-- Public bundle (minified, cache-busted via versioned clientlib URL) -->
+  <sly data-sly-use.pubJs="${'org.motorbrot.slingmatrix.slingmodels.ClientlibUrl' @ path='/apps/sling-matrix/js/public/public-bundle.min.js'}"
+       data-sly-use.pubCss="${'org.motorbrot.slingmatrix.slingmodels.ClientlibUrl' @ path='/apps/sling-matrix/css/public/public.min.css'}">
+    <script src="${pubJs.href}"></script>
+    <link rel="stylesheet" href="${pubCss.href}" />
+  </sly>
 
   <!-- Editor bundle (minified, htmx inlined) — only for logged-in users -->
   <sly data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
        data-sly-test="${auth.loggedIn}">
-    <script src="/apps/sling-matrix/js/editor/editor-bundle.min.js"></script>
-    <link rel="stylesheet" href="/apps/sling-matrix/css/editor/editor.min.css" />
+    <sly data-sly-use.editJs="${'org.motorbrot.slingmatrix.slingmodels.ClientlibUrl' @ path='/apps/sling-matrix/js/editor/editor-bundle.min.js'}"
+         data-sly-use.editCss="${'org.motorbrot.slingmatrix.slingmodels.ClientlibUrl' @ path='/apps/sling-matrix/css/editor/editor.min.css'}">
+      <script src="${editJs.href}"></script>
+      <link rel="stylesheet" href="${editCss.href}" />
+    </sly>
   </sly>
 
 </sly>
