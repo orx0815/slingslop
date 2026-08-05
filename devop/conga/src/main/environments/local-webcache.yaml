@@ -1,0 +1,36 @@
+# local-webcache — OPERATIONS-owned.
+# One local box running Sling + the Apache webcache. Use to verify caching and
+# inbound short-URL re-expansion without TLS / Traefik.
+#
+# Add an app = append one `- tenant:` block below. Nothing else changes.
+
+config:
+  # Base domain for this environment. Visible to nodes and tenants alike.
+  domain: localhost
+
+nodes:
+
+- node: localhost
+  roles:
+  - role: slingslop-webcache
+    variant: apache
+
+tenants:
+
+- tenant: zengarden
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zengarden
+
+- tenant: sling-matrix
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/sling-matrix
+    appsRoot: /apps/sling-matrix
+    subdomain: www
+    serverAliases:
+    - "${domain}"
+    passthroughPaths:
+    - /bin/public

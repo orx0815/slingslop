@@ -1,6 +1,6 @@
 # Slingslop
 
-[![CI](https://img.shields.io/github/actions/workflow/status/orx0815/slingslop/maven-main.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/orx0815/slingslop/actions/workflows/maven-main.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/orx0815/slingslop/ci-cd.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/orx0815/slingslop/actions/workflows/ci-cd.yml)
 [![Publish](https://img.shields.io/github/actions/workflow/status/orx0815/slingslop/publish-ghcr.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Publish)](https://github.com/orx0815/slingslop/actions/workflows/publish-ghcr.yml)
 [![Java 25](https://img.shields.io/badge/Java-25-007396?style=for-the-badge&logo=openjdk&logoColor=white)](#prerequisites)
 [![Maven 3.9.12+](https://img.shields.io/badge/Maven-3.9.12%2B-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)](#prerequisites)
@@ -187,3 +187,93 @@ When done, you should unmount again:
 mvn sling:fsmount
 ```
 followed by `cq:install` to have a "normal" state in JCR.
+
+---
+
+## Adding a new public-facing app
+
+A new app lives **next to `zengarden`** under `sling-apps/` and follows the same
+shape — `zengarden` is the smallest "Learn Sling" example to copy from. An app is:
+
+- an OSGi bundle (`*.core`) for Java business logic — **optional**; omit it for a
+  pure template/content app,
+- a `ui.apps` content-package with the HTL scripts under `/apps/slingslop/<app>`
+  and its page(s) under `/content/slingslop/<app>`.
+
+The render chain mirrors `zengarden`: a `home` node is a *page*
+(`sling:resourceType = slingslop/<app>/pages/page`) whose `html.html` delegates to
+its `jcr:content` child, which carries the *homepage* resourceType that emits the
+markup. For a full-featured app let **Agent Smith** scaffold it (see
+[`docs/agent-skills/create-Sling-app-with-Agent_Smith.md`](docs/agent-skills/create-Sling-app-with-Agent_Smith.md)).
+
+### Register it in three places
+
+```jsonc
+// a) pom.xml (root)                          — add the module(s)
+// b) content-packages/complete/pom.xml       — add a <dependency> + <subPackage>
+//                                               (bakes it into the all-in-one package)
+// c) devop/conga/src/main/environments/*.yaml — add the CONGA tenant
+```
+
+If the app follows the `/content/slingslop/<name>` + `/apps/slingslop/<name>`
+convention, the CONGA tenant is **zero-config** — CONGA derives `contentRoot`,
+`appsRoot`, `subdomain` and `homePage` from the name, so the whole deployment
+registration is three lines. Put it next to the `zengarden` tenant:
+
+```yaml
+# devop/conga/src/main/environments/prod-motorbrot.yaml
+tenants:
+  - tenant: zengarden
+    roles: [ public-cached ]
+    config: { contentRoot: /content/slingslop/zengarden }
+  - tenant: my-app
+    roles: [ public-cached ]
+```
+
+From those three lines, `mvn -pl devop/conga clean package` generates — per
+environment — the Apache cache/short-URL vhost (`webcache/my-app.conf`), the
+Traefik router (`traefik/dynamic/router-my-app.yml`) and the outbound Sling
+`/etc/map` short-URL mapping. No proxy/router/mapping file is hand-edited; see
+[`devop/conga/README.md`](devop/conga/README.md) and
+[`docs/conga-config-generation-concept.md`](docs/conga-config-generation-concept.md).
+
+### Build & run it locally
+
+```bash
+mvn clean install -DskipITs
+cd launcher && ./launch.sh
+curl http://localhost:8080/content/slingslop/my-app/home.html
+```
+
+> **Gotcha — stale local repository.** `launch.sh` keeps a **persisted**
+> repository under `launcher/launcher/`. If you rebuilt but the page still 404s,
+> the launcher reused the old repo. Wipe it and relaunch:
+>
+> ```bash
+> pkill -f 'org.apache.sling.feature.launcher'   # stop the running instance
+> rm -rf launcher/launcher                        # drop the persisted repo
+> cd launcher && ./launch.sh                       # fresh install
+> ```
+
+To see it live on the real (Traefik + webcache + Sling) stack — the same Ansible
+playbooks prod runs, on a throwaway Vagrant VM — follow
+**[Local testing (Vagrant VM)](ops/README.md#local-testing-vagrant-vm)** in the
+ops guide. Adding the tenant above is all a new public sub-domain needs: the
+GitOps `deploy-tenant-edge` job ships that generated config (router + vhost +
+`/etc/map`) to a running host **without an image rebuild**.
+
+### Where the content lives (important)
+
+The sample content under `content-packages/` is **baked into the image** so the
+demo apps run out of the box. **Real / production content should *not* live in
+the image** — it is authored, grows and changes independently of code, and
+belongs in the writable content volume (and, at scale, is replicated to publish
+instances via **Sling Content Distribution** — see
+[ops/README.md](ops/README.md#scaling-out-a-multi-node-topology-concept)).
+
+A **tenant supports this directly**: its `contentRoot` can point anywhere, so the
+*same* app can serve different content trees per deployment — e.g. a `sling-matrix`
+app rooted at `/content/realProdContent/anothermatrix` on one host and at
+`/content/sling-matrix` on another. Ops adds such a tenant at deploy time (router
++ vhost + `/etc/map`) **without a new app or a code change** — the mapping is
+installed into the running repository, not compiled into the image.

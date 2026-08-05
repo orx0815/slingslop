@@ -1,0 +1,329 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1540" height="960" viewBox="0 0 1540 960" font-family="Helvetica, Arial, sans-serif">
+  <style>
+    .title    { font: 700 13px Helvetica, Arial, sans-serif; }
+    .stereo   { font: italic 10px Helvetica, Arial, sans-serif; fill:#333; }
+    .p        { font: 11px 'DejaVu Sans Mono', Menlo, Consolas, monospace; fill:#1a1a1a; }
+    .y        { font: 11px 'DejaVu Sans Mono', Menlo, Consolas, monospace; fill:#16324f; }
+    .yc       { fill:#6b7a3f; }      /* yaml comment */
+    .new      { fill:#b5651d; }      /* added since slide */
+    .cap      { font: 700 12px Helvetica, Arial, sans-serif; }
+    .note     { font: 11px Helvetica, Arial, sans-serif; fill:#333; }
+    .lbl      { font: 10px Helvetica, Arial, sans-serif; fill:#555; }
+    .greenH   { fill:#7e9b3e; } .greenB { fill:#eef3e0; }
+    .blueH    { fill:#33608f; } .blueB  { fill:#e6eef6; }
+    .greyH    { fill:#b8b8b8; } .greyB  { fill:#efefef; }
+    rect.box  { stroke:#5a5a5a; stroke-width:1; }
+    text.hdr  { fill:#ffffff; }
+  </style>
+
+  <rect x="0" y="0" width="1540" height="960" fill="#ffffff"/>
+  <text x="24" y="34" font="700 26px Helvetica" font-size="26" font-weight="700" fill="#3a6ea5">CONGA Model</text>
+  <text x="24" y="52" class="lbl">UML object model (io.wcm.devops.conga.model) — reproduced as selectable text; verified against branch develop / v1.20 (2026-08).</text>
+
+  <!-- ===================== ROLE ===================== -->
+  <rect class="box greenH" x="20" y="66" width="255" height="20"/>
+  <rect class="box greenB" x="20" y="86" width="255" height="82"/>
+  <text class="title hdr" x="147" y="80" text-anchor="middle">Role</text>
+  <text class="p" x="28" y="100">
+    <tspan x="28" dy="0">- inherits : List&lt;RoleInherit&gt;</tspan>
+    <tspan x="28" dy="14">- variants : List&lt;RoleVariant&gt;</tspan>
+    <tspan x="28" dy="14">- templateDir : String</tspan>
+    <tspan x="28" dy="14">- files : List&lt;RoleFile&gt;</tspan>
+    <tspan x="28" dy="14">- sensitiveConfigParameters</tspan>
+    <tspan x="28" dy="14">  (extends AbstractConfigurable)</tspan>
+  </text>
+
+  <!-- ===================== ROLEVARIANT ===================== -->
+  <rect class="box greenH" x="20" y="190" width="200" height="20"/>
+  <rect class="box greenB" x="20" y="210" width="200" height="40"/>
+  <text class="title hdr" x="120" y="204" text-anchor="middle">RoleVariant</text>
+  <text class="p" x="28" y="226">
+    <tspan x="28" dy="0">- variant : String</tspan>
+    <tspan x="28" dy="14">  (+ config : Map)</tspan>
+  </text>
+
+  <!-- ===================== ROLEFILE ===================== -->
+  <rect class="box blueH" x="20" y="276" width="292" height="20"/>
+  <rect class="box blueB" x="20" y="296" width="292" height="286"/>
+  <text class="title hdr" x="166" y="290" text-anchor="middle">RoleFile</text>
+  <text class="stereo" x="28" y="309">extends AbstractModel (not Configurable)</text>
+  <text class="p" x="28" y="325">
+    <tspan x="28" dy="0">- file : String</tspan>
+    <tspan x="28" dy="14">- dir : String</tspan>
+    <tspan x="28" dy="14">- template : String   (Handlebars .hbs)</tspan>
+    <tspan x="28" dy="14">- url : String</tspan>
+    <tspan x="28" dy="14">- symlinkTarget : String</tspan>
+    <tspan x="28" dy="14">- variants : List&lt;String&gt;</tspan>
+    <tspan x="28" dy="14">- condition : String</tspan>
+    <tspan x="28" dy="14">- validators : List&lt;String&gt;</tspan>
+    <tspan x="28" dy="14">- validatorOptions : Map</tspan>
+    <tspan x="28" dy="14">- postProcessors : List&lt;String&gt;</tspan>
+    <tspan x="28" dy="14">- postProcessorOptions : Map</tspan>
+    <tspan x="28" dy="14">- fileHeader : String</tspan>
+    <tspan x="28" dy="14">- multiply : String</tspan>
+    <tspan x="28" dy="14">- multiplyOptions : Map</tspan>
+    <tspan x="28" dy="14">- charset : String = UTF-8</tspan>
+    <tspan x="28" dy="14">- lineEndings : LineEndings = unix</tspan>
+    <tspan x="28" dy="14">- escapingStrategy : String</tspan>
+    <tspan x="28" dy="14">- modelOptions : Map</tspan>
+    <tspan x="28" dy="14">- deleteSource : boolean</tspan>
+  </text>
+
+  <!-- ===================== ENVIRONMENT ===================== -->
+  <rect class="box greenH" x="340" y="66" width="250" height="20"/>
+  <rect class="box greenB" x="340" y="86" width="250" height="96"/>
+  <text class="title hdr" x="465" y="80" text-anchor="middle">Environment</text>
+  <text class="p" x="348" y="100">
+    <tspan x="348" dy="0">- nodes : List&lt;Node&gt;</tspan>
+    <tspan x="348" dy="14">- roleConfig : List&lt;RoleConfig&gt;</tspan>
+    <tspan x="348" dy="14">- tenants : List&lt;Tenant&gt;</tspan>
+    <tspan x="348" dy="14">- dependencies : List&lt;String&gt;</tspan>
+    <tspan x="348" dy="14">- pluginConfig : Map</tspan>
+    <tspan x="348" dy="14">  (extends AbstractConfigurable)</tspan>
+  </text>
+
+  <!-- ===================== ROLECONFIG ===================== -->
+  <rect class="box greenH" x="340" y="200" width="210" height="20"/>
+  <rect class="box greenB" x="340" y="220" width="210" height="40"/>
+  <text class="title hdr" x="445" y="214" text-anchor="middle">RoleConfig</text>
+  <text class="p" x="348" y="236">
+    <tspan x="348" dy="0">- role : String</tspan>
+    <tspan x="348" dy="14">  (+ config : Map)</tspan>
+  </text>
+
+  <!-- ===================== NODEROLE ===================== -->
+  <rect class="box greenH" x="340" y="280" width="210" height="20"/>
+  <rect class="box greenB" x="340" y="300" width="210" height="54"/>
+  <text class="title hdr" x="445" y="294" text-anchor="middle">NodeRole</text>
+  <text class="p" x="348" y="316">
+    <tspan x="348" dy="0">- role : String</tspan>
+    <tspan x="348" dy="14">- variant / variants</tspan>
+    <tspan x="348" dy="14">  (+ config : Map)</tspan>
+  </text>
+
+  <!-- ===================== ABSTRACTCONFIGURABLE ===================== -->
+  <rect class="box greyH" x="340" y="384" width="395" height="20"/>
+  <rect class="box greyB" x="340" y="404" width="395" height="44"/>
+  <text class="title" x="537" y="398" text-anchor="middle" fill="#222">AbstractConfigurable</text>
+  <text class="p" x="348" y="422">
+    <tspan x="348" dy="0">- config : Map&lt;String,Object&gt; = new HashMap&lt;&gt;()</tspan>
+    <tspan x="348" dy="14" class="lbl">merged along the tree — see merge order at the bottom &#8595;</tspan>
+  </text>
+
+  <!-- ===================== CONFIGURABLE (interface) ===================== -->
+  <rect class="box greyH" x="340" y="470" width="250" height="20"/>
+  <rect class="box greyB" x="340" y="490" width="250" height="26"/>
+  <text class="stereo hdr" x="465" y="484" text-anchor="middle">&#171;interface&#187;  Configurable</text>
+  <text class="p" x="348" y="507">+ config : Map&lt;String,Object&gt;</text>
+
+  <!-- ===================== NODE ===================== -->
+  <rect class="box greenH" x="600" y="66" width="200" height="20"/>
+  <rect class="box greenB" x="600" y="86" width="200" height="68"/>
+  <text class="title hdr" x="700" y="80" text-anchor="middle">Node</text>
+  <text class="p" x="608" y="100">
+    <tspan x="608" dy="0">- node : String</tspan>
+    <tspan x="608" dy="14">- nodes : List&lt;String&gt;</tspan>
+    <tspan x="608" dy="14">- roles : List&lt;NodeRole&gt;</tspan>
+    <tspan x="608" dy="14">  (+ config : Map)</tspan>
+  </text>
+
+  <!-- ===================== TENANT ===================== -->
+  <rect class="box greenH" x="600" y="188" width="200" height="20"/>
+  <rect class="box greenB" x="600" y="208" width="200" height="54"/>
+  <text class="title hdr" x="700" y="202" text-anchor="middle">Tenant</text>
+  <text class="p" x="608" y="224">
+    <tspan x="608" dy="0">- tenant : String</tspan>
+    <tspan x="608" dy="14">- roles : List&lt;String&gt;</tspan>
+    <tspan x="608" dy="14" class="lbl">  tenant roles (&#8800; node roles)</tspan>
+  </text>
+
+  <!-- ===================== ROLEINHERIT (new) ===================== -->
+  <rect class="box blueH" x="600" y="296" width="200" height="20"/>
+  <rect class="box blueB" x="600" y="316" width="200" height="40"/>
+  <text class="title hdr" x="700" y="310" text-anchor="middle">RoleInherit</text>
+  <text class="p" x="608" y="332">
+    <tspan x="608" dy="0">- role : String</tspan>
+    <tspan x="608" dy="14" class="lbl">(target role to inherit)</tspan>
+  </text>
+
+  <!-- ===================== CONTEXTPROPERTIES ===================== -->
+  <rect class="box blueH" x="340" y="540" width="395" height="20"/>
+  <rect class="box blueB" x="340" y="560" width="395" height="182"/>
+  <text class="title hdr" x="537" y="554" text-anchor="middle">ContextProperties (implicit — set by CONGA, not in YAML)</text>
+  <text class="p" x="348" y="576">
+    <tspan x="348" dy="0">VERSION              = "version"</tspan>
+    <tspan x="348" dy="14">ROLE                 = "nodeRole"</tspan>
+    <tspan x="348" dy="14">ROLE_VARIANT         = "nodeRoleVariant"</tspan>
+    <tspan x="348" dy="14">ENVIRONMENT          = "environment"</tspan>
+    <tspan x="348" dy="14">NODE                 = "node"</tspan>
+    <tspan x="348" dy="14">NODES                = "nodes"</tspan>
+    <tspan x="348" dy="14">NODES_BY_ROLE        = "nodesByRole"</tspan>
+    <tspan x="348" dy="14">NODES_BY_ROLE_VARIANT= "nodesByRoleVariant"</tspan>
+    <tspan x="348" dy="14">TENANTS              = "tenants"</tspan>
+    <tspan x="348" dy="14">TENANTS_BY_ROLE      = "tenantsByRole"</tspan>
+    <tspan x="348" dy="14">TENANT               = "tenant"</tspan>
+    <tspan x="348" dy="14">TENANT_ROLES         = "tenantRoles"</tspan>
+  </text>
+
+  <!-- ===================== eg expression ===================== -->
+  <rect class="box" x="20" y="758" width="715" height="62" fill="#fdf9ea"/>
+  <text class="cap" x="30" y="776">eg.</text>
+  <text class="y" x="30" y="794" xml:space="preserve">{{#each tenantsByRole.webserver}}{{this.config.website.domain}}{{#unless @last}},{{/unless}}{{/each}}</text>
+  <text class="p" x="30" y="812">  &#8594;  becomes  "mysite.de,mysite.fr"</text>
+
+  <!-- =========================================================== -->
+  <!-- =============== RIGHT: DEV / OPS YAML EXAMPLE ============== -->
+  <!-- =========================================================== -->
+  <g transform="translate(60,0)">
+
+  <!-- OPS (green) -->
+  <rect class="box" x="760" y="60" width="345" height="700" fill="#f3f7e8" stroke="#7e9b3e" stroke-width="2"/>
+  <text class="cap" x="772" y="80" fill="#5f7a2e">OPS — Environment (two apaches)</text>
+  <text class="y" x="772" y="98" xml:space="preserve">
+    <tspan x="772" dy="0" class="yc"># two apache nodes, each 1 role</tspan>
+    <tspan x="772" dy="14">nodes:</tspan>
+    <tspan x="772" dy="14">- nodes:</tspan>
+    <tspan x="772" dy="14">  - myApache</tspan>
+    <tspan x="772" dy="14">  config:</tspan>
+    <tspan x="772" dy="14">    varX: v4_NodeCfg</tspan>
+    <tspan x="772" dy="14">  roles:</tspan>
+    <tspan x="772" dy="14">  - role: webserver</tspan>
+    <tspan x="772" dy="14">    variant: stdVariant</tspan>
+    <tspan x="772" dy="14">    config:</tspan>
+    <tspan x="772" dy="14">      varX: v6_NodeRoleCfg</tspan>
+    <tspan x="772" dy="14"> </tspan>
+    <tspan x="772" dy="14">- nodes:</tspan>
+    <tspan x="772" dy="14">  - mySslApache</tspan>
+    <tspan x="772" dy="14">  config:</tspan>
+    <tspan x="772" dy="14">    varX: v4_NodeCfg-ssl</tspan>
+    <tspan x="772" dy="14">  roles:</tspan>
+    <tspan x="772" dy="14">  - role: webserver</tspan>
+    <tspan x="772" dy="14">    variant: secureVariant</tspan>
+    <tspan x="772" dy="14">    config:</tspan>
+    <tspan x="772" dy="14">      varX: v6_NodeRoleCfg-ssl</tspan>
+    <tspan x="772" dy="14"> </tspan>
+    <tspan x="772" dy="14" class="yc"># role-specific global config</tspan>
+    <tspan x="772" dy="14">roleConfig:</tspan>
+    <tspan x="772" dy="14">- role: webserver</tspan>
+    <tspan x="772" dy="14">  config:</tspan>
+    <tspan x="772" dy="14">    varX: v5_RoleCfg</tspan>
+    <tspan x="772" dy="14"> </tspan>
+    <tspan x="772" dy="14" class="yc"># global configuration</tspan>
+    <tspan x="772" dy="14">config:</tspan>
+    <tspan x="772" dy="14">  varX: v3_EnvironmentCfg</tspan>
+    <tspan x="772" dy="14"> </tspan>
+    <tspan x="772" dy="14" class="yc"># tenant definitions</tspan>
+    <tspan x="772" dy="14">tenants:</tspan>
+    <tspan x="772" dy="14">- tenant: tenant1</tspan>
+    <tspan x="772" dy="14">  roles:</tspan>
+    <tspan x="772" dy="14">  - webserver</tspan>
+    <tspan x="772" dy="14">  config:</tspan>
+    <tspan x="772" dy="14">    varX: v7_Tenant1Cfg-de</tspan>
+    <tspan x="772" dy="14">    website.domain: mysite.de</tspan>
+    <tspan x="772" dy="14"> </tspan>
+    <tspan x="772" dy="14">- tenant: tenant2</tspan>
+    <tspan x="772" dy="14">  roles:</tspan>
+    <tspan x="772" dy="14">  - webserver</tspan>
+    <tspan x="772" dy="14">  config:</tspan>
+    <tspan x="772" dy="14">    varX: v7_Tenant2Cfg-fr</tspan>
+    <tspan x="772" dy="14">    website:</tspan>
+    <tspan x="772" dy="14">      domain: mysite.fr</tspan>
+  </text>
+
+  <!-- DEV (blue) -->
+  <rect class="box" x="1120" y="60" width="345" height="512" fill="#eaf1f8" stroke="#33608f" stroke-width="2"/>
+  <text class="cap" x="1132" y="80" fill="#2b5480">DEV — defines a role</text>
+  <text class="y" x="1132" y="98" xml:space="preserve">
+    <tspan x="1132" dy="0">variants:</tspan>
+    <tspan x="1132" dy="14">- variant: stdVariant</tspan>
+    <tspan x="1132" dy="14">  config:</tspan>
+    <tspan x="1132" dy="14">    varX: v2_RoleVariantStd</tspan>
+    <tspan x="1132" dy="14">- variant: secureVariant</tspan>
+    <tspan x="1132" dy="14">  config:</tspan>
+    <tspan x="1132" dy="14">    varX: v2_RoleVariantSsl</tspan>
+    <tspan x="1132" dy="14"> </tspan>
+    <tspan x="1132" dy="14">templateDir: webserver</tspan>
+    <tspan x="1132" dy="14">files:</tspan>
+    <tspan x="1132" dy="14">- file: "${tenant}_vhost.conf"</tspan>
+    <tspan x="1132" dy="14">  dir: vhosts</tspan>
+    <tspan x="1132" dy="14">  template: tenant_vhost.conf.hbs</tspan>
+    <tspan x="1132" dy="14">  variants:</tspan>
+    <tspan x="1132" dy="14">  - stdVariant</tspan>
+    <tspan x="1132" dy="14" class="yc">  # multiply each tenant w/ role</tspan>
+    <tspan x="1132" dy="14">  multiply: tenant</tspan>
+    <tspan x="1132" dy="14">  multiplyOptions:</tspan>
+    <tspan x="1132" dy="14">    roles:</tspan>
+    <tspan x="1132" dy="14">    - webserver</tspan>
+    <tspan x="1132" dy="14"> </tspan>
+    <tspan x="1132" dy="14">- file: "${tenant}_vhost_ssl.conf"</tspan>
+    <tspan x="1132" dy="14">  dir: vhosts</tspan>
+    <tspan x="1132" dy="14">  template: tenant_vhost_ssl.conf.hbs</tspan>
+    <tspan x="1132" dy="14">  variants:</tspan>
+    <tspan x="1132" dy="14">  - secureVariant</tspan>
+    <tspan x="1132" dy="14">  multiply: tenant</tspan>
+    <tspan x="1132" dy="14">  multiplyOptions:</tspan>
+    <tspan x="1132" dy="14">    roles:</tspan>
+    <tspan x="1132" dy="14">    - webserver</tspan>
+    <tspan x="1132" dy="14"> </tspan>
+    <tspan x="1132" dy="14" class="yc"># role parameters and defaults</tspan>
+    <tspan x="1132" dy="14">config:</tspan>
+    <tspan x="1132" dy="14">  varX: v1_RoleCfg-web</tspan>
+  </text>
+  </g>
+
+  <!-- ===================== CONFIG-MERGE PRECEDENCE LADDER (full width) ===================== -->
+  <defs>
+    <linearGradient id="prio" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c8d8b6"/>
+      <stop offset="1" stop-color="#4f6a26"/>
+    </linearGradient>
+    <marker id="ah" markerWidth="12" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L12,5 L0,10 z" fill="#3a5a1e"/>
+    </marker>
+  </defs>
+
+  <rect class="box" x="20" y="838" width="1500" height="112" fill="#f7f9f2" stroke="#5a5a5a"/>
+  <text class="cap" x="40" y="860">Configuration merge &#8212; a value set further RIGHT overrides the same value set on the LEFT (the right side wins):</text>
+  <text class="lbl" x="1500" y="860" text-anchor="end">blue = set by developers · green = set by operations</text>
+
+  <!-- 7 layers, left (lowest priority) → right (highest) -->
+  <!-- v1 -->
+  <rect x="58" y="872" width="176" height="46" rx="6" fill="#e6eef6" stroke="#33608f" stroke-width="1.5"/>
+  <text class="title" x="146" y="893" text-anchor="middle">v1 Role</text>
+  <text class="lbl"   x="146" y="908" text-anchor="middle">default · dev</text>
+  <text x="250" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v2 -->
+  <rect x="266" y="872" width="176" height="46" rx="6" fill="#e6eef6" stroke="#33608f" stroke-width="1.5"/>
+  <text class="title" x="354" y="893" text-anchor="middle">v2 Role</text>
+  <text class="lbl"   x="354" y="908" text-anchor="middle">variant · dev</text>
+  <text x="458" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v3 -->
+  <rect x="474" y="872" width="176" height="46" rx="6" fill="#eef3e0" stroke="#7e9b3e" stroke-width="1.5"/>
+  <text class="title" x="562" y="893" text-anchor="middle">v3 Environment</text>
+  <text class="lbl"   x="562" y="908" text-anchor="middle">ops</text>
+  <text x="666" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v4 -->
+  <rect x="682" y="872" width="176" height="46" rx="6" fill="#eef3e0" stroke="#7e9b3e" stroke-width="1.5"/>
+  <text class="title" x="770" y="893" text-anchor="middle">v4 Node</text>
+  <text class="lbl"   x="770" y="908" text-anchor="middle">ops</text>
+  <text x="874" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v5 -->
+  <rect x="890" y="872" width="176" height="46" rx="6" fill="#eef3e0" stroke="#7e9b3e" stroke-width="1.5"/>
+  <text class="title" x="978" y="893" text-anchor="middle">v5 Env roleConfig</text>
+  <text class="lbl"   x="978" y="908" text-anchor="middle">ops</text>
+  <text x="1082" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v6 -->
+  <rect x="1098" y="872" width="176" height="46" rx="6" fill="#eef3e0" stroke="#7e9b3e" stroke-width="1.5"/>
+  <text class="title" x="1186" y="893" text-anchor="middle">v6 NodeRole</text>
+  <text class="lbl"   x="1186" y="908" text-anchor="middle">ops</text>
+  <text x="1290" y="901" text-anchor="middle" font-size="18" font-weight="700" fill="#3a5a1e">&#9656;</text>
+  <!-- v7 -->
+  <rect x="1306" y="872" width="176" height="46" rx="6" fill="#dcead0" stroke="#4f6a26" stroke-width="3"/>
+  <text class="title" x="1394" y="893" text-anchor="middle">v7 Tenant</text>
+  <text class="lbl"   x="1394" y="908" text-anchor="middle" font-weight="700">highest · wins</text>
+
+  <!-- direction bar -->
+  <line x1="58" y1="934" x2="1470" y2="934" stroke="url(#prio)" stroke-width="6" marker-end="url(#ah)"/>
+  <text class="lbl" x="58"   y="931">lower priority</text>
+  <text class="lbl" x="1450" y="927" text-anchor="end">higher priority (wins)</text>
+</svg>

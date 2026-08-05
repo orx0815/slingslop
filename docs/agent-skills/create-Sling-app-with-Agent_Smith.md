@@ -135,7 +135,7 @@ Smith must explicitly say:
 
 ### 2.0 Build a Task List First (Mandatory)
 
-Before creating any files, set up a tracked task list covering every phase. **All 13 tasks are mandatory.** Do not omit documentation. Do not start with an archetype or your own project-creation ideas. Do the tasks.
+Before creating any files, set up a tracked task list covering every phase. **All 14 tasks are mandatory** (Task 13 applies to public-facing apps only). Do not omit documentation. Do not start with an archetype or your own project-creation ideas. Do the tasks.
 
 ```
 Task  1 — OSGi core bundle (pom.xml, UserIsLoggedIn.java, package-info.java)
@@ -150,7 +150,8 @@ Task  9 — HTL component templates (view + edit-form-fields for each component)
 Task 10 — Sample content package (pom.xml, filter.xml, all content nodes)
 Task 11 — Wire root pom.xml + content-packages/complete/pom.xml
 Task 12 — ReadMe.md in sling-apps/{PROJECT_NAME}/
-Task 13 — Build and validate (mvn install, fix any errors)
+Task 13 — Register the app for deployment via CONGA (PUBLIC-FACING apps only; see §2.8)
+Task 14 — Build and validate (mvn install, fix any errors)
 ```
 
 ### 2.0.1 Analyze Project Structure (Mandatory)
@@ -494,6 +495,65 @@ src/main/content/jcr_root/apps/{RT_PREFIX}/js/public/
 src/main/content/jcr_root/apps/{RT_PREFIX}/css/editor/
 src/main/content/jcr_root/apps/{RT_PREFIX}/css/public/
 ```
+
+---
+
+### 2.8 Register the app for deployment via CONGA (Task 13 — public-facing apps only)
+
+> **Skip this task for internal / building-block apps** that are never exposed on
+> their own sub-domain. For a **public-facing** app it is mandatory.
+
+Deployment config (Traefik router, webcache vhost, Sling short-URL mapping,
+launcher wiring) is **generated** by the [`devop/conga`](../../devop/conga/README.md)
+module from a single per-app *tenant* block — you do **not** hand-edit the
+Traefik, webcache or launcher files. See the full design in
+[docs/conga-config-generation-concept.md](../conga-config-generation-concept.md).
+
+**Step 1 — append one tenant block** to every environment the app should ship in
+(at minimum `devop/conga/src/main/environments/prod-motorbrot.yaml`; optionally
+the `local-*` environments). Derive the values from the Agent Smith variables:
+
+| Agent Smith variable | Tenant field |
+|---|---|
+| `PROJECT_NAME` (lower-case-hyphenated) | `tenant` (and default `subdomain`) |
+| `CONTENT_ROOT` | `config.contentRoot` |
+| `APPS_ROOT` | `config.appsRoot` (omit if it matches the default `/apps/slingslop/<tenant>`) |
+| home page node | `config.homePage` (omit if it is `home`) |
+| gated? (basicAuth) | `roles: [ gated ]` + `middlewares: [ sec-headers, editor-basicauth ]` vs. `roles: [ public-cached ]` |
+
+```yaml
+# devop/conga/src/main/environments/prod-motorbrot.yaml
+tenants:
+  # ...existing apps...
+  - tenant: {PROJECT_NAME}
+    roles: [ public-cached ]
+    config:
+      contentRoot: {CONTENT_ROOT}
+```
+
+**Step 2 — prove it renders:**
+
+```bash
+mvn -q -f devop/conga/pom.xml clean package
+```
+
+Confirm the new files appear under
+`devop/conga/target/configuration/prod-motorbrot/vps1/` (a `webcache/{PROJECT_NAME}.conf`,
+a `traefik/dynamic/router-{PROJECT_NAME}.yml`, and a
+`slingmappings/.../{subdomain}.motorbrot.org/.content.xml`).
+
+**Do not** hand-edit `ops/ansible/roles/webcache/templates/*.conf.j2`,
+`ops/ansible/roles/traefik/templates/*.j2` or the launcher features for the new
+app — CONGA owns them now.
+
+**GitOps — the deploy is automatic.** When your tenant change to
+`devop/conga/src/main/environments/**` lands on the deploy branch, the
+[`deploy-edge` CI job](../../.github/workflows/ci-cd.yml) regenerates the CONGA
+config and ships the new tenant's **Traefik router + webcache vhost + Sling
+`/etc/map` mapping** to the running host (via
+`ops/ansible/playbooks/deploy-tenant-edge.yml`) — **no image rebuild**. So Task 13
+is just the data change: append the tenant, open the PR. (If the app is brand new,
+the `sling` image is rebuilt/published first, then the edge config is shipped.)
 
 ---
 

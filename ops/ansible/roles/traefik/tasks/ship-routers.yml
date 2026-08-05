@@ -1,0 +1,24 @@
+---
+# Ship the per-app Traefik routers CONGA generated for the current tenant list.
+# Extracted so a config-only edge deploy (GitOps: Agent Smith added a tenant)
+# can ship just the routers without re-rendering traefik.yml / the edge compose
+# or swapping any image. The file provider hot-reloads the dropped files.
+
+- name: Ensure traefik file-provider dir exists
+  ansible.builtin.file:
+    path: "{{ slingslop_root }}/data/traefik/dynamic"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Ship CONGA-generated per-app Traefik routers
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ slingslop_root }}/data/traefik/dynamic/"
+    owner: root
+    group: root
+    mode: "0640"
+  with_fileglob:
+    - "{{ conga_config_dir }}/traefik/dynamic/router-*.yml"
+  notify: reload traefik

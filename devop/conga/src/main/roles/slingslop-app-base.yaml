@@ -1,0 +1,57 @@
+# slingslop-app-base — shared per-app (tenant) parameter menu.
+#
+# This role renders NO files. It only declares the configuration parameters
+# (with defaults + doc-comments) that describe a public-facing Slingslop app.
+# slingslop-edge / slingslop-webcache / slingslop-runtime inherit it so the
+# parameter menu lives in exactly one place.
+#
+# Values marked "no default" MUST be supplied by operations, per tenant, in the
+# environment file. Everything else has a convention-based default derived from
+# the tenant name.
+
+config:
+
+  # ---- node-level (one value per box, set in the environment) ----
+
+  # Base domain. A public app is served at <subdomain>.<domain>.
+  # No default — operations MUST set it per environment.
+  domain: localhost
+
+  # ---- per-tenant (per-app) values ----
+
+  # JCR content root, e.g. /content/slingslop/zengarden. Drives proxy + mapping.
+  # No default — every app must declare it.
+  contentRoot: /content/slingslop/${tenant}
+
+  # Scripts / clientlib root under /apps, e.g. /apps/slingslop/zengarden.
+  appsRoot: /apps/slingslop/${tenant}
+
+  # Left-most DNS label. Final host = <subdomain>.<domain>.
+  # Use 'www' for the primary site.
+  subdomain: ${tenant}
+
+  # Home page node name mapped from '/', e.g. 'home' -> home.html.
+  homePage: home
+
+  # contentRoot with the leading '/content' stripped — the "short" internal
+  # path the webcache re-expands (e.g. /slingslop/zengarden, /sling-matrix).
+  # Derived; operations never sets this.
+  shortContentPath: "${stringUtils:removeStart(contentRoot, '/content')}"
+
+  # Extra ServerAlias host names for the webcache vhost (the primary 'www' site
+  # usually adds the bare apex domain). Empty for a normal sub-domain app.
+  serverAliases: []
+
+  # Extra proxy pass-through path prefixes that must reach Sling unrewritten,
+  # e.g. /bin/public for the cache-busting clientlib servlet. Empty by default.
+  passthroughPaths: []
+
+  # Traefik middleware chain applied to this app's router. Gated apps add
+  # 'editor-basicauth' (and optionally 'editor-allowlist').
+  middlewares:
+  - sec-headers
+
+  # Traefik service backend for this app's router. Public-cached apps point at
+  # the webcache; a public-uncached app can override to sling:8080.
+  backendHost: webcache
+  backendPort: 80

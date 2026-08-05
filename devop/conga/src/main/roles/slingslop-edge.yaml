@@ -1,0 +1,54 @@
+# slingslop-edge — Traefik reverse proxy. Generates the static Traefik config
+# and the shared middlewares once per node, plus one file-provider router per
+# public app (multiply: tenant).
+#
+# Variants pick the TLS strategy: 'acme' (Let's Encrypt) for public boxes,
+# 'selfsigned' for local / private VMs.
+
+inherits:
+- role: slingslop-app-base
+
+variants:
+- variant: acme
+  config:
+    acme: true
+- variant: selfsigned
+  config:
+    acme: false
+
+templateDir: slingslop-edge
+
+files:
+
+# Static Traefik config — rendered once per node.
+# (No 'yaml' validator ships with CONGA; rely on well-formedness at deploy time.)
+- file: traefik.yml
+  dir: traefik
+  template: traefik.yml.hbs
+  validators: []
+
+# Shared middlewares — rendered once per node.
+- file: middlewares.yml
+  dir: traefik/dynamic
+  template: middlewares.yml.hbs
+  validators: []
+
+# One file-provider router per publicly-routed app.
+- file: "router-${tenant}.yml"
+  dir: traefik/dynamic
+  template: router.yml.hbs
+  multiply: tenant
+  multiplyOptions:
+    roles:
+    - public-cached
+    - public-uncached
+    - gated
+  validators: []
+
+config:
+  # Default TLS strategy (overridden by the 'selfsigned' variant).
+  acme: true
+  # ACME account e-mail (operations sets it per environment; empty locally).
+  acmeEmail: ""
+  # Docker network Traefik joins for label-based service discovery.
+  dockerNetwork: slingslop

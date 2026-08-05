@@ -1,0 +1,54 @@
+# slingslop-webcache — the caching + short-URL re-expansion layer in front of
+# Sling. One vhost/config file is generated per public-cached tenant (app).
+#
+# The three variants are interchangeable implementations of the same job
+# (cache Sling output + re-expand short URLs). Operations picks one per node
+# with `variant:`; the tenant params they read are identical.
+
+inherits:
+- role: slingslop-app-base
+
+variants:
+- variant: apache      # Apache httpd mod_cache + mod_proxy (default)
+- variant: varnish     # Varnish VCL
+- variant: nginx       # nginx proxy_cache
+
+templateDir: slingslop-webcache
+
+files:
+
+# ---- Apache variant: one vhost per public-cached app ----
+- file: "${tenant}.conf"
+  dir: webcache
+  template: apache/vhost.conf.hbs
+  variants:
+  - apache
+  multiply: tenant
+  multiplyOptions:
+    roles:
+    - public-cached
+  validators: []
+
+# ---- Varnish variant: one VCL per public-cached app ----
+- file: "${tenant}.vcl"
+  dir: webcache
+  template: varnish/app.vcl.hbs
+  variants:
+  - varnish
+  multiply: tenant
+  multiplyOptions:
+    roles:
+    - public-cached
+  validators: []
+
+# ---- nginx variant: one server{} per public-cached app ----
+- file: "${tenant}.conf"
+  dir: webcache
+  template: nginx/app.conf.hbs
+  variants:
+  - nginx
+  multiply: tenant
+  multiplyOptions:
+    roles:
+    - public-cached
+  validators: []

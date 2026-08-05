@@ -1,0 +1,29 @@
+# local-plain — OPERATIONS-owned. Fastest inner loop: Sling runtime only, no
+# edge, no webcache. Hit /content/... (or Sling-mapped) URLs on :8080 via
+# launcher/launch.sh. CONGA emits only the runtime feature/mapping files.
+
+config:
+  domain: localhost
+
+nodes:
+
+- node: localhost
+  roles:
+  - role: slingslop-runtime
+    variant: segment
+
+tenants:
+
+- tenant: zengarden
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zengarden
+
+- tenant: sling-matrix
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/sling-matrix
+    appsRoot: /apps/sling-matrix
+    subdomain: www

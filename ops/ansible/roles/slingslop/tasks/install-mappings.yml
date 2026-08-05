@@ -1,0 +1,49 @@
+---
+# Deploy-time short-URL mapping. Installs the CONGA-generated host-based /etc/map
+# package into the RUNNING Sling. This is what lets ops add a tenant — a host →
+# content-root binding, e.g. www.<domain> → /content/realProdContent/anothermatrix
+# — at DEPLOY time, WITHOUT rebuilding the image. /etc/map is JCR content, so it
+# must be installed at runtime, not baked as a static (image-wide) OSGi config.
+#
+# Extracted so the GitOps edge-config deploy (Agent Smith added a tenant) can run
+# just this, against the already-running Sling, without touching the container.
+
+- name: Ensure properties.xml carries the FileVault DOCTYPE (CONGA strips it)
+  ansible.builtin.replace:
+    path: "{{ conga_config_dir }}/slingmappings/META-INF/vault/properties.xml"
+    regexp: '(<\?xml[^>]*\?>)(?!<!DOCTYPE)'
+    replace: '\1<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">'
+  delegate_to: localhost
+  become: false
+
+- name: Package the slingmappings vlt zip (jcr_root + META-INF at zip root)
+  ansible.builtin.shell:
+    cmd: rm -f slingslop.slingmappings.zip && zip -qr slingslop.slingmappings.zip jcr_root META-INF
+    chdir: "{{ conga_config_dir }}/slingmappings"
+  delegate_to: localhost
+  become: false
+  changed_when: true
+
+- name: Copy mappings package to the host
+  ansible.builtin.copy:
+    src: "{{ conga_config_dir }}/slingmappings/slingslop.slingmappings.zip"
+    dest: /tmp/slingslop.slingmappings.zip
+    mode: "0644"
+
+- name: Upload + install mappings package (Composum package manager)
+  ansible.builtin.shell:
+    cmd: |
+      set -euo pipefail
+      P=$(curl -sf -u 'admin:{{ vault_sling_admin_password }}' \
+            -F file=@/tmp/slingslop.slingmappings.zip -F force=true \
+            '{{ sling_internal_url }}/bin/cpm/package.upload.json' \
+          | sed -n 's/.*"path":"\([^"]*\)".*/\1/p')
+      test -n "$P"
+      curl -sf -u 'admin:{{ vault_sling_admin_password }}' -X POST \
+            "{{ sling_internal_url }}/bin/cpm/package.install.json$P"
+  changed_when: true
+
+- name: Remove the uploaded package tarball from the host
+  ansible.builtin.file:
+    path: /tmp/slingslop.slingmappings.zip
+    state: absent

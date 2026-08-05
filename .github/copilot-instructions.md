@@ -25,7 +25,7 @@ The agent should:
 1. Read `docs/agent-skills/create-Sling-app-with-Agent_Smith.md` in full.
 2. Map every issue-template field to the corresponding Agent Smith variable (see table below).
 3. Skip the Conversation Phase (§1) — the issue body replaces it.
-4. Execute all 13 tasks from §2.0 in order, tracking them as a todo list.
+4. Execute all 14 tasks from §2.0 in order, tracking them as a todo list. Task 13 (register the app for deployment via CONGA — see §2.8) applies to public-facing apps only.
 5. Open a pull request when the build passes, using the PR description format from the skill.
 
 ### Field mapping: issue → Agent Smith variables

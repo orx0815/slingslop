@@ -1,0 +1,54 @@
+# prod.motorbrot — OPERATIONS-owned production environment.
+#
+# The ENTIRE per-deployment surface. Add an app = append one `- tenant:` block.
+# Fork = copy this file, change `domain` and the tenant list.
+#
+# Secrets (ACME e-mail, htpasswd) stay in the Ansible vault; only non-sensitive
+# routing lives here.
+
+config:
+  domain: motorbrot.org
+
+nodes:
+
+- node: vps1
+  roles:
+  - role: slingslop-edge
+    variant: acme
+  - role: slingslop-webcache
+    variant: apache
+  - role: slingslop-runtime
+    variant: composite-nodestore
+
+tenants:
+
+- tenant: zengarden
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zengarden
+
+- tenant: sling-matrix
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/sling-matrix
+    appsRoot: /apps/sling-matrix
+    subdomain: www
+    serverAliases:
+    - "${domain}"
+    passthroughPaths:
+    - /bin/public
+
+- tenant: digitalmedia
+  roles:
+  - gated
+  config:
+    contentRoot: /content/digitalmedia
+    # author/preview host: basicAuth-gated at the edge, no webcache in front,
+    # so Traefik proxies straight to Sling.
+    backendHost: sling
+    backendPort: 8080
+    middlewares:
+    - sec-headers
+    - editor-basicauth

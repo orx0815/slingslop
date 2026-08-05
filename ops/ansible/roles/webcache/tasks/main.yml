@@ -1,7 +1,10 @@
 ---
-# Render webcache vhost configs that get bind-mounted *over* the ones baked
-# into the published webcache image. This lets us reuse the upstream image
-# without rebuilding it per deployment, and parameterise the domain.
+# Ship the webcache vhosts that CONGA generated for this environment/node.
+# One `<app>.conf` per public-cached tenant is rendered by `mvn -pl devop/conga`
+# into devop/conga/target/configuration/<env>/<node>/webcache/ ; here we just
+# copy that directory onto the host, where compose bind-mounts it over the
+# image's /etc/apache2/sites-enabled. Adding an app needs *no* change here —
+# only a new tenant in the CONGA environment file.
 
 - name: Create webcache config dir
   ansible.builtin.file:
@@ -11,53 +14,27 @@
     group: root
     mode: "0755"
 
-# If a bind-mounted vhost config source is ever missing when `dc up` runs,
-# Docker silently creates a *directory* at that path; the mount then fails with
-# "not a directory". Self-heal by removing any such stale directory before we
-# (re-)render the real files.
-- name: Stat vhost config paths (may be stale dirs left by a failed bind-mount)
+- name: Locate CONGA webcache output (must exist on the control node)
   ansible.builtin.stat:
-    path: "{{ slingslop_root }}/data/webcache/{{ item }}"
-  loop:
-    - www.conf
-    - zengarden.conf
-  register: webcache_conf_stat
+    path: "{{ conga_config_dir }}/webcache"
+  delegate_to: localhost
+  become: false
+  register: conga_webcache_dir
 
-- name: Remove stale directories Docker auto-created at vhost config paths
-  ansible.builtin.file:
-    path: "{{ item.stat.path }}"
-    state: absent
-  loop: "{{ webcache_conf_stat.results }}"
-  loop_control:
-    label: "{{ item.stat.path }}"
-  when: item.stat.exists and item.stat.isdir
+- name: Fail with a helpful hint when CONGA output is missing
+  ansible.builtin.fail:
+    msg: >-
+      No CONGA webcache output at {{ conga_config_dir }}/webcache .
+      Run `mvn -pl devop/conga clean package` on the control node first
+      (conga_env={{ conga_env }}, conga_node={{ conga_node }}).
+  when: not conga_webcache_dir.stat.exists
 
-- name: Render www vhost
-  ansible.builtin.template:
-    src: www.conf.j2
-    dest: "{{ slingslop_root }}/data/webcache/www.conf"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: restart webcache
-
-- name: Render zengarden vhost
-  ansible.builtin.template:
-    src: zengarden.conf.j2
-    dest: "{{ slingslop_root }}/data/webcache/zengarden.conf"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: restart webcache
-
-- name: Drop empty placeholder that replaces the image's editor_motor.conf
+- name: Ship CONGA-generated webcache vhosts (one per public-cached app)
   ansible.builtin.copy:
-    dest: "{{ slingslop_root }}/data/webcache/editor_motor.conf"
+    src: "{{ conga_config_dir }}/webcache/"
+    dest: "{{ slingslop_root }}/data/webcache/"
     owner: root
     group: root
     mode: "0644"
-    content: |
-      # placeholder — replaces editor_motor.conf shipped in the upstream
-      # webcache image. editor.{{ '{{' }} domain {{ '}}' }} is served directly by Traefik
-      # -> slingslop (no cache, basicAuth gate); no Apache vhost needed here.
   notify: restart webcache
+

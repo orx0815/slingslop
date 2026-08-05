@@ -12,6 +12,20 @@
 # --- Local domain (mapped to the VM IP via /etc/hosts, see test-local.sh) ---
 domain: slingslop.local
 
+# --- CONGA deploy config for this box. `local-full` is the CONGA environment
+# whose domain is slingslop.local (self-signed edge); its single node is
+# `localhost`. The webcache/traefik roles ship the vhosts + routers CONGA
+# rendered there (devop/conga/target/configuration/local-full/localhost/…).
+conga_env: local-full
+conga_node: localhost
+
+# --- Ship a locally-built image (with your freshly-added apps) into the VM,
+# instead of pulling the prebuilt one from GHCR. test-local.sh builds it
+# (`mvn … -Ddocker.skip=false`) and `docker save`s it to this tarball. ---
+slingslop_image: ghcr.io/orx0815/slingslop:snapshot
+slingslop_image_pull: false
+slingslop_image_load_tar: "{{ playbook_dir }}/../local/.runtime/slingslop-image.tar"
+
 # --- The whole point of the local harness: no Let's Encrypt on a private VM.
 # Traefik serves its built-in self-signed cert; browsers will warn (expected).
 traefik_acme_enabled: false

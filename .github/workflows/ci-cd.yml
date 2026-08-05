@@ -52,6 +52,7 @@ jobs:
       is_deploy: ${{ steps.tags.outputs.is_deploy }}
       sling: ${{ steps.filter.outputs.sling }}
       webcache: ${{ steps.filter.outputs.webcache }}
+      tenants: ${{ steps.filter.outputs.tenants }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -80,6 +81,11 @@ jobs:
               - 'pom.xml'
             webcache:
               - 'docker/webcache/**'
+            tenants:
+              # CONGA roles / templates / environments (the tenant list). A change
+              # here — e.g. Agent Smith adding a tenant — triggers an edge-config
+              # deploy (Traefik routers + webcache vhosts + Sling /etc/map), no image.
+              - 'devop/conga/src/main/**'
 
   # ---------------------------------------------------------------- build+test
   build-test:
@@ -225,4 +231,59 @@ jobs:
           ansible-playbook -i inventory/hosts.yml playbooks/update-webcache.yml \
             --vault-password-file /tmp/vp \
             -e "webcache_image=$IMAGE"
+          rm -f /tmp/vp
+
+  # ---------------------------------------------------------------- deploy edge config (tenants)
+  # GitOps: when the CONGA tenant list / roles / templates change (e.g. Agent
+  # Smith added a tenant), regenerate the CONGA config and ship the reverse-proxy
+  # + Sling short-URL mapping for the new tenant to the running host — WITHOUT
+  # rebuilding or swapping any image. Runs after the image deploys if those ran
+  # (so a combined app+tenant change lands content first), or standalone for a
+  # pure tenant change.
+  deploy-edge:
+    needs: [meta, build-test, deploy-sling, deploy-webcache]
+    if: |
+      always() &&
+      needs.meta.outputs.is_deploy == 'true' &&
+      needs.meta.outputs.tenants == 'true' &&
+      needs.build-test.result == 'success' &&
+      needs.deploy-sling.result != 'failure' && needs.deploy-sling.result != 'cancelled' &&
+      needs.deploy-webcache.result != 'failure' && needs.deploy-webcache.result != 'cancelled'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Generate CONGA deploy config
+        # Builds the parent + launcher-dependencies BOM + the CONGA module, which
+        # renders devop/conga/target/configuration/<env>/<node>/ that Ansible ships.
+        run: |
+          mvn -U -pl launcher/launcher-dependencies,devop/conga -am \
+            -DskipTests -Ddocker.skip=true clean package
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Deploy edge config (Traefik routers + webcache vhosts + Sling /etc/map)
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST || 'motorbrot.org' }}
+          DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'motorbrot.org' }}
+        run: |
+          set -euo pipefail
+          [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
+          python3 -m pip install --quiet "ansible-core>=2.17"
+          cd ops/ansible
+          ansible-galaxy collection install -r requirements.yml >/dev/null
+          printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
+          bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
+          ansible-playbook -i inventory/hosts.yml playbooks/deploy-tenant-edge.yml \
+            --vault-password-file /tmp/vp
           rm -f /tmp/vp

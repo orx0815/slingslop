@@ -17,11 +17,32 @@
     group: root
     mode: "0640"
 
+# Local test path: ship a locally-built image (containing freshly-added apps)
+# into the host instead of pulling from a registry.
+- name: Load locally-built slingslop image tarball
+  when: slingslop_image_load_tar | default('') | length > 0
+  block:
+    - name: Copy image tarball to host
+      ansible.builtin.copy:
+        src: "{{ slingslop_image_load_tar }}"
+        dest: /tmp/slingslop-image.tar
+        mode: "0644"
+    - name: docker load the image
+      ansible.builtin.command:
+        cmd: "docker load -i /tmp/slingslop-image.tar"
+      register: img_load
+      changed_when: "'Loaded image' in img_load.stdout"
+    - name: Remove the tarball
+      ansible.builtin.file:
+        path: /tmp/slingslop-image.tar
+        state: absent
+
 - name: Pull slingslop image
   community.docker.docker_image:
     name: "{{ slingslop_image }}"
     source: pull
     force_source: false
+  when: slingslop_image_pull | default(true) | bool
 
 - name: Bring up slingslop container
   ansible.builtin.command:
@@ -41,3 +62,10 @@
 
 - name: Rotate Sling admin password
   ansible.builtin.include_tasks: rotate-password.yml
+
+# Deploy-time short-URL mapping — install the CONGA /etc/map package into the
+# running Sling (see install-mappings.yml). Extracted so the GitOps edge-config
+# deploy can reuse it standalone.
+- name: Install CONGA /etc/map short-URL mappings package
+  ansible.builtin.include_tasks: install-mappings.yml
+  tags: [slingmappings]

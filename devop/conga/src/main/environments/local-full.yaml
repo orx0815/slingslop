@@ -1,0 +1,37 @@
+# local-full — OPERATIONS-owned. Full prod-like stack on one local box
+# (vagrant): Traefik (self-signed TLS) + webcache + Sling runtime. Reach it at
+# https://<app>.slingslop.local.
+
+config:
+  domain: slingslop.local
+
+nodes:
+
+- node: localhost
+  roles:
+  - role: slingslop-edge
+    variant: selfsigned
+  - role: slingslop-webcache
+    variant: apache
+  - role: slingslop-runtime
+    variant: composite-nodestore
+
+tenants:
+
+- tenant: zengarden
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zengarden
+
+- tenant: sling-matrix
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/sling-matrix
+    appsRoot: /apps/sling-matrix
+    subdomain: www
+    serverAliases:
+    - "${domain}"
+    passthroughPaths:
+    - /bin/public

@@ -8,7 +8,8 @@
 # Usage:
 #   ./test-local.sh up         # boot VM + run bootstrap + site (default)
 #   ./test-local.sh bootstrap  # (re)run bootstrap.yml only
-#   ./test-local.sh site       # (re)run site.yml only
+#   ./test-local.sh site       # rebuild image + CONGA config, then (re)run site.yml
+#   ./test-local.sh image      # only rebuild the local image + CONGA config (docker save)
 #   ./test-local.sh hosts      # print the /etc/hosts lines you need
 #   ./test-local.sh ssh        # ssh into the VM as the deploy user
 #   ./test-local.sh status     # vagrant status
@@ -19,6 +20,7 @@ set -euo pipefail
 
 LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ANSIBLE_DIR="$(cd "${LOCAL_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${ANSIBLE_DIR}/../.." && pwd)"
 VM_IP="${SLINGSLOP_VM_IP:-192.168.56.50}"
 DEPLOY_USER="deploy"
 RUNTIME_DIR="${LOCAL_DIR}/.runtime"
@@ -28,12 +30,13 @@ DEPLOY_KEY="${SSH_DIR}/deploy_ed25519"
 SECRETS_VARS="${RUNTIME_DIR}/secrets.local.yml"
 BOOTSTRAP_INV="${RUNTIME_DIR}/bootstrap-inventory.ini"
 DEPLOY_INV="${RUNTIME_DIR}/deploy-inventory.ini"
+IMAGE_TAR="${RUNTIME_DIR}/slingslop-image.tar"
 
 MAIN_VARS="${ANSIBLE_DIR}/inventory/group_vars/all/main.yml"
 LOCAL_VARS="${LOCAL_DIR}/vars.local.yml"
 
 # Domains that must resolve to the VM for Traefik host-routing to work.
-HOST_NAMES=("slingslop.local" "www.slingslop.local" "editor.slingslop.local" "grafana.slingslop.local" "logs.slingslop.local" "traefik.slingslop.local")
+HOST_NAMES=("slingslop.local" "www.slingslop.local" "zengarden.slingslop.local" "editor.slingslop.local" "grafana.slingslop.local" "logs.slingslop.local" "traefik.slingslop.local")
 
 log()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[!]\033[0m %s\n' "$*"; }
@@ -147,6 +150,7 @@ run_play() {  # $1 = inventory, $2 = playbook
 
 cmd_up() {
   ensure_prereqs; ensure_venv; ensure_ssh_key; gen_secrets
+  build_and_save_image
   log "Booting VM (vagrant up) …"
   ( cd "${LOCAL_DIR}" && vagrant up )
   write_inventories
@@ -156,14 +160,30 @@ cmd_up() {
   run_play "${DEPLOY_INV}" site.yml
   cmd_hosts
   log "Done. Add the /etc/hosts lines above, then browse (accept the self-signed cert):"
-  echo "     https://www.slingslop.local/     (public site)"
-  echo "     https://editor.slingslop.local/  (basicAuth: localtest / localtest, then Sling admin)"
-  echo "     https://grafana.slingslop.local/ (basicAuth: localtest / localtest)"
-  echo "     https://traefik.slingslop.local/ (basicAuth: localtest / localtest)"
+  echo "     https://www.slingslop.local/          (public site — sling-matrix)"
+  echo "     https://zengarden.slingslop.local/    (public site — CSS Zen Garden)"
+  echo "     https://editor.slingslop.local/       (basicAuth: localtest / localtest, then Sling admin)"
+  echo "     https://grafana.slingslop.local/      (basicAuth: localtest / localtest)"
+  echo "     https://traefik.slingslop.local/      (basicAuth: localtest / localtest)"
+}
+
+# Build the slingslop image + CONGA deploy config locally, then `docker save` the
+# image so Ansible can load it into the VM (the VM must run *your* code, incl.
+# freshly-added apps, not a prebuilt registry image). The same `mvn install` also
+# populates devop/conga/target/configuration/, which the webcache/traefik roles
+# ship onto the box.
+build_and_save_image() {
+  require docker "Install Docker (the local test loads a locally-built image into the VM)."
+  log "Building slingslop image + CONGA deploy config (mvn … -Ddocker.skip=false) …"
+  ( cd "${REPO_ROOT}" && mvn -q clean install -DskipITs -Ddocker.skip=false )
+  mkdir -p "${RUNTIME_DIR}"
+  log "Saving image to ${IMAGE_TAR} (docker save) …"
+  docker save ghcr.io/orx0815/slingslop:snapshot -o "${IMAGE_TAR}"
 }
 
 cmd_bootstrap() { ensure_prereqs; ensure_venv; ensure_ssh_key; gen_secrets; write_inventories; run_play "${BOOTSTRAP_INV}" bootstrap.yml; }
-cmd_site()      { ensure_prereqs; ensure_venv; ensure_ssh_key; gen_secrets; write_inventories; run_play "${DEPLOY_INV}" site.yml; }
+cmd_site()      { ensure_prereqs; ensure_venv; ensure_ssh_key; gen_secrets; build_and_save_image; write_inventories; run_play "${DEPLOY_INV}" site.yml; }
+cmd_image()     { ensure_prereqs; build_and_save_image; }
 
 cmd_hosts() {
   log "Add these lines to /etc/hosts on your host machine:"
@@ -182,11 +202,12 @@ main() {
     up)        cmd_up ;;
     bootstrap) cmd_bootstrap ;;
     site)      cmd_site ;;
+    image)     cmd_image ;;
     hosts)     cmd_hosts ;;
     ssh)       cmd_ssh ;;
     status)    cmd_status ;;
     destroy)   cmd_destroy ;;
-    *) die "Unknown command '$1'. Use: up | bootstrap | site | hosts | ssh | status | destroy" ;;
+    *) die "Unknown command '$1'. Use: up | bootstrap | site | image | hosts | ssh | status | destroy" ;;
   esac
 }
 

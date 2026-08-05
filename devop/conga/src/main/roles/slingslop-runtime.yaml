@@ -1,0 +1,69 @@
+# slingslop-runtime — the Sling instance side. Generates:
+#  * the OUTBOUND short-URL half: a FileVault (vlt) package of /etc/map host
+#    mappings, so resourceResolver.map() writes short links into the markup;
+#  * the launcher Feature Model aggregate that lists the app content packages
+#    plus the generated slingslop.slingmappings package.
+#
+# Variants select the Oak nodestore flavour used by the launcher.
+
+inherits:
+- role: slingslop-app-base
+
+variants:
+- variant: composite-nodestore
+  config:
+    nodeStore: composite
+- variant: segment
+  config:
+    nodeStore: segment
+
+templateDir: slingslop-runtime
+
+files:
+
+# OUTBOUND short URLs: one /etc/map host node per publicly-routed app.
+# FileVault layout: jcr_root/etc/map/https/<host>/.content.xml
+- file: .content.xml
+  dir: "slingmappings/jcr_root/etc/map/https/${subdomain}.${domain}"
+  template: mapping.content.xml.hbs
+  multiply: tenant
+  multiplyOptions:
+    roles:
+    - public-cached
+    - public-uncached
+    - gated
+  validators:
+  - xml
+
+# FileVault package descriptor — rendered once per node.
+- file: filter.xml
+  dir: slingmappings/META-INF/vault
+  template: filter.xml.hbs
+  validators:
+  - xml
+
+- file: properties.xml
+  dir: slingmappings/META-INF/vault
+  template: properties.xml.hbs
+  # No xml validator: the FileVault properties.xml carries a DOCTYPE (required by
+  # java.util.Properties.loadFromXML at install time); a well-formedness check
+  # would try to fetch the external DTD offline and fail.
+  validators: []
+
+# Launcher Feature Model aggregate — lists app packages + the mappings package.
+- file: apps-aggregate.json
+  dir: features
+  template: apps-aggregate.json.hbs
+  validators:
+  - json
+
+config:
+  # Maven coordinates of the generated /etc/map FileVault package, referenced by
+  # the feature aggregate and installed next to slingslop.complete.
+  mappingsPackageGroup: org.motorbrot
+  mappingsPackageName: slingslop.slingmappings
+  mappingsPackageVersion: 0.0.1-SNAPSHOT
+  # Coordinates of the existing 'complete' (all) content package. The
+  # ${...} is a Feature Model launch-time variable, escaped so CONGA emits it
+  # literally rather than trying to resolve it.
+  completePackageId: "org.motorbrot/slingslop.complete/\\${slingslop.launcher.version}/zip"
