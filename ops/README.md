@@ -109,6 +109,71 @@ structure — replace `group_vars/all/vault.yml` with `vault.sops.yml` and add
 - `vault_acme_email` — Let's Encrypt registration
 - `vault_ssh_admin_pubkey` — public key of the only allowed login user
 
+### 1a. Two-tier vault — public on `main`, real on the deploy branch
+
+The committed, encrypted `vault.yml` is **deliberately different per branch**:
+
+| Branch | `vault.yml` contents | Vault passphrase |
+|---|---|---|
+| `main` (and feature branches) | **public demo** values (`admin`/`admin`, `editor`/`editor`, `ops`/`ops`; an **inert** SSH key whose private half was destroyed) | **committed**: [`ansible/.vault_pass.public`](ansible/.vault_pass.public) → `slingslop-public-demo` |
+| `deploy/motorbrot_prod` | the **real** secrets | private — the `ANSIBLE_VAULT_PASSWORD` GitHub secret, never committed |
+
+So anyone can clone `main` and inspect (or dry-run against their own inventory)
+with the demo vault — no secret required:
+
+```bash
+cd ops/ansible
+ansible-vault view inventory/group_vars/all/vault.yml \
+  --vault-password-file .vault_pass.public
+ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
+  --vault-password-file .vault_pass.public
+```
+
+**A real deploy never uses the public vault.** The `deploy/motorbrot_prod` branch
+carries its own `vault.yml` (real secrets); CI decrypts it with the
+`ANSIBLE_VAULT_PASSWORD` secret. For a real host you MUST also override
+`vault_ssh_admin_pubkey` with a usable key — the demo one grants access to nobody
+by design. (The local Vagrant harness ignores the vault entirely; it supplies
+throwaway `vault_*` values via `local/vars.local.yml`.)
+
+**Branch safety.** A root [`.gitattributes`](../.gitattributes) marks `vault.yml`
+as `merge=ours`, so each branch keeps its own vault on any merge — a `main`→prod
+merge can't overwrite the real secrets, and a prod→`main` merge can't leak them.
+Enable the driver once per clone / CI runner (without it, git safely falls back
+to a normal merge → conflict, never a silent clobber):
+
+```bash
+git config merge.ours.driver true
+```
+
+### 1b. Editing / rotating a vault (how-to)
+
+All commands run from `ops/ansible/`. On `main` decrypt with the committed public
+passphrase (`--vault-password-file .vault_pass.public`); on
+`deploy/motorbrot_prod` swap that for `--ask-vault-pass` (or a file holding the
+private `ANSIBLE_VAULT_PASSWORD`) — **never commit the real passphrase**.
+
+```bash
+P=--vault-password-file=.vault_pass.public          # main; use --ask-vault-pass on the deploy branch
+V=inventory/group_vars/all/vault.yml
+
+ansible-vault view  $V $P                            # read it
+ansible-vault edit  $V $P                            # opens $EDITOR, re-encrypts on save
+ansible-vault rekey $V $P                            # change the passphrase
+
+# Encrypt ONE value to paste into a plain YAML file (mixed plain+secret vars):
+ansible-vault encrypt_string 'new-pass' --name vault_grafana_admin_password $P
+```
+
+- After changing a credential, apply it:
+  `ansible-playbook -i inventory/hosts.yml playbooks/site.yml $P`
+  (or `playbooks/change-admin-password.yml` for just the Sling admin password).
+- The file must stay **encrypted** in git — verify its first line is
+  `$ANSIBLE_VAULT;1.1;AES256` before you `git add` (see the `.gitignore` note).
+- Regenerate the whole public vault from scratch? Write plaintext to a temp file,
+  then `ansible-vault encrypt /tmp/plain --vault-password-file .vault_pass.public
+  --output inventory/group_vars/all/vault.yml` (keep plaintext out of the repo).
+
 ### 2. Docker
 
 Installed from Docker's own apt repo (engine + compose plugin + buildx) via

@@ -262,6 +262,20 @@ ops guide. Adding the tenant above is all a new public sub-domain needs: the
 GitOps `deploy-tenant-edge` job ships that generated config (router + vhost +
 `/etc/map`) to a running host **without an image rebuild**.
 
+> **Demo credentials** — local Vagrant VM, all throwaway, never reuse anywhere real:
+>
+> | Surface | Login |
+> |---|---|
+> | Sling admin — author UI at `editor.slingslop.local`, console at `/` | `admin` / `admin` |
+> | Edge basicAuth gate — `editor.` / `grafana.` / `logs.` / `traefik.slingslop.local` | `localtest` / `localtest` |
+> | Grafana app login (inside Grafana) | `admin` / `admin` |
+> | Ansible vault on `main` (public) — passphrase file `ops/ansible/.vault_pass.public` | `slingslop-public-demo` |
+>
+> These come from `ops/ansible/local/vars.local.yml` (+ generated
+> `secrets.local.yml`); the public vault ships the same throwaway values for a
+> real-stack dry-run. A production deploy uses the private vault on
+> `deploy/motorbrot_prod` instead — see [ops/README.md](ops/README.md#1-secret-management).
+
 ### Where the content lives (important)
 
 The sample content under `content-packages/` is **baked into the image** so the
