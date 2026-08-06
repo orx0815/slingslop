@@ -2,21 +2,17 @@
 # Pre-flight guard for the GitOps deploy.
 #
 # The committed prod vault MUST decrypt with the real ANSIBLE_VAULT_PASSWORD and
-# carry known keys. A PR based on `main` carries the PUBLIC demo vault, which is
-# encrypted with a DIFFERENT passphrase. If such a PR is merged into the deploy
-# branch and clobbers the real vault (e.g. a fast-forward of the vault file that
-# no merge driver caught, because GitHub's server-side merge ignores
-# `.gitattributes merge=ours`), the box would otherwise be deployed with demo
-# credentials. This guard fails the deploy BEFORE the VPS is touched.
+# carry known keys. The vault is byte-identical on every branch, so this is not
+# about branch divergence — it catches a commit that replaced it with a
+# different / empty / garbled file, failing the deploy BEFORE the VPS is touched
+# instead of shipping wrong or broken secrets.
 #
-# See ops/README.md and the two-tier vault note.
+# See ops/README.md.
 set -euo pipefail
 
 VP="${1:?usage: verify-vault.sh <vault-password-file>}"
 
-# The real prod vault lives at the deploy-only group path (group_vars/slingslop/),
-# which main/feature branches never carry — so a merge from main can't clobber it.
-VAULT="ops/ansible/inventory/group_vars/slingslop/vault.yml"
+VAULT="ops/ansible/inventory/group_vars/all/vault.yml"
 if [ ! -f "$VAULT" ]; then
   echo "::error::no committed vault found at $VAULT — refusing to deploy."
   exit 1
@@ -43,7 +39,7 @@ done
 
 if [ ${#missing[@]} -gt 0 ]; then
   echo "::error::prod vault decrypted but is missing expected keys: ${missing[*]}"
-  echo "::error::This looks like the wrong vault was committed to the deploy branch. Refusing to deploy."
+  echo "::error::This looks like the wrong vault was committed. Refusing to deploy."
   exit 1
 fi
 

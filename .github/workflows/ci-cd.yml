@@ -11,7 +11,7 @@ name: CI/CD
 # Required repo/org config:
 #   Secrets:
 #     DEPLOY_SSH_KEY        private key allow-listed for the `deploy` user on the VPS
-#     ANSIBLE_VAULT_PASSWORD  password for inventory/group_vars/slingslop/vault.yml
+#     ANSIBLE_VAULT_PASSWORD  password for inventory/group_vars/all/vault.yml
 #   Variables (optional, sensible defaults shown):
 #     DEPLOY_HOST   (default motorbrot.org)   SSH target for the VPS
 #     DEPLOY_DOMAIN (default motorbrot.org)   public domain published by Traefik

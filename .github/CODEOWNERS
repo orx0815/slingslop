@@ -5,7 +5,7 @@
 # Purpose: no app / Agent-Smith PR can quietly modify secrets or deploy infra.
 # The real prod vault must only ever change through a reviewed, deliberate PR.
 
-/ops/ansible/inventory/group_vars/slingslop/vault.yml   @orx0815
+/ops/ansible/inventory/group_vars/all/vault.yml   @orx0815
 /ops/ansible/**                                    @orx0815
 /.github/workflows/**                              @orx0815
 /.github/scripts/**                                @orx0815
