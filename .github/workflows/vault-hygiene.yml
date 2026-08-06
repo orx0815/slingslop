@@ -1,0 +1,35 @@
+name: vault-hygiene
+
+# Enforces the invariant: the REAL prod vault lives ONLY on deploy/motorbrot_prod.
+# `main` (and anything merged into it) must NEVER contain it. This is the reverse
+# of verify-vault (which guards the deploy side) and catches:
+#   * a deploy -> main merge dragging the encrypted vault into main,
+#   * a fork PR that adds a vault file,
+#   * an accidental commit.
+#
+# Deliberately needs NO secrets (it only checks file presence), so it runs on
+# fork pull_request events too. Make it a required status check on `main`.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  no-real-vault-on-main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Real prod vault must never land on main
+        run: |
+          set -euo pipefail
+          f=ops/ansible/inventory/group_vars/slingslop/vault.yml
+          if [ -e "$f" ]; then
+            echo "::error file=$f::$f must NOT exist on main — the real prod vault belongs only on deploy/motorbrot_prod. A deploy→main merge or a fork PR likely brought it in. Remove it (git rm) before merging."
+            exit 1
+          fi
+          echo "ok: no real prod vault present on main."

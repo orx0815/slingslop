@@ -1,0 +1,11 @@
+# Code owners — GitHub requires an owner review on matching paths when the
+# branch-protection rule "Require review from Code Owners" is enabled for the
+# target branch (do enable it for `main` and `deploy/motorbrot_prod`).
+#
+# Purpose: no app / Agent-Smith PR can quietly modify secrets or deploy infra.
+# The real prod vault must only ever change through a reviewed, deliberate PR.
+
+/ops/ansible/inventory/group_vars/slingslop/vault.yml   @orx0815
+/ops/ansible/**                                    @orx0815
+/.github/workflows/**                              @orx0815
+/.github/scripts/**                                @orx0815

@@ -84,17 +84,83 @@ Layout:
 | Path | Contents | Encrypted? |
 |---|---|---|
 | `ops/ansible/inventory/group_vars/all/main.yml`  | non-secret config | no |
-| `ops/ansible/inventory/group_vars/all/vault.yml` | every secret | **yes** (ansible-vault) |
+| `ops/ansible/inventory/group_vars/slingslop/vault.yml` | every real secret (**deploy branch only**) | **yes** (ansible-vault) |
 | `/opt/slingslop/secrets/*.env` on host | rendered env-files, `0600 root:root` | n/a |
 
 ```bash
-# create the vault once
-ansible-vault create ops/ansible/inventory/group_vars/all/vault.yml
+# create the vault once (on the deploy branch)
+ansible-vault create ops/ansible/inventory/group_vars/slingslop/vault.yml
 # edit later
-ansible-vault edit   ops/ansible/inventory/group_vars/all/vault.yml
+ansible-vault edit   ops/ansible/inventory/group_vars/slingslop/vault.yml
 # run plays
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass
 ```
+
+#### Why the vault lives in `group_vars/slingslop/` (merge-clobber protection)
+
+The real vault deliberately sits at `group_vars/slingslop/vault.yml`, a path that
+`main` and feature branches **never contain**. Git merges only reconcile files
+present in the incoming history, so a PR merged from `main` (e.g. an Agent Smith
+app PR) into `deploy/motorbrot_prod` **cannot modify or delete** the real vault.
+
+This replaces the old, fragile design where the demo vault (on `main`) and the
+real vault (on `deploy`) shared the path `group_vars/all/vault.yml` on different
+branches — exactly what a merge clobbers. `.gitattributes merge=ours` does **not**
+help, because GitHub's server-side "Merge" button ignores custom merge drivers.
+The `verify-vault` CI job is the backstop: it decrypts the committed vault and
+checks sentinel keys before any deploy job runs, so a wrong/clobbered vault fails
+the pipeline before the VPS is touched.
+
+The `slingslop` group's only member is `slingslop-prod`, and group-scoped vars
+override `group_vars/all`, so these values apply to the real host. No new GitHub
+secret is needed — the deploy still uses the single `ANSIBLE_VAULT_PASSWORD`.
+
+##### The reverse direction: keep the real vault OFF `main`
+
+The new-path trick protects `main → deploy`, but the vault must also never travel
+the other way. A `deploy → main` merge (or a fork PR) *would* add
+`group_vars/slingslop/vault.yml` to `main`, spreading the encrypted blob to the
+public branch and every fork. Two rules enforce the invariant:
+
+- **Flow is one-way.** Author ops changes on `main`/feature branches and merge
+  *forward* into `deploy/motorbrot_prod`. Never merge `deploy → main`; if a commit
+  made directly on deploy needs to reach main, cherry-pick the non-vault commit.
+- **CI backstop:** the `vault-hygiene` workflow fails any PR to (or push on) `main`
+  that contains `group_vars/slingslop/vault.yml`. It needs no secret, so it also
+  runs on fork PRs. Make it a required status check on `main`.
+
+Forks inherently copy whatever ciphertext is in the history they clone; that is
+acceptable under ansible-vault *because the passphrase is never committed*. If you
+treat the encrypted blob itself as sensitive, keep the repo private and/or rotate
+the secrets whose old ciphertext already exists in `main`'s history.
+
+##### Migrating an existing real vault from `group_vars/all/vault.yml`
+
+The deploy branch's real vault has already been relocated to
+`group_vars/slingslop/vault.yml` (a plain `mv` of the *encrypted* blob — no
+decryption, no secret config). To reproduce on a fresh deploy branch:
+
+```bash
+mkdir -p ops/ansible/inventory/group_vars/slingslop
+git mv ops/ansible/inventory/group_vars/all/vault.yml \
+       ops/ansible/inventory/group_vars/slingslop/vault.yml
+```
+
+The only remaining step is on `main`: delete the demo `group_vars/all/vault.yml`
+(non-secret) so **no branch** carries that shared path any more — after which a
+`main → deploy` merge can never touch the real vault:
+
+```bash
+git switch main
+git rm ops/ansible/inventory/group_vars/all/vault.yml   # demo values only
+git commit -m "ops(vault): drop shared-path demo vault; real vault is deploy-only"
+git push
+```
+
+Sanity check: the `verify-vault` job (or `bash .github/scripts/verify-vault.sh
+<pwfile>` locally) must decrypt `group_vars/slingslop/vault.yml` and find the
+sentinel keys. No play may target `localhost` expecting `vault_*` — all secret
+consumers run against the `slingslop-prod` host.
 
 **GitOps upgrade path:** drop in **sops + age** without changing the play
 structure — replace `group_vars/all/vault.yml` with `vault.sops.yml` and add

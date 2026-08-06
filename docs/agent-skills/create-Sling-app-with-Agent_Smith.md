@@ -178,6 +178,14 @@ older conventions that will mislead a fresh scaffold (and burn tokens):**
 **Sole exception:** `devop/conga/` — and only while executing **Task 13** (CONGA
 tenant registration) for a *public-facing* app, per §2.8. Otherwise stay out.
 
+**NEVER create, edit, move, or delete secrets or deploy infrastructure.** In
+particular, do not touch any `vault.yml` / `vault.*.yml` (ansible-vault
+encrypted), anything under `ops/`, or the CI workflows under `.github/workflows/`.
+These are branch-protected and carry real production secrets — an app scaffold
+has no business changing them, and a stray edit can clobber the prod vault on
+merge. Your Task 13 change is limited to *appending a tenant block* to a CONGA
+`environments/*.yaml` file; nothing else in `devop/` or `ops/`.
+
 If you catch yourself opening a file outside `zengarden`, the root `pom.xml`, or the
 files this skill names explicitly — stop. You don't need it.
 
@@ -1506,6 +1514,7 @@ Use this checklist to verify completeness:
 - **Never** create a JavaScript solution when CSS can do it
 - **Never** include tiptap/modal code if ALF chose non-editable
 - **Never** hard-code the "silly hack" from zengarden's UserIsLoggedIn
+- **Never** touch secrets or deploy infra: no `vault.yml` / `vault.*.yml`, nothing under `ops/`, no `.github/workflows/**` — these are branch-protected and a stray edit can clobber the prod vault on merge (Task 13 only *appends a tenant block* to a CONGA `environments/*.yaml`)
 - **Never** skip the `mvn install` validation step
 
 ## Appendix C: Smith's Creative Latitude

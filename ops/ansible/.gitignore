@@ -1,8 +1,11 @@
 .ansible-facts/
 inventory/hosts.yml
-# NOTE: inventory/group_vars/all/vault.yml IS committed on purpose — it must be
-# ansible-vault ENCRYPTED (first line: "$ANSIBLE_VAULT;1.1;AES256"). Committing
-# the encrypted blob is what makes GitOps site.yml/change-admin-password.yml work
-# in CI. Do NOT re-add it here, and never commit an unencrypted vault.
+# NOTE: the REAL prod vault is inventory/group_vars/slingslop/vault.yml (a path
+# main/feature branches never carry, so a merge from main can't clobber it). It
+# IS committed on purpose and must be ansible-vault ENCRYPTED (first line:
+# "$ANSIBLE_VAULT;1.1;AES256") — committing the encrypted blob is what makes the
+# GitOps deploy work in CI. Any legacy inventory/group_vars/all/vault.yml must
+# likewise be encrypted. Do NOT ignore either here, and never commit a
+# decrypted vault.
 inventory/host_vars/slingslop-prod.yml
 *.retry
