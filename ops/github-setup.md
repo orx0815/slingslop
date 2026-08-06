@@ -15,7 +15,7 @@ Repo: `https://github.com/orx0815/slingslop`
 | Name | Value | Needed for |
 |---|---|---|
 | `DEPLOY_SSH_KEY` | **private** key for the `deploy` user (whole file incl. `-----BEGIN…END-----`) | every deploy |
-| `ANSIBLE_VAULT_PASSWORD` | password used to encrypt `ops/ansible/inventory/group_vars/all/vault.yml` | every deploy |
+| `ANSIBLE_VAULT_PASSWORD` | password used to encrypt `ops/ansible/inventory/group_vars/slingslop/vault.yml` | every deploy |
 | `ROOT_SSH_KEY` | a **root** private key for a fresh box | `infra.yml` → `bootstrap` only |
 
 Copy an SSH private key value with (copy **all** lines, including BEGIN/END):

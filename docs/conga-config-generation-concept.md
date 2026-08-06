@@ -135,12 +135,27 @@ Handlebars `{{ }}`:
 - `traefik/dynamic/middlewares.yml` — shared middlewares (`sec-headers`, `editor-basicauth`, …)
 
 **Files on `slingslop-webcache`** — one per-app cache config, but the `template:`
-is **variant-specific** (same logical `file`, three templates each gated by `variants:`):
+is **variant-specific** (same logical file, three templates each gated by `variants:`):
 
 - `${tenant}.conf` · `variants: [apache]` — Apache `mod_cache` + `mod_proxy` vhost
-- `${tenant}.vcl`  · `variants: [varnish]` — Varnish VCL (backend, TTLs, short-URL restore)
-- `${tenant}.conf` · `variants: [nginx]`  — nginx `server{}` with `proxy_cache`
+- `${tenant}.vcl`  · `variants: [varnish]` — Varnish VCL (backend, TTLs, filters, short-URL restore)
+- `${tenant}.nginx.conf` · `variants: [nginx]`  — nginx `server{}` with `proxy_cache`
 - plus a node-level include/mount list built from `{{#each tenantsByRole.public-cached}}…{{/each}}`
+
+> **Distinct output names are required.** CONGA de-duplicates `RoleFile` entries
+> by their `dir` + `file` key *before* variant filtering, so two variants cannot
+> both emit `webcache/${tenant}.conf` — the second silently loses. The nginx
+> file is therefore `${tenant}.nginx.conf` (still matches nginx's `conf.d/*.conf`
+> include). A node runs a single variant, so its `webcache/` dir holds only that
+> engine's files.
+
+> **One shared parameter set for all three engines.** The security + cache knobs
+> — `allowedMethods`, `denySelectors`, `denyPathPrefixes`, `jsonAllowlist`,
+> `uncachedPatterns`, `passthroughPaths`, `serverAliases`, `htmlTtlSeconds`,
+> `staticTtlSeconds` — live once in `slingslop-app-base` and are rendered by each
+variant in its own syntax. See [ops/webcache.md](../ops/webcache.md) for the
+  per-app knob table and [ops/conga-handlebars-101.md](../ops/conga-handlebars-101.md)
+  for a how-to on promoting a hard-coded value to a tenant parameter.
 
 **Files on `slingslop-runtime`:**
 

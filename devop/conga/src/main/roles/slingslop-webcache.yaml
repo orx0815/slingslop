@@ -42,7 +42,7 @@ files:
   validators: []
 
 # ---- nginx variant: one server{} per public-cached app ----
-- file: "${tenant}.conf"
+- file: "${tenant}.nginx.conf"
   dir: webcache
   template: nginx/app.conf.hbs
   variants:

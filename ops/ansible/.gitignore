@@ -1,14 +1,11 @@
 .ansible-facts/
 inventory/hosts.yml
-# NOTE: inventory/group_vars/all/vault.yml IS committed on purpose — it must be
-# ansible-vault ENCRYPTED (first line: "$ANSIBLE_VAULT;1.1;AES256"). Committing
-# the encrypted blob is what makes GitOps site.yml/change-admin-password.yml work
-# in CI. Do NOT re-add it here, and never commit an unencrypted vault.
-#
-# Two-tier model: on `main` this vault is the PUBLIC demo vault, decryptable with
-# the committed `.vault_pass.public`. The REAL secrets live only on the
-# deploy/motorbrot_prod branch (private ANSIBLE_VAULT_PASSWORD). `.vault_pass.public`
-# IS committed on purpose (public passphrase); NEVER commit a private vault
-# password file.
+# NOTE: the REAL prod vault is inventory/group_vars/slingslop/vault.yml, committed
+# ONLY on the deploy/motorbrot_prod branch (a path main/feature branches never
+# carry, so a merge from main can't clobber it, and it never leaks onto main). It
+# must be ansible-vault ENCRYPTED (first line: "$ANSIBLE_VAULT;1.1;AES256") —
+# committing the encrypted blob is what makes the GitOps deploy work in CI.
+# `main` carries NO vault (only vault.example.yml). Do NOT ignore the real vault
+# here, and never commit a decrypted vault.
 inventory/host_vars/slingslop-prod.yml
 *.retry

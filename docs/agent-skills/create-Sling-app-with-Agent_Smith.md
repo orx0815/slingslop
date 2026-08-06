@@ -140,8 +140,8 @@ Before creating any files, set up a tracked task list covering every phase. **Al
 ```
 Task  1 — OSGi core bundle (pom.xml, UserIsLoggedIn.java, package-info.java)
 Task  2 — ui.apps POM + shell scripts + filter.xml + .gitignore + AGENTS.md
-Task  3 — Frontend build config (package.json, tsconfig, eslint, prettier, bundle.js)
-Task  4 — TypeScript files (editor.ts, public.ts, editor/* submodules)
+Task  3 — Frontend build config — COPY via §3.0 manifest (tsconfig, eslint, prettier verbatim; bundle.js patched); write package.json from template
+Task  4 — TypeScript files — COPY editor.ts + editor/* verbatim via §3.0 (zen-editable only); write public.ts fresh
 Task  5 — Public CSS partials (00-variables through 09-animations)
 Task  6 — Editor CSS partials (00-variables through 06-inline-editor) — zen-editable only
 Task  7 — JCR .content.xml nodes for pages and components
@@ -162,6 +162,32 @@ Before creating any POM files, the agent MUST read the root `pom.xml` of the wor
 - The common `<relativePath>` to the parent POM from a nested module.
 
 This information is CRITICAL to avoid dependency resolution errors and loops during the build phase.
+
+### 2.0.2 Reference Scope (read-restriction — saves tokens, avoids drift)
+
+**`zengarden` is the ONE and only reference application.** It is the clean,
+current, single-bundle pattern this skill is built around. Every "follow the
+zengarden pattern" instruction below refers to it.
+
+**Do NOT read, analyse, list, or copy from these — they use heavier, different, or
+older conventions that will mislead a fresh scaffold (and burn tokens):**
+- `sling-apps/sling-matrix/` — parsys + different component conventions
+- `sling-apps/digitalmedia/` — four-module `client.core` / `client.ui.apps` split, FFM/ImageMagick specifics
+- `devop/` and `ops/` — deployment / infrastructure, not app scaffolding
+
+**Sole exception:** `devop/conga/` — and only while executing **Task 13** (CONGA
+tenant registration) for a *public-facing* app, per §2.8. Otherwise stay out.
+
+**NEVER create, edit, move, or delete secrets or deploy infrastructure.** In
+particular, do not touch any `vault.yml` / `vault.*.yml` (ansible-vault
+encrypted), anything under `ops/`, or the CI workflows under `.github/workflows/`.
+These are branch-protected and carry real production secrets — an app scaffold
+has no business changing them, and a stray edit can clobber the prod vault on
+merge. Your Task 13 change is limited to *appending a tenant block* to a CONGA
+`environments/*.yaml` file; nothing else in `devop/` or `ops/`.
+
+If you catch yourself opening a file outside `zengarden`, the root `pom.xml`, or the
+files this skill names explicitly — stop. You don't need it.
 
 ### 2.1 Directory Structure to Create
 
@@ -559,6 +585,51 @@ the `sling` image is rebuilt/published first, then the edge config is shipped.)
 
 ## 3. UI / Frontend Phase
 
+### 3.0 Copy Manifest — shell-copy the plumbing, do NOT read it
+
+Most of the frontend is **identical** across apps. Copy it with shell commands and
+**do NOT open these files in your context** — you already know their role; reading
+them only burns tokens and invites drift. Spend tokens on the *design* tier (C).
+
+Set once (paths relative to repo root):
+
+```bash
+SRC=sling-apps/zengarden/zengarden.ui.apps/frontend
+DST=sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/frontend
+mkdir -p "$DST/scripts" "$DST/src/typescript/editor" "$DST/src/css/editor" "$DST/src/css/public"
+```
+
+**Tier A — copy verbatim (never read, never edit):**
+
+```bash
+cp "$SRC"/tsconfig.json "$SRC"/eslint.config.js "$SRC"/.prettierrc "$SRC"/.prettierignore "$DST"/
+# editor CSS structure — colours live ONLY in 00-variables.css (Tier C)
+cp "$SRC"/src/css/editor/0{1,2,3,4,5,6}-*.css "$SRC"/src/css/editor/editor.css "$DST"/src/css/editor/
+# zen-editable ONLY — the tiptap/HTMX editor stack is generic, no app references:
+cp "$SRC"/src/typescript/editor.ts "$DST"/src/typescript/
+cp "$SRC"/src/typescript/editor/*.ts "$DST"/src/typescript/editor/
+```
+
+**Tier B — copy, then patch the two identifiers (don't read the rest of the file):**
+
+```bash
+cp "$SRC"/scripts/bundle.js "$DST"/scripts/bundle.js
+sed -i 's#apps/slingslop/zengarden#apps/{RT_PREFIX}#g; s/Zen Garden/{DISPLAY_NAME}/g' "$DST"/scripts/bundle.js
+```
+
+**Tier C — generate fresh (this is where tokens SHOULD go):**
+- `src/css/public/*` — the visual identity (§3.3)
+- `src/css/editor/00-variables.css` — copy zengarden's, then swap the OKLCH hues to ALF's palette (§4.1); zen-editable only
+- `src/typescript/public.ts` — project-specific public JS (§3.2)
+- `package.json` — write from the template in §3.1 (add `@tiptap/*` deps only if zen-editable)
+- all HTL templates, sample content, and dummy text
+
+**Do NOT copy** `package-lock.json` (npm regenerates it) or `FRONTEND_README.md`
+(write a short fresh one if you want).
+
+**If NOT zen-editable:** skip every `editor.ts` / `editor/` / `css/editor` copy
+above, use the placeholders in §3.2, and omit tiptap deps.
+
 ### 3.1 Frontend Build Setup
 
 Replicate the zengarden frontend build pattern exactly. The build produces **two independent bundles** — `editor` and `public` — each with plain (dev) and minified (prod) outputs.
@@ -609,14 +680,15 @@ Replicate the zengarden frontend build pattern exactly. The build produces **two
 
 #### bundle.js
 
-Replicate `sling-apps/zengarden/zengarden.ui.apps/frontend/scripts/bundle.js` but replace all paths:
-- `JCR_BASE` → `path.resolve(ROOT, '../src/main/content/jcr_root/apps/{RT_PREFIX}')`
-- Banner comments reference `{PROJECT_NAME}` instead of "Zen Garden"
-- `inlineHtmx: true` for the editor bundle only (same pattern)
+Already copied + patched by the §3.0 manifest (Tier B) — do not re-read it. For
+reference, the only app-specific bits are the `JCR_BASE` path
+(`.../jcr_root/apps/{RT_PREFIX}`) and the banner; `inlineHtmx: true` stays on the
+editor bundle only.
 
 #### tsconfig.json, eslint.config.js, .prettierrc, .prettierignore
 
-Copy from zengarden's frontend, adjusting paths where they reference `slingslop/zengarden` to `{RT_PREFIX}`.
+Copied verbatim by the §3.0 manifest (Tier A). They contain no app-specific paths —
+do not read or edit them.
 
 ### 3.2 TypeScript Files
 
@@ -641,7 +713,9 @@ Copy from zengarden's frontend, adjusting paths where they reference `slingslop/
 
 #### editor.ts (zen-editable only)
 
-Copy the full editor.ts from zengarden's frontend. It's generic — no project-specific references. Same for all files in `editor/` (state.ts, tiptap.ts, toolbar.ts, component-modal.ts, save.ts).
+Already copied verbatim by the §3.0 manifest (Tier A) — `cp`, don't read them.
+`editor.ts` and everything in `editor/` (state.ts, tiptap.ts, toolbar.ts,
+component-modal.ts, save.ts) are generic with no project-specific references.
 
 **If NOT zen-editable:** create a placeholder:
 ```typescript
@@ -1440,6 +1514,7 @@ Use this checklist to verify completeness:
 - **Never** create a JavaScript solution when CSS can do it
 - **Never** include tiptap/modal code if ALF chose non-editable
 - **Never** hard-code the "silly hack" from zengarden's UserIsLoggedIn
+- **Never** touch secrets or deploy infra: no `vault.yml` / `vault.*.yml`, nothing under `ops/`, no `.github/workflows/**` — these are branch-protected and a stray edit can clobber the prod vault on merge (Task 13 only *appends a tenant block* to a CONGA `environments/*.yaml`)
 - **Never** skip the `mvn install` validation step
 
 ## Appendix C: Smith's Creative Latitude

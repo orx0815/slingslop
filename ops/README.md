@@ -84,20 +84,86 @@ Layout:
 | Path | Contents | Encrypted? |
 |---|---|---|
 | `ops/ansible/inventory/group_vars/all/main.yml`  | non-secret config | no |
-| `ops/ansible/inventory/group_vars/all/vault.yml` | every secret | **yes** (ansible-vault) |
+| `ops/ansible/inventory/group_vars/slingslop/vault.yml` | every real secret (**deploy branch only**) | **yes** (ansible-vault) |
 | `/opt/slingslop/secrets/*.env` on host | rendered env-files, `0600 root:root` | n/a |
 
 ```bash
-# create the vault once
-ansible-vault create ops/ansible/inventory/group_vars/all/vault.yml
+# create the vault once (on the deploy branch)
+ansible-vault create ops/ansible/inventory/group_vars/slingslop/vault.yml
 # edit later
-ansible-vault edit   ops/ansible/inventory/group_vars/all/vault.yml
+ansible-vault edit   ops/ansible/inventory/group_vars/slingslop/vault.yml
 # run plays
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass
 ```
 
+#### Why the vault lives in `group_vars/slingslop/` (merge-clobber protection)
+
+The real vault deliberately sits at `group_vars/slingslop/vault.yml`, a path that
+`main` and feature branches **never contain**. Git merges only reconcile files
+present in the incoming history, so a PR merged from `main` (e.g. an Agent Smith
+app PR) into `deploy/motorbrot_prod` **cannot modify or delete** the real vault.
+
+This replaces the old, fragile design where the demo vault (on `main`) and the
+real vault (on `deploy`) shared the path `group_vars/all/vault.yml` on different
+branches — exactly what a merge clobbers. `.gitattributes merge=ours` does **not**
+help, because GitHub's server-side "Merge" button ignores custom merge drivers.
+The `verify-vault` CI job is the backstop: it decrypts the committed vault and
+checks sentinel keys before any deploy job runs, so a wrong/clobbered vault fails
+the pipeline before the VPS is touched.
+
+The `slingslop` group's only member is `slingslop-prod`, and group-scoped vars
+override `group_vars/all`, so these values apply to the real host. No new GitHub
+secret is needed — the deploy still uses the single `ANSIBLE_VAULT_PASSWORD`.
+
+##### The reverse direction: keep the real vault OFF `main`
+
+The new-path trick protects `main → deploy`, but the vault must also never travel
+the other way. A `deploy → main` merge (or a fork PR) *would* add
+`group_vars/slingslop/vault.yml` to `main`, spreading the encrypted blob to the
+public branch and every fork. Two rules enforce the invariant:
+
+- **Flow is one-way.** Author ops changes on `main`/feature branches and merge
+  *forward* into `deploy/motorbrot_prod`. Never merge `deploy → main`; if a commit
+  made directly on deploy needs to reach main, cherry-pick the non-vault commit.
+- **CI backstop:** the `vault-hygiene` workflow fails any PR to (or push on) `main`
+  that contains `group_vars/slingslop/vault.yml`. It needs no secret, so it also
+  runs on fork PRs. Make it a required status check on `main`.
+
+Forks inherently copy whatever ciphertext is in the history they clone; that is
+acceptable under ansible-vault *because the passphrase is never committed*. If you
+treat the encrypted blob itself as sensitive, keep the repo private and/or rotate
+the secrets whose old ciphertext already exists in `main`'s history.
+
+##### Migrating an existing real vault from `group_vars/all/vault.yml`
+
+The deploy branch's real vault has already been relocated to
+`group_vars/slingslop/vault.yml` (a plain `mv` of the *encrypted* blob — no
+decryption, no secret config). To reproduce on a fresh deploy branch:
+
+```bash
+mkdir -p ops/ansible/inventory/group_vars/slingslop
+git mv ops/ansible/inventory/group_vars/all/vault.yml \
+       ops/ansible/inventory/group_vars/slingslop/vault.yml
+```
+
+The only remaining step is on `main`: delete the demo `group_vars/all/vault.yml`
+(non-secret) so **no branch** carries that shared path any more — after which a
+`main → deploy` merge can never touch the real vault:
+
+```bash
+git switch main
+git rm ops/ansible/inventory/group_vars/all/vault.yml   # demo values only
+git commit -m "ops(vault): drop shared-path demo vault; real vault is deploy-only"
+git push
+```
+
+Sanity check: the `verify-vault` job (or `bash .github/scripts/verify-vault.sh
+<pwfile>` locally) must decrypt `group_vars/slingslop/vault.yml` and find the
+sentinel keys. No play may target `localhost` expecting `vault_*` — all secret
+consumers run against the `slingslop-prod` host.
+
 **GitOps upgrade path:** drop in **sops + age** without changing the play
-structure — replace `group_vars/all/vault.yml` with `vault.sops.yml` and add
+structure — replace `group_vars/slingslop/vault.yml` with `vault.sops.yml` and add
 `community.sops.load_vars`. The host-side rendering is unaffected.
 
 **Secrets we manage:**
@@ -109,70 +175,49 @@ structure — replace `group_vars/all/vault.yml` with `vault.sops.yml` and add
 - `vault_acme_email` — Let's Encrypt registration
 - `vault_ssh_admin_pubkey` — public key of the only allowed login user
 
-### 1a. Two-tier vault — public on `main`, real on the deploy branch
+### 1a. The real vault lives only on the deploy branch
 
-The committed, encrypted `vault.yml` is **deliberately different per branch**:
+The encrypted `vault.yml` is committed at
+`inventory/group_vars/slingslop/vault.yml` and exists **only on
+`deploy/motorbrot_prod`**. `main` and feature branches carry **no vault** — only
+`inventory/group_vars/slingslop/vault.example.yml` (a fill-in template).
 
-| Branch | `vault.yml` contents | Vault passphrase |
+| Branch | vault | passphrase |
 |---|---|---|
-| `main` (and feature branches) | **public demo** values (`admin`/`admin`, `editor`/`editor`, `ops`/`ops`; an **inert** SSH key whose private half was destroyed) | **committed**: [`ansible/.vault_pass.public`](ansible/.vault_pass.public) → `slingslop-public-demo` |
-| `deploy/motorbrot_prod` | the **real** secrets | private — the `ANSIBLE_VAULT_PASSWORD` GitHub secret, never committed |
+| `main` / feature | none (template only) | n/a |
+| `deploy/motorbrot_prod` | real secrets at `group_vars/slingslop/vault.yml` | private `ANSIBLE_VAULT_PASSWORD` GitHub secret, never committed |
 
-So anyone can clone `main` and inspect (or dry-run against their own inventory)
-with the demo vault — no secret required:
+Why this path, and how merges/forks are kept safe, is covered above under *"Why
+the vault lives in `group_vars/slingslop/`"* and *"The reverse direction: keep the
+real vault OFF `main`"*. In short: it is a path `main` never carries, so a
+`main → deploy` merge can't clobber it; the `vault-hygiene` workflow blocks a
+`deploy → main` merge (or fork PR) from leaking it; and the `verify-vault` job
+decrypts it before every deploy. (The local Vagrant harness ignores the vault
+entirely; it supplies throwaway `vault_*` values via `local/vars.local.yml`.)
 
-```bash
-cd ops/ansible
-ansible-vault view inventory/group_vars/all/vault.yml \
-  --vault-password-file .vault_pass.public
-ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
-  --vault-password-file .vault_pass.public
-```
+### 1b. Editing / rotating the vault (how-to)
 
-**A real deploy never uses the public vault.** The `deploy/motorbrot_prod` branch
-carries its own `vault.yml` (real secrets); CI decrypts it with the
-`ANSIBLE_VAULT_PASSWORD` secret. For a real host you MUST also override
-`vault_ssh_admin_pubkey` with a usable key — the demo one grants access to nobody
-by design. (The local Vagrant harness ignores the vault entirely; it supplies
-throwaway `vault_*` values via `local/vars.local.yml`.)
-
-**Branch safety.** A root [`.gitattributes`](../.gitattributes) marks `vault.yml`
-as `merge=ours`, so each branch keeps its own vault on any merge — a `main`→prod
-merge can't overwrite the real secrets, and a prod→`main` merge can't leak them.
-Enable the driver once per clone / CI runner (without it, git safely falls back
-to a normal merge → conflict, never a silent clobber):
+All commands run from `ops/ansible/` **on the `deploy/motorbrot_prod` branch**,
+decrypting with the private passphrase (`--ask-vault-pass`, or a file holding the
+`ANSIBLE_VAULT_PASSWORD` — never commit it):
 
 ```bash
-git config merge.ours.driver true
-```
+V=inventory/group_vars/slingslop/vault.yml
 
-### 1b. Editing / rotating a vault (how-to)
-
-All commands run from `ops/ansible/`. On `main` decrypt with the committed public
-passphrase (`--vault-password-file .vault_pass.public`); on
-`deploy/motorbrot_prod` swap that for `--ask-vault-pass` (or a file holding the
-private `ANSIBLE_VAULT_PASSWORD`) — **never commit the real passphrase**.
-
-```bash
-P=--vault-password-file=.vault_pass.public          # main; use --ask-vault-pass on the deploy branch
-V=inventory/group_vars/all/vault.yml
-
-ansible-vault view  $V $P                            # read it
-ansible-vault edit  $V $P                            # opens $EDITOR, re-encrypts on save
-ansible-vault rekey $V $P                            # change the passphrase
+ansible-vault view  $V --ask-vault-pass      # read it
+ansible-vault edit  $V --ask-vault-pass      # opens $EDITOR, re-encrypts on save
+ansible-vault rekey $V --ask-vault-pass      # change the passphrase
 
 # Encrypt ONE value to paste into a plain YAML file (mixed plain+secret vars):
-ansible-vault encrypt_string 'new-pass' --name vault_grafana_admin_password $P
+ansible-vault encrypt_string 'new-pass' --name vault_grafana_admin_password --ask-vault-pass
 ```
 
 - After changing a credential, apply it:
-  `ansible-playbook -i inventory/hosts.yml playbooks/site.yml $P`
+  `ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass`
   (or `playbooks/change-admin-password.yml` for just the Sling admin password).
 - The file must stay **encrypted** in git — verify its first line is
-  `$ANSIBLE_VAULT;1.1;AES256` before you `git add` (see the `.gitignore` note).
-- Regenerate the whole public vault from scratch? Write plaintext to a temp file,
-  then `ansible-vault encrypt /tmp/plain --vault-password-file .vault_pass.public
-  --output inventory/group_vars/all/vault.yml` (keep plaintext out of the repo).
+  `$ANSIBLE_VAULT;1.1;AES256` before you `git add` (the `verify-vault` CI guard
+  enforces this on every deploy).
 
 ### 2. Docker
 
@@ -248,7 +293,15 @@ image's `sites-enabled`. The Traefik role likewise copies the generated
 > environment whose domain matches this deployment. See
 > [docs/conga-config-generation-concept.md](../docs/conga-config-generation-concept.md) §6.
 
+**Three interchangeable engines** (`variant:` on the `slingslop-webcache` role):
+`apache` (default), `nginx` and `varnish` — all rendered from the **same** tenant
+parameters. Per-app tuning (allow lists, extra domains, uncached patterns, JSON
+allow-list, deny rules, TTLs) and the engine trade-offs are in
+[ops/webcache.md](webcache.md). To add a knob that doesn't exist yet,
+see [ops/conga-handlebars-101.md](conga-handlebars-101.md).
+
 ### 7. Monitoring (Grafana)
+
 
 `monitoring` role brings up **Prometheus + Grafana + node-exporter + cAdvisor**.
 Grafana is provisioned (datasources, two starter dashboards) from
@@ -444,10 +497,10 @@ ansible-galaxy collection install -r ops/ansible/requirements.yml
 cp ops/ansible/inventory/hosts.example.yml ops/ansible/inventory/hosts.yml
 $EDITOR ops/ansible/inventory/hosts.yml      # ansible_host, ansible_user etc.
 
-# 2. Copy the secrets template, then fill it in
-cp ops/ansible/inventory/group_vars/all/vault.example.yml \
-   ops/ansible/inventory/group_vars/all/vault.yml
-$EDITOR ops/ansible/inventory/group_vars/all/vault.yml
+# 2. Copy the secrets template, then fill it in (on the deploy branch)
+cp ops/ansible/inventory/group_vars/slingslop/vault.example.yml \
+   ops/ansible/inventory/group_vars/slingslop/vault.yml
+$EDITOR ops/ansible/inventory/group_vars/slingslop/vault.yml
 ```
 
 > ### 2a. Generate the basicAuth (htpasswd) values
@@ -522,7 +575,7 @@ $EDITOR ops/ansible/inventory/group_vars/all/vault.yml
 
 ```bash
 # ...once vault.yml is fully filled in (htpasswd + SSH keys), encrypt it in place
-ansible-vault encrypt ops/ansible/inventory/group_vars/all/vault.yml
+ansible-vault encrypt ops/ansible/inventory/group_vars/slingslop/vault.yml
 ```
 
 > ### 2c. Commit the *encrypted* vault (this is what makes GitOps work)
@@ -532,8 +585,8 @@ ansible-vault encrypt ops/ansible/inventory/group_vars/all/vault.yml
 > `ANSIBLE_VAULT_PASSWORD` secret. (The `.gitignore` no longer ignores it.)
 >
 > ```bash
-> head -1 ops/ansible/inventory/group_vars/all/vault.yml   # MUST print: $ANSIBLE_VAULT;1.1;AES256
-> git add -f ops/ansible/inventory/group_vars/all/vault.yml
+> head -1 ops/ansible/inventory/group_vars/slingslop/vault.yml   # MUST print: $ANSIBLE_VAULT;1.1;AES256
+> git add -f ops/ansible/inventory/group_vars/slingslop/vault.yml
 > ```
 >
 > **Never** commit an unencrypted vault — always verify that first line before
@@ -683,7 +736,7 @@ for `infra.yml` when the box itself (Traefik, monitoring, users, …) changes.
 | Kind | Name | Purpose |
 |---|---|---|
 | secret | `DEPLOY_SSH_KEY` | private key allow-listed for the `deploy` user |
-| secret | `ANSIBLE_VAULT_PASSWORD` | decrypts `group_vars/all/vault.yml` |
+| secret | `ANSIBLE_VAULT_PASSWORD` | decrypts `group_vars/slingslop/vault.yml` |
 | secret | `ROOT_SSH_KEY` | *(bootstrap only)* root key for a fresh box |
 | variable | `DEPLOY_HOST` | SSH target (default `motorbrot.org`) |
 | variable | `DEPLOY_DOMAIN` | published domain (default `motorbrot.org`) |

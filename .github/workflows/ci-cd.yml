@@ -11,7 +11,7 @@ name: CI/CD
 # Required repo/org config:
 #   Secrets:
 #     DEPLOY_SSH_KEY        private key allow-listed for the `deploy` user on the VPS
-#     ANSIBLE_VAULT_PASSWORD  password for inventory/group_vars/all/vault.yml
+#     ANSIBLE_VAULT_PASSWORD  password for inventory/group_vars/slingslop/vault.yml
 #   Variables (optional, sensible defaults shown):
 #     DEPLOY_HOST   (default motorbrot.org)   SSH target for the VPS
 #     DEPLOY_DOMAIN (default motorbrot.org)   public domain published by Traefik
@@ -163,8 +163,34 @@ jobs:
             ${{ env.GHCR_WEBCACHE }}:${{ needs.meta.outputs.sha_tag }}
 
   # ---------------------------------------------------------------- deploy sling
+  # ---------------------------------------------------------------- vault guard
+  # GitOps safety net. `main` (+ Smith/feature PRs) carry the PUBLIC demo vault,
+  # encrypted with a DIFFERENT passphrase than the real prod vault. If a PR based
+  # on main is merged into a deploy branch and clobbers the real vault, deploying
+  # would ship demo credentials. This job decrypts the committed vault with the
+  # real ANSIBLE_VAULT_PASSWORD and checks sentinel keys BEFORE any deploy job
+  # runs — so a clobbered/wrong vault fails here, before the VPS is touched.
+  # NOTE: GitHub's server-side PR merge ignores `.gitattributes merge=ours`, so
+  # this CI gate — not a merge driver — is what actually protects prod.
+  verify-vault:
+    needs: meta
+    if: needs.meta.outputs.is_deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify prod vault decrypts and carries expected keys
+        env:
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
+          python3 -m pip install --quiet "ansible-core>=2.17"
+          printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
+          bash .github/scripts/verify-vault.sh /tmp/vp
+          rm -f /tmp/vp
+
   deploy-sling:
-    needs: [meta, publish-sling]
+    needs: [meta, publish-sling, verify-vault]
     if: needs.meta.outputs.is_deploy == 'true' && needs.meta.outputs.sling == 'true'
     runs-on: ubuntu-latest
     environment: production
@@ -195,12 +221,13 @@ jobs:
 
   # ---------------------------------------------------------------- deploy webcache
   deploy-webcache:
-    needs: [meta, publish-webcache, deploy-sling]
+    needs: [meta, publish-webcache, deploy-sling, verify-vault]
     # Runs when webcache changed. Waits for deploy-sling if that ran (both
     # changed → sling first), but still runs if deploy-sling was skipped
     # (webcache-only change). Blocked if deploy-sling failed.
     if: |
       always() &&
+      needs.verify-vault.result == 'success' &&
       needs.meta.outputs.is_deploy == 'true' &&
       needs.meta.outputs.webcache == 'true' &&
       needs.publish-webcache.result == 'success' &&
@@ -256,9 +283,10 @@ jobs:
   # (so a combined app+tenant change lands content first), or standalone for a
   # pure tenant change.
   deploy-edge:
-    needs: [meta, build-test, deploy-sling, deploy-webcache]
+    needs: [meta, build-test, deploy-sling, deploy-webcache, verify-vault]
     if: |
       always() &&
+      needs.verify-vault.result == 'success' &&
       needs.meta.outputs.is_deploy == 'true' &&
       needs.meta.outputs.tenants == 'true' &&
       needs.build-test.result == 'success' &&

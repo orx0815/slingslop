@@ -38,13 +38,64 @@ config:
   # Derived; operations never sets this.
   shortContentPath: "${stringUtils:removeStart(contentRoot, '/content')}"
 
-  # Extra ServerAlias host names for the webcache vhost (the primary 'www' site
-  # usually adds the bare apex domain). Empty for a normal sub-domain app.
+  # Extra host names ("add more domains") the webcache + Traefik answer for, on
+  # top of <subdomain>.<domain>. The primary 'www' site usually adds the bare
+  # apex domain; a normal sub-domain app leaves this empty.
   serverAliases: []
 
-  # Extra proxy pass-through path prefixes that must reach Sling unrewritten,
-  # e.g. /bin/public for the cache-busting clientlib servlet. Empty by default.
+  # ---- webcache request filtering & cache policy (the app's front-line ----
+  # ---- protection). ALL THREE variants (apache/varnish/nginx) read the ----
+  # ---- SAME parameters below; each renders them in its own syntax. The  ----
+  # ---- defaults suit a normal public HTML app — tighten/extend per tenant. --
+  #
+  # See ops/webcache.md for the per-app knob table, and
+  # ops/conga-handlebars-101.md for a worked how-to on turning any hard-coded
+  # template value into a tenant parameter.
+
+  # ALLOW LIST — extra path prefixes that reach Sling UNREWRITTEN (no short-URL
+  # re-expansion), e.g. /bin/public for the cache-busting clientlib servlet.
+  # The app's own ${appsRoot} is always allowed; add more here. Empty by default.
   passthroughPaths: []
+
+  # HTTP methods forwarded to Sling. Anything else is rejected at the cache with
+  # 405 (a public site is read-only). Empty = block everything.
+  allowedMethods:
+  - GET
+  - HEAD
+
+  # Sling selector / view names that are ALWAYS blocked (dangerous JCR dumps),
+  # matched as ".<name>." anywhere in the path. Empty = block none.
+  denySelectors:
+  - infinity
+  - tidy
+  - sysview
+  - docview
+  - children
+  - query
+
+  # Internal JCR path prefixes never reachable through the cache, matched as
+  # "^/<prefix>/". Empty = block none.
+  denyPathPrefixes:
+  - system
+  - bin
+  - crx
+  - libs/granite
+
+  # Path prefixes under which a `.json` RESOURCE EXTENSION is allowed (the true
+  # extension, ignoring any /suffix). Everything else ending in a `.json`
+  # extension is denied. Empty = expose no JSON at all.
+  jsonAllowlist: []
+
+  # UNCACHED paths / selectors / extensions: URL patterns (regex, matched against
+  # the request path) that must NEVER be cached — still proxied to Sling, but
+  # always fetched fresh. Empty = cache everything cacheable.
+  uncachedPatterns: []
+
+  # Cache lifetime for HTML-ish responses, in seconds (short — content changes).
+  htmlTtlSeconds: 10
+
+  # Cache lifetime for long-lived static assets (css/js/images), in seconds.
+  staticTtlSeconds: 2592000   # 30 days
 
   # Traefik middleware chain applied to this app's router. Gated apps add
   # 'editor-basicauth' (and optionally 'editor-allowlist').

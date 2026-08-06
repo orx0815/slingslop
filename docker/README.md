@@ -41,4 +41,14 @@ Then map the URLs *www.motorbrot.local*, *zengarden.motorbrot.local* and *editor
     127.0.0.1 zengarden.motorbrot.local
     127.0.0.1 editor.motorbrot.local
 
+## Webcache bench (apache vs nginx vs varnish)
+
+`webcache-bench/` runs the three webcache engines side-by-side from the **same
+CONGA-generated** config, against your dev Sling on the host, so you can diff
+their behaviour after tweaking a webcache template. Run instructions are in
+[webcache-bench/docker-compose.yml](webcache-bench/docker-compose.yml); the
+config comes from the `local-bench` CONGA environment. See
+[ops/webcache.md](../ops/webcache.md) for the engine trade-offs.
+
+
 
