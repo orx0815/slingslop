@@ -10,6 +10,14 @@ Using HTMX to GET component **markup** and to POST content via Sling's OOTB endp
 
 (The name is a pun about the Apache Sling Slingshot sample application, that didn't get much love either.)
 
+## Try it in your browser
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orx0815/slingslop?quickstart=1)
+
+One click → a full VS-Code-in-the-browser dev environment, no local setup.
+See [Running the Application](#running-the-application) for details and the
+Agent-Smith → review → deploy loop.
+
 ### Key Directories
 
 - `sling-apps/`  
@@ -150,6 +158,39 @@ There are four primary ways to run the application locally:
       ghcr.io/orx0815/slingslop:snapshot \
       slingslop_aggregate
     ```
+
+6.  **In the browser (GitHub Codespaces / DevPod / Ona):**
+    Use the [Open in Codespaces](#try-it-in-your-browser) badge. On the GitHub
+    free tier personal accounts get 120 core-hours + 15 GB/month — on the 4-core
+    box this dev container asks for that's ~30 h, comparable to the old Gitpod
+    allowance. The [`.devcontainer/`](.devcontainer/devcontainer.json) provisions
+    Java 25 + Maven, pre-builds the project, and forwards Sling on port **8080**
+    with an in-browser preview. Once the codespace is up:
+
+    ```bash
+    cd launcher && ./launch.sh
+    # → the forwarded 8080 preview serves e.g.
+    #   /content/slingslop/zengarden/home.html
+    ```
+
+    The same `devcontainer.json` is portable: open it in
+    **[DevPod](https://devpod.sh/)** (open-source, self-host for unlimited hours)
+    or in **[Ona](https://ona.com/)** (the rebranded Gitpod) without changes.
+
+    **The Agent-Smith → review → deploy loop** — fully GitOps, closing the loop
+    the old Gitpod button only hinted at:
+
+    1. **Author** — assign a GitHub issue (using the *"Agent Smith — new Sling
+       app"* template) to the Copilot coding agent. It runs the
+       [Agent Smith skill](docs/agent-skills/create-Sling-app-with-Agent_Smith.md)
+       in the cloud and opens a pull request with the new app.
+    2. **Review live** — open that PR branch in a Codespace (one click from the
+       PR's *Code* menu), `./launch.sh`, and eyeball the running app in the
+       forwarded preview — no local checkout, "works on my machine" confirmed.
+    3. **Ship it** — merge to `deploy/motorbrot_prod`. The
+       [CI/CD workflow](.github/workflows/ci-cd.yml) builds the immutable
+       `sha-<commit>` image and rolls it onto the VPS (Traefik + Ansible),
+       typically within ~10 minutes.
 
 ### Developing the Application
 
