@@ -30,6 +30,19 @@ tenants:
 That's it. Everything downstream (Traefik router, webcache vhost, short URLs) is
 derived from those fields.
 
+### Fine-grained per-app cache & security rules
+
+The vhost is the front-line protection. Each tenant can additionally tune the
+cache tier with **shared** knobs read identically by all three webcache engines
+(apache / nginx / varnish): `serverAliases` (add domains), `passthroughPaths`
+(allow-list paths to Sling), `jsonAllowlist`, `denySelectors`,
+`denyPathPrefixes`, `uncachedPatterns`, `allowedMethods`, `htmlTtlSeconds` /
+`staticTtlSeconds`. They are declared with defaults + docs in
+[`roles/slingslop-app-base.yaml`](src/main/roles/slingslop-app-base.yaml). See
+[ops/webcache.md](../../ops/webcache.md) for the knob table + worked example,
+and [ops/conga-handlebars-101.md](../../ops/conga-handlebars-101.md) for a
+**how-to on promoting any hard-coded template value to a tenant parameter**.
+
 ## Generate & ship
 
 ```bash

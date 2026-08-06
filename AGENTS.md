@@ -79,5 +79,7 @@ Some modules have their own `AGENTS.md` with module-specific context:
 |---|---|
 | `docs/editing-patterns.md` | Editing supertypes, component contract, new-component checklist |
 | `docs/composite-nodestore.md` | Composite NodeStore: immutable `/apps`+`/libs` from image, mutable content in volume |
+| `ops/webcache.md` | Webcache config: three cache engines (apache/nginx/varnish) + per-app cache & security knobs |
+| `ops/conga-handlebars-101.md` | How to promote a hard-coded template value to a CONGA tenant parameter; Handlebars idioms |
 | `ops/README.md` | **Production Ansible deployment** — full single-VPS setup with Traefik+ACME, Grafana, Loki, hardening |
 | `ReadMe.md` | Project overview, prerequisites, build & run instructions |

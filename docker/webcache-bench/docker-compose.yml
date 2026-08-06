@@ -1,0 +1,68 @@
+# Webcache benchmark / cross-check harness — Apache vs nginx vs Varnish, all
+# serving the SAME CONGA-generated config, side-by-side, against your existing
+# dev Sling (host :8080). Use this after tweaking a webcache Handlebars template
+# to confirm all three engines still render + behave equivalently ("disk vs
+# memory" PoC for swapping variants).
+#
+# HOW IT WORKS
+#   The `local-bench` CONGA environment renders the sling-matrix tenant through
+#   all three variants (one node each). This compose bind-mounts each node's
+#   generated webcache/ dir into the matching engine image. No engine reads a
+#   hand-written config — they all run the generated output.
+#
+# PREREQUISITES
+#   1. Generate the configs:
+#        mvn -pl devop/conga -am -DskipTests clean package
+#   2. Dev Sling running with the sling-matrix content:
+#        cd launcher && ./launch.sh          # binds 0.0.0.0:8080
+#
+# RUN
+#   cd docker/webcache-bench
+#   docker compose up -d --build
+#   # send the Host header the vhosts expect (www.motorbrot.local):
+#   hey -n 5000 -c 50 -host www.motorbrot.local http://localhost:8081/sling-matrix/home.html   # apache  (disk)
+#   hey -n 5000 -c 50 -host www.motorbrot.local http://localhost:8082/sling-matrix/home.html   # nginx   (disk, coalescing)
+#   hey -n 5000 -c 50 -host www.motorbrot.local http://localhost:8083/sling-matrix/home.html   # varnish (RAM,  coalescing)
+#
+# Compare X-Cache / X-Cache-Status headers + throughput/latency. Same Sling
+# backend for all three; the cache tier is the only variable. Probe the security
+# filters too, e.g.:
+#   curl -s -o /dev/null -w '%{http_code}\n' -H 'Host: www.motorbrot.local' http://localhost:8082/sling-matrix/home.infinity.json   # → 403
+name: webcache-bench
+
+services:
+
+  # ---- Apache httpd (mod_cache, disk) — the production engine ----
+  apache:
+    build: ../webcache
+    environment:
+      RENDERER_URL: sling            # generated vhost proxies http://${RENDERER_URL}:8080
+    volumes:
+      - ../../devop/conga/target/configuration/local-bench/apache/webcache:/etc/apache2/sites-enabled:ro
+    extra_hosts:
+      - "sling:host-gateway"         # backend "sling" → host → dev Sling :8080
+    ports:
+      - "8081:80"
+
+  # ---- nginx proxy_cache (disk, request-coalescing) ----
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../devop/conga/target/configuration/local-bench/nginx/webcache:/etc/nginx/conf.d:ro
+    extra_hosts:
+      - "sling:host-gateway"
+    ports:
+      - "8082:80"
+
+  # ---- Varnish (RAM, native coalescing + grace) ----
+  varnish:
+    image: varnish:7.5
+    environment:
+      VARNISH_SIZE: 512m
+    volumes:
+      - ../../devop/conga/target/configuration/local-bench/varnish/webcache/sling-matrix.vcl:/etc/varnish/default.vcl:ro
+    extra_hosts:
+      - "sling:host-gateway"
+    ports:
+      - "8083:80"

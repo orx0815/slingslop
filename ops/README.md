@@ -183,7 +183,15 @@ image's `sites-enabled`. The Traefik role likewise copies the generated
 > environment whose domain matches this deployment. See
 > [docs/conga-config-generation-concept.md](../docs/conga-config-generation-concept.md) §6.
 
+**Three interchangeable engines** (`variant:` on the `slingslop-webcache` role):
+`apache` (default), `nginx` and `varnish` — all rendered from the **same** tenant
+parameters. Per-app tuning (allow lists, extra domains, uncached patterns, JSON
+allow-list, deny rules, TTLs) and the engine trade-offs are in
+[ops/webcache.md](webcache.md). To add a knob that doesn't exist yet,
+see [ops/conga-handlebars-101.md](conga-handlebars-101.md).
+
 ### 7. Monitoring (Grafana)
+
 
 `monitoring` role brings up **Prometheus + Grafana + node-exporter + cAdvisor**.
 Grafana is provisioned (datasources, two starter dashboards) from
