@@ -1,0 +1,32 @@
+<!--/* footer.html — Footer component view */-->
+<footer class="site-footer"
+        data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+
+  <div class="container">
+    <div class="footer__inner">
+      <div>
+        <a href="/content/cyberpunk-alpaca/home.html" class="footer__brand">
+          Cyberpunk Alpaca
+        </a>
+        <p class="footer__tagline">${properties.tagline @ context='text'}</p>
+      </div>
+
+      <ul class="footer__links" role="list">
+        <li><a href="/content/cyberpunk-alpaca/home.html" class="footer__link">home</a></li>
+        <li><a href="/content/cyberpunk-alpaca/about.html" class="footer__link">about</a></li>
+        <li><a href="/content/cyberpunk-alpaca/styleguide.html" class="footer__link">style-guide</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__copyright">© 2089 Cyberpunk Alpaca Corp — All fleece reserved.</p>
+      <span class="footer__status">SYSTEM ONLINE</span>
+    </div>
+  </div>
+
+</footer>

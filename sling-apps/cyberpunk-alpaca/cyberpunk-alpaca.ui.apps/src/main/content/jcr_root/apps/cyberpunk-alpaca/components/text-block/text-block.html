@@ -1,0 +1,18 @@
+<!--/* text-block.html — Text Block component view */-->
+<article class="text-block container"
+         data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+         data-sly-set.editPath="${resource.path}.edit-form.html"
+         data-zen-editable="true"
+         data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+         data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+         data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+
+  <sly data-sly-test="${properties.headline}">
+    <h3 class="text-block__headline">${properties.headline @ context='text'}</h3>
+  </sly>
+
+  <div class="text-block__body">
+    ${properties.text @ context='html'}
+  </div>
+
+</article>

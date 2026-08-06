@@ -1,0 +1,102 @@
+/* ── 03-layout.css — Cyberpunk Alpaca Layout ── */
+
+.container {
+  width: min(var(--container-max), 100% - var(--space-8));
+  margin-inline: auto;
+}
+
+.container--narrow {
+  width: min(var(--container-narrow), 100% - var(--space-8));
+  margin-inline: auto;
+}
+
+.page-wrapper {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+main {
+  padding-block: var(--space-16);
+}
+
+/* ── Section ── */
+.section {
+  padding-block: var(--space-16);
+}
+
+.section--alt {
+  background: var(--color-bg-elevated);
+}
+
+.section__header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+
+  & h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  & .section__subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    max-width: 60ch;
+    margin-inline: auto;
+  }
+}
+
+/* ── Grid utilities ── */
+.grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}
+
+/* ── Flex utilities ── */
+.flex {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.flex--center {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex--between {
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Cyberpunk panel ── */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    opacity: 0.8;
+  }
+}
+
+.panel--accent {
+  border-color: var(--color-primary);
+  box-shadow: var(--glow-primary);
+}

@@ -1,0 +1,139 @@
+/* ── 05-hero.css — Hero Section ── */
+
+.hero {
+  position: relative;
+  min-height: calc(100dvh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ── Scanline overlay — gives that CRT monitor feel ── */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.03) 2px,
+    oklch(0 0 0 / 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Grid background ── */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background-image:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.3;
+  animation: grid-drift 20s linear infinite;
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  width: min(var(--container-max), 100% - var(--space-8));
+  margin-inline: auto;
+  padding-block: var(--space-20);
+}
+
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-secondary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: var(--color-secondary);
+    box-shadow: var(--glow-secondary);
+  }
+}
+
+.hero__title {
+  font-size: var(--text-4xl);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.03em;
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  animation: fade-up 0.8s ease forwards;
+}
+
+.hero__title-accent {
+  display: block;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.hero__subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  max-width: 55ch;
+  margin-bottom: var(--space-10);
+  line-height: 1.65;
+  animation: fade-up 0.8s 0.15s ease both;
+}
+
+.hero__actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  animation: fade-up 0.8s 0.3s ease both;
+}
+
+.hero__badge {
+  position: absolute;
+  bottom: var(--space-8);
+  right: var(--space-8);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  z-index: 2;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+/* ── Terminal cursor blink ── */
+.cursor-blink::after {
+  content: '_';
+  animation: cursor-blink 1s step-end infinite;
+  color: var(--color-primary);
+  margin-left: 2px;
+}

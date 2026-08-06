@@ -1,0 +1,32 @@
+<!--/* hero.html — Hero component view */-->
+<section class="hero"
+         data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+         data-sly-set.editPath="${resource.path}.edit-form.html"
+         data-zen-editable="true"
+         data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+         data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+         data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+
+  <div class="hero__inner">
+    <p class="hero__eyebrow">${properties.eyebrow @ context='text'}</p>
+
+    <h1 class="hero__title">
+      <span class="cursor-blink" data-glitch="${properties.title @ context='text'}">${properties.title @ context='text'}</span>
+      <span class="hero__title-accent">${properties.subtitle @ context='text'}</span>
+    </h1>
+
+    <p class="hero__subtitle">${properties.description @ context='text'}</p>
+
+    <div class="hero__actions">
+      <a href="${properties.ctaPrimaryUrl @ context='uri'}" class="btn btn--primary btn--lg">
+        ${properties.ctaPrimaryLabel @ context='text'}
+      </a>
+      <a href="${properties.ctaSecondaryUrl @ context='uri'}" class="btn btn--secondary btn--lg">
+        ${properties.ctaSecondaryLabel @ context='text'}
+      </a>
+    </div>
+  </div>
+
+  <div class="hero__badge" aria-hidden="true">// CYBERPUNK_ALPACA v1.0.0</div>
+
+</section>

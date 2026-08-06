@@ -1,0 +1,147 @@
+/* ── 09-animations.css — Keyframes & Transitions ── */
+
+/* ── Entrance animations ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Grid background drift ── */
+@keyframes grid-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(60px, 60px);
+  }
+}
+
+/* ── Pulse glow (for status indicator, brand symbol, etc.) ── */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: var(--glow-primary);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: none;
+  }
+}
+
+/* ── Terminal cursor blink ── */
+@keyframes cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Glitch effect ── */
+@keyframes glitch-before {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, 1px);
+  }
+  25% {
+    clip-path: inset(20% 0 70% 0);
+    transform: translate(2px, -1px);
+  }
+  50% {
+    clip-path: inset(70% 0 10% 0);
+    transform: translate(-1px, 2px);
+  }
+  75% {
+    clip-path: inset(10% 0 80% 0);
+    transform: translate(1px, -2px);
+  }
+  100% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, 1px);
+  }
+}
+
+@keyframes glitch-after {
+  0% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, -1px);
+  }
+  25% {
+    clip-path: inset(50% 0 30% 0);
+    transform: translate(-2px, 2px);
+  }
+  50% {
+    clip-path: inset(25% 0 55% 0);
+    transform: translate(1px, -2px);
+  }
+  75% {
+    clip-path: inset(60% 0 20% 0);
+    transform: translate(-1px, 1px);
+  }
+  100% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, -1px);
+  }
+}
+
+/* ── Scroll-driven entrance ── */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+[data-animate].animate--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Stagger delays for lists of animated items ── */
+[data-animate]:nth-child(2) {
+  transition-delay: 100ms;
+}
+[data-animate]:nth-child(3) {
+  transition-delay: 200ms;
+}
+[data-animate]:nth-child(4) {
+  transition-delay: 300ms;
+}
+[data-animate]:nth-child(5) {
+  transition-delay: 400ms;
+}
+[data-animate]:nth-child(6) {
+  transition-delay: 500ms;
+}
+
+/* ── View transitions ── */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: fade-in 200ms reverse ease;
+}
+
+::view-transition-new(root) {
+  animation: fade-in 200ms ease;
+}

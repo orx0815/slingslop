@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Cyberpunk Alpaca — Home"
+    description="Welcome to the digital den of the most stylish camelid on the net."
+    sling:resourceType="cyberpunk-alpaca/pages/homepage"/>

@@ -1,0 +1,101 @@
+/* ── 00-variables.css — Cyberpunk Alpaca Design Tokens ── */
+/*
+ * All colours derive from two OKLCH hues:
+ *   Primary:   neon magenta  (~330° on the OKLCH wheel)
+ *   Secondary: electric cyan (~195° on the OKLCH wheel)
+ *
+ * Change only --hue-primary and --hue-secondary to completely re-theme.
+ */
+
+:root {
+  /* ── Hue anchors ────────────────────────────────────────────────────── */
+  --hue-primary: 330;
+  --hue-secondary: 195;
+  --hue-primary-complement: calc(var(--hue-primary) + 180);
+  --hue-secondary-complement: calc(var(--hue-secondary) + 180);
+
+  /* ── Primary palette (neon magenta) ───────────────────────────────── */
+  --color-primary: oklch(0.72 0.25 var(--hue-primary));
+  --color-primary-light: oklch(0.85 0.16 var(--hue-primary));
+  --color-primary-dark: oklch(0.45 0.20 var(--hue-primary));
+  --color-primary-hover: oklch(0.65 0.28 var(--hue-primary));
+  --color-primary-subtle: oklch(0.18 0.06 var(--hue-primary));
+  --color-primary-glow: oklch(0.72 0.25 var(--hue-primary) / 0.35);
+
+  /* ── Secondary palette (electric cyan) ───────────────────────────── */
+  --color-secondary: oklch(0.75 0.15 var(--hue-secondary));
+  --color-secondary-light: oklch(0.88 0.10 var(--hue-secondary));
+  --color-secondary-dark: oklch(0.45 0.12 var(--hue-secondary));
+  --color-secondary-hover: oklch(0.68 0.18 var(--hue-secondary));
+  --color-secondary-glow: oklch(0.75 0.15 var(--hue-secondary) / 0.35);
+
+  /* ── Complementary palette ───────────────────────────────────────── */
+  --color-complement-primary: oklch(0.72 0.10 var(--hue-primary-complement));
+  --color-complement-secondary: oklch(0.72 0.10 var(--hue-secondary-complement));
+
+  /* ── Dark background neutrals (cyberpunk = dark theme) ──────────── */
+  --color-bg: oklch(0.08 0.015 var(--hue-primary));
+  --color-bg-elevated: oklch(0.12 0.018 var(--hue-primary));
+  --color-surface: oklch(0.15 0.020 var(--hue-primary));
+  --color-surface-high: oklch(0.20 0.022 var(--hue-primary));
+  --color-border: oklch(0.28 0.040 var(--hue-primary));
+  --color-border-accent: var(--color-primary);
+
+  /* ── Text ────────────────────────────────────────────────────────── */
+  --color-text: oklch(0.92 0.010 var(--hue-secondary));
+  --color-text-muted: oklch(0.60 0.025 var(--hue-secondary));
+  --color-text-accent: var(--color-primary);
+  --color-text-secondary: var(--color-secondary);
+
+  /* ── Tinted black & white ────────────────────────────────────────── */
+  --color-black: oklch(0.05 0.012 var(--hue-primary));
+  --color-white: oklch(0.96 0.008 var(--hue-secondary));
+
+  /* ── Spacing scale ──────────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Typography ─────────────────────────────────────────────────── */
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: var(--font-mono);
+
+  --text-xs: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+  --text-sm: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+  --text-lg: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.6rem);
+  --text-2xl: clamp(1.5rem, 1.2rem + 1.5vw, 2.2rem);
+  --text-3xl: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  --text-4xl: clamp(2.5rem, 1.8rem + 3.5vw, 5rem);
+
+  /* ── Layout ─────────────────────────────────────────────────────── */
+  --container-max: 1200px;
+  --container-narrow: 760px;
+  --nav-height: 64px;
+
+  /* ── Borders & radius ───────────────────────────────────────────── */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  /* ── Shadows / glows ────────────────────────────────────────────── */
+  --glow-primary: 0 0 12px var(--color-primary-glow), 0 0 30px var(--color-primary-glow);
+  --glow-secondary: 0 0 12px var(--color-secondary-glow), 0 0 30px var(--color-secondary-glow);
+  --shadow-card: 0 2px 8px oklch(0 0 0 / 0.5);
+
+  /* ── Transitions ────────────────────────────────────────────────── */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+}

@@ -1,0 +1,10 @@
+<!--/* text-block/edit-form-fields.html — richtext edit fields */-->
+<label for="headline-input" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Headline</label>
+<input type="text" id="headline-input" name="headline" class="inline-headline-input"
+       value="${properties.headline @ context='attribute'}" placeholder="Section headline…"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<!--/* Hidden textarea: carries initial HTML from Sling; read by editor-bundle.js on init */-->
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<!--/* Hidden input populated with editor HTML before htmx submit */-->
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />

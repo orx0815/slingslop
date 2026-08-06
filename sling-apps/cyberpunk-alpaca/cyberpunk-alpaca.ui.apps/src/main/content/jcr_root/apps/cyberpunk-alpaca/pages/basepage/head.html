@@ -1,0 +1,27 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${properties['jcr:title'] @ context='text'} — Cyberpunk Alpaca</title>
+<meta name="description" content="${properties.description @ context='attribute'}">
+
+<!--/* Add the .noMinLibs selector (e.g. /content/cyberpunk-alpaca/home.noMinLibs.html)
+       for unminified sources. A selector (not a query param) keeps the cache key clean. */-->
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
+  <script src="/apps/cyberpunk-alpaca/js/public/public-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/cyberpunk-alpaca/css/public/public.css" />
+  <!--/* Editor assets: only for authenticated users */-->
+  <sly data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/cyberpunk-alpaca/js/htmx.js"></script>
+    <script src="/apps/cyberpunk-alpaca/js/editor/editor-bundle.js"></script>
+    <link rel="stylesheet" href="/apps/cyberpunk-alpaca/css/editor/editor.css" />
+  </sly>
+</sly>
+<sly data-sly-test="${!noMinLibs}">
+  <script src="/apps/cyberpunk-alpaca/js/public/public-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/cyberpunk-alpaca/css/public/public.min.css" />
+  <sly data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/cyberpunk-alpaca/js/editor/editor-bundle.min.js"></script>
+    <link rel="stylesheet" href="/apps/cyberpunk-alpaca/css/editor/editor.min.css" />
+  </sly>
+</sly>

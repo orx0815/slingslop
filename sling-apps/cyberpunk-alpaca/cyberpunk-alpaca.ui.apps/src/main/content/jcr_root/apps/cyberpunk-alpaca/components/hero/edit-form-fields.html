@@ -1,0 +1,40 @@
+<!--/* hero/edit-form-fields.html — modal edit fields for the hero component */-->
+<label for="hero-eyebrow" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Eyebrow text</label>
+<input type="text" id="hero-eyebrow" name="eyebrow" class="inline-headline-input"
+       value="${properties.eyebrow @ context='attribute'}" placeholder="e.g. // STATUS: ONLINE"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-title" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Main title</label>
+<input type="text" id="hero-title" name="title" class="inline-headline-input"
+       value="${properties.title @ context='attribute'}" placeholder="e.g. AL-PACA-9000"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-subtitle" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Subtitle / accent line</label>
+<input type="text" id="hero-subtitle" name="subtitle" class="inline-headline-input"
+       value="${properties.subtitle @ context='attribute'}" placeholder="e.g. Digital Mercenary for Hire"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-description" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Description</label>
+<textarea id="hero-description" name="description" class="inline-headline-input"
+          placeholder="Short description shown below the title…"
+          form="editor-form" rows="3" style="margin-bottom: 12px;">${properties.description @ context='text'}</textarea>
+
+<label for="hero-cta-primary-label" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Primary CTA label</label>
+<input type="text" id="hero-cta-primary-label" name="ctaPrimaryLabel" class="inline-headline-input"
+       value="${properties.ctaPrimaryLabel @ context='attribute'}" placeholder="e.g. view.portfolio()"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-cta-primary-url" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Primary CTA URL</label>
+<input type="text" id="hero-cta-primary-url" name="ctaPrimaryUrl" class="inline-headline-input"
+       value="${properties.ctaPrimaryUrl @ context='attribute'}" placeholder="/content/cyberpunk-alpaca/about.html"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-cta-secondary-label" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Secondary CTA label</label>
+<input type="text" id="hero-cta-secondary-label" name="ctaSecondaryLabel" class="inline-headline-input"
+       value="${properties.ctaSecondaryLabel @ context='attribute'}" placeholder="e.g. read.manifesto()"
+       form="editor-form" style="margin-bottom: 12px;" />
+
+<label for="hero-cta-secondary-url" style="display:block; margin-bottom: 4px; font-size: 0.875em; color: var(--editor-text-muted);">Secondary CTA URL</label>
+<input type="text" id="hero-cta-secondary-url" name="ctaSecondaryUrl" class="inline-headline-input"
+       value="${properties.ctaSecondaryUrl @ context='attribute'}" placeholder="/content/cyberpunk-alpaca/styleguide.html"
+       form="editor-form" />

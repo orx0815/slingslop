@@ -1,0 +1,54 @@
+/* ── editor/00-variables.css — Editor OKLCH tokens for Cyberpunk Alpaca ── */
+/*
+ * These editor colour tokens are tuned to match the Cyberpunk Alpaca palette
+ * (neon magenta primary, electric cyan secondary, dark background).
+ */
+
+:root {
+  /* ── Primary hue (neon magenta) ── */
+  --hue-primary: 330;
+  --hue-secondary: 195;
+
+  /* ── Editor surface colours ── */
+  --editor-bg: oklch(0.10 0.018 var(--hue-primary));
+  --editor-surface: oklch(0.15 0.022 var(--hue-primary));
+  --editor-border: oklch(0.28 0.040 var(--hue-primary));
+  --editor-overlay: oklch(0 0 0 / 0.75);
+
+  /* ── Editor accent ── */
+  --editor-primary: oklch(0.72 0.25 var(--hue-primary));
+  --editor-primary-hover: oklch(0.65 0.28 var(--hue-primary));
+  --editor-secondary: oklch(0.75 0.15 var(--hue-secondary));
+
+  /* ── Editor text ── */
+  --editor-text: oklch(0.92 0.010 var(--hue-secondary));
+  --editor-text-muted: oklch(0.60 0.025 var(--hue-secondary));
+  --editor-text-placeholder: oklch(0.40 0.015 var(--hue-primary));
+
+  /* ── Toolbar ── */
+  --toolbar-bg: oklch(0.12 0.020 var(--hue-primary));
+  --toolbar-border: oklch(0.24 0.035 var(--hue-primary));
+  --toolbar-button-hover: oklch(0.20 0.030 var(--hue-primary));
+  --toolbar-button-active: var(--editor-primary);
+
+  /* ── Modal ── */
+  --modal-bg: oklch(0.13 0.020 var(--hue-primary));
+  --modal-header-bg: oklch(0.10 0.018 var(--hue-primary));
+  --modal-border: oklch(0.32 0.050 var(--hue-primary));
+
+  /* ── Buttons ── */
+  --btn-primary-bg: var(--editor-primary);
+  --btn-primary-text: oklch(0.08 0.012 var(--hue-primary));
+  --btn-secondary-bg: oklch(0.18 0.025 var(--hue-primary));
+  --btn-secondary-text: var(--editor-text);
+  --btn-secondary-border: var(--editor-border);
+
+  /* ── Inline editor ── */
+  --inline-editor-footer-bg: oklch(0.10 0.018 var(--hue-primary) / 0.95);
+  --inline-editor-footer-border: oklch(0.28 0.040 var(--hue-primary));
+
+  /* ── Error notification ── */
+  --error-bg: oklch(0.15 0.030 25);
+  --error-border: oklch(0.50 0.18 25);
+  --error-text: oklch(0.88 0.015 25);
+}

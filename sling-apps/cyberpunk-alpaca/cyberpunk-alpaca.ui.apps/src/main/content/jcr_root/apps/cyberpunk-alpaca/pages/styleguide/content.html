@@ -1,0 +1,159 @@
+<!--/* styleguide/content.html — living style guide */-->
+<div class="styleguide container">
+
+  <h1 style="font-family: var(--font-mono); margin-bottom: var(--space-4);">&gt; style_guide.render()</h1>
+  <p class="text-muted" style="margin-bottom: var(--space-16); font-family: var(--font-mono);">
+    // A reference for all visual primitives and components in this system.
+  </p>
+
+  <!-- ── Colours ── -->
+  <section class="sg-section">
+    <h2>colours</h2>
+    <div class="sg-swatches">
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-primary); box-shadow: var(--glow-primary);"></div>
+        <div class="sg-swatch__name">primary</div>
+        <div class="sg-swatch__label">oklch(0.72 0.25 330)</div>
+      </div>
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-secondary); box-shadow: var(--glow-secondary);"></div>
+        <div class="sg-swatch__name">secondary</div>
+        <div class="sg-swatch__label">oklch(0.75 0.15 195)</div>
+      </div>
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-bg);"></div>
+        <div class="sg-swatch__name">background</div>
+        <div class="sg-swatch__label">--color-bg</div>
+      </div>
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-surface);"></div>
+        <div class="sg-swatch__name">surface</div>
+        <div class="sg-swatch__label">--color-surface</div>
+      </div>
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-text);"></div>
+        <div class="sg-swatch__name">text</div>
+        <div class="sg-swatch__label">--color-text</div>
+      </div>
+      <div class="sg-swatch">
+        <div class="sg-swatch__color" style="background: var(--color-text-muted);"></div>
+        <div class="sg-swatch__name">text muted</div>
+        <div class="sg-swatch__label">--color-text-muted</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Typography ── -->
+  <section class="sg-section">
+    <h2>typography</h2>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">h1 / text-4xl</span>
+      <h1 style="margin:0;">Alpaca.exe</h1>
+    </div>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">h2 / text-3xl</span>
+      <h2 style="margin:0;">Neural.Interface()</h2>
+    </div>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">h3 / text-2xl</span>
+      <h3 style="margin:0;">Protocol Override</h3>
+    </div>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">body</span>
+      <p style="margin:0;">The alpaca is a domesticated species of South American camelid. It resembles a small llama in appearance. Unlike the llama, alpacas are not used as beasts of burden but are raised specifically for their fiber. In the future, they will also write your firmware.</p>
+    </div>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">code</span>
+      <code>alpaca.query(depth=infinity)</code>
+    </div>
+    <div class="sg-type-specimen">
+      <span class="sg-type-label">blockquote</span>
+      <blockquote style="margin:0;">
+        <p>"The network is the alpaca. The alpaca is the network. Or so the firewall claims." — Anonymous sysadmin, 2089</p>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ── Buttons ── -->
+  <section class="sg-section">
+    <h2>buttons</h2>
+    <div class="sg-buttons">
+      <button class="btn btn--primary">btn--primary</button>
+      <button class="btn btn--secondary">btn--secondary</button>
+      <button class="btn btn--ghost">btn--ghost</button>
+      <button class="btn btn--primary btn--sm">btn--sm</button>
+      <button class="btn btn--primary btn--lg">btn--lg</button>
+    </div>
+  </section>
+
+  <!-- ── Components ── -->
+  <section class="sg-section">
+    <h2>components</h2>
+    <h3>card</h3>
+    <div class="sg-preview">
+      <div class="grid grid--3">
+        <div class="card" data-animate>
+          <div class="card__tag">firmware</div>
+          <div class="card__title">Wool Encryption v2.3</div>
+          <div class="card__body">Standard-issue fleece, now with 256-bit entanglement. Warm and quantum-resistant.</div>
+        </div>
+        <div class="card" data-animate>
+          <div class="card__tag">hardware</div>
+          <div class="card__title">Neural Saddle™</div>
+          <div class="card__body">Ergonomically designed for prolonged jack-in sessions. Comes in midnight magenta.</div>
+        </div>
+        <div class="card" data-animate>
+          <div class="card__tag">service</div>
+          <div class="card__title">Pasture-as-a-Service</div>
+          <div class="card__body">We handle the hay. You handle the hacking. SLA: 99.9% uptime or your llama back.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>stats</h3>
+    <div class="sg-preview">
+      <div class="grid grid--3">
+        <div class="stat">
+          <div class="stat__value">42k</div>
+          <div class="stat__label">packets herded</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">∞</div>
+          <div class="stat__label">fleece protocols</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">0</div>
+          <div class="stat__label">regrets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Spacing ── -->
+  <section class="sg-section">
+    <h2>spacing</h2>
+    <div class="sg-spacing-scale">
+      <div class="sg-spacing-item">
+        <div class="sg-spacing-label">--space-1 (4px)</div>
+        <div class="sg-spacing-bar" style="width: var(--space-1);"></div>
+      </div>
+      <div class="sg-spacing-item">
+        <div class="sg-spacing-label">--space-2 (8px)</div>
+        <div class="sg-spacing-bar" style="width: calc(var(--space-2) * 4);"></div>
+      </div>
+      <div class="sg-spacing-item">
+        <div class="sg-spacing-label">--space-4 (16px)</div>
+        <div class="sg-spacing-bar" style="width: calc(var(--space-4) * 4);"></div>
+      </div>
+      <div class="sg-spacing-item">
+        <div class="sg-spacing-label">--space-8 (32px)</div>
+        <div class="sg-spacing-bar" style="width: calc(var(--space-8) * 4);"></div>
+      </div>
+      <div class="sg-spacing-item">
+        <div class="sg-spacing-label">--space-16 (64px)</div>
+        <div class="sg-spacing-bar" style="width: calc(var(--space-16) * 4);"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
