@@ -23,7 +23,7 @@
 	"portsAttributes": {
 		"8080": {
 			"label": "Sling",
-			"onAutoForward": "openPreview"
+			"onAutoForward": "silent"
 		}
 	},
 
@@ -31,6 +31,11 @@
 	// the Codespaces prebuild, so a fresh codespace boots ready-to-run.
 	// (The frontend-maven-plugin fetches its own Node per ui.apps module.)
 	"postCreateCommand": "mvn -q clean install -DskipITs",
+
+	// Start Sling automatically for each container boot, then open the
+	// Sling Matrix homepage in the host browser once the instance responds.
+	"postStartCommand": ".devcontainer/start-launcher.sh",
+	"postAttachCommand": ".devcontainer/open-matrix.sh",
 
 	// A 2-core box is tight for a full Sling build; ask for 4c/8GB.
 	"hostRequirements": {
