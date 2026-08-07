@@ -25,6 +25,9 @@ on:
     branches:
       - main
       - deploy/motorbrot_prod
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -104,7 +107,7 @@ jobs:
   # ---------------------------------------------------------------- publish sling
   publish-sling:
     needs: [meta, build-test]
-    if: needs.meta.outputs.sling == 'true' || github.ref_name == 'main'
+    if: github.event_name == 'push' && (needs.meta.outputs.sling == 'true' || github.ref_name == 'main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -143,7 +146,7 @@ jobs:
   # ---------------------------------------------------------------- publish webcache
   publish-webcache:
     needs: [meta, build-test]
-    if: needs.meta.outputs.webcache == 'true' || github.ref_name == 'main'
+    if: github.event_name == 'push' && (needs.meta.outputs.webcache == 'true' || github.ref_name == 'main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -174,7 +177,7 @@ jobs:
   # this CI gate — not a merge driver — is what actually protects prod.
   verify-vault:
     needs: meta
-    if: needs.meta.outputs.is_deploy == 'true'
+    if: github.event_name == 'push' && needs.meta.outputs.is_deploy == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -191,7 +194,7 @@ jobs:
 
   deploy-sling:
     needs: [meta, publish-sling, verify-vault]
-    if: needs.meta.outputs.is_deploy == 'true' && needs.meta.outputs.sling == 'true'
+    if: github.event_name == 'push' && needs.meta.outputs.is_deploy == 'true' && needs.meta.outputs.sling == 'true'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -226,6 +229,7 @@ jobs:
     # changed → sling first), but still runs if deploy-sling was skipped
     # (webcache-only change). Blocked if deploy-sling failed.
     if: |
+      github.event_name == 'push' &&
       always() &&
       needs.verify-vault.result == 'success' &&
       needs.meta.outputs.is_deploy == 'true' &&
