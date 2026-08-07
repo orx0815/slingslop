@@ -1,9 +1,16 @@
 <!--/* Default page body: render the hero (if present) then the main container.
-       Concrete page types (homepage, styleguide) override this script. */-->
-<sly data-sly-resource="${'hero' @ resourceType='cyberpunk-alpaca/components/hero'}"
-     data-sly-test="${resource.getChild('hero')}" />
+       Concrete page types (homepage, styleguide) override this script.
 
-<div class="wrap section">
-  <sly data-sly-resource="${'main' @ resourceType='cyberpunk-alpaca/components/parsys'}"
-       data-sly-test="${resource.getChild('main')}" />
-</div>
+       HTL has no method-call-with-arguments syntax, so a named child cannot be
+       fetched via resource.getChild('x'). Instead we iterate resource.listChildren
+       (a valid no-arg accessor) and match by node name. */-->
+<sly data-sly-list.child="${resource.listChildren}">
+  <sly data-sly-test="${child.name == 'hero'}"
+       data-sly-resource="${child.path @ resourceType='cyberpunk-alpaca/components/hero'}" />
+</sly>
+
+<sly data-sly-list.child="${resource.listChildren}">
+  <div class="wrap section" data-sly-test="${child.name == 'main'}">
+    <sly data-sly-resource="${child.path @ resourceType='cyberpunk-alpaca/components/parsys'}" />
+  </div>
+</sly>
