@@ -173,18 +173,18 @@ zengarden pattern" instruction below refers to it.
 older conventions that will mislead a fresh scaffold (and burn tokens):**
 - `sling-apps/sling-matrix/` — parsys + different component conventions
 - `sling-apps/digitalmedia/` — four-module `client.core` / `client.ui.apps` split, FFM/ImageMagick specifics
-- `devop/` and `ops/` — deployment / infrastructure, not app scaffolding
+- `devops/` — deployment / infrastructure, not app scaffolding
 
-**Sole exception:** `devop/conga/` — and only while executing **Task 13** (CONGA
+**Sole exception:** `devops/conga/` — and only while executing **Task 13** (CONGA
 tenant registration) for a *public-facing* app, per §2.8. Otherwise stay out.
 
 **NEVER create, edit, move, or delete secrets or deploy infrastructure.** In
 particular, do not touch any `vault.yml` / `vault.*.yml` (ansible-vault
-encrypted), anything under `ops/`, or the CI workflows under `.github/workflows/`.
+encrypted), anything under `devops/`, or the CI workflows under `.github/workflows/`.
 These are branch-protected and carry real production secrets — an app scaffold
 has no business changing them, and a stray edit can clobber the prod vault on
 merge. Your Task 13 change is limited to *appending a tenant block* to a CONGA
-`environments/*.yaml` file; nothing else in `devop/` or `ops/`.
+`environments/*.yaml` file; nothing else in `devops/`.
 
 If you catch yourself opening a file outside `zengarden`, the root `pom.xml`, or the
 files this skill names explicitly — stop. You don't need it.
@@ -566,13 +566,13 @@ So: "this app doesn't need ACL nodes" is only true for an app that is **never** 
 > their own sub-domain. For a **public-facing** app it is mandatory.
 
 Deployment config (Traefik router, webcache vhost, Sling short-URL mapping,
-launcher wiring) is **generated** by the [`devop/conga`](../../devop/conga/README.md)
+launcher wiring) is **generated** by the [`devops/conga`](../../devops/conga/README.md)
 module from a single per-app *tenant* block — you do **not** hand-edit the
 Traefik, webcache or launcher files. See the full design in
 [docs/conga-config-generation-concept.md](../conga-config-generation-concept.md).
 
 **Step 1 — append one tenant block** to every environment the app should ship in
-(at minimum `devop/conga/src/main/environments/prod-motorbrot.yaml`; optionally
+(at minimum `devops/conga/src/main/environments/prod-motorbrot.yaml`; optionally
 the `local-*` environments). Derive the values from the Agent Smith variables:
 
 | Agent Smith variable | Tenant field |
@@ -584,7 +584,7 @@ the `local-*` environments). Derive the values from the Agent Smith variables:
 | gated? (basicAuth) | `roles: [ gated ]` + `middlewares: [ sec-headers, editor-basicauth ]` vs. `roles: [ public-cached ]` |
 
 ```yaml
-# devop/conga/src/main/environments/prod-motorbrot.yaml
+# devops/conga/src/main/environments/prod-motorbrot.yaml
 tenants:
   # ...existing apps...
   - tenant: {PROJECT_NAME}
@@ -596,24 +596,24 @@ tenants:
 **Step 2 — prove it renders:**
 
 ```bash
-mvn -q -f devop/conga/pom.xml clean package
+mvn -q -f devops/conga/pom.xml clean package
 ```
 
 Confirm the new files appear under
-`devop/conga/target/configuration/prod-motorbrot/vps1/` (a `webcache/{PROJECT_NAME}.conf`,
+`devops/conga/target/configuration/prod-motorbrot/vps1/` (a `webcache/{PROJECT_NAME}.conf`,
 a `traefik/dynamic/router-{PROJECT_NAME}.yml`, and a
 `slingmappings/.../{subdomain}.motorbrot.org/.content.xml`).
 
-**Do not** hand-edit `ops/ansible/roles/webcache/templates/*.conf.j2`,
-`ops/ansible/roles/traefik/templates/*.j2` or the launcher features for the new
+**Do not** hand-edit `devops/ansible/roles/webcache/templates/*.conf.j2`,
+`devops/ansible/roles/traefik/templates/*.j2` or the launcher features for the new
 app — CONGA owns them now.
 
 **GitOps — the deploy is automatic.** When your tenant change to
-`devop/conga/src/main/environments/**` lands on the deploy branch, the
+`devops/conga/src/main/environments/**` lands on the deploy branch, the
 [`deploy-edge` CI job](../../.github/workflows/ci-cd.yml) regenerates the CONGA
 config and ships the new tenant's **Traefik router + webcache vhost + Sling
 `/etc/map` mapping** to the running host (via
-`ops/ansible/playbooks/deploy-tenant-edge.yml`) — **no image rebuild**. So Task 13
+`devops/ansible/playbooks/deploy-tenant-edge.yml`) — **no image rebuild**. So Task 13
 is just the data change: append the tenant, open the PR. (If the app is brand new,
 the `sling` image is rebuilt/published first, then the edge config is shipped.)
 
@@ -1627,7 +1627,7 @@ Use this checklist to verify completeness:
 - **Never** create a JavaScript solution when CSS can do it
 - **Never** include tiptap/modal code if ALF chose non-editable
 - **Never** hard-code the "silly hack" from zengarden's UserIsLoggedIn
-- **Never** touch secrets or deploy infra: no `vault.yml` / `vault.*.yml`, nothing under `ops/`, no `.github/workflows/**` — these are branch-protected and a stray edit can clobber the prod vault on merge (Task 13 only *appends a tenant block* to a CONGA `environments/*.yaml`)
+- **Never** touch secrets or deploy infra: no `vault.yml` / `vault.*.yml`, nothing under `devops/`, no `.github/workflows/**` — these are branch-protected and a stray edit can clobber the prod vault on merge (Task 13 only *appends a tenant block* to a CONGA `environments/*.yaml`)
 - **Never** skip the `mvn install` validation step
 
 ## Appendix C: Smith's Creative Latitude

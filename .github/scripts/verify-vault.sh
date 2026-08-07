@@ -7,12 +7,12 @@
 # different / empty / garbled file, failing the deploy BEFORE the VPS is touched
 # instead of shipping wrong or broken secrets.
 #
-# See ops/README.md.
+# See devops/README.md.
 set -euo pipefail
 
 VP="${1:?usage: verify-vault.sh <vault-password-file>}"
 
-VAULT="ops/ansible/inventory/group_vars/all/vault.yml"
+VAULT="devops/ansible/inventory/group_vars/all/vault.yml"
 if [ ! -f "$VAULT" ]; then
   echo "::error::no committed vault found at $VAULT — refusing to deploy."
   exit 1

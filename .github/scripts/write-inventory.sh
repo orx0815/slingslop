@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Writes the (gitignored) prod inventory + host_vars from CI env vars so the
-# deploy jobs have something to target. Run from ops/ansible as the CWD.
+# deploy jobs have something to target. Run from devops/ansible as the CWD.
 #
 #   DEPLOY_HOST    SSH target / public IP of the VPS   (e.g. motorbrot.org)
 #   DEPLOY_DOMAIN  public domain published by Traefik   (e.g. motorbrot.org)

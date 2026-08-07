@@ -216,7 +216,7 @@
 
     <!-- Deploy-config generator: renders reverse-proxy / webcache / Sling
          URL-mapping / launcher config per public app. See docs/conga-config-generation-concept.md -->
-    <module>devop/conga</module>
+    <module>devops/conga</module>
 
   </modules>
 </project>

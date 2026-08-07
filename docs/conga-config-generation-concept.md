@@ -1,11 +1,11 @@
 # Concept: CONGA-driven configuration generation for public-facing Slingslop apps
 
-> **Status:** implemented (Phases 1–7). The `devop/conga/` Maven module now
+> **Status:** implemented (Phases 1–7). The `devops/conga/` Maven module now
 > renders the reverse-proxy, webcache, Sling URL-mapping and launcher config for
 > every public-facing app from a single per-app *tenant* block. This document is
 > the design rationale; the working module lives at
-> [devop/conga/](../devop/conga/README.md). Build it with
-> `mvn -pl devop/conga clean package` (or as part of the root reactor).
+> [devops/conga/](../devops/conga/README.md). Build it with
+> `mvn -pl devops/conga clean package` (or as part of the root reactor).
 >
 > **CONGA version:** `conga-maven-plugin` 1.20.0 with the `sling` + `ansible`
 > plugins 1.6.0 — builds cleanly on the repo's JDK 25 toolchain.
@@ -23,12 +23,12 @@ half-deployed.
 
 | # | Concern | File(s) today | What is app-specific |
 |---|---|---|---|
-| 1 | **Traefik router** (subdomain, TLS/ACME, optional basicAuth) | [ops/ansible/roles/traefik/templates/compose.edge.yml.j2](../ops/ansible/roles/traefik/templates/compose.edge.yml.j2) (container labels) + [dynamic.yml.j2](../ops/ansible/roles/traefik/templates/dynamic.yml.j2) (file-provider routers/middlewares) | `Host(\`<app>.<domain>\`)`, cert resolver, which middlewares apply |
-| 2 | **Apache webcache vhost** (short-URL rewrites, proxy, cache policy) | one `*.conf.j2` per app, e.g. [zengarden.conf.j2](../ops/ansible/roles/webcache/templates/zengarden.conf.j2), [www.conf.j2](../ops/ansible/roles/webcache/templates/www.conf.j2) | `ServerName`, `DocumentRoot`, every `ProxyPass* /content/slingslop/<app>` and `/apps/slingslop/<app>`, home page node |
-| 3 | **Webcache bind-mount + render task** | [compose.edge.yml.j2](../ops/ansible/roles/traefik/templates/compose.edge.yml.j2) (volume line) + [roles/webcache/tasks/main.yml](../ops/ansible/roles/webcache/tasks/main.yml) (stat/remove/render loop) | one more `*.conf` file to mount and render |
+| 1 | **Traefik router** (subdomain, TLS/ACME, optional basicAuth) | [devops/ansible/roles/traefik/templates/compose.edge.yml.j2](../devops/ansible/roles/traefik/templates/compose.edge.yml.j2) (container labels) + [dynamic.yml.j2](../devops/ansible/roles/traefik/templates/dynamic.yml.j2) (file-provider routers/middlewares) | `Host(\`<app>.<domain>\`)`, cert resolver, which middlewares apply |
+| 2 | **Apache webcache vhost** (short-URL rewrites, proxy, cache policy) | one `*.conf.j2` per app, e.g. [zengarden.conf.j2](../devops/ansible/roles/webcache/templates/zengarden.conf.j2), [www.conf.j2](../devops/ansible/roles/webcache/templates/www.conf.j2) | `ServerName`, `DocumentRoot`, every `ProxyPass* /content/slingslop/<app>` and `/apps/slingslop/<app>`, home page node |
+| 3 | **Webcache bind-mount + render task** | [compose.edge.yml.j2](../devops/ansible/roles/traefik/templates/compose.edge.yml.j2) (volume line) + [roles/webcache/tasks/main.yml](../devops/ansible/roles/webcache/tasks/main.yml) (stat/remove/render loop) | one more `*.conf` file to mount and render |
 | 4 | **Sling short-URL mapping** | *currently faked in Apache `RewriteRule`/`ProxyPassMatch`* — no real Sling mapping yet | `/<app>/` ⇄ `/content/slingslop/<app>/` |
 | 5 | **Launcher OSGi config / feature aggregate** | [launcher/src/main/features/*.json](../launcher/src/main/features/launcher.json) | per-app OSGi configs (e.g. resolver mapping, rendition service), feature include |
-| 6 | **Doc / var comments** | [group_vars/all/main.yml](../ops/ansible/inventory/group_vars/all/main.yml) header lists every published sub-domain | the sub-domain list |
+| 6 | **Doc / var comments** | [group_vars/all/main.yml](../devops/ansible/inventory/group_vars/all/main.yml) header lists every published sub-domain | the sub-domain list |
 | 7 | **Sling context-aware config** | content packages (`sling:configs`) | *runtime config — see §7, deliberately out of scope for now* |
 
 ---
@@ -60,7 +60,7 @@ cache/gate flags = **tenant config values**. Traefik router, Apache vhost and
 Sling mapping = **files multiplied per tenant** from a single template.
 
 Adding an app becomes: **append one tenant block** to an environment file and
-re-run `mvn -pl devop/conga conga:generate`. No template edits, no five-file safari.
+re-run `mvn -pl devops/conga conga:generate`. No template edits, no five-file safari.
 
 ---
 
@@ -68,7 +68,7 @@ re-run `mvn -pl devop/conga conga:generate`. No template edits, no five-file saf
 
 ```
 ┌──────────────────────────── DEVELOPER (this repo, versioned) ───────────────────────────┐
-│ devop/conga/src/main/                                                                    │
+│ devops/conga/src/main/                                                                    │
 │   roles/                    ← what a node/app *is*: files, variants, param definitions   │
 │   templates/                ← Handlebars: traefik router, apache vhost, sling mapping,   │
 │                               feature-model cfg.json, group_vars fragment                │
@@ -78,7 +78,7 @@ re-run `mvn -pl devop/conga conga:generate`. No template edits, no five-file saf
                                           │ mvn conga:generate
                                           ▼
 ┌──────────────────────────── OPERATIONS (per node / per fork) ───────────────────────────┐
-│ devop/conga/src/main/environments/                                                       │
+│ devops/conga/src/main/environments/                                                       │
 │   prod-motorbrot.yaml       ← domain: motorbrot.org, node vps1, tenant list, ACME on     │
 │   local.yaml                ← domain: slingslop.local, self-signed, basicAuth off        │
 │   staging.yaml              ← …                                                          │
@@ -86,7 +86,7 @@ re-run `mvn -pl devop/conga conga:generate`. No template edits, no five-file saf
 └──────────────────────────────────────────────────────────────────────────────────────────┘
                                           │ generated files
                                           ▼
-                     ops/ansible  copies/mounts them onto the VPS
+                     devops/ansible  copies/mounts them onto the VPS
 ```
 
 The golden rule (CONGA's own):
@@ -153,8 +153,8 @@ is **variant-specific** (same logical file, three templates each gated by `varia
 > — `allowedMethods`, `denySelectors`, `denyPathPrefixes`, `jsonAllowlist`,
 > `uncachedPatterns`, `passthroughPaths`, `serverAliases`, `htmlTtlSeconds`,
 > `staticTtlSeconds` — live once in `slingslop-app-base` and are rendered by each
-variant in its own syntax. See [ops/webcache.md](../ops/webcache.md) for the
-  per-app knob table and [ops/conga-handlebars-101.md](../ops/conga-handlebars-101.md)
+variant in its own syntax. See [devops/webcache.md](../devops/webcache.md) for the
+  per-app knob table and [devops/conga-handlebars-101.md](../devops/conga-handlebars-101.md)
   for a how-to on promoting a hard-coded value to a tenant parameter.
 
 **Files on `slingslop-runtime`:**
@@ -213,7 +213,7 @@ Illustrative `role.yaml` excerpt (final syntax per
 [CONGA YAML definitions](https://devops.wcm.io/conga/yaml-definitions.html)):
 
 ```yaml
-# devop/conga/src/main/roles/slingslop-edge.yaml   (DEVELOPER-OWNED)
+# devops/conga/src/main/roles/slingslop-edge.yaml   (DEVELOPER-OWNED)
 role:
   # ---- node-level, one value for the whole box ----
   domain:
@@ -283,7 +283,7 @@ An environment file is the **entire** per-deployment surface. Adding an app =
 one tenant block; forking = copy the file and change `domain` + the tenant list.
 
 ```yaml
-# devop/conga/src/main/environments/prod-motorbrot.yaml   (OPERATIONS-OWNED)
+# devops/conga/src/main/environments/prod-motorbrot.yaml   (OPERATIONS-OWNED)
 # NOTE: environment YAML uses TOP-LEVEL keys (nodes/config/tenants) — there is
 # no `environment:` wrapper. `domain` lives in the environment-global `config:`
 # so both node- and tenant-scoped values can resolve `${domain}`.
@@ -349,7 +349,7 @@ upstream merges cleanly. This is the core payoff of the dev/ops split.
 
 ### Even cleaner fork: consume the roles as a published artifact
 
-A fork that *copies* the `devop/conga/` module still has to merge upstream template
+A fork that *copies* the `devops/conga/` module still has to merge upstream template
 changes by hand. CONGA's **`Environment.dependencies`** (present in ≥ 1.20)
 removes even that: publish the Slingslop roles + templates as a Maven artifact,
 and let a fork's environment file pull them in — the fork then contains **only**
@@ -374,7 +374,7 @@ tenants:
 ```
 
 Upgrading is now a version bump, not a merge. Use this for external forks; keep
-the in-repo `devop/conga/` module (source templates) for Slingslop itself.
+the in-repo `devops/conga/` module (source templates) for Slingslop itself.
 
 ### Local-development environments — topology by role selection
 
@@ -389,7 +389,7 @@ templates. The three local topologies we care about:
 | `local-full` (vagrant) | `slingslop-edge:selfsigned` + `slingslop-webcache` + `slingslop-runtime` + observability | Traefik `:443` on `slingslop.local` | full prod-like stack incl. TLS + Grafana/Loki |
 
 ```yaml
-# devop/conga/src/main/environments/local-webcache.yaml   (OPS)
+# devops/conga/src/main/environments/local-webcache.yaml   (OPS)
 config:
   domain: localhost
 nodes:
@@ -414,10 +414,10 @@ the role list**; the templates never learn which stack they're in.
 CONGA only *generates files* — it is explicitly **not** a deployment tool. Two
 integration patterns; we recommend a hybrid.
 
-> **Resolved — the seam is wired (Pattern A).** `ops/ansible` now **consumes the
+> **Resolved — the seam is wired (Pattern A).** `devops/ansible` now **consumes the
 > CONGA output** instead of hand-rendering per-app `.j2`:
 >
-> - The **webcache** role ships `devop/conga/target/configuration/<env>/<node>/webcache/`
+> - The **webcache** role ships `devops/conga/target/configuration/<env>/<node>/webcache/`
 >   (one `<app>.conf` per public-cached tenant) and compose bind-mounts the whole
 >   dir over the image's `sites-enabled`. The old `www.conf.j2`/`zengarden.conf.j2`
 >   render tasks are gone.
@@ -441,10 +441,10 @@ integration patterns; we recommend a hybrid.
 
 ### Pattern A — CONGA renders the final config files, Ansible ships bytes *(recommended for §1 items 1–5)*
 
-`mvn -pl devop/conga conga:generate` writes, per node, e.g.:
+`mvn -pl devops/conga conga:generate` writes, per node, e.g.:
 
 ```
-devop/conga/target/configuration/prod-motorbrot/vps1/
+devops/conga/target/configuration/prod-motorbrot/vps1/
   traefik/traefik.yml
   traefik/dynamic/middlewares.yml
   traefik/dynamic/router-zengarden.yml
@@ -463,7 +463,7 @@ devop/conga/target/configuration/prod-motorbrot/vps1/
 > part of the output path (files from all roles on a node share one tree).
 
 Ansible then simplifies to a **generic sync** — the per-app render tasks in
-[roles/webcache/tasks/main.yml](../ops/ansible/roles/webcache/tasks/main.yml)
+[roles/webcache/tasks/main.yml](../devops/ansible/roles/webcache/tasks/main.yml)
 and the hand-maintained bind-mount / router blocks disappear:
 
 ```yaml
@@ -548,7 +548,7 @@ for each webcache variant).
 ## 8. Repository layout (as implemented)
 
 ```
-devop/conga/                             ← Maven module (packaging `config`; runs io.wcm.devops.conga:conga-maven-plugin 1.20.0)
+devops/conga/                             ← Maven module (packaging `config`; runs io.wcm.devops.conga:conga-maven-plugin 1.20.0)
   README.md                              ← brief, plain-language front door (non-devops first; see below)
   pom.xml                                ← packaging `config` (auto-binds conga:generate); declares sling + ansible plugins
   src/main/
@@ -581,7 +581,7 @@ devop/conga/                             ← Maven module (packaging `config`; r
       example-fork.yaml                       # OPS (documented template for forks)
   target/configuration/…                      # generated (git-ignored)
 
-ops/ansible/…                                 ← slimmed: generic "ship generated config" tasks
+devops/ansible/…                                 ← slimmed: generic "ship generated config" tasks
 ```
 
 For external forks this whole `src/main/roles` + `templates` tree can instead be
@@ -591,7 +591,7 @@ and consumed via `Environment.dependencies` (see §5) — the fork keeps only it
 
 ### READMEs lead with a brief, plain-language concept (non-devops first)
 
-Both `devop/conga/README.md` and the existing [ops/README.md](../ops/README.md)
+Both `devops/conga/README.md` and the existing [devops/README.md](../devops/README.md)
 target someone who is **not** a DevOps engineer. Each must open with a short,
 no-jargon *concept-first* section **before** any CONGA/Ansible internals:
 
@@ -606,7 +606,7 @@ door, not a manual.
 The README should also carry a short **“Advanced — running your own fleet”** note.
 Slingslop itself is a single mono-repo (roles live in-tree, secrets in the
 committed encrypted vault). A **larger org** that runs *several* independent
-Slingslop deployments can instead **publish the `devop/conga` roles + templates
+Slingslop deployments can instead **publish the `devops/conga` roles + templates
 as a versioned artifact** (e.g. `your-org.conga-roles`) and have each deployment
 repo depend on it via `Environment.dependencies` (§5). Why they'd bother:
 
@@ -631,7 +631,7 @@ the build. With CONGA, a new **13th task** for public-facing apps becomes tiny
 and mechanical:
 
 > **Task 13 — Register the app for deployment (public-facing only):**
-> Append a tenant block to `devop/conga/src/main/environments/*.yaml` mapping the new
+> Append a tenant block to `devops/conga/src/main/environments/*.yaml` mapping the new
 > app. Derive values from existing Agent Smith variables:
 >
 > | Agent Smith variable | Tenant config |
@@ -642,17 +642,17 @@ and mechanical:
 > | home page node | `homePage` |
 > | "is it gated?" | `roles: [ gated ]` vs `[ public-cached ]` |
 >
-> Then run `mvn -pl devop/conga conga:generate` to prove it renders. **Do not** hand-edit
+> Then run `mvn -pl devops/conga conga:generate` to prove it renders. **Do not** hand-edit
 > Traefik/webcache/launcher files — CONGA owns them now.
 
 This replaces the error-prone five-file edit with a single, validated data
 change — exactly the reliability win that matters for non-interactive cloud runs.
 
 **GitOps trigger.** The tenant change deploys itself: a change under
-`devop/conga/src/main/**` on the deploy branch fires the **`deploy-edge`** job in
+`devops/conga/src/main/**` on the deploy branch fires the **`deploy-edge`** job in
 [`.github/workflows/ci-cd.yml`](../.github/workflows/ci-cd.yml), which regenerates
 the CONGA config and runs
-[`ops/ansible/playbooks/deploy-tenant-edge.yml`](../ops/ansible/playbooks/deploy-tenant-edge.yml)
+[`devops/ansible/playbooks/deploy-tenant-edge.yml`](../devops/ansible/playbooks/deploy-tenant-edge.yml)
 to ship the new tenant's Traefik router + webcache vhost + Sling `/etc/map`
 mapping to the running host — **no image rebuild** (the mapping is installed into
 the live Sling via the Composum package manager). Adding a tenant is therefore a
@@ -662,9 +662,9 @@ pure data change that auto-deploys the reverse-proxy + short-URL layer.
 
 ## 10. Rollout phases
 
-Phases 1–7 are **implemented** in `devop/conga/`; phase 8 remains an opt-in.
+Phases 1–7 are **implemented** in `devops/conga/`; phase 8 remains an opt-in.
 
-1. ✅ **Bootstrap module.** `devop/conga/` Maven module (`packaging: config`) wired
+1. ✅ **Bootstrap module.** `devops/conga/` Maven module (`packaging: config`) wired
    to `conga:generate`; plugin chain (core 1.20.0 + sling/ansible 1.6.0) resolves
    and runs on JDK 25.
 2. ✅ **Webcache first (highest pain).** `apache/vhost.conf.hbs` authored from the
@@ -681,11 +681,11 @@ Phases 1–7 are **implemented** in `devop/conga/`; phase 8 remains an opt-in.
    plus the generated `slingslop.slingmappings` package.
 6. ✅ **Agent Smith Task 13.** The skill now has a §2.8 registration task; the
    cloud instructions count 14 tasks.
-7. ✅ **Docs & fork template.** `example-fork.yaml` ships; this doc + `devop/conga/README.md`
+7. ✅ **Docs & fork template.** `example-fork.yaml` ships; this doc + `devops/conga/README.md`
    updated.
 8. ⬜ **Publish roles artifact (optional).** Release `slingslop.conga-roles` so
    external forks can consume roles/templates via `Environment.dependencies`
-   instead of copying the `devop/conga/` module. Not needed for the mono-repo.
+   instead of copying the `devops/conga/` module. Not needed for the mono-repo.
 
 Each phase is independently shippable and byte-diff-verifiable, so we never do a
 big-bang cutover.
@@ -709,7 +709,7 @@ big-bang cutover.
   produced on demand — committing it would only add per-box noise and merge
   conflicts. Ansible ships it straight to the host (§6).
 - **Forks: simple mono-repo (in-tree module).** Slingslop keeps roles + templates
-  in-tree at `devop/conga/`. Publishing a versioned `slingslop.conga-roles`
+  in-tree at `devops/conga/`. Publishing a versioned `slingslop.conga-roles`
   artifact is an **opt-in for larger orgs** running many independent deployments
   — see the README guidance (§8) and §5. For a single mono-repo it's unnecessary.
 - **CONGA vs. a plain Ansible `tenants:` loop — CONGA it is.** A Jinja loop only
@@ -735,7 +735,7 @@ big-bang cutover.
 - **Ansible vault wiring.** The Ansible plugin is declared as a dependency, but the
   environments currently carry **self-contained non-sensitive values** (so the
   build needs no vault key). Wiring the vault value-provider to pull `acmeEmail` /
-  htpasswd from `ops/ansible` at generate-time is a follow-up once prod rendering
+  htpasswd from `devops/ansible` at generate-time is a follow-up once prod rendering
   is exercised end-to-end.
 - **Which webcache engine is the default?** `apache` (mod_cache) is the default and
   is byte-checked against the current vhosts; `varnish` and `nginx` variants are
@@ -794,4 +794,4 @@ big-bang cutover.
 - CONGA Sling plugin (cfg.json / feature model) — <https://devops.wcm.io/conga/plugins/sling/index.html>
 - CONGA Ansible plugin (vault + inventory) — <https://devops.wcm.io/conga/plugins/ansible/>
 - Training decks — DATM-57 (CONGA overview) & DATM-58 (AEM config with CONGA), <https://training.wcm.io/conga/>
-- Current deployment architecture — [ops/README.md](../ops/README.md)
+- Current deployment architecture — [devops/README.md](../devops/README.md)

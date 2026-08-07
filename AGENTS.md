@@ -14,7 +14,7 @@ sling-apps/           ← Sling applications (each = ui.apps + core bundle)
 content-packages/     ← Sample content (VLT zips) + 'complete' container package
 launcher/             ← Feature-model launcher, Docker image, integration tests
 docker/               ← docker-compose + web cache proxy configs (local dev)
-ops/                  ← Production Ansible deployment (single-VPS, GitOps-ready)
+devops/               ← CONGA config generator + Production Ansible deployment (single-VPS, GitOps-ready)
 docs/
   agent-skills/       ← Executable agent skill files (invoke via VS Code Copilot)
   editing-patterns.md ← Component editing supertypes and contracts
@@ -79,7 +79,7 @@ Some modules have their own `AGENTS.md` with module-specific context:
 |---|---|
 | `docs/editing-patterns.md` | Editing supertypes, component contract, new-component checklist |
 | `docs/composite-nodestore.md` | Composite NodeStore: immutable `/apps`+`/libs` from image, mutable content in volume |
-| `ops/webcache.md` | Webcache config: three cache engines (apache/nginx/varnish) + per-app cache & security knobs |
-| `ops/conga-handlebars-101.md` | How to promote a hard-coded template value to a CONGA tenant parameter; Handlebars idioms |
-| `ops/README.md` | **Production Ansible deployment** — full single-VPS setup with Traefik+ACME, Grafana, Loki, hardening |
+| `devops/webcache.md` | Webcache config: three cache engines (apache/nginx/varnish) + per-app cache & security knobs |
+| `devops/conga-handlebars-101.md` | How to promote a hard-coded template value to a CONGA tenant parameter; Handlebars idioms |
+| `devops/README.md` | **Production Ansible deployment** — full single-VPS setup with Traefik+ACME, Grafana, Loki, hardening |
 | `ReadMe.md` | Project overview, prerequisites, build & run instructions |
