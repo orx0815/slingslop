@@ -224,10 +224,12 @@ jobs:
 
   # ---------------------------------------------------------------- deploy webcache
   deploy-webcache:
-    needs: [meta, publish-webcache, deploy-sling, verify-vault]
+    needs: [meta, publish-sling, publish-webcache, deploy-sling, verify-vault]
     # Runs when webcache changed. Waits for deploy-sling if that ran (both
     # changed → sling first), but still runs if deploy-sling was skipped
-    # (webcache-only change). Blocked if deploy-sling failed.
+    # (webcache-only change). Blocked if deploy-sling failed — or if the sling
+    # IMAGE publish itself failed (which only *skips* deploy-sling, so guard on
+    # publish-sling directly; skipped = webcache-only change, still allowed).
     if: |
       github.event_name == 'push' &&
       always() &&
@@ -235,6 +237,8 @@ jobs:
       needs.meta.outputs.is_deploy == 'true' &&
       needs.meta.outputs.webcache == 'true' &&
       needs.publish-webcache.result == 'success' &&
+      needs.publish-sling.result != 'failure' &&
+      needs.publish-sling.result != 'cancelled' &&
       needs.deploy-sling.result != 'failure' &&
       needs.deploy-sling.result != 'cancelled'
     runs-on: ubuntu-latest
@@ -287,13 +291,20 @@ jobs:
   # (so a combined app+tenant change lands content first), or standalone for a
   # pure tenant change.
   deploy-edge:
-    needs: [meta, build-test, deploy-sling, deploy-webcache, verify-vault]
+    needs: [meta, build-test, publish-sling, publish-webcache, deploy-sling, deploy-webcache, verify-vault]
+    # `deploy-sling`/`deploy-webcache` only *skip* (never fail) when their image
+    # publish fails, so a failed publish would otherwise look like a green-light
+    # here. Guard on the publish jobs directly: `failure` blocks the edge deploy
+    # (content must land first); `skipped` still passes, so a pure-tenant change
+    # (nothing published) deploys as before.
     if: |
       always() &&
       needs.verify-vault.result == 'success' &&
       needs.meta.outputs.is_deploy == 'true' &&
       needs.meta.outputs.tenants == 'true' &&
       needs.build-test.result == 'success' &&
+      needs.publish-sling.result != 'failure' && needs.publish-sling.result != 'cancelled' &&
+      needs.publish-webcache.result != 'failure' && needs.publish-webcache.result != 'cancelled' &&
       needs.deploy-sling.result != 'failure' && needs.deploy-sling.result != 'cancelled' &&
       needs.deploy-webcache.result != 'failure' && needs.deploy-webcache.result != 'cancelled'
     runs-on: ubuntu-latest
