@@ -206,8 +206,11 @@
     <module>sling-apps/digitalmedia/digitalmedia.core</module>
     <module>sling-apps/digitalmedia/digitalmedia.client.ui.apps</module>
     <module>sling-apps/digitalmedia/digitalmedia.ui.apps</module>
+    <module>sling-apps/alf-vs-agent/alf-vs-agent.core</module>
+    <module>sling-apps/alf-vs-agent/alf-vs-agent.ui.apps</module>
 
     <module>content-packages/zengarden.sample-content</module>
+    <module>content-packages/alf-vs-agent.sample-content</module>
     <module>content-packages/sling-matrix.sample-content</module>
     <module>content-packages/digitalmedia.sample-content</module>
     <module>content-packages/complete</module>

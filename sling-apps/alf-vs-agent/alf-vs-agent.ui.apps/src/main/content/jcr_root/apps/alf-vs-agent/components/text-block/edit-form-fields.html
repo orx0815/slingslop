@@ -1,0 +1,8 @@
+<!--/* text-block/edit-form-fields.html — Edit form fields for text-block component */-->
+<div class="edit-form__field">
+  <label for="headline-field">Headline</label>
+  <input type="text" id="headline-field" name=".:headline" value="${properties.headline @ context='attribute'}" />
+</div>
+
+<textarea id="content-editor" style="display:none;">${properties.text @ context='html'}</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />

@@ -1,0 +1,93 @@
+<!--/* styleguide/styleguide-body.html — Living style guide content */-->
+<div class="container">
+  <h1>Style Guide</h1>
+  <p class="hero__subtitle">A living reference for the Alf vs Agent Smith design system.</p>
+
+  <!-- Colors -->
+  <section class="styleguide-section">
+    <h2 class="styleguide-section__title">Colors</h2>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-primary)"></div>
+        <div class="swatch__label">--color-primary</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-primary-light)"></div>
+        <div class="swatch__label">--color-primary-light</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-primary-dark)"></div>
+        <div class="swatch__label">--color-primary-dark</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-secondary)"></div>
+        <div class="swatch__label">--color-secondary</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-secondary-light)"></div>
+        <div class="swatch__label">--color-secondary-light</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-secondary-dark)"></div>
+        <div class="swatch__label">--color-secondary-dark</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-bg);border:1px solid var(--color-border)"></div>
+        <div class="swatch__label">--color-bg</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__color" style="background:var(--color-surface);border:1px solid var(--color-border)"></div>
+        <div class="swatch__label">--color-surface</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Typography -->
+  <section class="styleguide-section">
+    <h2 class="styleguide-section__title">Typography</h2>
+    <div class="specimen"><h1>Heading 1 — The Matrix Has You</h1><div class="specimen__meta">h1 — clamp(1.75rem, 1rem + 2vw, 3rem)</div></div>
+    <div class="specimen"><h2>Heading 2 — Follow the White Rabbit</h2><div class="specimen__meta">h2 — clamp(1.5rem, 1rem + 1.5vw, 2.25rem)</div></div>
+    <div class="specimen"><h3>Heading 3 — Knock, Knock</h3><div class="specimen__meta">h3 — clamp(1.25rem, 1rem + 1vw, 1.75rem)</div></div>
+    <div class="specimen"><h4>Heading 4 — Wake Up</h4><div class="specimen__meta">h4 — clamp(1.1rem, 0.9rem + 0.75vw, 1.4rem)</div></div>
+    <div class="specimen"><p>Body text — The quick brown fox jumps over the lazy dog. Font family: <code>var(--font-mono)</code>, size: <code>clamp(0.875rem, 0.8rem + 0.25vw, 1rem)</code>.</p><div class="specimen__meta">body — monospace</div></div>
+  </section>
+
+  <!-- Components -->
+  <section class="styleguide-section">
+    <h2 class="styleguide-section__title">Components</h2>
+
+    <h3>Buttons</h3>
+    <div style="display:flex;gap:var(--space-4);margin-block:var(--space-4)">
+      <a href="#" class="btn">Primary Button</a>
+      <a href="#" class="btn btn--secondary">Secondary Button</a>
+    </div>
+
+    <h3>Cards</h3>
+    <div class="grid" style="margin-block:var(--space-4)">
+      <div class="card">
+        <h4 class="card__title">Card Title</h4>
+        <p class="card__body">A card component with a subtle hover effect and green glow.</p>
+      </div>
+      <div class="card">
+        <h4 class="card__title">Another Card</h4>
+        <p class="card__body">Cards are used for fighter profiles, stats, and content blocks.</p>
+      </div>
+    </div>
+
+    <h3>Stats</h3>
+    <div class="stats">
+      <div class="stat"><div class="stat__value">99</div><div class="stat__label">Power</div></div>
+      <div class="stat"><div class="stat__value">87</div><div class="stat__label">Speed</div></div>
+      <div class="stat"><div class="stat__value">76</div><div class="stat__label">Defense</div></div>
+      <div class="stat"><div class="stat__value">92</div><div class="stat__label">Wit</div></div>
+    </div>
+  </section>
+
+  <!-- Animations -->
+  <section class="styleguide-section">
+    <h2 class="styleguide-section__title">Animations</h2>
+    <p>Hover over the text below to see the glitch effect:</p>
+    <p class="glitch" style="font-size:1.5rem;font-weight:700;color:var(--color-primary)">Glitch on Hover</p>
+    <p class="cursor-blink" style="margin-block:var(--space-4);font-size:1.2rem">Typing cursor</p>
+  </section>
+</div>

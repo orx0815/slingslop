@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Alf vs Agent Smith"
+    sling:resourceType="alf-vs-agent/pages/homepage">
+
+    <hero
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Hero"
+        sling:resourceType="alf-vs-agent/components/hero"
+        headline="Alf vs Agent Smith"
+        subtitle="Two agents. One arena. No escape."
+        ctaText="Enter the Arena"
+        ctaLink="/content/alf-vs-agent/content-page.html"/>
+
+    <versus
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Versus Section"
+        sling:resourceType="alf-vs-agent/components/text-block"
+        headline="Choose Your Fighter"
+        text=" &lt;div class=&quot;versus&quot; data-animate=&quot;stagger&quot;&gt; &lt;div class=&quot;versus__fighter versus__fighter--alf&quot;&gt; &lt;div class=&quot;fighter-card&quot;&gt; &lt;div class=&quot;fighter-card__avatar&quot;&gt;🤖&lt;/div&gt; &lt;h3 class=&quot;fighter-card__name&quot;&gt;ALF&lt;/h3&gt; &lt;p class=&quot;fighter-card__tagline&quot;&gt;&quot;AEM Landing-page Facilitator&quot;&lt;/p&gt; &lt;div class=&quot;stats&quot;&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;88&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Creativity&lt;/div&gt;&lt;/div&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;72&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Logic&lt;/div&gt;&lt;/div&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;95&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Chaos&lt;/div&gt;&lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;div class=&quot;versus__vs&quot;&gt;VS&lt;/div&gt; &lt;div class=&quot;versus__fighter&quot;&gt; &lt;div class=&quot;fighter-card&quot;&gt; &lt;div class=&quot;fighter-card__avatar&quot;&gt;🕶️&lt;/div&gt; &lt;h3 class=&quot;fighter-card__name&quot;&gt;Agent Smith&lt;/h3&gt; &lt;p class=&quot;fighter-card__tagline&quot;&gt;&quot;I am a virus, Mr. Anderson&quot;&lt;/p&gt; &lt;div class=&quot;stats&quot;&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Creativity&lt;/div&gt;&lt;/div&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;99&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Logic&lt;/div&gt;&lt;/div&gt; &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;stat__value&quot;&gt;100&lt;/div&gt;&lt;div class=&quot;stat__label&quot;&gt;Control&lt;/div&gt;&lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt; "/>
+
+    <text-block
+        jcr:primaryType="nt:unstructured"
+        jcr:title="About"
+        sling:resourceType="alf-vs-agent/components/text-block"
+        headline="The Battle Begins"
+        text=" &lt;p&gt;In a world where agents collide, two forces face off: ALF — the creative, chaotic facilitator — and Agent Smith — the methodical, precise architect. This is their arena.&lt;/p&gt; &lt;p&gt;Every page is a round. Every component, a move. The winner? Whoever ships first.&lt;/p&gt; "/>
+</jcr:root>

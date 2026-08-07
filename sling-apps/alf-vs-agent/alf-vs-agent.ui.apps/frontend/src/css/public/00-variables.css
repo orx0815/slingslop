@@ -1,0 +1,72 @@
+/*
+ * 00-variables.css — Design tokens for Alf vs Agent Smith
+ * Theme: Matrix green + digital amber, technical + playful
+ */
+:root {
+  /* ── Hues ───────────────────────────────────────────────────────────── */
+  --hue-primary: 142;
+  --hue-secondary: 85;
+
+  /* ── Complementary hues ─────────────────────────────────────────────── */
+  --hue-primary-complement: calc(var(--hue-primary) + 180);
+  --hue-secondary-complement: calc(var(--hue-secondary) + 180);
+
+  /* ── Primary palette (Matrix green) ─────────────────────────────────── */
+  --color-primary:       oklch(0.72 0.19 var(--hue-primary));
+  --color-primary-light: oklch(0.85 0.12 var(--hue-primary));
+  --color-primary-dark:  oklch(0.45 0.15 var(--hue-primary));
+  --color-primary-hover: oklch(0.65 0.22 var(--hue-primary));
+  --color-primary-subtle: oklch(0.95 0.04 var(--hue-primary));
+
+  /* ── Secondary palette (Digital amber) ──────────────────────────────── */
+  --color-secondary:       oklch(0.75 0.18 var(--hue-secondary));
+  --color-secondary-light: oklch(0.88 0.12 var(--hue-secondary));
+  --color-secondary-dark:  oklch(0.50 0.15 var(--hue-secondary));
+  --color-secondary-hover: oklch(0.68 0.20 var(--hue-secondary));
+
+  /* ── Complementary palette ──────────────────────────────────────────── */
+  --color-complement-primary:   oklch(0.72 0.10 var(--hue-primary-complement));
+  --color-complement-secondary: oklch(0.72 0.10 var(--hue-secondary-complement));
+
+  /* ── Neutrals ───────────────────────────────────────────────────────── */
+  --color-bg:          oklch(0.10 0.005 var(--hue-primary));
+  --color-surface:     oklch(0.15 0.008 var(--hue-primary));
+  --color-surface-raised: oklch(0.18 0.010 var(--hue-primary));
+  --color-border:      oklch(0.28 0.015 var(--hue-primary));
+  --color-text:        oklch(0.92 0.010 var(--hue-primary));
+  --color-text-muted:  oklch(0.65 0.02  var(--hue-primary));
+
+  /* ── Black & white (tinted) ─────────────────────────────────────────── */
+  --color-black:       oklch(0.06 0.005 var(--hue-primary));
+  --color-white:       oklch(0.97 0.005 var(--hue-primary));
+
+  /* ── Spacing scale ──────────────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* ── Font stacks ────────────────────────────────────────────────────── */
+  --font-mono: 'Courier New', Courier, 'Lucida Sans Typewriter', monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* ── Breakpoints ────────────────────────────────────────────────────── */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  /* ── Misc ───────────────────────────────────────────────────────────── */
+  --radius: 2px;
+  --radius-lg: 4px;
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --max-width: 1200px;
+}

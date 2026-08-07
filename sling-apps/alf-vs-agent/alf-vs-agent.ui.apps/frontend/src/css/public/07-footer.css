@@ -1,0 +1,38 @@
+/*
+ * 07-footer.css — Footer layout
+ */
+.site-footer {
+  background: var(--color-surface);
+  border-block-start: 1px solid var(--color-border);
+  padding-block: var(--space-8);
+  margin-block-start: auto;
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.site-footer__brand {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.site-footer__links {
+  display: flex;
+  gap: var(--space-4);
+  list-style: none;
+  padding: 0;
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}

@@ -83,3 +83,9 @@ tenants:
     middlewares:
     - sec-headers
     - editor-basicauth
+
+- tenant: alf-vs-agent
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/alf-vs-agent
