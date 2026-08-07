@@ -29,7 +29,12 @@
    RewriteRule "\.(?:$^{{#each denySelectors}}|{{this}}{{/each}})\." - [F,L,NC]
    # Numbered JSON tree dumps (.10.json) → 403.
    RewriteRule "\.[0-9]+\.json" - [F,L]
-   # Internal JCR trees (/system /bin …) → 403.
+   # Internal JCR trees (/system /bin …) → 403 — EXCEPT paths the operator
+   # explicitly allow-listed via passthroughPaths (e.g. /bin/public for the
+   # cache-busting clientlib servlet), which must reach Sling unrewritten.
+{{#each passthroughPaths}}
+   RewriteCond %{REQUEST_URI} !^{{this}}/
+{{/each}}
    RewriteRule "^/(?:$^{{#each denyPathPrefixes}}|{{this}}{{/each}})/" - [F,L,NC]
 
    # Compute the TRUE Sling extension (first .ext before any /suffix) into an

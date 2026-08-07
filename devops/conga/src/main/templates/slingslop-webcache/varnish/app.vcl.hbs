@@ -30,9 +30,15 @@ sub vcl_recv {
             return (synth(405, "method not allowed"));
         }
         # Dangerous selectors / views, numbered json dumps and internal trees.
+        # Internal-tree prefixes 403 EXCEPT paths allow-listed via passthroughPaths
+        # (e.g. /bin/public for the clientlib servlet).
         if (req.url ~ "(?i)\.(?:$^{{#each denySelectors}}|{{this}}{{/each}})\."
          || req.url ~ "\.[0-9]+\.json"
-         || req.url ~ "(?i)^/(?:$^{{#each denyPathPrefixes}}|{{this}}{{/each}})/") {
+         || (req.url ~ "(?i)^/(?:$^{{#each denyPathPrefixes}}|{{this}}{{/each}})/"
+{{#each passthroughPaths}}
+             && req.url !~ "^{{this}}/"
+{{/each}}
+            )) {
             return (synth(403));
         }
         # .json RESOURCE extension only under an allow-listed prefix (true ext,
