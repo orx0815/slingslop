@@ -88,7 +88,7 @@ jobs:
               # CONGA roles / templates / environments (the tenant list). A change
               # here — e.g. Agent Smith adding a tenant — triggers an edge-config
               # deploy (Traefik routers + webcache vhosts + Sling /etc/map), no image.
-              - 'devop/conga/src/main/**'
+              - 'devops/conga/src/main/**'
 
   # ---------------------------------------------------------------- build+test
   build-test:
@@ -213,7 +213,7 @@ jobs:
           set -euo pipefail
           [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
           python3 -m pip install --quiet "ansible-core>=2.17"
-          cd ops/ansible
+          cd devops/ansible
           ansible-galaxy collection install -r requirements.yml >/dev/null
           printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
           bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
@@ -249,11 +249,11 @@ jobs:
 
       - name: Generate CONGA deploy config
         # update-webcache.yml re-ships the CONGA-rendered vhosts, so the webcache
-        # role needs devop/conga/target/configuration/<env>/<node>/webcache/ on
+        # role needs devops/conga/target/configuration/<env>/<node>/webcache/ on
         # the runner (same generate step as deploy-edge). Without it the role's
         # "CONGA output missing" guard fails the job.
         run: |
-          mvn -U -pl launcher/launcher-dependencies,devop/conga -am \
+          mvn -U -pl launcher/launcher-dependencies,devops/conga -am \
             -DskipTests -Ddocker.skip=true clean package
 
       - uses: webfactory/ssh-agent@v0.9.0
@@ -270,7 +270,7 @@ jobs:
           set -euo pipefail
           [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
           python3 -m pip install --quiet "ansible-core>=2.17"
-          cd ops/ansible
+          cd devops/ansible
           ansible-galaxy collection install -r requirements.yml >/dev/null
           printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
           bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"
@@ -308,9 +308,9 @@ jobs:
 
       - name: Generate CONGA deploy config
         # Builds the parent + launcher-dependencies BOM + the CONGA module, which
-        # renders devop/conga/target/configuration/<env>/<node>/ that Ansible ships.
+        # renders devops/conga/target/configuration/<env>/<node>/ that Ansible ships.
         run: |
-          mvn -U -pl launcher/launcher-dependencies,devop/conga -am \
+          mvn -U -pl launcher/launcher-dependencies,devops/conga -am \
             -DskipTests -Ddocker.skip=true clean package
 
       - uses: webfactory/ssh-agent@v0.9.0
@@ -327,7 +327,7 @@ jobs:
           set -euo pipefail
           [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
           python3 -m pip install --quiet "ansible-core>=2.17"
-          cd ops/ansible
+          cd devops/ansible
           ansible-galaxy collection install -r requirements.yml >/dev/null
           printf '%s' "$VAULT_PASS" > /tmp/vp && chmod 600 /tmp/vp
           bash "$GITHUB_WORKSPACE/.github/scripts/write-inventory.sh"

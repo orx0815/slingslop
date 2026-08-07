@@ -48,7 +48,7 @@ CONGA-generated** config, against your dev Sling on the host, so you can diff
 their behaviour after tweaking a webcache template. Run instructions are in
 [webcache-bench/docker-compose.yml](webcache-bench/docker-compose.yml); the
 config comes from the `local-bench` CONGA environment. See
-[ops/webcache.md](../ops/webcache.md) for the engine trade-offs.
+[devops/webcache.md](../devops/webcache.md) for the engine trade-offs.
 
 
 

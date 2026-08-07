@@ -262,7 +262,7 @@ markup. For a full-featured app let **Agent Smith** scaffold it (see
 // a) pom.xml (root)                          — add the module(s)
 // b) content-packages/complete/pom.xml       — add a <dependency> + <subPackage>
 //                                               (bakes it into the all-in-one package)
-// c) devop/conga/src/main/environments/*.yaml — add the CONGA tenant
+// c) devops/conga/src/main/environments/*.yaml — add the CONGA tenant
 ```
 
 If the app follows the `/content/slingslop/<name>` + `/apps/slingslop/<name>`
@@ -271,7 +271,7 @@ convention, the CONGA tenant is **zero-config** — CONGA derives `contentRoot`,
 registration is three lines. Put it next to the `zengarden` tenant:
 
 ```yaml
-# devop/conga/src/main/environments/prod-motorbrot.yaml
+# devops/conga/src/main/environments/prod-motorbrot.yaml
 tenants:
   - tenant: zengarden
     roles: [ public-cached ]
@@ -280,11 +280,11 @@ tenants:
     roles: [ public-cached ]
 ```
 
-From those three lines, `mvn -pl devop/conga clean package` generates — per
+From those three lines, `mvn -pl devops/conga clean package` generates — per
 environment — the Apache cache/short-URL vhost (`webcache/my-app.conf`), the
 Traefik router (`traefik/dynamic/router-my-app.yml`) and the outbound Sling
 `/etc/map` short-URL mapping. No proxy/router/mapping file is hand-edited; see
-[`devop/conga/README.md`](devop/conga/README.md) and
+[`devops/conga/README.md`](devops/conga/README.md) and
 [`docs/conga-config-generation-concept.md`](docs/conga-config-generation-concept.md).
 
 ### Build & run it locally
@@ -307,7 +307,7 @@ curl http://localhost:8080/content/slingslop/my-app/home.html
 
 To see it live on the real (Traefik + webcache + Sling) stack — the same Ansible
 playbooks prod runs, on a throwaway Vagrant VM — follow
-**[Local testing (Vagrant VM)](ops/README.md#local-testing-vagrant-vm)** in the
+**[Local testing (Vagrant VM)](devops/README.md#local-testing-vagrant-vm)** in the
 ops guide. Adding the tenant above is all a new public sub-domain needs: the
 GitOps `deploy-tenant-edge` job ships that generated config (router + vhost +
 `/etc/map`) to a running host **without an image rebuild**.
@@ -320,9 +320,9 @@ GitOps `deploy-tenant-edge` job ships that generated config (router + vhost +
 > | Edge basicAuth gate — `editor.` / `grafana.` / `logs.` / `traefik.slingslop.local` | `localtest` / `localtest` |
 > | Grafana app login (inside Grafana) | `admin` / `admin` |
 >
-> These come from `ops/ansible/local/vars.local.yml` (+ generated
+> These come from `devops/ansible/local/vars.local.yml` (+ generated
 > `secrets.local.yml`). A production deploy uses the private vault on
-> `deploy/motorbrot_prod` instead — see [ops/README.md](ops/README.md#1-secret-management).
+> `deploy/motorbrot_prod` instead — see [devops/README.md](devops/README.md#1-secret-management).
 
 ### Where the content lives (important)
 
@@ -331,7 +331,7 @@ demo apps run out of the box. **Real / production content should *not* live in
 the image** — it is authored, grows and changes independently of code, and
 belongs in the writable content volume (and, at scale, is replicated to publish
 instances via **Sling Content Distribution** — see
-[ops/README.md](ops/README.md#scaling-out-a-multi-node-topology-concept)).
+[devops/README.md](devops/README.md#scaling-out-a-multi-node-topology-concept)).
 
 A **tenant supports this directly**: its `contentRoot` can point anywhere, so the
 *same* app can serve different content trees per deployment — e.g. a `sling-matrix`

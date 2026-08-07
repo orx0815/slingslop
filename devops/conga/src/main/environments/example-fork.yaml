@@ -1,0 +1,42 @@
+# example-fork — OPERATIONS-owned template for a downstream fork.
+#
+# A fork owns ONLY an environment file like this one: a different domain and a
+# different app set. Roles, templates and defaults are inherited unchanged from
+# this repo, so `git pull` from upstream merges cleanly.
+#
+# (A fork that would rather NOT copy the devops/conga module can instead consume
+# the roles/templates as a published Maven artifact via `dependencies:` — see
+# docs/conga-config-generation-concept.md §5.)
+
+config:
+  domain: someoneelse.org
+
+nodes:
+
+- node: box
+  roles:
+  - role: slingslop-edge
+    variant: acme
+  - role: slingslop-webcache
+    variant: apache
+  - role: slingslop-runtime
+    variant: composite-nodestore
+
+tenants:
+
+# They keep zengarden as-is.
+- tenant: zengarden
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zengarden
+
+# ...and add their own app, served on www.someoneelse.org.
+- tenant: myshop
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/myshop
+    subdomain: www
+    serverAliases:
+    - "${domain}"
