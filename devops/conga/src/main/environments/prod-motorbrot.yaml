@@ -39,6 +39,12 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/slingslop/zengarden
+    
+- tenant: zen
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zen
 
 # CONTENT-ONLY tenant: `zen` ships NO app of its own. It re-serves the existing
 # `zengarden` app at a second content root. `/content/slingslop/zen` is created
