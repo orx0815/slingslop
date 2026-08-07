@@ -1,0 +1,76 @@
+/*
+ * 03-layout.css — page scaffolding + the neon grid backdrop.
+ */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  background-image:
+    linear-gradient(
+      color-mix(in oklch, var(--color-primary), transparent 94%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--color-primary), transparent 94%) 1px,
+      transparent 1px
+    );
+  background-size: 2.5rem 2.5rem;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 0%,
+    color-mix(in oklch, var(--color-primary), transparent 82%),
+    transparent 60%
+  );
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.wrap {
+  width: min(100% - 2rem, var(--content-max));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--space-24);
+}
+
+.section--tight {
+  padding-block: var(--space-12);
+}
+
+.stack > * + * {
+  margin-top: var(--space-6);
+}
+
+.grid-2 {
+  display: grid;
+  gap: var(--space-8);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.eyebrow::before {
+  content: "// ";
+  color: var(--color-primary);
+}

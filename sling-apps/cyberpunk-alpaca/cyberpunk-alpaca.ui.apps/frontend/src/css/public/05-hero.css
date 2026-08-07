@@ -1,0 +1,110 @@
+/*
+ * 05-hero.css — the neon entrance. CSS-only glow, gradient, and grain.
+ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--space-24);
+  text-align: center;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -20% -20% auto -20%;
+  height: 60%;
+  z-index: -1;
+  background: radial-gradient(
+      ellipse at 30% 20%,
+      var(--glow-primary),
+      transparent 55%
+    ),
+    radial-gradient(ellipse at 75% 40%, var(--glow-secondary), transparent 50%);
+  filter: blur(30px);
+  animation: drift 14s var(--ease-out) infinite alternate;
+}
+
+.hero__inner {
+  width: min(100% - 2rem, 56rem);
+  margin-inline: auto;
+}
+
+.hero__title {
+  font-size: var(--text-3xl);
+  background: linear-gradient(
+    100deg,
+    var(--color-primary),
+    var(--color-secondary),
+    var(--color-complement-primary)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 8s linear infinite;
+}
+
+.hero__subtitle {
+  margin-top: var(--space-4);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  color: var(--color-secondary-light);
+  font-family: var(--font-mono);
+}
+
+.hero__description {
+  margin: var(--space-6) auto 0;
+  max-width: 42rem;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: center;
+  margin-top: var(--space-8);
+}
+
+/* Buttons (shared, but hero is their first showcase) */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.btn-cta--primary {
+  background: var(--color-primary);
+  color: var(--color-black);
+  box-shadow: 0 0 0 1px var(--color-primary), 0 4px 24px var(--glow-primary);
+}
+
+.btn-cta--primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px var(--color-primary-hover), 0 8px 32px var(--glow-primary);
+}
+
+.btn-cta--secondary {
+  color: var(--color-secondary);
+  box-shadow: inset 0 0 0 1px var(--color-secondary);
+}
+
+.btn-cta--secondary:hover {
+  background: color-mix(in oklch, var(--color-secondary), transparent 88%);
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px var(--color-secondary), 0 6px 24px var(--glow-secondary);
+}

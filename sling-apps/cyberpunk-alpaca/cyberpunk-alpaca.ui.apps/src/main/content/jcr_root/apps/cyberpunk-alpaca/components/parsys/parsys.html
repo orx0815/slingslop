@@ -1,0 +1,6 @@
+<!--/* parsys.html — iterates the container's child resources in JCR order and
+       renders each via its own sling:resourceType. Content authors add blocks
+       under this container node; each block carries its own resourceType. */-->
+<sly data-sly-list.child="${resource.listChildren}">
+  <sly data-sly-resource="${child.path}" />
+</sly>

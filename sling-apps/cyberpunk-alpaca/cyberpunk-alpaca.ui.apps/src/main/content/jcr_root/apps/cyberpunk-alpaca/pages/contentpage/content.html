@@ -1,0 +1,20 @@
+<!--/* Content page body: optional hero, then the editable blocks in the main
+       container, each revealed on scroll.
+
+       HTL has no method-call-with-arguments syntax, so a named child cannot be
+       fetched via resource.getChild('x'). Instead we iterate resource.listChildren
+       (a valid no-arg accessor) and match by node name. */-->
+<sly data-sly-list.child="${resource.listChildren}">
+  <sly data-sly-test="${child.name == 'hero'}"
+       data-sly-resource="${child.path @ resourceType='cyberpunk-alpaca/components/hero'}" />
+</sly>
+
+<sly data-sly-list.child="${resource.listChildren}">
+  <div class="wrap section stack" data-sly-test="${child.name == 'main'}">
+    <sly data-sly-list.block="${child.listChildren}">
+      <div data-reveal>
+        <sly data-sly-resource="${block.path}" />
+      </div>
+    </sly>
+  </div>
+</sly>

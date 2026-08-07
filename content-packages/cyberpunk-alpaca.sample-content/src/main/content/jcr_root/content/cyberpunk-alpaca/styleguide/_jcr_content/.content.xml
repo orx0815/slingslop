@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Style Guide"
+    jcr:description="The living style guide for Cyberpunk Alpaca."
+    sling:resourceType="cyberpunk-alpaca/pages/styleguide">
+    <navigation
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="cyberpunk-alpaca/components/navigation"
+        brand="Cyberpunk Alpaca"/>
+    <footer
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="cyberpunk-alpaca/components/footer"
+        col1Title="Explore"
+        link1Text="Home"
+        link1Url="/content/cyberpunk-alpaca/home.html"
+        link2Text="About"
+        link2Url="/content/cyberpunk-alpaca/about.html"
+        col2Title="System"
+        link3Text="Style Guide"
+        link3Url="/content/cyberpunk-alpaca/styleguide.html"
+        link4Text="Apache Sling"
+        link4Url="https://sling.apache.org/"
+        col3Title="Elsewhere"
+        link5Text="Slingslop on GitHub"
+        link5Url="https://github.com/orx0815/slingslop"
+        link6Text="HTMX"
+        link6Url="https://htmx.org/"
+        copyright="© Cyberpunk Alpaca — all fibres reserved."
+        tagline="Rendered on Apache Sling. No alpacas were debugged in production."/>
+</jcr:root>
