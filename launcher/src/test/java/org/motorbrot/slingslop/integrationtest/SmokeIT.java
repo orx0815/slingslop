@@ -3,10 +3,13 @@ package org.motorbrot.slingslop.integrationtest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.felix.utils.json.JSONParser;
@@ -23,6 +26,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -220,6 +224,67 @@ public class SmokeIT {
         assertTrue(
                 String.format("Expecting at least %d tests, got %d", minTests, checks.size()),
                 checks.size() >= minTests);
+    }
+
+    /**
+     * Regression guard for silent script-resolution failures.
+     *
+     * <p>When an app content page's {@code sling:resourceType} does not resolve to a rendering
+     * script, Sling's default GET servlet still answers with HTTP 200 but the body is a property
+     * dump produced by {@code HtmlRendererServlet} ("Resource dumped by HtmlRendererServlet")
+     * instead of the app's HTL output. Because the status code is 200, {@link #checkReadableUrls()}
+     * does not notice — the page looks "reachable" while being completely unrendered.
+     *
+     * <p>This test GETs every {@code /content/**.html} page listed in {@code starter.check.paths}
+     * and asserts it was rendered by an actual page template: a full HTML document (has a
+     * {@code <!DOCTYPE html>}) and not the default resource dumper.
+     */
+    @Test
+    public void contentPagesAreRenderedByAppScripts() throws Exception {
+        final List<String> htmlContentPaths = Stream.of(System.getProperty(CHECK_PATHS_PROPERTY).split(","))
+                .map(String::trim)
+                .filter(path -> path.startsWith("/content/"))
+                .filter(path -> path.endsWith(".html"))
+                .collect(Collectors.toList());
+
+        assertThat(
+                "Expected at least one /content/**.html page in " + CHECK_PATHS_PROPERTY,
+                htmlContentPaths.isEmpty(),
+                equalTo(false));
+
+        try (CloseableHttpClient client = newClient()) {
+            for (String path : htmlContentPaths) {
+                final String url = "http://localhost:" + slingHttpPort + path;
+                final HttpGet get = new HttpGet(url);
+
+                // authenticate as admin so this checks script resolution, not read ACLs
+                try (CloseableHttpResponse response = client.execute(get, httpClientContext)) {
+
+                    assertThat(
+                            "Unexpected status for " + url,
+                            response.getStatusLine().getStatusCode(),
+                            equalTo(200));
+
+                    final String body = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+                    final String bodyLower = body.toLowerCase(Locale.ROOT);
+                    final String excerpt = body.substring(0, Math.min(500, body.length()));
+
+                    // Negative: the default GET servlet fell back to dumping the resource.
+                    if (bodyLower.contains("resource dumped by")) {
+                        fail(url + " was rendered by Sling's default GET servlet (script resolution"
+                                + " failed for its sling:resourceType) instead of an app HTL template."
+                                + " First 500 chars:\n" + excerpt);
+                    }
+
+                    // Positive: an HTL page template emits a full HTML document; the dumper never does.
+                    assertThat(
+                            url + " is not a full HTML document (missing <!DOCTYPE html>); it was likely"
+                                    + " not rendered by an app page script. First 500 chars:\n" + excerpt,
+                            bodyLower.contains("<!doctype html"),
+                            equalTo(true));
+                }
+            }
+        }
     }
 
     static class BundleStatus {

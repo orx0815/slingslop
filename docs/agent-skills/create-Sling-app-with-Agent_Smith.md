@@ -279,9 +279,11 @@ sling-apps/
                   components/
                     ... (see component section)
                   css/
+                    _rep_policy.xml ← ACL: grants 'everyone' jcr:read (MANDATORY — §2.8)
                     editor/         ← build output targets
                     public/
                   js/
+                    _rep_policy.xml ← ACL: grants 'everyone' jcr:read (MANDATORY — §2.8)
                     editor/
                     public/
 
@@ -358,7 +360,7 @@ Key configuration:
 - `filevault-package-maven-plugin` with `packageType: application`
 - `filterSource` pointing to `filter.xml`
 - `validRoots` set to **`/apps`** — this must be the *ancestor* of the filter root (`/apps/{RT_PREFIX}`), not the root itself. The Jackrabbit FileVault validator checks that the ancestor is declared as a known root; setting it to `/apps/{RT_PREFIX}` still triggers "Filter root's ancestor `/apps` is not covered".
-- **`<acHandling>merge_preserve</acHandling>`** in `<properties>` — required because the ui.apps package ships `_rep_policy.xml` files (see below). Must be present whenever ACL nodes exist, and absent when they don't.
+- **`<acHandling>merge_preserve</acHandling>`** in `<properties>` — **always required for the ui.apps package**, because every public-facing app ships `_rep_policy.xml` ACL nodes under `css/` and `js/` (see §2.8 for *why* these are mandatory, not optional). Omit this property *only* from the sample-content package, which normally has no ACL nodes.
 - `wcmio-content-package-maven-plugin` for download/upload
 - `frontend-maven-plugin` for node/npm (same versions as zengarden: `nodeVersion=v24.14.0`, `npmVersion=11.10.1`)
   - install node and npm
@@ -442,6 +444,8 @@ Add the new artifacts as dependencies and as embedded/subPackages in `content-pa
 </subPackage>
 ```
 
+**Core artifact type is `jar`, not `bundle`.** The `.core` dependency (and its `<embedded>`) uses `<type>jar</type>`. The OSGi bundle is a plain jar with a bnd-generated manifest — declaring `<type>bundle</type>` makes Maven fail to resolve the artifact.
+
 ### 2.4 Add Integration Test Path
 
 In `launcher/pom.xml`, add the new homepage path to `<starter.check.paths>`:
@@ -521,6 +525,38 @@ src/main/content/jcr_root/apps/{RT_PREFIX}/js/public/
 src/main/content/jcr_root/apps/{RT_PREFIX}/css/editor/
 src/main/content/jcr_root/apps/{RT_PREFIX}/css/public/
 ```
+
+### 2.8 CSS/JS Access Control — MANDATORY (do not skip)
+
+> This is the step cheap coding models most often drop, because they reason "this app doesn't need ACLs." **They do.** Read the rationale before deciding otherwise.
+
+Every app whose pages are served to the public **must** ship two ACL nodes:
+
+- `jcr_root/apps/{RT_PREFIX}/css/_rep_policy.xml`
+- `jcr_root/apps/{RT_PREFIX}/js/_rep_policy.xml`
+
+Both grant the `everyone` principal `jcr:read`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:rep="internal"
+    jcr:primaryType="rep:ACL">
+    <allow
+        jcr:primaryType="rep:GrantACE"
+        rep:principalName="everyone"
+        rep:privileges="{Name}[jcr:read]"/>
+</jcr:root>
+```
+
+**Why `everyone` needs read access to `/apps/{RT_PREFIX}` — the reasoning:**
+
+In Apache Sling / Oak, the `/apps` tree is readable by administrators and privileged service users **only**. The `everyone` group — which includes the **anonymous** user that every public site visitor is authenticated as — has **no read access to `/apps` by default**.
+
+That is fine for HTL: templates under `pages/` and `components/` are executed **server-side** by Sling with elevated rights, so the visitor never reads those nodes directly.
+
+But the compiled **CSS and JS bundles are static assets**. The browser fetches them as separate HTTP requests — `GET /apps/{RT_PREFIX}/css/public/public.css`, `GET /apps/{RT_PREFIX}/js/public/public.js`, etc. — **as the anonymous user**. Without an explicit `everyone` → `jcr:read` grant on `css/` and `js/`, those requests return **404 for anonymous visitors**. The public site then loads completely unstyled and non-interactive — while a logged-in admin sees it working perfectly, which is exactly why this bug slips through: it is invisible unless you test as anonymous.
+
+So: "this app doesn't need ACL nodes" is only true for an app that is **never** served to anonymous users. That is not the scaffolded default. **Do not drop these two files, and do not drop `<acHandling>merge_preserve</acHandling>` (§2.2), which FileVault needs to package the `rep:ACL` nodes.**
 
 ---
 
@@ -999,6 +1035,31 @@ For non-editable components (when zen-editable is not chosen):
     sling:resourceSuperType="{RT_PREFIX}/components/editable-component"/>
 ```
 
+### 5.8.1 Property names are a three-way contract (verify before finishing)
+
+For every component, each field has **one** property name that must be spelled **identically** in three places:
+
+1. the **view HTL** — `${properties.<name> @ context='…'}`
+2. the **edit form** — `edit-form-fields.html`: `name="<name>"` (and the `${properties.<name>}` that pre-fills it)
+3. the **sample content** — `.content.xml`: `<name>="…"`
+
+If these drift, **the build still passes** — there is no validator for JCR property names — but the page renders wrong at runtime: fields come up **empty**, CTA buttons have no label or link. A coding model that only checks `mvn install` will never catch this, so you must check it by eye.
+
+**Real drift seen in generated apps — do not repeat:**
+- text-block body authored as `content="…"` in sample content but read as `${properties.text}` in HTL and written as `name="text"` in the edit form → body renders **empty**.
+- hero CTAs authored as `ctaLabel` / `ctaUrl` / `cta2Label` / `cta2Url` in sample content but read as `ctaPrimaryLabel` / `ctaPrimaryUrl` / `ctaSecondaryLabel` / `ctaSecondaryUrl` in HTL → both buttons render **blank**.
+
+**Before declaring the app done**, for each component confirm the property sets match across all three files. A quick cross-check:
+
+```bash
+APP=src/main/content/jcr_root/apps/{RT_PREFIX}/components
+# names the templates/edit-forms READ:
+grep -rho 'properties\.[A-Za-z0-9]*' "$APP" | sort -u
+# names the edit-forms WRITE:
+grep -rho 'name="[A-Za-z0-9]*"' "$APP" | sort -u
+```
+Every name a template reads must (a) be written by its edit form under the same name and (b) be set on the matching sample-content node under the same name.
+
 ### 5.9 Sling Includes vs Sling Resources
 
 - **`data-sly-include`** — includes an HTL script file in the *current* resource context. Use for template fragments belonging to the page (nav, footer partial, head).
@@ -1175,6 +1236,29 @@ Example Structure:
     text="&lt;p&gt;...creative dummy text based on ALF's input...&lt;/p&gt;"/>
 ```
 
+> **XML mechanics.** These are FileVault DocView files. A node with no inline child nodes uses the **self-closing** form `<jcr:root … />`. Add inline child nodes — and therefore the paired `</jcr:root>` closing tag — only when a child cannot be its own folder; otherwise prefer a child folder with its own `.content.xml`. Property values are XML-attribute-encoded on a single line: `<` → `&lt;`, `>` → `&gt;`, `&` → `&amp;`, `"` → `&quot;`. Do **not** use CDATA. Inside a richtext value, encode **both** the opening and closing HTML tags — e.g. `&lt;p&gt;…&lt;/p&gt;`. Leaving `</p>` literal while encoding `<p>` produces invalid XML and is a common confusion; if it looks asymmetric, that is the bug.
+
+### 7.2.1 Richtext vs plain-text properties — encode ONLY richtext
+
+A property may hold XML-encoded HTML markup **only if the component consumes it as richtext** — i.e. the view HTL renders it with `@ context='html'` **and** the edit form wires it through the Tiptap pair (`#content-editor` / `#content-hidden`). For those, sample content is encoded HTML on one line:
+
+```xml
+text="&lt;p&gt;First paragraph.&lt;/p&gt;&lt;p&gt;Second paragraph.&lt;/p&gt;"
+```
+
+Every **other** property — anything the HTL renders with `context='text'`, `context='attribute'`, or `context='uri'` (headlines, eyebrows, titles, taglines, CTA labels, URLs, and plain `<textarea>` descriptions) — must be a **plain, unescaped string with NO `<p>` wrapper**:
+
+```xml
+<!-- CORRECT: plain-text fields -->
+title="Cyberpunk Alpaca"
+description="A rogue camelid draped in neon."
+
+<!-- WRONG: wrapping a context='text' field in encoded HTML -->
+description="&lt;p&gt;A rogue camelid draped in neon.&lt;/p&gt;"
+```
+
+The wrong form makes the literal characters `<p>…</p>` appear on the rendered page, because `context='text'` escapes them for display rather than interpreting them. **Match the encoding of each sample-content property to the `context` its component uses** (§5.7, §5.8.1).
+
 ### 7.3 Dummy Text Guidelines
 
 - Be creative, light-hearted — base on ALF's project description and mood
@@ -1219,6 +1303,11 @@ This will:
 7. Run integration tests (which now check the new content path)
 
 **Fix any build errors before considering the task complete.**
+
+> **A green `mvn install` is necessary but NOT sufficient.** The build validates XML syntax, Maven wiring, and lint \u2014 it does **not** validate that JCR property names match between templates, edit forms, and sample content, nor that anonymous visitors can read the CSS/JS. The most damaging bugs in past runs (empty component bodies, blank CTA buttons, unstyled anonymous pages) all passed `mvn install`. After the build is green, explicitly verify:
+> - **Property-name contract** for every component (\u00a75.8.1) \u2014 grep the three files and confirm the names match.
+> - **Encoding matches context** for every sample-content property (\u00a77.2.1) \u2014 richtext (`context='html'`) is XML-encoded HTML; everything else is plain text with no `<p>`.
+> - **ACL nodes present** (\u00a72.8) \u2014 both `css/_rep_policy.xml` and `js/_rep_policy.xml` exist and `<acHandling>merge_preserve</acHandling>` is set.
 
 Common issues to check:
 - Maven artifact names match between pom.xml, complete/pom.xml, and parent modules list
@@ -1265,7 +1354,7 @@ Do **not** use a single `<input type="hidden">` with `context='attribute'` — t
 
 **Symptom:** Logged-in users see the styled page; anonymous users get unstyled HTML or broken pages.
 
-**Cause:** By default, `/apps/` is not readable by anonymous users in Apache Sling / Oak. The CSS and JS folders need explicit `jcr:read` ACLs.
+**Cause:** By default, `/apps/` is not readable by anonymous users in Apache Sling / Oak. The CSS and JS folders need explicit `jcr:read` ACLs for the `everyone` principal. This is expected — the two `_rep_policy.xml` files are a **mandatory** part of scaffolding, not an afterthought. See **§2.8** for the full rationale. If you reach this symptom, the ACL nodes were dropped during generation.
 
 **Fix:**
 1. Add `_rep_policy.xml` to **both** `jcr_root/apps/{RT_PREFIX}/css/` and `jcr_root/apps/{RT_PREFIX}/js/`:
@@ -1491,7 +1580,7 @@ Use this checklist to verify completeness:
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/src/main/content/jcr_root/apps/{RT_PREFIX}/.content.xml`
 - [ ] Page scripts: `pages/page/`, `pages/basepage/`, `pages/homepage/`, `pages/contentpage/`, `pages/styleguide/`
 - [ ] Components: `hero`, `text-block`, `navigation`, `footer`, `parsys` (+ editable supertypes if zen-editable)
-- [ ] ACL files: `jcr_root/apps/{RT_PREFIX}/css/_rep_policy.xml` and `jcr_root/apps/{RT_PREFIX}/js/_rep_policy.xml`
+- [ ] ACL files: `jcr_root/apps/{RT_PREFIX}/css/_rep_policy.xml` and `jcr_root/apps/{RT_PREFIX}/js/_rep_policy.xml` **(MANDATORY — §2.8; do not omit)**
 - [ ] Frontend: `package.json`, `tsconfig.json`, `eslint.config.js`, `.prettierrc`, `.prettierignore`
 - [ ] Frontend: `scripts/bundle.js`
 - [ ] Frontend: `src/typescript/editor.ts`, `public.ts` (+ editor/ submodules if zen-editable)
