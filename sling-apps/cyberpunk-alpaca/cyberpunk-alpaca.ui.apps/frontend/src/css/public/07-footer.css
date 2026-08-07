@@ -1,0 +1,51 @@
+/*
+ * 07-footer.css — the sign-off, glowing quietly at the bottom of the grid.
+ */
+.site-footer {
+  flex-shrink: 0;
+  margin-top: var(--space-24);
+  padding-block: var(--space-12) var(--space-8);
+  background: var(--color-bg-deep);
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer__inner {
+  width: min(100% - 2rem, var(--content-max));
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-8);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.site-footer__col h4 {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}
+
+.site-footer__col a {
+  display: block;
+  color: var(--color-text-muted);
+  padding-block: var(--space-1);
+  transition: color var(--transition);
+}
+
+.site-footer__col a:hover {
+  color: var(--color-secondary);
+}
+
+.site-footer__bar {
+  width: min(100% - 2rem, var(--content-max));
+  margin: var(--space-8) auto 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}

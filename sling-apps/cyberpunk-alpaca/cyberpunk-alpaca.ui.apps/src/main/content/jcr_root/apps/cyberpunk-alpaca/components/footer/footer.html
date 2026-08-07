@@ -1,0 +1,30 @@
+<!--/* footer.html — the sign-off. Modal-editable for logged-in authors. */-->
+<footer class="site-footer"
+        data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="${auth.loggedIn ? 'true' : false}"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="site-footer__inner">
+    <div class="site-footer__col">
+      <h4>${properties.col1Title}</h4>
+      <a data-sly-test="${properties.link1Text}" href="${properties.link1Url @ context='uri'}">${properties.link1Text}</a>
+      <a data-sly-test="${properties.link2Text}" href="${properties.link2Url @ context='uri'}">${properties.link2Text}</a>
+    </div>
+    <div class="site-footer__col">
+      <h4>${properties.col2Title}</h4>
+      <a data-sly-test="${properties.link3Text}" href="${properties.link3Url @ context='uri'}">${properties.link3Text}</a>
+      <a data-sly-test="${properties.link4Text}" href="${properties.link4Url @ context='uri'}">${properties.link4Text}</a>
+    </div>
+    <div class="site-footer__col">
+      <h4>${properties.col3Title}</h4>
+      <a data-sly-test="${properties.link5Text}" href="${properties.link5Url @ context='uri'}">${properties.link5Text}</a>
+      <a data-sly-test="${properties.link6Text}" href="${properties.link6Url @ context='uri'}">${properties.link6Text}</a>
+    </div>
+  </div>
+  <div class="site-footer__bar">
+    <span>${properties.copyright}</span>
+    <span>${properties.tagline}</span>
+  </div>
+</footer>
