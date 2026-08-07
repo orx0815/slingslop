@@ -886,6 +886,24 @@ Sling resolves rendering scripts by `sling:resourceType`. The page rendering cha
 4. **`pages/homepage/html.html`** (if it exists) or falls through to **`pages/basepage/html.html`** via `sling:resourceSuperType`
 5. **`basepage/html.html`** is the page shell: `<!DOCTYPE html>`, `<head>`, `<body>`, includes partials
 
+### 5.1.1 Page wiring — the three mistakes that produce a "Resource dumped by HtmlRenderer" page
+
+If `/content/{RT_PREFIX}/home.html` comes back as a property dump titled **"Resource dumped by HtmlRenderer"** (HTTP **200**, not 500), a script failed to resolve. This is the single most common failure of a scaffolded app, and `mvn install` never catches it. There are three independent causes — check all three:
+
+1. **The content *folder* node is missing `sling:resourceType`.** The node at `/content/{RT_PREFIX}/home` (the folder itself — its own `.content.xml`, **not** its `_jcr_content` child) MUST carry `sling:resourceType="{RT_PREFIX}/pages/page"`. A bare `sling:Folder`/`sling:OrderedFolder` with only a `jcr:title` has **no rendering script**, so Sling falls back to the default dumper. The tell-tale in the dump is `Resource type: sling:OrderedFolder` with `Resource super type: -`. **Every** page folder node (home and every sibling page) needs this property — it is what triggers the `pages/page` thin-wrapper that delegates to `jcr:content`.
+
+2. **The page-body script name must match what `basepage/html.html` includes.** `basepage/html.html` includes a fixed name: `<sly data-sly-include="${'content.html'}" />`. Therefore every page type's body script MUST be named exactly **`content.html`**. Do **not** invent per-page names like `intro.html` or `styleguide-body.html` — HTL will never include them, they become dead files, and the page body renders empty. A page type ships its own `content.html` only when its body differs from the default; otherwise it inherits `basepage/content.html` through `sling:resourceSuperType`.
+
+3. **`basepage/content.html` must render the *children* of the current resource — not re-include `jcr:content`.** By the time `content.html` runs, the current resource already **is** `jcr:content`. Re-referencing `jcr:content` (e.g. `data-sly-resource="${'jcr:content' @ resourceType='nt/unstructured'}"`) points at a non-existent grandchild and renders nothing — and `nt/unstructured` is not even a valid resourceType. The correct default body iterates the authored child components:
+   ```html
+   <!--/* basepage/content.html — default body: render the authored child components */-->
+   <sly data-sly-list="${resource.listChildren}">
+     <sly data-sly-resource="${item}"/>
+   </sly>
+   ```
+
+**Also author pages as flat siblings** under the content root (`/content/{RT_PREFIX}/home`, `/content/{RT_PREFIX}/content-page`, `/content/{RT_PREFIX}/styleguide`), matching the flat URLs your `nav.html`, `footer.html`, and CTAs link to (`/content/{RT_PREFIX}/content-page.html`). Nesting a page under another (`/content/{RT_PREFIX}/home/content-page`) turns every flat link into a 404.
+
 ### 5.2 Page Types to Create
 
 | Page type | resourceType | resourceSuperType | Purpose |
@@ -1324,6 +1342,12 @@ Common issues to check:
 ### 9.1 Post-Scaffold Troubleshooting Checklist
 
 These are issues found in real scaffolding runs that were **not** caught by `mvn install` but broke the app at runtime. Check each one before opening a PR.
+
+#### 9.1.0 Homepage shows "Resource dumped by HtmlRenderer" (HTTP 200)
+
+**Symptom:** `/content/{RT_PREFIX}/home.html` returns 200 but the body is a JCR property dump titled "Resource dumped by HtmlRenderer" (`Resource type: sling:OrderedFolder`, `Resource super type: -`).
+
+**Cause:** Script resolution failed. Almost always the page *folder* node is missing `sling:resourceType="{RT_PREFIX}/pages/page"`, or a page-body script is misnamed (`intro.html` instead of `content.html`) so nothing renders. See **§5.1.1** for the three causes and their fixes. Verify by fetching the page as **anonymous** as well — a 200 dump is easy to miss when only spot-checking as admin.
 
 #### 9.1.1 Pages render blank / child components missing
 
