@@ -1,0 +1,12 @@
+<!--/* Homepage body: hero splash, then the editable content blocks in the main
+       container. Each block fades in on scroll via [data-reveal]. */-->
+<sly data-sly-resource="${'hero' @ resourceType='cyberpunk-alpaca/components/hero'}"
+     data-sly-test="${resource.getChild('hero')}" />
+
+<div class="wrap section stack" data-sly-test="${resource.getChild('main')}">
+  <sly data-sly-list.child="${resource.getChild('main').listChildren}">
+    <div data-reveal>
+      <sly data-sly-resource="${child.path}" />
+    </div>
+  </sly>
+</div>

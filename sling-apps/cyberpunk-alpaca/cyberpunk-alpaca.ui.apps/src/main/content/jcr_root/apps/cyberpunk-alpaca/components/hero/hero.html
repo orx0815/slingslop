@@ -1,0 +1,23 @@
+<!--/* hero.html — the landing splash. Modal-editable for logged-in authors. */-->
+<section class="hero"
+         data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+         data-sly-set.editPath="${resource.path}.edit-form.html"
+         data-zen-editable="${auth.loggedIn ? 'true' : false}"
+         data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+         data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+         data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="hero__inner wrap">
+    <p class="eyebrow" data-sly-test="${properties.eyebrow}">${properties.eyebrow}</p>
+    <h1 class="hero__title">${properties.title}</h1>
+    <p class="hero__subtitle" data-sly-test="${properties.subtitle}">${properties.subtitle}</p>
+    <p class="hero__description" data-sly-test="${properties.description}">${properties.description}</p>
+    <div class="hero__actions">
+      <a data-sly-test="${properties.ctaPrimaryLabel}"
+         class="btn-cta btn-cta--primary"
+         href="${properties.ctaPrimaryUrl @ context='uri'}">${properties.ctaPrimaryLabel}</a>
+      <a data-sly-test="${properties.ctaSecondaryLabel}"
+         class="btn-cta btn-cta--secondary"
+         href="${properties.ctaSecondaryUrl @ context='uri'}">${properties.ctaSecondaryLabel}</a>
+    </div>
+  </div>
+</section>

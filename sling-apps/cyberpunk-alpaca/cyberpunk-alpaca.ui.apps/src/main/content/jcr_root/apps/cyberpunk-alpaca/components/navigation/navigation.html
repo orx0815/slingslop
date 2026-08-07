@@ -1,0 +1,19 @@
+<!--/* navigation.html — sticky top bar. Menu is built dynamically from sibling
+       pages by the Navigation Sling model; brand text is an authorable property. */-->
+<nav class="site-nav" data-sly-use.nav="org.motorbrot.cyberpunkalpaca.slingmodels.Navigation">
+  <div class="site-nav__inner wrap">
+    <a class="site-nav__brand" href="/content/cyberpunk-alpaca/home.html">
+      <span class="site-nav__dot" aria-hidden="true"></span>${properties.brand || 'Cyberpunk Alpaca'}
+    </a>
+    <button class="site-nav__toggle" type="button" data-nav-toggle
+            aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="site-nav__menu" data-nav-menu role="list">
+      <li data-sly-repeat.item="${nav.items}">
+        <a class="site-nav__link ${item.active ? 'is-active' : ''}"
+           href="${item.link @ context='uri'}">${item.title}</a>
+      </li>
+    </ul>
+  </div>
+</nav>

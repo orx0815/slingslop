@@ -1,0 +1,11 @@
+<!--/* text-block.html — richtext content block, inline-editable for authors. */-->
+<div class="text-block" role="article"
+     data-sly-use.auth="org.motorbrot.cyberpunkalpaca.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="${auth.loggedIn ? 'true' : false}"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <h3 data-sly-test="${properties.headline}">${properties.headline}</h3>
+  ${properties.text @ context='html'}
+</div>

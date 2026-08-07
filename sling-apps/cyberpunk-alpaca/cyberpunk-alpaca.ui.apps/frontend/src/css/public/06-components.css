@@ -1,0 +1,77 @@
+/*
+ * 06-components.css — text blocks, cards, and editable-hover affordances.
+ */
+.text-block {
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.text-block::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+}
+
+.text-block > h3 {
+  color: var(--color-white);
+  margin-bottom: var(--space-4);
+}
+
+.text-block > h3::after {
+  content: "_";
+  color: var(--color-primary);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+/* Inline-editing affordance: only shown to logged-in authors (JS gates hx-*). */
+[data-zen-editable="true"] {
+  transition: outline-color var(--transition), background var(--transition);
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+  cursor: pointer;
+}
+
+[data-zen-editable="true"]:hover {
+  outline-color: var(--color-secondary);
+  background: color-mix(in oklch, var(--color-secondary), transparent 94%);
+}
+
+/* Generic CTA section */
+.cta-band {
+  text-align: center;
+  padding: var(--space-16);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      circle at 50% 120%,
+      color-mix(in oklch, var(--color-primary), transparent 78%),
+      transparent 60%
+    ),
+    var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.card {
+  padding: var(--space-6);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+}

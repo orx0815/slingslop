@@ -1,0 +1,9 @@
+<!--/* Default page body: render the hero (if present) then the main container.
+       Concrete page types (homepage, styleguide) override this script. */-->
+<sly data-sly-resource="${'hero' @ resourceType='cyberpunk-alpaca/components/hero'}"
+     data-sly-test="${resource.getChild('hero')}" />
+
+<div class="wrap section">
+  <sly data-sly-resource="${'main' @ resourceType='cyberpunk-alpaca/components/parsys'}"
+       data-sly-test="${resource.getChild('main')}" />
+</div>
