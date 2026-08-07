@@ -4,10 +4,9 @@
 	// Plain Ubuntu base + devcontainer "features" so the exact same file also
 	// works in DevPod (self-hosted, unlimited) and Ona/Gitpod, not only in
 	// GitHub Codespaces. Features are cached in Codespaces prebuilds.
-	// Note the tag has no hyphen (24.04/22.04 use "ubuntu-24.04"; 26.04 ships
-	// only as "ubuntu26.04"). Everything that matters (JDK 25, Maven) comes
-	// from features below, so the base OS release is barely load-bearing.
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
+	// Use the most widely tested base tag to reduce recovery/fallback starts
+	// across different providers and host runtimes.
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
 
 	"features": {
 		// Temurin 25 + Maven, matching the repo prerequisites (see ReadMe.md).
@@ -16,10 +15,7 @@
 			"jdkDistro": "tem",
 			"installMaven": true,
 			"mavenVersion": "3.9.12"
-		},
-		// Lets you run the webcache proxy / docker-compose preview from inside
-		// the workspace (docker/docker-compose.yml). Optional but handy.
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+		}
 	},
 
 	// Sling's HTTP port. Auto-opens the in-browser preview once it is up.
