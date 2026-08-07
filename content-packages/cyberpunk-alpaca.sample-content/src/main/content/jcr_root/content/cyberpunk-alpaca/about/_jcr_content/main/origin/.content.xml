@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="cyberpunk-alpaca/components/text-block"
+    headline="Origin Story"
+    text="&lt;p&gt;Born on a mountain plateau with suspiciously good Wi-Fi, the Cyberpunk Alpaca discovered the internet at age two when it accidentally sat on a router. The resulting data burst awakened something in its woolly cortex that no amount of pastoral scenery could soothe.&lt;/p&gt;&lt;p&gt;By age four it had learned to solder. By age six it was running its own CDN out of a repurposed barn. Today it operates across seventeen time zones under three distinct personas, all of them stylish.&lt;/p&gt;"/>
