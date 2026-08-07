@@ -9,8 +9,7 @@ export function updateCharCount(ed: Editor): void {
     return;
   }
   const storage = ed.storage['characterCount'] as
-    | { characters: () => number; words: () => number }
-    | undefined;
+    { characters: () => number; words: () => number } | undefined;
   if (storage) {
     charCountEl.textContent = `${storage.words()} words · ${storage.characters()} characters`;
   }
@@ -75,9 +74,9 @@ export function updateToolbarState(ed: Editor): void {
 
 export function setToolbarDisabled(toolbar: HTMLElement, disabled: boolean): void {
   toolbar
-    .querySelectorAll<
-      HTMLButtonElement | HTMLSelectElement | HTMLInputElement
-    >('button[data-action], select, input[type="color"]')
+    .querySelectorAll<HTMLButtonElement | HTMLSelectElement | HTMLInputElement>(
+      'button[data-action], select, input[type="color"]'
+    )
     .forEach((el) => {
       el.disabled = disabled;
     });

@@ -39,7 +39,7 @@
           }
         });
       },
-      { threshold: 0.15 },
+      { threshold: 0.15 }
     );
     targets.forEach((el) => observer.observe(el));
   }

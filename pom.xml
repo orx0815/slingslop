@@ -206,10 +206,13 @@
     <module>sling-apps/digitalmedia/digitalmedia.core</module>
     <module>sling-apps/digitalmedia/digitalmedia.client.ui.apps</module>
     <module>sling-apps/digitalmedia/digitalmedia.ui.apps</module>
+    <module>sling-apps/cyberpunk-alpaca/cyberpunk-alpaca.core</module>
+    <module>sling-apps/cyberpunk-alpaca/cyberpunk-alpaca.ui.apps</module>
 
     <module>content-packages/zengarden.sample-content</module>
     <module>content-packages/sling-matrix.sample-content</module>
     <module>content-packages/digitalmedia.sample-content</module>
+    <module>content-packages/cyberpunk-alpaca.sample-content</module>
     <module>content-packages/complete</module>
 
     <module>launcher</module>
