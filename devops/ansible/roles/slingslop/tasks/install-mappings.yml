@@ -33,14 +33,37 @@
 - name: Upload + install mappings package (Composum package manager)
   ansible.builtin.shell:
     cmd: |
-      set -euo pipefail
-      P=$(curl -sf -u 'admin:{{ vault_sling_admin_password }}' \
-            -F file=@/tmp/slingslop.slingmappings.zip -F force=true \
-            '{{ sling_internal_url }}/bin/cpm/package.upload.json' \
-          | sed -n 's/.*"path":"\([^"]*\)".*/\1/p')
-      test -n "$P"
-      curl -sf -u 'admin:{{ vault_sling_admin_password }}' -X POST \
-            "{{ sling_internal_url }}/bin/cpm/package.install.json$P"
+      set -eu
+      U='{{ sling_internal_url }}'
+      AUTH='admin:{{ vault_sling_admin_password }}'
+
+      # --- upload (capture HTTP status + body so failures are diagnosable) ---
+      code=$(curl -s --connect-timeout 10 --max-time 180 \
+              -o /tmp/cpm-upload.json -w '%{http_code}' -u "$AUTH" \
+              -F file=@/tmp/slingslop.slingmappings.zip -F force=true \
+              "$U/bin/cpm/package.upload.json")
+      if [ "$code" != "200" ]; then
+        echo "package.upload failed: HTTP $code" >&2
+        cat /tmp/cpm-upload.json >&2 || true
+        exit 1
+      fi
+      P=$(sed -n 's/.*"path":"\([^"]*\)".*/\1/p' /tmp/cpm-upload.json)
+      if [ -z "$P" ]; then
+        echo "package.upload returned no package path" >&2
+        cat /tmp/cpm-upload.json >&2 || true
+        exit 1
+      fi
+
+      # --- install ---
+      code=$(curl -s --connect-timeout 10 --max-time 300 \
+              -o /tmp/cpm-install.json -w '%{http_code}' -u "$AUTH" -X POST \
+              "$U/bin/cpm/package.install.json$P")
+      if [ "$code" != "200" ]; then
+        echo "package.install failed for $P: HTTP $code" >&2
+        cat /tmp/cpm-install.json >&2 || true
+        exit 1
+      fi
+      echo "installed $P (HTTP $code)"
   changed_when: true
 
 - name: Remove the uploaded package tarball from the host
