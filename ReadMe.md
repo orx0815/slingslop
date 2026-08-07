@@ -12,7 +12,10 @@ Using HTMX to GET component **markup** and to POST content via Sling's OOTB endp
 
 ## Try it in your browser
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orx0815/slingslop?quickstart=1)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/orx0815/slingslop?hide_repo_select=true)
+
+Branch-specific quickstart URL pattern:
+`https://codespaces.new/orx0815/slingslop/tree/<branch>?quickstart=1`
 
 One click → a full VS-Code-in-the-browser dev environment, no local setup.
 See [Running the Application](#running-the-application) for details and the
@@ -176,6 +179,12 @@ There are four primary ways to run the application locally:
     The same `devcontainer.json` is portable: open it in
     **[DevPod](https://devpod.sh/)** (open-source, self-host for unlimited hours)
     or in **[Ona](https://ona.com/)** (the rebranded Gitpod) without changes.
+
+    For a specific branch, open Codespaces with:
+
+    ```text
+    https://codespaces.new/orx0815/slingslop/tree/<branch>?quickstart=1
+    ```
 
     **The Agent-Smith → review → deploy loop** — fully GitOps, closing the loop
     the old Gitpod button only hinted at:
