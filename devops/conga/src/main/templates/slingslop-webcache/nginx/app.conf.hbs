@@ -21,7 +21,15 @@ server {
     # Dangerous selectors / views, numbered json dumps and internal trees.
     if ($uri ~* "\.(?:$^{{#each denySelectors}}|{{this}}{{/each}})\.")  { return 403; }
     if ($uri ~  "\.[0-9]+\.json")                                       { return 403; }
-    if ($uri ~* "^/(?:$^{{#each denyPathPrefixes}}|{{this}}{{/each}})/") { return 403; }
+    # Internal trees → 403, EXCEPT paths allow-listed via passthroughPaths
+    # (e.g. /bin/public for the clientlib servlet). nginx `if` has no AND, so
+    # combine flags like the .json allow-list below.
+    set $denyflag "";
+    if ($uri ~* "^/(?:$^{{#each denyPathPrefixes}}|{{this}}{{/each}})/") { set $denyflag "deny"; }
+{{#each passthroughPaths}}
+    if ($uri ~ "^{{this}}/") { set $denyflag "${denyflag}-ok"; }
+{{/each}}
+    if ($denyflag = "deny") { return 403; }
 
     # .json RESOURCE extension only under an allow-listed prefix (true ext,
     # ignoring any /suffix). nginx `if` has no AND, so combine flags.
