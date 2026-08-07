@@ -29,10 +29,9 @@ if [ ! -x "$FEATURE_LAUNCHER" ]; then
 	exit 1
 fi
 
-	(
-		cd "$LAUNCHER_DIR"
-		nohup ./launch.sh >"$LOG_FILE" 2>&1 &
-		echo $! >"$PID_FILE"
-	)
+cd "$LAUNCHER_DIR"
+nohup ./launch.sh >"$LOG_FILE" 2>&1 &
+LAUNCHER_PID=$!
+echo "$LAUNCHER_PID" >"$PID_FILE"
 
-printf '%s\n' "Started Sling launcher in background. Log: $LOG_FILE"
+printf '%s\n' "Started Sling launcher (PID $LAUNCHER_PID) in background. Log: $LOG_FILE"
