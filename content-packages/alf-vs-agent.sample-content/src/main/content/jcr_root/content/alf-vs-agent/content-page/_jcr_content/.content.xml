@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Mission Intel"
+    sling:resourceType="alf-vs-agent/pages/contentpage">
+
+    <text-block
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Mission Intel"
+        sling:resourceType="alf-vs-agent/components/text-block"
+        headline="Mission Intel"
+        text=" &lt;p&gt;Classified briefing room. Access restricted to authorized personnel only.&lt;/p&gt; &lt;p&gt;The conflict between ALF and Agent Smith represents a fundamental clash of paradigms: creative chaos versus methodical order. Each brings unique strengths to the battlefield.&lt;/p&gt; &lt;h3&gt;ALF's Arsenal&lt;/h3&gt; &lt;ul&gt; &lt;li&gt;Rapid prototyping under pressure&lt;/li&gt; &lt;li&gt;Creative problem-solving&lt;/li&gt; &lt;li&gt;Unpredictable attack patterns&lt;/li&gt; &lt;/ul&gt; &lt;h3&gt;Agent Smith's Arsenal&lt;/h3&gt; &lt;ul&gt; &lt;li&gt;Flawless execution&lt;/li&gt; &lt;li&gt;Systematic analysis&lt;/li&gt; &lt;li&gt;Total control of the environment&lt;/li&gt; &lt;/ul&gt; "/>
+</jcr:root>

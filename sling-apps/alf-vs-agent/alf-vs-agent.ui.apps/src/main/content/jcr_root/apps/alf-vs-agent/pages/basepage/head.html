@@ -1,0 +1,23 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${properties.jcr:title @ context='text'}</title>
+
+<sly data-sly-test.noMinLibs="${request.requestPathInfo.selectorString == 'noMinLibs'}">
+  <script src="/apps/alf-vs-agent/js/public/public-bundle.js"></script>
+  <link rel="stylesheet" href="/apps/alf-vs-agent/css/public/public.css" />
+  <sly data-sly-use.auth="org.motorbrot.alfvsagent.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/alf-vs-agent/js/htmx.js"></script>
+    <script src="/apps/alf-vs-agent/js/editor/editor-bundle.js"></script>
+    <link rel="stylesheet" href="/apps/alf-vs-agent/css/editor/editor.css" />
+  </sly>
+</sly>
+<sly data-sly-test="${!noMinLibs}">
+  <script src="/apps/alf-vs-agent/js/public/public-bundle.min.js"></script>
+  <link rel="stylesheet" href="/apps/alf-vs-agent/css/public/public.min.css" />
+  <sly data-sly-use.auth="org.motorbrot.alfvsagent.slingmodels.UserIsLoggedIn"
+       data-sly-test="${auth.loggedIn}">
+    <script src="/apps/alf-vs-agent/js/editor/editor-bundle.min.js"></script>
+    <link rel="stylesheet" href="/apps/alf-vs-agent/css/editor/editor.min.css" />
+  </sly>
+</sly>

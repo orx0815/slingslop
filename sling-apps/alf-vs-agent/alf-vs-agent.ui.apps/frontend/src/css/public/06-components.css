@@ -1,0 +1,124 @@
+/*
+ * 06-components.css — Cards, text blocks, stats
+ */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.1);
+  }
+}
+
+.card__title {
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  margin-block-end: var(--space-2);
+}
+
+.card__body {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Fighter profile card */
+.fighter-card {
+  text-align: center;
+
+  .fighter-card__avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary);
+    margin: 0 auto var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: var(--color-surface-raised);
+  }
+
+  .fighter-card__name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-block-end: var(--space-1);
+  }
+
+  .fighter-card__tagline {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-block-end: var(--space-4);
+  }
+}
+
+/* Stats bar */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-4);
+  margin-block: var(--space-6);
+}
+
+.stat {
+  text-align: center;
+
+  .stat__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+  }
+
+  .stat__label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* Text block */
+.text-block {
+  margin-block-end: var(--space-8);
+
+  h3 {
+    color: var(--color-primary);
+    margin-block-end: var(--space-3);
+  }
+}
+
+/* Button */
+.btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-6);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    background: var(--color-primary);
+    color: var(--color-black);
+  }
+
+  &--secondary {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+
+    &:hover {
+      background: var(--color-secondary);
+      color: var(--color-black);
+    }
+  }
+}

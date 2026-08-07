@@ -1,0 +1,7 @@
+<!--/* basepage/content.html — default page body: render the authored child
+       components of the current jcr:content node, each via its own resourceType.
+       Page types with bespoke, non-content-driven bodies (e.g. styleguide) override
+       this by providing their own content.html. */-->
+<sly data-sly-list="${resource.listChildren}">
+  <sly data-sly-resource="${item}"/>
+</sly>

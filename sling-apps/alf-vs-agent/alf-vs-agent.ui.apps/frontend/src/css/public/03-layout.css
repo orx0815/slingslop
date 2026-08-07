@@ -1,0 +1,48 @@
+/*
+ * 03-layout.css — Page wrapper, grid, containers
+ */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: min(100% - var(--space-8), var(--max-width));
+  margin-inline: auto;
+}
+
+main {
+  flex: 1;
+  padding-block: var(--space-10);
+}
+
+.section {
+  padding-block: var(--space-12);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+
+  @media (min-width: var(--bp-md)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: var(--bp-lg)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

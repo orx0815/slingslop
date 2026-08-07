@@ -1,0 +1,14 @@
+<!--/* hero/html.html — Hero/banner component view */-->
+<div class="hero"
+     data-sly-use.auth="org.motorbrot.alfvsagent.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="container" data-animate>
+    <h1 class="hero__title">${properties.headline @ context='text'}</h1>
+    <p class="hero__subtitle">${properties.subtitle @ context='text'}</p>
+    <a href="${properties.ctaLink @ context='uri'}" class="hero__cta">${properties.ctaText @ context='text'}</a>
+  </div>
+</div>

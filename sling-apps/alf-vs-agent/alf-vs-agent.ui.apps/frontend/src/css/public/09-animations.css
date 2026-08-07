@@ -1,0 +1,84 @@
+/*
+ * 09-animations.css — Keyframes, transitions, scroll-driven effects
+ */
+
+/* Entry animations */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-animate].in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children */
+[data-animate='stagger'] > * {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+[data-animate='stagger'].in-view > * {
+  opacity: 1;
+  transform: translateY(0);
+
+  &:nth-child(1) { transition-delay: 0ms; }
+  &:nth-child(2) { transition-delay: 80ms; }
+  &:nth-child(3) { transition-delay: 160ms; }
+  &:nth-child(4) { transition-delay: 240ms; }
+  &:nth-child(5) { transition-delay: 320ms; }
+}
+
+/* Scanline overlay effect */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Typing cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--color-primary);
+}
+
+/* Glitch text effect */
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.glitch:hover {
+  animation: glitch 0.3s ease infinite;
+}
+
+/* Scroll-driven reveal */
+@supports (animation-timeline: scroll()) {
+  [data-scroll-reveal] {
+    animation: scroll-fade-in linear both;
+    animation-timeline: scroll();
+    animation-range: entry 0% entry 30%;
+  }
+}
+
+@keyframes scroll-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
