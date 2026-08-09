@@ -1,6 +1,12 @@
 # prod.motorbrot — OPERATIONS-owned production environment.
 #
-# The ENTIRE per-deployment surface. Add an app = append one `- tenant:` block.
+# The ENTIRE per-deployment surface. Publish something = append one `- tenant:`
+# block. A tenant is a host -> content-root mapping, NOT necessarily its own app:
+# it usually points at its own app, but several tenants can reuse ONE app at
+# different content roots (e.g. the content-only `zen` tenant serves the
+# `zengarden` app from /content/slingslop/zen). When a tenant reuses another
+# app, set `appsRoot` to that app's clientlib root or the webcache rewrites its
+# css/js to a 404. See devops/conga/README.md ("Tenants vs apps").
 # Fork = copy this file, change `domain` and the tenant list.
 #
 # Secrets (ACME e-mail, htpasswd) stay in the Ansible vault; only non-sensitive
@@ -27,6 +33,19 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/slingslop/zengarden
+
+# CONTENT-ONLY tenant: `zen` ships NO app of its own. It re-serves the existing
+# `zengarden` app at a second content root. `/content/slingslop/zen` is created
+# live in prod (a copy of zengarden) and lives in the content volume — it is NOT
+# in git. Because the clientlibs are served by the zengarden app, appsRoot must
+# point at the zengarden app root (NOT the /apps/slingslop/zen default), or the
+# webcache URL-shortener rewrites its css/js to a 404. See devops/conga/README.md.
+- tenant: zen
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/slingslop/zen
+    appsRoot: /apps/slingslop/zengarden
 
 - tenant: sling-matrix
   roles:

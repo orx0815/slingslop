@@ -12,6 +12,10 @@ name: Infra (manual)
 #                   re-ship them, then (re)deploy the webcache image — cache
 #                   preserved. The same thing ci-cd.yml does on push, on demand
 #                   (e.g. re-ship vhosts without a code push). Uses `image_tag`.
+#   * "acme"      → retry-acme.yml: force-recreate Traefik so it re-attempts
+#                   Let's Encrypt for any router host still missing a cert (e.g. a
+#                   new subdomain whose first order failed on not-yet-propagated
+#                   DNS). No image build; Traefik-only, ~seconds of edge downtime.
 #
 # Day-to-day app/webcache deploys ALSO happen automatically via ci-cd.yml on push
 # to deploy/motorbrot_prod; this workflow is the manual escape hatch for those.
@@ -31,6 +35,7 @@ on:
           - site
           - bootstrap
           - webcache
+          - acme
       image_tag:
         description: "GHCR webcache image tag to deploy (webcache play only)"
         type: string
@@ -89,6 +94,9 @@ jobs:
             ansible-playbook -i inventory/hosts.yml playbooks/update-webcache.yml \
               --vault-password-file /tmp/vp \
               -e "webcache_image=$WEBCACHE_IMAGE"
+          elif [ "$PLAY" = "acme" ]; then
+            ansible-playbook -i inventory/hosts.yml playbooks/retry-acme.yml \
+              --vault-password-file /tmp/vp
           else
             ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
               --vault-password-file /tmp/vp

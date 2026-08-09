@@ -30,6 +30,38 @@ tenants:
 That's it. Everything downstream (Traefik router, webcache vhost, short URLs) is
 derived from those fields.
 
+### A tenant is not always an app — *content-only* tenants
+
+A **tenant** is a `host → content-root` mapping, **not** necessarily its own
+application. Most tenants *do* point at their own app, but several tenants can
+reuse **one** app at different content roots. We call a tenant that ships no code
+of its own a **content-only tenant**.
+
+Example: the `zen` tenant re-serves the existing **zengarden** app at a second
+content root:
+
+```yaml
+  - tenant: zen
+    roles: [ public-cached ]
+    config:
+      contentRoot: /content/slingslop/zen        # a *copy* of the zengarden content
+      appsRoot:    /apps/slingslop/zengarden      # clientlibs come from the zengarden app!
+```
+
+Two things make this work:
+
+- **`appsRoot` must point at the app that actually serves the clientlibs.** The
+  webcache passes `appsRoot` through unrewritten (the app's css/js); the default
+  is `/apps/slingslop/<tenant>`, which for a content-only tenant would be **wrong**
+  and the URL-shortener would rewrite its css/js to a 404. Point it at the reused
+  app's root instead (here, the zengarden app).
+- **The content itself is not in git.** `/content/slingslop/zen` is created *live*
+  in production (e.g. copy zengarden → zen in the author UI) and lives in the
+  Sling **content volume**, which survives redeploys. Only the tenant block above
+  is version-controlled. This is the intended "clone a sample → add a tenant →
+  edit the prod content in place" workflow for spinning up a new site from an
+  existing app without writing any code.
+
 ### Fine-grained per-app cache & security rules
 
 The vhost is the front-line protection. Each tenant can additionally tune the

@@ -1,7 +1,10 @@
-# slingslop-app-base — shared per-app (tenant) parameter menu.
+# slingslop-app-base — shared per-tenant parameter menu.
 #
 # This role renders NO files. It only declares the configuration parameters
-# (with defaults + doc-comments) that describe a public-facing Slingslop app.
+# (with defaults + doc-comments) that describe a public-facing Slingslop tenant.
+# A tenant is a host -> content-root mapping; it usually maps to its own app, but
+# several tenants can reuse ONE app at different content roots (then set appsRoot
+# to the reused app's clientlib root — see the `appsRoot` param below).
 # slingslop-edge / slingslop-webcache / slingslop-runtime inherit it so the
 # parameter menu lives in exactly one place.
 #
@@ -20,10 +23,15 @@ config:
   # ---- per-tenant (per-app) values ----
 
   # JCR content root, e.g. /content/slingslop/zengarden. Drives proxy + mapping.
-  # No default — every app must declare it.
+  # No default — every tenant must declare it.
   contentRoot: /content/slingslop/${tenant}
 
-  # Scripts / clientlib root under /apps, e.g. /apps/slingslop/zengarden.
+  # Scripts / clientlib root under /apps, e.g. /apps/slingslop/zengarden. The
+  # webcache always passes this prefix through UNREWRITTEN (the app's css/js),
+  # so it MUST match where the app actually serves its clientlibs. The default
+  # only fits an app whose scripts live at /apps/slingslop/<tenant>; override it
+  # when the tenant reuses another app (e.g. `zen` -> /apps/slingslop/zengarden)
+  # or the app's root differs (e.g. /apps/<tenant>). Wrong value = 404'd css/js.
   appsRoot: /apps/slingslop/${tenant}
 
   # Left-most DNS label. Final host = <subdomain>.<domain>.

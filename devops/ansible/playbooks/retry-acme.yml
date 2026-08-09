@@ -1,0 +1,62 @@
+---
+# Force Traefik to re-attempt Let's Encrypt (ACME) for every router domain that
+# still lacks a valid certificate.
+#
+#   ansible-playbook -i inventory/hosts.yml playbooks/retry-acme.yml --ask-vault-pass
+#
+# WHY THIS EXISTS
+#   Certs are per-host HTTP-01 (traefik.yml certResolver: letsencrypt). When a new
+#   subdomain's first ACME order fails — classically because its DNS record had not
+#   propagated yet — Traefik backs the order off and does NOT spontaneously retry.
+#   The GitOps tenant path (deploy-tenant-edge.yml) only hot-reloads the file
+#   provider, which is a no-op for an unchanged router, so nothing re-triggers the
+#   failed order once DNS is fixed. Recreating the Traefik container makes it run a
+#   fresh certificate-resolution pass for all router domains on startup.
+#
+#   acme.json only stores SUCCESSFUL certs (failed orders are not persisted), so a
+#   recreate is a clean retry — no need to edit or delete anything.
+#
+# NOTE: this briefly recreates only the Traefik container (~seconds). The webcache
+#   and Sling containers are untouched. Beware the Let's Encrypt failed-validation
+#   limit (5 per hostname per hour); if you burned it during the broken-DNS window,
+#   wait for the hour to roll over before retrying.
+
+- hosts: slingslop
+  gather_facts: true
+  become: true
+
+  vars:
+    # Seconds to wait after recreate before scraping the log for the ACME outcome.
+    acme_log_settle_seconds: 25
+
+  tasks:
+    - name: Force-recreate the Traefik container (fresh ACME resolution pass)
+      ansible.builtin.command:
+        cmd: "{{ slingslop_root }}/dc up -d --force-recreate --no-deps traefik"
+      register: traefik_recreate
+      changed_when: true
+
+    - name: Give Traefik time to run the ACME HTTP-01 challenge(s)
+      ansible.builtin.pause:
+        seconds: "{{ acme_log_settle_seconds }}"
+
+    - name: Scrape recent Traefik log for ACME / certificate activity
+      ansible.builtin.shell:
+        cmd: >-
+          docker logs --since {{ acme_log_settle_seconds + 15 }}s slingslop-traefik 2>&1
+          | grep -iE 'acme|certificate|challenge|unable to obtain|error' || true
+      register: acme_log
+      changed_when: false
+
+    - name: Show ACME / certificate log lines
+      ansible.builtin.debug:
+        msg: "{{ acme_log.stdout_lines | default([]) }}"
+
+    - name: Reminder — how to confirm the issued certificate
+      ansible.builtin.debug:
+        msg:
+          - "If the log shows 'Unable to obtain ACME certificate' the domain's HTTP-01"
+          - "challenge still failed — check public DNS resolves to this host and port 80"
+          - "is reachable, then re-run this play."
+          - "Verify a live cert with:"
+          - "  echo | openssl s_client -connect {{ inventory_hostname }}:443 -servername <host> 2>/dev/null | openssl x509 -noout -issuer -dates"

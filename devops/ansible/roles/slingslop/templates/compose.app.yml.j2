@@ -17,6 +17,12 @@ services:
     image: {{ slingslop_image }}
     container_name: slingslop
     restart: unless-stopped
+    # Give Oak time to flush + checkpoint on stop. Docker's default 10s can
+    # SIGKILL Sling mid-flush on a redeploy, forcing a SegmentStore recovery on
+    # next start that can drop the most recent (unflushed) writes. The feature
+    # launcher runs as PID 1 (exec in launch.sh) and stops the framework
+    # gracefully on SIGTERM, so a generous grace period protects content.
+    stop_grace_period: 90s
     env_file:
       - {{ slingslop_secrets_dir }}/slingslop.env
     volumes:
