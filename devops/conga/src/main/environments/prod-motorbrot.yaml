@@ -45,6 +45,11 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/slingslop/zen
+    # A tenant is NOT always its own app: this is a second mount of the
+    # zengarden app at a different content root. Clientlibs are still served
+    # from the zengarden app, so appsRoot must point there (NOT /apps/.../zen)
+    # or the webcache's URL-shortener rewrites the css/js to a 404.
+    appsRoot: /apps/slingslop/zengarden
 
 # CONTENT-ONLY tenant: `zen` ships NO app of its own. It re-serves the existing
 # `zengarden` app at a second content root. `/content/slingslop/zen` is created
@@ -95,3 +100,13 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/alf-vs-agent
+    # Clientlibs live at /apps/alf-vs-agent (not the /apps/slingslop/${tenant}
+    # default), so appsRoot must be set explicitly for the css/js passthrough.
+    appsRoot: /apps/alf-vs-agent
+
+- tenant: cyberpunk-alpaca
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/cyberpunk-alpaca
+    appsRoot: /apps/cyberpunk-alpaca
