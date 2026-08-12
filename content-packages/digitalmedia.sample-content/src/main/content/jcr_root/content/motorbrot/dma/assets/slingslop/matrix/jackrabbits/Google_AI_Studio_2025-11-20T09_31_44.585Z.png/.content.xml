@@ -4,6 +4,7 @@
     sling:resourceType="motorbrot/dma/components/asset"
     isAsset="{Boolean}true"
     uploadedBy="admin">
+    <jcr:content/>
     <metadata
         jcr:primaryType="nt:unstructured"
         filename="Google_AI_Studio_2025-11-20T09_31_44.585Z.png"

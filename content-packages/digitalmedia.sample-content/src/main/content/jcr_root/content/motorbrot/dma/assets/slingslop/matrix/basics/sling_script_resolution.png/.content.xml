@@ -4,6 +4,7 @@
     sling:resourceType="motorbrot/dma/components/asset"
     isAsset="{Boolean}true"
     uploadedBy="admin">
+    <jcr:content/>
     <metadata
         jcr:primaryType="nt:unstructured"
         filename="sling script resolution.png"
@@ -13,5 +14,6 @@
         width="{Long}1033"/>
     <renditions jcr:primaryType="nt:unstructured">
         <preview/>
+        <matrix-feature-mobile/>
     </renditions>
 </jcr:root>
