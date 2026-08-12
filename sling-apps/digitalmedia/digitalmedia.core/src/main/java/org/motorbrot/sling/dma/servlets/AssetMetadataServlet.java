@@ -6,6 +6,7 @@ import org.apache.sling.api.SlingJakartaHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.servlets.SlingJakartaSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
+import org.motorbrot.sling.dma.internal.AssetBinary;
 import org.motorbrot.sling.dma.slingmodels.AssetModel;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class AssetMetadataServlet extends SlingJakartaSafeMethodsServlet {
         try {
             Node assetNode = resource.adaptTo(Node.class);
             if (assetNode != null && assetNode.hasNode("jcr:content")) {
-                Node contentNode = assetNode.getNode("jcr:content");
+                Node contentNode = AssetBinary.originalResource(assetNode);
                 if (contentNode.hasProperty("jcr:lastModified")) {
                     metadata.put("lastModified", contentNode.getProperty("jcr:lastModified").getString());
                 }

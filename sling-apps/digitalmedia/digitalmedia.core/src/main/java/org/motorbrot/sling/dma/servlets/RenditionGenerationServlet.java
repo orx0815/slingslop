@@ -14,6 +14,7 @@ import org.motorbrot.sling.dma.client.MediaFormat;
 import org.motorbrot.sling.dma.client.MediaFormatRegistry;
 import org.motorbrot.sling.dma.client.crop.FocusPoint;
 import org.motorbrot.sling.dma.client.crop.SimpleFocusPoint;
+import org.motorbrot.sling.dma.internal.AssetBinary;
 import org.motorbrot.sling.dma.services.RenditionService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -78,7 +79,7 @@ public class RenditionGenerationServlet extends SlingJakartaAllMethodsServlet {
             }
 
             // Get original image data
-            Node contentNode = assetNode.getNode("jcr:content");
+            Node contentNode = AssetBinary.originalResource(assetNode);
             InputStream originalData = contentNode.getProperty("jcr:data").getBinary().getStream();
 
             // Resolve focus point: request params override asset metadata

@@ -21,6 +21,7 @@ import org.motorbrot.sling.dma.client.MediaFormat;
 import org.motorbrot.sling.dma.client.crop.FocusPoint;
 import org.motorbrot.sling.dma.client.crop.SimpleFocusPoint;
 import org.motorbrot.sling.dma.client.MediaFormatRegistry;
+import org.motorbrot.sling.dma.internal.AssetBinary;
 import org.motorbrot.sling.dma.services.RenditionService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -143,7 +144,7 @@ public class CropRenditionServlet extends SlingJakartaAllMethodsServlet {
                     continue;
                 }
                 // Fresh stream per format — the source binary is consumed each time.
-                InputStream originalData = assetNode.getNode("jcr:content")
+                InputStream originalData = AssetBinary.originalResource(assetNode)
                         .getProperty("jcr:data").getBinary().getStream();
                 byte[] renditionData = renditionService.generateCroppedRendition(
                         originalData, formatOpt.get(), focus);

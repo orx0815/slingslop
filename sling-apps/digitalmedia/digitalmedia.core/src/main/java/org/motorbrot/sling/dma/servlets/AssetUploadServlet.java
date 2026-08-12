@@ -146,8 +146,11 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
             assetNode.setProperty("jcr:created", Calendar.getInstance());
             assetNode.setProperty("uploadedBy", session.getUserID());
 
-            // Create jcr:content node with file data
-            Node contentNode = assetNode.addNode("jcr:content", "nt:resource");
+            // Store the original as nt:file (same wrapper as renditions) so it
+            // serializes cleanly in FileVault content packages. Bytes live on the
+            // inner nt:resource.
+            Node contentNode = assetNode.addNode("jcr:content", "nt:file")
+                    .addNode("jcr:content", "nt:resource");
             contentNode.setProperty("jcr:data", session.getValueFactory().createBinary(
                     new ByteArrayInputStream(fileBytes)));
             contentNode.setProperty("jcr:mimeType", (String) metadata.get("mimeType"));

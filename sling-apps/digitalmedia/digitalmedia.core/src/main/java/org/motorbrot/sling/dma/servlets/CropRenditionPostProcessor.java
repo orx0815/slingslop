@@ -20,6 +20,7 @@ import org.motorbrot.sling.dma.client.MediaFormatRegistry;
 import org.motorbrot.sling.dma.client.RenditionValidator;
 import org.motorbrot.sling.dma.client.crop.FocusPoint;
 import org.motorbrot.sling.dma.client.crop.SimpleFocusPoint;
+import org.motorbrot.sling.dma.internal.AssetBinary;
 import org.motorbrot.sling.dma.services.RenditionService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -135,7 +136,7 @@ public class CropRenditionPostProcessor implements SlingJakartaPostProcessor {
             if (RenditionValidator.validate(sourceWidth, sourceHeight, fmt).isOk()) {
                 continue;
             }
-            InputStream originalData = assetNode.getNode("jcr:content")
+            InputStream originalData = AssetBinary.originalResource(assetNode)
                     .getProperty("jcr:data").getBinary().getStream();
             byte[] data = renditionService.generateCroppedRendition(originalData, fmt, focus);
             if (data == null) {

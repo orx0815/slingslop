@@ -4,6 +4,7 @@ import org.apache.sling.api.SlingJakartaHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
+import org.motorbrot.sling.dma.internal.AssetBinary;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -46,7 +47,7 @@ public class AssetModel {
         try {
             Node assetNode = resource.adaptTo(Node.class);
             if (assetNode != null && assetNode.hasNode("jcr:content")) {
-                Node contentNode = assetNode.getNode("jcr:content");
+                Node contentNode = AssetBinary.originalResource(assetNode);
                 Node metaNode = assetNode.hasNode("metadata") ? assetNode.getNode("metadata") : null;
 
                 this.assetPath = assetNode.getPath();
