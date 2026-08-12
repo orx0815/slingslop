@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="motorbrot/dma/components/asset"
+    isAsset="{Boolean}true"
+    uploadedBy="admin">
+    <jcr:content/>
+    <metadata
+        jcr:primaryType="nt:unstructured"
+        filename="Google_AI_Studio_2025-11-20T09_31_44.585Z.png"
+        fileSize="{Long}1573846"
+        fileType="image"
+        height="{Long}1024"
+        width="{Long}1024"/>
+    <renditions jcr:primaryType="nt:unstructured">
+        <preview/>
+    </renditions>
+</jcr:root>
