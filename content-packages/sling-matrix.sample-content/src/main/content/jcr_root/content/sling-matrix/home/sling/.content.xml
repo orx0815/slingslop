@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:OrderedFolder"
-    jcr:title="Sling"/>
+    jcr:title="Sling">
+    <sling-intro/>
+    <sling-components/>
+    <htl-sightly/>
+    <sling-resource-api/>
+    <sling-models/>
+    <sling-i18n/>
+    <sling-testing/>
+    <sling-caconfig/>
+    <sling-dml-demo/>
+</jcr:root>

@@ -1,4 +1,214 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Sling Components and Script Resolution"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Script Resolution at a Glance"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>The 5 steps of Sling script resolution:&lt;/p>&lt;ol>&lt;li>&lt;strong>HTTP Request&lt;/strong> — e.g. &lt;code>GET /content/mypage.edit.html/richtext?simple=true&lt;/code>&lt;/li>&lt;li>&lt;strong>Content Resolution&lt;/strong> — resolve the resource path: &lt;code>/content/mypage&lt;/code>&lt;/li>&lt;li>&lt;strong>Get Resource Type&lt;/strong> — resource has &lt;code>sling:resourceType&lt;/code> property&lt;/li>&lt;li>&lt;strong>Script Locations&lt;/strong> — look in &lt;code>/apps/{type}/&lt;/code> then &lt;code>/libs/{type}/&lt;/code>&lt;/li>&lt;li>&lt;strong>Script Names&lt;/strong> — best match using selector, extension, HTTP method, script extension&lt;/li>&lt;/ol>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="URL Decomposition"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Examples:&lt;/p>&lt;pre>http://host/content/mynode.html&#xa;  → Resource path: /content/mynode, Extension: html&#xa;&#xa;http://host/content/mynode.tagsearch.html/Sling&#xa;  → Resource path: /content/mynode, Selector: tagsearch, Extension: html, Suffix: /Sling&#xa;&#xa;http://host/etc/clientlibs/lib1/css/styles.css&#xa;  → Resource path (static file): full path&lt;/pre>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Request Processing Steps"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ol>&lt;li>Sling tries to find a direct match of the full path in the repository (for static content like images, CSS, JS)&lt;/li>&lt;li>Sling extracts the resource path from the URL (usually the path before the first dot)&lt;/li>&lt;li>Get resource type of resource to locate rendering scripts&lt;/li>&lt;li>Take selectors, extension and HTTP method into account; also look for servlets mapped to resource type&lt;/li>&lt;li>Render and return response&lt;/li>&lt;/ol>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Selectors, Extension, and Suffix"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>&lt;strong>Selectors:&lt;/strong> The substring between the first dot and the dot leading the extension. Used for alternative methods of rendering content. There can be multiple selectors. Optional.&lt;/p>&lt;p>Example: &lt;code>/some/path.s1.s2.html&lt;/code>&lt;/p>&lt;p>&lt;strong>Extension:&lt;/strong> The string between the last dot after the resource path and the next slash. Specifies the content format. Optional.&lt;/p>&lt;p>&lt;strong>Suffix:&lt;/strong> If the URL contains a slash after the resource path and optional selectors+extension, the remaining path is the suffix. Not used for script resolution. At least a dot must be in the URL to let Sling detect the suffix path.&lt;/p>&lt;p>Example: &lt;code>/some/path.s1.s2.html/suffix.html&lt;/code>&lt;/p>"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Script Location"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Sling uses the resource type path to locate associated scripts:&lt;/p>&lt;ul>&lt;li>If the path is &lt;strong>absolute&lt;/strong> (starts with /), it is used as-is. Example: &lt;code>/apps/myapp/components/comp1&lt;/code>&lt;/li>&lt;li>If the path is &lt;strong>relative&lt;/strong>, Sling prepends the script search paths (&lt;code>/apps&lt;/code>, &lt;code>/libs&lt;/code>) and looks for the first match&lt;/li>&lt;/ul>&lt;p>Applications should only use &lt;code>/apps&lt;/code>.&lt;/p>"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Script Naming Rules"/>
+            <text-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>General pattern of a script filename:&lt;/p>&lt;pre>{selectorStringPath}.{requestExtension}.{requestMethod}.{scriptExtension}&lt;/pre>&lt;p>If the request has no selectors, use the &lt;code>resourceTypeLabel&lt;/code> (name of the last part of the resource type path) instead.&lt;/p>"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Script Selection Priority Example"/>
+            <text-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Request: &lt;code>/content/corporate/jobs/developer.print.a4.html&lt;/code> with resource type &lt;code>hr/jobs&lt;/code>&lt;/p>&lt;p>Order of preference (first matches first):&lt;/p>&lt;ol>&lt;li>&lt;code>print/a4.html.html&lt;/code>&lt;/li>&lt;li>&lt;code>print/a4/html.html&lt;/code>&lt;/li>&lt;li>&lt;code>print.a4.html&lt;/code>&lt;/li>&lt;li>&lt;code>print.html.html&lt;/code>&lt;/li>&lt;li>&lt;code>print.html&lt;/code>&lt;/li>&lt;li>&lt;code>html.html&lt;/code>&lt;/li>&lt;li>&lt;code>jobs.html&lt;/code>&lt;/li>&lt;li>&lt;code>GET.html&lt;/code>&lt;/li>&lt;/ol>&lt;p>Don't confuse the HTL script extension '.html' with the request extension '.html'.&lt;/p>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Components"/>
+            <text-block-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A Sling component is a resource type (a &amp;quot;folder&amp;quot; in the repository) with scripts or servlets to render it. The structure:&lt;/p>&lt;pre>/apps&#xa;  /myapp&#xa;    /components&#xa;      /comp1 (scripts here)&lt;/pre>"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Resource Type Inheritance"/>
+            <text-block-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A resource can define a &lt;code>sling:resourceSuperType&lt;/code> property. If set, script resolution falls back to this super type before falling back to default scripts.&lt;/p>&lt;ul>&lt;li>If no explicit resource super type, default is &lt;code>sling/servlet/default&lt;/code>&lt;/li>&lt;li>The super type can be declared on the resource node itself or for its resource type&lt;/li>&lt;/ul>"/>
+            <slide-headline-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Scripting Support"/>
+            <text-block-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Sling scripting is based on JSR 223 (scripting in JVM). Supported languages:&lt;/p>&lt;ul>&lt;li>&lt;strong>HTL (Sightly)&lt;/strong> — recommended default&lt;/li>&lt;li>&lt;strong>JSP&lt;/strong> — legacy, long the main language&lt;/li>&lt;li>&lt;strong>JavaScript&lt;/strong> (server-side)&lt;/li>&lt;li>Additional: Freemarker, Groovy, Java, Python, Ruby, Scala, Thymeleaf, Velocity&lt;/li>&lt;/ul>"/>
+            <slide-headline-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Simple HTL Script"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;div>&#xa;  &lt;h1>${properties.jcr:title}&lt;/h1>&#xa;  &lt;p>${properties.jcr:description}&lt;/p>&#xa;  ${properties.richText @ context='html'}&#xa;  &lt;p>&#xa;    &lt;a href=&quot;${properties.linkUrl}&quot;>${properties.linkText}&lt;/a>&#xa;  &lt;/p>&#xa;&lt;/div>&#xa;&#xa;&lt;!-- JCR-typical names supported without escaping -->&#xa;&lt;!-- Strict XSS rules applied automatically -->&#xa;&lt;!-- context='html' relaxes XSS to allow basic markup -->"
+                language="html"/>
+            <slide-headline-12
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="HTL Context Objects"/>
+            <text-block-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A Sling script is always rendered in context of a resource. You have a set of context objects implicitly available:&lt;/p>&lt;ul>&lt;li>&lt;code>properties&lt;/code> — current resource ValueMap&lt;/li>&lt;li>&lt;code>resource&lt;/code> — current Resource&lt;/li>&lt;li>&lt;code>request&lt;/code> — SlingHttpServletRequest&lt;/li>&lt;li>&lt;code>response&lt;/code> — SlingHttpServletResponse&lt;/li>&lt;/ul>&lt;p>You cannot call methods with arguments in HTL (by design). When accessing properties you can omit the &amp;quot;get&amp;quot; or &amp;quot;is&amp;quot; prefix:&lt;/p>&lt;pre>&amp;lt;a href=&amp;quot;${resource.parent.path @ extension='html'}&amp;quot;&amp;gt;Back to parent&amp;lt;/a&amp;gt;&lt;/pre>"/>
+            <slide-headline-13
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Including Resources"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Following statements are equivalent: */-->&#xa;&lt;sly data-sly-resource=&quot;./path&quot;>&lt;/sly>&#xa;&lt;sly data-sly-resource=&quot;${'./path'}&quot;>&lt;/sly>&#xa;&#xa;&lt;!--/* Manipulating the path: */-->&#xa;&lt;sly data-sly-resource=&quot;${'my/path' @ appendPath='appended/path'}&quot;>&lt;/sly>&#xa;&lt;sly data-sly-resource=&quot;${'my/path' @ prependPath='prepended/path'}&quot;>&lt;/sly>&#xa;&#xa;&lt;!--/* Manipulating selectors: */-->&#xa;&lt;sly data-sly-resource=&quot;${'my/path' @ selectors='selector1.selector2'}&quot;>&lt;/sly>&#xa;&lt;sly data-sly-resource=&quot;${'my/path' @ addSelectors='selector1'}&quot;>&lt;/sly>&#xa;&lt;sly data-sly-resource=&quot;${'my/path' @ removeSelectors}&quot;>&lt;/sly>&#xa;&#xa;&lt;!--/* Forcing the type of the rendered resource: */-->&#xa;&lt;sly data-sly-resource=&quot;${'./path' @ resourceType='my/resource/type'}&quot;>&lt;/sly>"
+                language="html"/>
+            <slide-headline-14
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Including Resources — Best Practice"/>
+            <text-block-12
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Resource inclusion is the most powerful and most-used way to modularize HTML markup into multiple components. You can combine components in different scripting languages.&lt;/p>&lt;p>&lt;strong>Prefer resource inclusion over script inclusion.&lt;/strong>&lt;/p>&lt;p>Most times you will either:&lt;/p>&lt;ul>&lt;li>Include a child resource by its relative path, using the resource type in the content&lt;/li>&lt;li>Include the current resource again using a different resource type for rendering&lt;/li>&lt;/ul>"/>
+            <slide-headline-15
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Including Scripts"/>
+            <code-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Script path is relative to current script location, not resource */-->&#xa;&lt;sly data-sly-include=&quot;template.html&quot;/>&#xa;&lt;sly data-sly-include=&quot;template.jsp&quot;/>&#xa;&#xa;&lt;!--/* Mixing of scripting languages supported */-->&#xa;&lt;!--/* Script is rendered in context of current resource */-->"
+                language="html"/>
+            <slide-headline-16
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Script Inclusion + Resource Type Inheritance"/>
+            <text-block-13
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A powerful concept: combine script inclusion with resource type inheritance. If a script to include is not found in the current resource type's folder, its super resource types are searched:&lt;/p>&lt;pre>/apps/myapp/components&#xa;  /globalpage&#xa;    html.html&#xa;    header.html&#xa;    body.html&#xa;    footer.html&#xa;  /articlepage (sling:resourceSuperType = globalpage)&#xa;    body.html&lt;/pre>&lt;p>Rendering a resource with type &lt;code>articlepage&lt;/code>: main script &lt;code>html.html&lt;/code> from &lt;code>globalpage&lt;/code>, includes &lt;code>header.html&lt;/code> and &lt;code>footer.html&lt;/code> from &lt;code>globalpage&lt;/code>, but &lt;code>body.html&lt;/code> from &lt;code>articlepage&lt;/code>.&lt;/p>"/>
+            <slide-headline-17
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Navigating the Resource Hierarchy in HTL"/>
+            <code-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Build a list with links to each child resource */-->&#xa;&lt;ul data-sly-list.child=&quot;${resource.listChildren}&quot;>&#xa;  &lt;li>&lt;a href=&quot;${child.path}.html&quot;>${child.jcr:title}&lt;/a>&lt;/li>&#xa;&lt;/ul>&#xa;&#xa;&lt;!--/* Render each child resource in a list */-->&#xa;&lt;div data-sly-list.child=&quot;${resource.listChildren}&quot;>&#xa;  &lt;sly data-sly-resource=&quot;${child.path}&quot;/>&#xa;&lt;/div>"
+                language="html"/>
+            <slide-headline-18
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="HTL Templates"/>
+            <text-block-14
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>HTL templates are reusable markup snippets (not to be confused with page/content templates). They can be used like function calls with parameters and support recursion.&lt;/p>&lt;p>You can build &amp;quot;template libraries&amp;quot; in separate files:&lt;/p>&lt;pre>&amp;lt;sly data-sly-use.lib=&amp;quot;templateLib.html&amp;quot; data-sly-call=&amp;quot;${lib.one}&amp;quot;/&amp;gt;&lt;/pre>"/>
+            <slide-headline-19
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="HTL Use — Sling Model"/>
+            <code-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Use Sling Model using name &quot;ctrl&quot; */-->&#xa;&lt;div data-sly-use.ctrl=&quot;org.matrix.sentinel.SentinelController&quot;>&#xa;  Output: ${ctrl.output}&#xa;&lt;/div>&#xa;&#xa;&lt;!--/* Pass parameters to Sling Model */-->&#xa;&lt;div data-sly-use.ctrl=&quot;${'org.matrix.sentinel.SentinelController' @&#xa;    scanMode='deep', cssClass='sentinel-icon'}&quot;>&#xa;  Output: ${ctrl.output}&#xa;&lt;/div>"
+                language="html"/>
+            <slide-headline-20
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Model for HTL Use"/>
+            <code-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@Model(adaptables = SlingHttpServletRequest.class)&#xa;public class SentinelController {&#xa;&#xa;    @ValueMapValue(injectionStrategy = InjectionStrategy.OPTIONAL)&#xa;    private String text;&#xa;&#xa;    @SlingObject&#xa;    private SlingHttpServletRequest request;&#xa;&#xa;    public String getOutput() {&#xa;        return text + &quot; - &quot; + request.getRequestURI();&#xa;    }&#xa;}&#xa;&#xa;// Reading parameters passed from HTL:&#xa;@Model(adaptables = SlingHttpServletRequest.class)&#xa;public class SentinelController {&#xa;&#xa;    @RequestAttribute(injectionStrategy = InjectionStrategy.OPTIONAL)&#xa;    private String scanMode;&#xa;&#xa;    @RequestAttribute(injectionStrategy = InjectionStrategy.OPTIONAL)&#xa;    private String cssClass;&#xa;}"
+                language="java"/>
+            <slide-headline-21
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="HTL Use — Best Practices"/>
+            <text-block-15
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>Do not use data-sly-use when not needed — if you only read some properties and need simple logic, use HTL directly&lt;/li>&lt;li>Do not include the same Java/JS object multiple times via data-sly-use — declare it once on top and reuse it&lt;/li>&lt;li>Not always best to have 1:1 relation between script and controller — define controllers per aspect of functionality&lt;/li>&lt;li>A HTL script can use multiple data-sly-use statements for different aspects&lt;/li>&lt;/ul>"/>
+            <slide-headline-22
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Using Servlets"/>
+            <code-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@Component(service = Servlet.class, immediate = true)&#xa;@SlingServletResourceTypes(&#xa;    resourceTypes = &quot;matrix/components/sentinel-servlet&quot;,&#xa;    selectors = { &quot;selector1&quot;, &quot;selector2&quot; },&#xa;    methods = HttpConstants.METHOD_GET)&#xa;public class SentinelServlet extends SlingSafeMethodsServlet {&#xa;&#xa;    @Override&#xa;    protected void doGet(SlingHttpServletRequest request,&#xa;            SlingHttpServletResponse response)&#xa;            throws ServletException, IOException {&#xa;        response.getWriter().write(&quot;Hello from the Matrix&quot;);&#xa;    }&#xa;}&#xa;&#xa;// SlingSafeMethodsServlet — for read-only operations (GET, HEAD)&#xa;// SlingAllMethodsServlet — for POST, PUT, DELETE methods&#xa;// Servlets participate in script resolution via resource types,&#xa;// selectors, extensions, and methods (as OSGi service properties)&#xa;// Annotations: @SlingServletResourceTypes, @SlingServletPaths"
+                language="java"/>
+            <slide-headline-23
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Using Filters"/>
+            <text-block-16
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Registering a custom servlet filter uses the OSGi whiteboard pattern. Service must implement &lt;code>javax.servlet.Filter&lt;/code> and set &lt;code>sling.filter.scope&lt;/code> property.&lt;/p>&lt;ul>&lt;li>&lt;strong>request&lt;/strong> — applied to requests from outside&lt;/li>&lt;li>&lt;strong>include&lt;/strong> — applied to include requests&lt;/li>&lt;li>&lt;strong>forward&lt;/strong> — applied to forward requests&lt;/li>&lt;li>&lt;strong>component&lt;/strong> — applied to any of them&lt;/li>&lt;li>&lt;strong>error&lt;/strong> — applied to error handler calls&lt;/li>&lt;/ul>&lt;p>All registered filters are always called when scope matches. Keep filter code small and efficient. Control order with &lt;code>service.ranking&lt;/code>. Annotation: &lt;code>@SlingServletFilter&lt;/code>.&lt;/p>"/>
+            <slide-headline-24
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="HTL/Frontend Changes Without Redeployment"/>
+            <text-block-17
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>With the &amp;quot;Sling Filesystem Resource Provider&amp;quot; it is possible to mount the local filesystem inside the repository. Changes on JS, CSS, HTML files are reflected directly (only browser refresh needed).&lt;/p>&lt;p>This does not work for Java code or content structures in JSON — a bundle deployment via Maven is required for those.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

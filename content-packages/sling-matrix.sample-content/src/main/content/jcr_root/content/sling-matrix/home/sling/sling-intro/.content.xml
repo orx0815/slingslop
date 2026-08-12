@@ -1,4 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Apache Sling Introduction"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Apache Sling"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Apache Sling is a content-centric web application framework:&lt;/p>&lt;ul>&lt;li>Built around RESTful principles, embraces the web&lt;/li>&lt;li>Uses JCR for content storage — or other data sources via Resource Providers&lt;/li>&lt;li>Supports Scripts (JSR 223) or Servlets for processing&lt;/li>&lt;li>Highly modular and based on OSGi&lt;/li>&lt;li>Healthy community: &amp;gt;30 Committers (mostly from Adobe and other companies)&lt;/li>&lt;li>&amp;gt;300 modules on GitHub&lt;/li>&lt;/ul>&lt;p>Started as internal project at Day Software, Apache Incubator project since 2007, top-level project since 2009.&lt;/p>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="REST Principles"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>REST stands for &amp;quot;REpresentational State Transfer&amp;quot; — an architectural style for distributed systems defined in 2000 by Roy Fielding.&lt;/p>&lt;ul>&lt;li>A &lt;strong>Resource&lt;/strong> can be anything (but has to be addressable)&lt;/li>&lt;li>Resources are &lt;strong>independent from their representation&lt;/strong> — a web page is not a resource, it's a representation of one&lt;/li>&lt;li>An &lt;strong>URL identifies a resource&lt;/strong> — URLs have an implicit hierarchy&lt;/li>&lt;li>&lt;strong>Methods&lt;/strong> perform operations on resources (GET, POST, PUT, DELETE…) — operation is not part of the URL&lt;/li>&lt;li>HTTP status codes indicate result success&lt;/li>&lt;/ul>&lt;p>Benefits: Performance, Scalability, Simplicity, Modifiability, Cacheability.&lt;/p>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Uses RESTful URLs"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Un-RESTful URL in &amp;quot;traditional&amp;quot; apps:&lt;/p>&lt;pre>/schedule.jsp?event=1&amp;amp;year=2015&amp;amp;id=1&amp;amp;format=JSON&lt;/pre>&lt;p>RESTful URLs in Sling:&lt;/p>&lt;pre>/conference/2015/day1/rookie-session.json&#xa;/conference/2015/day1/rookie-session.xml&lt;/pre>&lt;p>URL addresses a &lt;strong>Resource&lt;/strong>, not a script. Representation selection via extension.&lt;/p>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="cURL — Write Data to Repository"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="# Create a node at /content/mynode with two properties&#xa;curl -u admin:admin &#xa;  -F&quot;sling:resourceType=matrix/sentinel&quot; &#xa;  -F&quot;title=Sentinel Outpost&quot; &#xa;  http://localhost:8080/content/mynode&#xa;&#xa;# This HTTP POST is intercepted by the default Sling POST Servlet.&#xa;# Authentication required to get write access."
+                language="bash"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="cURL — Read Data from Repository"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// HTTP GET with JSON extension:&#xa;// http://localhost:8080/content/mynode.json&#xa;&#xa;{&#xa;  &quot;jcr:primaryType&quot;: &quot;sling:Folder&quot;,&#xa;  &quot;jcr:createdBy&quot;: &quot;admin&quot;,&#xa;  &quot;jcr:created&quot;: &quot;Thu Nov 26 2015 11:22:39 GMT+0100&quot;,&#xa;  &quot;title&quot;: &quot;Sentinel Outpost&quot;,&#xa;  &quot;sling:resourceType&quot;: &quot;matrix/sentinel&quot;&#xa;}&#xa;&#xa;// Node type automatically chosen by Sling&#xa;// Alternative in XML: http://localhost:8080/content/mynode.xml"
+                language="json"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Upload a Render Script"/>
+            <code-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="# HTTP POST: Create two folders&#xa;curl -u admin:admin -F&quot;jcr:primaryType=sling:Folder&quot; http://localhost:8080/apps/matrix&#xa;curl -u admin:admin -F&quot;jcr:primaryType=sling:Folder&quot; http://localhost:8080/apps/matrix/sentinel&#xa;&#xa;# HTTP PUT: Upload the script&#xa;curl -u admin:admin -T sentinel.html http://localhost:8080/apps/matrix/sentinel/sentinel.html&#xa;&#xa;# Content of sentinel.html (HTL):&#xa;# &lt;h1>Hello World!&lt;/h1>&#xa;# &lt;p>${properties.title}&lt;/p>&#xa;&#xa;# Now GET http://localhost:8080/content/mynode.html&#xa;# Sling detects the script via script resolution and renders it"
+                language="bash"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Resources and Resource Types"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Resources are typed. A &amp;quot;content&amp;quot; resource has a &lt;code>sling:resourceType&lt;/code> property pointing to the Sling component containing script(s) to render the resource.&lt;/p>&lt;ul>&lt;li>Resource type is a repository path (can be relative to script search paths)&lt;/li>&lt;li>Resource type is optional if the resource is just used for storage&lt;/li>&lt;li>Sling components are resources as well — containing scripts rather than content&lt;/li>&lt;li>With &lt;code>sling:resourceSuperType&lt;/code> you can build hierarchies of resource types for generalization in script resolution&lt;/li>&lt;/ul>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Resource Providers"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A resource provider maps the resource hierarchy to a storage system. Default: JCR resource provider.&lt;/p>&lt;p>Multiple resource providers are mapped to the &lt;strong>same resource tree&lt;/strong>. There is no concept for multiple workspaces or repositories in Sling.&lt;/p>&lt;p>Example: Main resource provider is JCR with Jackrabbit Oak. On path &lt;code>/content/usergenerated&lt;/code> a different resource provider is mounted — all read/writes there go to a different store, everything else goes to JCR.&lt;/p>"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling GET Servlet"/>
+            <text-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>If no custom script or servlet is in place, all GET requests are handled by the standard GET servlet:&lt;/p>&lt;ul>&lt;li>&lt;code>.html/.xml/.txt&lt;/code> — dump resource data as HTML, XML or plain text&lt;/li>&lt;li>&lt;code>.json&lt;/code> — dump resource data as JSON&lt;/li>&lt;li>&lt;code>.&amp;lt;level&amp;gt;.json&lt;/code> — include child resources (e.g. &lt;code>.5.json&lt;/code> = 5 levels, &lt;code>.infinity.json&lt;/code> = all levels)&lt;/li>&lt;li>&lt;code>.tidy.&amp;lt;level&amp;gt;.json&lt;/code> — formatted JSON output&lt;/li>&lt;/ul>&lt;p>&lt;strong>Important:&lt;/strong> Configure in Felix console to switch off some/all of these features on production instances!&lt;/p>"/>
+            <slide-headline-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling POST Servlet"/>
+            <text-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Supports writing data back to repository without custom code:&lt;/p>&lt;ul>&lt;li>Creating or updating resources — maps POST parameters to property names&lt;/li>&lt;li>Control data types (Number, Boolean, Date)&lt;/li>&lt;li>Delete, Move, Copy, Import, Checkin, Checkout content&lt;/li>&lt;/ul>"/>
+            <slide-headline-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Access Restrictions"/>
+            <text-block-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>All access to the repository is subject to access restrictions:&lt;/p>&lt;ul>&lt;li>&lt;strong>Sling Launchpad&lt;/strong>: Read access to all resources, write access to none&lt;/li>&lt;li>If more access is needed, the user must authenticate with credentials authorized with proper access rights&lt;/li>&lt;li>JCR allows very fine-grained control of access rights on path level&lt;/li>&lt;li>All default servlets, custom scripts/servlets, and every access via the Sling API respects the ACLs&lt;/li>&lt;/ul>"/>
+            <slide-headline-12
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Initial Content"/>
+            <text-block-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Sling provides support for initial content to be deployed with bundles, installed when the bundle is started. Declared with the &lt;code>Sling-Initial-Content&lt;/code> bundle header.&lt;/p>&lt;ul>&lt;li>&lt;strong>Files &amp;amp; Folders&lt;/strong>: directly mapped to nt:folder and nt:file nodes in JCR&lt;/li>&lt;li>&lt;strong>XML&lt;/strong>: XML file containing JCR data structures&lt;/li>&lt;li>&lt;strong>JSON&lt;/strong>: JSON file containing JCR data structures (best option — XML has problems with multi-valued properties)&lt;/li>&lt;/ul>"/>
+            <slide-headline-13
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Initial Content — Bundle Header"/>
+            <code-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;plugin>&#xa;  &lt;groupId>biz.aQute.bnd&lt;/groupId>&#xa;  &lt;artifactId>bnd-maven-plugin&lt;/artifactId>&#xa;  &lt;configuration>&#xa;    &lt;bnd>&#xa;      &lt;!-- include application path as initial content -->&#xa;      Sling-Initial-Content: &#xa;        SLING-INF/app-root;overwrite:=true;ignoreImportProviders:=xml;path:=/apps/myapp&#xa;    &lt;/bnd>&#xa;  &lt;/configuration>&#xa;&lt;/plugin>&#xa;&#xa;&lt;!-- Imports content from SLING-INF/app-root in the JAR to /apps/myapp -->"
+                language="xml"/>
+            <slide-headline-14
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling API"/>
+            <text-block-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Additionally to the REST interfaces, Sling provides a Java API used by OSGi components and scripts on the server-side:&lt;/p>&lt;ul>&lt;li>The Sling API extends the Servlet API to provide Sling-specific and resource-related features (e.g. URL decomposition)&lt;/li>&lt;li>The Sling Resource API provides read/write operations to manage the resource hierarchy, transparent from the underlying resource providers&lt;/li>&lt;li>Entry points for customizing resource handling, authentication, security and helper functions&lt;/li>&lt;/ul>"/>
+            <slide-headline-15
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Request Processing"/>
+            <text-block-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Sling takes a unique approach: a request URL is first resolved to a resource, then based on the resource it selects the servlet or script to handle the request.&lt;/p>&lt;p>The request handling can be further customized by:&lt;/p>&lt;ul>&lt;li>Applying servlet filters&lt;/li>&lt;li>Applying Sling Mapping for &amp;quot;SEO-friendly short URLs&amp;quot;&lt;/li>&lt;li>Using the &amp;quot;Recent Requests&amp;quot; Felix Web Console plugin to debug request processing&lt;/li>&lt;/ul>"/>
+            <slide-headline-16
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Sling Launchpad"/>
+            <text-block-12
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Sling uses a very thin launcher to run Sling and OSGi: the Launchpad. May be launched as a standalone application or as a Web Application (WAR).&lt;/p>&lt;p>Created using the Sling Feature Model — a collection of OSGi Bundle references and configurations. Makes it easy to build own application starters with all required bundles and configuration flexibility.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

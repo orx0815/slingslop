@@ -1,4 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="HTL (Sightly)"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What is HTL?"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>HTL (HTML Template Language, formerly known as Sightly) is a scripting language invented by Adobe specifically for Sling:&lt;/p>&lt;ul>&lt;li>Recommended default scripting language&lt;/li>&lt;li>Enforces clean separation of presentation and logic — only simple logic constructs in template&lt;/li>&lt;li>Intelligent XSS support built-in&lt;/li>&lt;li>Good integration with Sling&lt;/li>&lt;/ul>&lt;p>File extension: &lt;code>.html&lt;/code>. Each HTML file is a valid HTL file. Data logic is added using &lt;code>data-sly-*&lt;/code> attributes and &lt;code>${}&lt;/code> expressions.&lt;/p>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Expressions"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>HTL expressions &lt;code>${}&lt;/code> access variables and their properties:&lt;/p>&lt;pre>${currentPage.title}&#xa;${properties.jcr:title}&#xa;${properties['jcr:title']}&lt;/pre>&lt;p>Supported: string, number, boolean, array literals. Operators: logical (&amp;amp;&amp;amp;, ||, !), comparison (&amp;lt;, &amp;gt;, ==), ternary (&lt;code>? :&lt;/code>), grouping.&lt;/p>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Expression Options"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Expression options modify the output. Syntax: &lt;code>${expression @ option1='value', option2='value'}&lt;/code>&lt;/p>&lt;ul>&lt;li>&lt;code>@ i18n&lt;/code> — translate string&lt;/li>&lt;li>&lt;code>@ format&lt;/code> — format with placeholders&lt;/li>&lt;li>&lt;code>@ join&lt;/code> — join array with separator&lt;/li>&lt;li>&lt;code>@ context&lt;/code> — set display/XSS context&lt;/li>&lt;li>&lt;code>@ scheme, domain, path, extension, selectors, query, fragment&lt;/code> — URI manipulation&lt;/li>&lt;/ul>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Display Context and XSS Prevention"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>HTL applies automatic context-aware XSS escaping. It detects HTML, attributes, URIs, JavaScript, CSS contexts:&lt;/p>&lt;pre>${properties.jcr:title}             &amp;lt;!-- auto-detected: text context --&amp;gt;&#xa;${properties.richText @ context='html'}  &amp;lt;!-- explicit: allow safe HTML --&amp;gt;&#xa;${properties.link @ context='uri'}       &amp;lt;!-- explicit: URI context --&amp;gt;&lt;/pre>&lt;p>Available contexts: text, html, attribute, uri, number, scriptToken, scriptString, scriptComment, styleToken, styleString, styleComment, unsafe.&lt;/p>&lt;p>&lt;strong>Warning:&lt;/strong> &lt;code>unsafe&lt;/code> disables all XSS protection. Use only in exceptional cases.&lt;/p>"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Test and List Statements"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* data-sly-test: conditional rendering */-->&#xa;&lt;p data-sly-test=&quot;${properties.showText}&quot;>Text to show&lt;/p>&#xa;&lt;p data-sly-test=&quot;${!properties.showText}&quot;>Fallback text&lt;/p>&#xa;&#xa;&lt;!--/* Saving test result to variable */-->&#xa;&lt;p data-sly-test.hasTitle=&quot;${properties.jcr:title}&quot;>has title&lt;/p>&#xa;&lt;p data-sly-test=&quot;${!hasTitle}&quot;>no title&lt;/p>&#xa;&#xa;&lt;!--/* data-sly-list: iterate over items */-->&#xa;&lt;ul data-sly-list.child=&quot;${resource.listChildren}&quot;>&#xa;  &lt;li>${child.name} (index: ${childList.index})&lt;/li>&#xa;&lt;/ul>&#xa;&#xa;&lt;!--/* data-sly-repeat: like list but keeps host element */-->&#xa;&lt;div data-sly-repeat.child=&quot;${resource.listChildren}&quot;>&#xa;  ${child.name}&#xa;&lt;/div>"
+                language="html"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Template and Call Statements"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Define template with parameters */-->&#xa;&lt;template data-sly-template.card=&quot;${@ title, description}&quot;>&#xa;  &lt;div class=&quot;card&quot;>&#xa;    &lt;h3>${title}&lt;/h3>&#xa;    &lt;p>${description}&lt;/p>&#xa;  &lt;/div>&#xa;&lt;/template>&#xa;&#xa;&lt;!--/* Call template */-->&#xa;&lt;sly data-sly-call=&quot;${card @ title='Neo', description='The One'}&quot;/>&#xa;&#xa;&lt;!--/* Include template library from separate file */-->&#xa;&lt;sly data-sly-use.lib=&quot;templateLib.html&quot;&#xa;     data-sly-call=&quot;${lib.card @ title='Morpheus', description='Captain'}&quot;/>&#xa;&#xa;&lt;!--/* Recursive example (site map) */-->&#xa;&lt;template data-sly-template.listChildren=&quot;${@ page}&quot;&#xa;         data-sly-list=&quot;${page.listChildren}&quot;>&#xa;  &lt;li>&#xa;    &lt;div class=&quot;title&quot;>${item.title}&lt;/div>&#xa;    &lt;ol data-sly-call=&quot;${listChildren @ page=item}&quot;>&lt;/ol>&#xa;  &lt;/li>&#xa;&lt;/template>"
+                language="html"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Unwrap, Element, Attribute, and Text Statements"/>
+            <code-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* data-sly-unwrap: conditionally remove outer element */-->&#xa;&lt;div class=&quot;editable&quot; data-sly-unwrap=&quot;${!wcmmode.edit}&quot;>&#xa;  text&#xa;&lt;/div>&#xa;&#xa;&lt;!--/* data-sly-element: change element name */-->&#xa;&lt;h1 data-sly-element=&quot;${titleElement}&quot;>Title&lt;/h1>&#xa;&lt;!-- Output: &lt;h3>Title&lt;/h3> (if titleElement = 'h3') -->&#xa;&#xa;&lt;!--/* data-sly-attribute: set attributes */-->&#xa;&lt;input data-sly-attribute=&quot;${keyValueMapOfAttributes}&quot;/>&#xa;&lt;!-- Output: &lt;input type=&quot;text&quot; name=&quot;firstName&quot; value=&quot;Alison&quot;/> -->&#xa;&#xa;&lt;!--/* Single attribute with identifier */-->&#xa;&lt;a href=&quot;#&quot; data-sly-attribute.href=&quot;${link}&quot;>link&lt;/a>&#xa;&#xa;&lt;!--/* data-sly-text: replace element content */-->&#xa;&lt;div data-sly-text=&quot;${content}&quot;>Lorem ipsum&lt;/div>"
+                language="html"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Use Statement"/>
+            <code-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="&lt;!--/* Java (Sling Model) example: */-->&#xa;&lt;div data-sly-use.logic=&quot;org.matrix.SentinelModel&quot;>&#xa;  ${logic.status}&#xa;&lt;/div>&#xa;&#xa;&lt;!--/* JavaScript Use API: */-->&#xa;&lt;div data-sly-use.logic=&quot;${'logic.js' @ param1='Matrix'}&quot;>&#xa;  ${logic.hi}&#xa;&lt;/div>&#xa;&#xa;&lt;!--/* logic.js */-->&#xa;&lt;!--/*&#xa;use(function () {&#xa;  return {&#xa;    hi: &quot;Hello &quot; + this.param1&#xa;  };&#xa;});&#xa;*/-->&#xa;&#xa;&lt;!--/* Resource object (exposes properties) — since HTL 1.2 */-->&#xa;&lt;div data-sly-use.nav=&quot;./navigation&quot;>&#xa;  ${nav.title}&#xa;&lt;/div>"
+                language="html"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Use Statement — Best Practices"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>Don't use data-sly-use when not needed — if you only read properties and need simple logic, use HTL directly&lt;/li>&lt;li>Don't include the same Java/JS object multiple times — declare once at top and reuse&lt;/li>&lt;li>Don't always use 1:1 relation between script and controller — define controllers per aspect of functionality&lt;/li>&lt;li>A HTL script can use multiple data-sly-use statements for different aspects&lt;/li>&lt;li>Recommended: Sling Models as controllers (not WCMUse or raw Java classes)&lt;/li>&lt;/ul>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

@@ -1,4 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="OSGi Declarative Services"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Introducing Declarative Services (DS)"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Make Java POJOs into OSGi components and services using Java annotations. Features:&lt;/p>&lt;ul>&lt;li>&lt;strong>Declarative&lt;/strong> — no explicit code to publish or consume services&lt;/li>&lt;li>&lt;strong>Lazy&lt;/strong> — service implementation not loaded until actually requested&lt;/li>&lt;li>&lt;strong>Lifecycle&lt;/strong> — components have activation/deactivation, bounded by bundle lifecycle&lt;/li>&lt;li>&lt;strong>Configuration&lt;/strong> — automatically receive config data from Configuration Admin&lt;/li>&lt;/ul>&lt;p>Two annotation sets exist: &lt;strong>OSGi annotations&lt;/strong> (&lt;code>org.osgi.service.component.annotations&lt;/code>) — use these for all new projects. Felix SCR annotations are legacy only.&lt;/p>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Define an OSGi Component"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// Component (not registered as service) — always active by default&#xa;@Component&#xa;public class MatrixWatcher {&#xa;    // component logic&#xa;}&#xa;&#xa;// Service — registered in service registry, lazy by default&#xa;@Component(service = OracleService.class, immediate = true)&#xa;public class OracleServiceImpl implements OracleService {&#xa;    // component logic&#xa;}"
+                language="java"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="The 'immediate' Flag"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>OSGi Component (only &lt;code>@Component&lt;/code>) is always active by default&lt;/li>&lt;li>OSGi Service (&lt;code>@Component&lt;/code> with service attribute) is &lt;strong>lazy&lt;/strong> by default — started when first requested&lt;/li>&lt;li>Never use &lt;code>immediate=true&lt;/code> for an OSGi Component&lt;/li>&lt;li>Don't use it for services requested by other OSGi services (they'll start on demand)&lt;/li>&lt;li>&lt;strong>Do use&lt;/strong> &lt;code>immediate=true&lt;/code> for services only used by request-bound code (e.g. Sling Models) — otherwise started/stopped per request&lt;/li>&lt;/ul>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Lifecycle: Activate, Deactivate, Modified"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@Component&#xa;public class SentinelComponent {&#xa;&#xa;    @Activate&#xa;    private void activate(ComponentContext context) {&#xa;        // handle startup&#xa;    }&#xa;&#xa;    @Deactivate&#xa;    private void deactivate(ComponentContext context) {&#xa;        // handle shutdown&#xa;    }&#xa;&#xa;    @Modified&#xa;    private void modified(Map&lt;String, Object> config) {&#xa;        // react on config change without restart&#xa;    }&#xa;}&#xa;&#xa;// Lifecycle method arguments (any combination):&#xa;// - No arguments&#xa;// - ComponentContext&#xa;// - BundleContext&#xa;// - Map&lt;String,Object>&#xa;// - Component property type (annotation class)"
+                language="java"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Reading OSGi Configuration (R6 Style)"/>
+            <code-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@Component(service = GatekeeperService.class)&#xa;@Designate(ocd = GatekeeperServiceImpl.Config.class)&#xa;public class GatekeeperServiceImpl implements GatekeeperService {&#xa;&#xa;    @ObjectClassDefinition(name = &quot;Gatekeeper Configuration&quot;)&#xa;    @interface Config {&#xa;        @AttributeDefinition(description = &quot;URL of gate service.&quot;)&#xa;        String entryPointUrl();&#xa;&#xa;        @AttributeDefinition(description = &quot;Timeout in seconds.&quot;)&#xa;        int timeout() default 5;&#xa;    }&#xa;&#xa;    @Activate&#xa;    private void activate(Config config) {&#xa;        String url = config.entryPointUrl();&#xa;        int timeout = config.timeout();&#xa;    }&#xa;}"
+                language="java"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Factory Configurations"/>
+            <code-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// 0..n instances with different configurations each&#xa;@Component(service = SentinelService.class)&#xa;@Designate(ocd = SentinelServiceImpl.Config.class, factory = true)&#xa;public class SentinelServiceImpl implements SentinelService {&#xa;&#xa;    @ObjectClassDefinition(name = &quot;Sentinel Service Factory&quot;)&#xa;    @interface Config {&#xa;        @AttributeDefinition(description = &quot;Sentinel sector name&quot;)&#xa;        String sectorName();&#xa;    }&#xa;&#xa;    @Activate&#xa;    private void activate(Config config) {&#xa;        // Each factory instance has its own config&#xa;    }&#xa;}"
+                language="java"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Component Properties"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Additional OSGi component properties (readable by consumers, not part of OSGi config):&lt;/p>&lt;pre>@Component(service = OracleService.class,&#xa;    property = {&#xa;        &amp;quot;property1=item1&amp;quot;,&#xa;        &amp;quot;property1=item2&amp;quot;,&#xa;        &amp;quot;property2:Integer=12345&amp;quot;&#xa;    })&lt;/pre>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Dependency Injection — Unary References"/>
+            <code-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// Mandatory single reference (default)&#xa;@Reference&#xa;private GatekeeperService gatekeeperService;&#xa;&#xa;// Optional single reference&#xa;@Reference(cardinality = ReferenceCardinality.OPTIONAL)&#xa;private OracleService oracleService;"
+                language="java"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Dependency Injection — Multiple References"/>
+            <code-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// Static multiple reference — component restarts if deps change&#xa;@Reference(cardinality = ReferenceCardinality.MULTIPLE,&#xa;    policy = ReferencePolicy.STATIC,&#xa;    policyOption = ReferencePolicyOption.GREEDY)&#xa;private List&lt;SentinelService> sentinels;&#xa;&#xa;// Dynamic multiple reference — services injected/removed at runtime&#xa;@Reference(cardinality = ReferenceCardinality.MULTIPLE,&#xa;    policy = ReferencePolicy.DYNAMIC,&#xa;    policyOption = ReferencePolicyOption.GREEDY)&#xa;private volatile List&lt;SentinelService> dynamicSentinels;&#xa;&#xa;// Always use volatile for dynamic references!"
+                language="java"/>
+            <slide-headline-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Filter Service References"/>
+            <code-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="// Filter based on service properties using LDAP-like syntax&#xa;@Reference(target = &quot;(sectorName=mainframe)&quot;,&#xa;    cardinality = ReferenceCardinality.MULTIPLE,&#xa;    policy = ReferencePolicy.DYNAMIC)&#xa;private volatile List&lt;SentinelService> mainframeSentinels;&#xa;&#xa;// Filter syntax examples (RFC 1960):&#xa;// (cn=Neo)&#xa;// (!(cn=Smith))&#xa;// (&amp;(objectClass=Agent)(|(sn=Smith)(cn=Agent*)))&#xa;// (sector=sector*)"
+                language="java"/>
+            <slide-headline-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Service and Reference Scope"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>&lt;strong>Service scopes:&lt;/strong>&lt;/p>&lt;ul>&lt;li>&lt;code>SINGLETON&lt;/code> — single instance in OSGi container&lt;/li>&lt;li>&lt;code>BUNDLE&lt;/code> — single instance per using bundle&lt;/li>&lt;li>&lt;code>PROTOTYPE&lt;/code> — new instance for each reference&lt;/li>&lt;/ul>&lt;p>&lt;strong>Reference scopes:&lt;/strong>&lt;/p>&lt;ul>&lt;li>&lt;code>BUNDLE&lt;/code> — single instance for all services in this bundle&lt;/li>&lt;li>&lt;code>PROTOTYPE&lt;/code> — new instance if service supports it, otherwise shared&lt;/li>&lt;li>&lt;code>PROTOTYPE_REQUIRED&lt;/code> — requires PROTOTYPE service scope, fails otherwise&lt;/li>&lt;/ul>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

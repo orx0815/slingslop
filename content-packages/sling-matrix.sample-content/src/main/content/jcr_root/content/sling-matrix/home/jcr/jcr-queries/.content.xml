@@ -1,4 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="JCR Queries"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Query Alternatives in JCR"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>JCR 2.0 provides two query syntaxes:&lt;/p>&lt;ul>&lt;li>&lt;strong>JCR-SQL2&lt;/strong> — &lt;code>SELECT * FROM [nt:unstructured]&lt;/code> (preferred)&lt;/li>&lt;li>&lt;strong>XPath&lt;/strong> — &lt;code>//element(*, nt:unstructured)&lt;/code> (officially deprecated in spec but fully supported by Oak)&lt;/li>&lt;/ul>&lt;p>JCR-SQL (v1) is deprecated — do not use it. Queries can be executed using either Sling or JCR Java API.&lt;/p>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="XPath vs JCR-SQL2"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>XPath is transformed internally to JCR-SQL2&lt;/li>&lt;li>XPath syntax is more compact for simple queries&lt;/li>&lt;li>Some special features only supported by JCR-SQL2&lt;/li>&lt;li>&lt;strong>JCR-SQL2 is preferred&lt;/strong>&lt;/li>&lt;/ul>&lt;p>All queries only return results for nodes for which the current user has at least read permission (ACLs are always enforced).&lt;/p>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Query Examples Overview"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>Find nodes of a given type&lt;/li>&lt;li>Find nodes under a given path&lt;/li>&lt;li>Find pages by property (single, multiple, multi-valued)&lt;/li>&lt;li>Find pages with property not set&lt;/li>&lt;li>Full text search&lt;/li>&lt;li>Filter by date&lt;/li>&lt;li>Ordering results (by path, score, property)&lt;/li>&lt;/ul>&lt;p>&lt;strong>Important:&lt;/strong> Always filter for a primary node type for which an Oak index is defined. Never query without node type (traversal query = inefficient).&lt;/p>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="JCR-SQL2 Query Examples"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="-- Find all pages&#xa;SELECT * FROM [nt:unstructured]&#xa;  WHERE ISDESCENDANTNODE('/content/matrix')&#xa;  AND [sling:resourceType] = 'sling-matrix/pages/contentpage'&#xa;&#xa;-- Find pages by property&#xa;SELECT * FROM [nt:unstructured] AS node&#xa;  WHERE ISDESCENDANTNODE(node, '/content/matrix')&#xa;  AND node.[sling:resourceType] = 'sling-matrix/pages/contentpage'&#xa;  AND node.[jcr:title] IS NOT NULL&#xa;&#xa;-- Find pages with property not set (hideInNav)&#xa;SELECT * FROM [nt:unstructured] AS node&#xa;  WHERE ISDESCENDANTNODE(node, '/content/matrix')&#xa;  AND node.[hideInNav] IS NULL&#xa;&#xa;-- Full text search&#xa;SELECT * FROM [nt:unstructured] AS node&#xa;  WHERE ISDESCENDANTNODE(node, '/content/matrix')&#xa;  AND CONTAINS(node.*, 'matrix')&#xa;&#xa;-- Order by property&#xa;SELECT * FROM [nt:unstructured] AS node&#xa;  WHERE ISDESCENDANTNODE(node, '/content/matrix')&#xa;  ORDER BY node.[jcr:created] DESC"
+                language="sql"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Execute Query via Sling API"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="String queryViaSling(ResourceResolver resolver) {&#xa;    Iterator&lt;Resource> resources = resolver.findResources(&#xa;        &quot;/jcr:root/content/matrix//element(*, nt:unstructured)&quot;&#xa;        + &quot;[sling:resourceType='sling-matrix/pages/contentpage']&quot;,&#xa;        &quot;xpath&quot;);&#xa;&#xa;    StringBuilder output = new StringBuilder();&#xa;    while (resources.hasNext()) {&#xa;        Resource resource = resources.next();&#xa;        output.append(&quot;path=&quot; + resource.getPath() + &quot;n&quot;);&#xa;    }&#xa;    return output.toString();&#xa;}"
+                language="java"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Execute Query via JCR API"/>
+            <code-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="String queryViaJcr(Session session) throws RepositoryException {&#xa;    QueryManager queryManager = session.getWorkspace().getQueryManager();&#xa;&#xa;    Query query = queryManager.createQuery(&#xa;        &quot;SELECT * FROM [nt:unstructured] AS node&quot;&#xa;        + &quot; WHERE ISDESCENDANTNODE(node, '/content/matrix')&quot;&#xa;        + &quot; AND node.[sling:resourceType] = 'sling-matrix/pages/contentpage'&quot;,&#xa;        Query.JCR_SQL2);&#xa;&#xa;    QueryResult result = query.execute();&#xa;    NodeIterator nodes = result.getNodes();&#xa;    StringBuilder output = new StringBuilder();&#xa;    while (nodes.hasNext()) {&#xa;        Node node = nodes.nextNode();&#xa;        output.append(&quot;path=&quot; + node.getPath() + &quot;n&quot;);&#xa;    }&#xa;    return output.toString();&#xa;}"
+                language="java"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Advanced JCR Query Features"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>JCR-SQL2 supports &lt;strong>joins&lt;/strong> similar to RDBMS SQL (but may not be performant on large results)&lt;/li>&lt;li>&lt;strong>Tabular data&lt;/strong> — results as rows/columns instead of nodes (both Sling and JCR API support this)&lt;/li>&lt;li>&lt;strong>Logical operators&lt;/strong> — AND, OR with brackets for complex filtering. Beware: OR may result in multiple query runs.&lt;/li>&lt;li>Advanced operators: LIKE, ISCHILDNODE, ISDESCENDANTNODE, ISSAMENODE, CONTAINS&lt;/li>&lt;/ul>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Escaping Query Parameters"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>To prevent &lt;strong>query injection&lt;/strong> threats, proper escaping is required for paths and strings from unsafe sources (e.g. URL parameters):&lt;/p>&lt;ul>&lt;li>&lt;code>ISO9075.encodePath()&lt;/code> — encode paths (XPath only)&lt;/li>&lt;li>&lt;code>Escape.jcrQueryLiteral()&lt;/code> — escape string values (XPath and JCR-SQL2)&lt;/li>&lt;li>&lt;code>Escape.jcrQueryContainsExpr()&lt;/code> — escape strings in jcr:contains calls&lt;/li>&lt;/ul>&lt;p>Alternatively: use &lt;strong>named parameters&lt;/strong> in JCR-SQL2 with &lt;code>$variableName&lt;/code> syntax and &lt;code>Query.bindValue()&lt;/code> (JCR API only).&lt;/p>"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Oak Indexing"/>
+            <text-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>In Jackrabbit Oak, per default no indexes are defined — they must be explicitly created&lt;/li>&lt;li>Always check in query plan that an Oak index is used, &lt;strong>not&lt;/strong> the &amp;quot;traversal index&amp;quot; (iterating all nodes = very slow)&lt;/li>&lt;li>Most trivial queries use one of the default indexes&lt;/li>&lt;li>Sometimes tweaking the query slightly can make use of a predefined index&lt;/li>&lt;li>Otherwise create your own index for your use case&lt;/li>&lt;/ul>"/>
+            <slide-headline-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Debugging Queries"/>
+            <text-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Set DEBUG logging levels for:&lt;/p>&lt;ul>&lt;li>&lt;code>org.apache.jackrabbit.oak.query&lt;/code>&lt;/li>&lt;li>&lt;code>org.apache.jackrabbit.oak.plugins.index&lt;/code>&lt;/li>&lt;/ul>&lt;p>Testing tools: CRX DE Lite (Tools → Query), Groovy Console, Query Performance Dashboard.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

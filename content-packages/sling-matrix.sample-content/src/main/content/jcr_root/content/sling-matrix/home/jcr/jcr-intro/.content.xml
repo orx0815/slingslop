@@ -1,4 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="JCR Introduction"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What is a JCR?"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>JCR (Java Content Repository) is a standardized API for accessing content repositories. Specifications:&lt;/p>&lt;ul>&lt;li>&lt;strong>JCR 1.0&lt;/strong> — JSR-170 (2004)&lt;/li>&lt;li>&lt;strong>JCR 2.0&lt;/strong> — JSR-283 (2009)&lt;/li>&lt;/ul>&lt;p>The implementation used in Sling is &lt;strong>Apache Jackrabbit Oak&lt;/strong>.&lt;/p>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What Is Content?"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>&lt;strong>Functional data:&lt;/strong> application domain-specific content — articles, blog posts, comments, assets&lt;/li>&lt;li>&lt;strong>Structured data:&lt;/strong> address records, spreadsheet-like data&lt;/li>&lt;li>&lt;strong>Unstructured data:&lt;/strong> PDFs, Word Docs, XML, CSVs&lt;/li>&lt;li>&lt;strong>Other:&lt;/strong> workflow definitions, ACLs, code&lt;/li>&lt;/ul>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Hierarchical Structure"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>JCR uses a hierarchical content model:&lt;/p>&lt;ol>&lt;li>&lt;strong>Repository&lt;/strong> — top-level container&lt;/li>&lt;li>&lt;strong>Workspace&lt;/strong> — logical partition (default: &amp;quot;crx.default&amp;quot;, typically only one used)&lt;/li>&lt;li>&lt;strong>Node&lt;/strong> — hierarchical tree structure (like folders and files)&lt;/li>&lt;li>&lt;strong>Property&lt;/strong> — holds data on a node&lt;/li>&lt;li>&lt;strong>Session&lt;/strong> — opened/closed per request. Should be short-lived, never shared across threads.&lt;/li>&lt;/ol>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="JCR Node"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Every node has a &lt;strong>Primary Nodetype&lt;/strong> which defines mandatory/optional properties, data types, and subnodes:&lt;/p>&lt;ul>&lt;li>&lt;code>nt:unstructured&lt;/code> — free data structure, no constraints (default)&lt;/li>&lt;li>&lt;code>nt:folder&lt;/code> — comparable to file system folder&lt;/li>&lt;li>&lt;code>nt:file&lt;/code> + &lt;code>nt:resource&lt;/code> — files/binary data&lt;/li>&lt;/ul>&lt;p>Additionally, a node can have any number of &lt;strong>Mixins&lt;/strong> (e.g. &lt;code>mix:title&lt;/code>, &lt;code>mix:referenceable&lt;/code>).&lt;/p>"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="JCR Property"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Properties hold the data of nodes. Supported data types:&lt;/p>&lt;ul>&lt;li>STRING, LONG, DOUBLE, DECIMAL, BOOLEAN, DATE, BINARY, REFERENCE&lt;/li>&lt;li>All types support multi-valued variants (arrays): STRING[], LONG[], etc.&lt;/li>&lt;/ul>"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="When to Use Nodetype Restrictions"/>
+            <text-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>&lt;strong>Rule of thumb: don't use it.&lt;/strong> &amp;quot;Content first, structure later, maybe.&amp;quot;&lt;/p>&lt;ul>&lt;li>Exception: Use built-in JCR node types where appropriate (especially for files)&lt;/li>&lt;li>For technical reasons, querying by nodetype is very efficient&lt;/li>&lt;li>Often existing nodetypes are sufficient&lt;/li>&lt;/ul>"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Important Built-in Nodetypes"/>
+            <text-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>&lt;strong>JCR:&lt;/strong>&lt;/p>&lt;ul>&lt;li>&lt;code>nt:base&lt;/code> — base type for all primary node types&lt;/li>&lt;li>&lt;code>nt:unstructured&lt;/code> — most flexible, no constraints&lt;/li>&lt;li>&lt;code>nt:folder&lt;/code> — represents folders&lt;/li>&lt;li>&lt;code>nt:file&lt;/code> — represents files (requires &lt;code>jcr:content&lt;/code> child)&lt;/li>&lt;li>&lt;code>nt:resource&lt;/code> — holds binary data (requires &lt;code>jcr:data&lt;/code>)&lt;/li>&lt;/ul>&lt;p>&lt;strong>Sling:&lt;/strong>&lt;/p>&lt;ul>&lt;li>&lt;code>sling:OrderedFolder&lt;/code> — default for folder structures&lt;/li>&lt;li>&lt;code>sling:OsgiConfig&lt;/code> — OSGi config stored in repository&lt;/li>&lt;li>&lt;code>sling:Mapping&lt;/code> — URL mappings&lt;/li>&lt;/ul>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="JCR API Overview"/>
+            <text-block-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Main package: &lt;code>javax.jcr&lt;/code>. The API defines different support levels:&lt;/p>&lt;ul>&lt;li>&lt;strong>Level 1&lt;/strong> — read access, export&lt;/li>&lt;li>&lt;strong>Level 2&lt;/strong> — write access, import&lt;/li>&lt;li>&lt;strong>Advanced&lt;/strong> — observation, locking, versioning, access control&lt;/li>&lt;/ul>&lt;p>Jackrabbit Oak supports all levels/all features.&lt;/p>&lt;p>&lt;em>Note: The API is a bit outdated (designed 2002) — makes heavy use of checked exceptions and is cumbersome compared to modern Java.&lt;/em>&lt;/p>"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="When to Use the JCR API"/>
+            <text-block-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>&lt;strong>Rule of thumb: don't use it.&lt;/strong> All normal read/write operations should use the Sling Resource API.&lt;/p>&lt;p>Use JCR API only for features not supported by Sling:&lt;/p>&lt;ul>&lt;li>Versioning and locking nodes&lt;/li>&lt;li>Managing security and ACLs&lt;/li>&lt;li>Observation use cases not supported by Sling eventing&lt;/li>&lt;li>Copy or move whole subtrees&lt;/li>&lt;li>Queries with special features like limiting&lt;/li>&lt;/ul>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

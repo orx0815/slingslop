@@ -1,4 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
     jcr:primaryType="sling:Folder"
-    sling:resourceType="sling-matrix/pages/page"/>
+    sling:resourceType="sling-matrix/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="OSGi Introduction"
+        sling:resourceType="sling-matrix/pages/contentpage">
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="sling-matrix/components/parsys"
+            allowedComponents="[code-block,feature-image,slide-headline,text-block]">
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Why OSGi? — Modularity Manages Complexity"/>
+            <text-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>The most difficult challenge in large software projects is &lt;strong>complexity&lt;/strong>. The only approach is to break things down into smaller, more understandable modules.&lt;/p>&lt;p>Modularity enables:&lt;/p>&lt;ul>&lt;li>&lt;strong>Division of Labor&lt;/strong> — separate individuals/groups work on separate modules&lt;/li>&lt;li>&lt;strong>Abstraction&lt;/strong> — think about the system as a whole without knowing every part&lt;/li>&lt;li>&lt;strong>Reuse&lt;/strong> — use modules with minimal alterations in other projects&lt;/li>&lt;li>&lt;strong>Ease of Maintenance&lt;/strong> — remove and replace failed modules without affecting the rest&lt;/li>&lt;/ul>"/>
+            <slide-headline-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What Should a Module Look Like?"/>
+            <text-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>&lt;strong>Self-Contained&lt;/strong> — can be moved, installed, uninstalled as a single unit&lt;/li>&lt;li>&lt;strong>Highly Cohesive&lt;/strong> — sticks to one logical purpose and fulfils it well&lt;/li>&lt;li>&lt;strong>Loosely Coupled&lt;/strong> — not concerned with internal implementation of other modules&lt;/li>&lt;/ul>&lt;p>To support all three: modules must have a &lt;strong>well-defined interface&lt;/strong> that enforces logical boundaries and prevents access to internals.&lt;/p>"/>
+            <slide-headline-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Module Systems in Java"/>
+            <text-block-3
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>&lt;strong>JAR Files&lt;/strong> — very poor modularity (no version concept, no information hiding, no dependency management, &amp;quot;classpath hell&amp;quot;)&lt;/li>&lt;li>&lt;strong>Java Platform Module System (JPMS)&lt;/strong> — arrived in Java 9 (2017), only solves parts of what OSGi targets&lt;/li>&lt;li>&lt;strong>OSGi&lt;/strong> — a standard defined by an Alliance of ~40 companies. Freely available specifications, used in many big applications for years, excellent tool support.&lt;/li>&lt;/ul>"/>
+            <slide-headline-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What is OSGi?"/>
+            <text-block-4
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>OSGi is the services-based runtime technology providing the basis for modularized Java development:&lt;/p>&lt;ul>&lt;li>Highly dynamic class loading and execution environment for &lt;strong>bundles&lt;/strong>&lt;/li>&lt;li>Full control over visibility and lifecycle of services exposed by bundles&lt;/li>&lt;li>A &lt;strong>service registry&lt;/strong> provides a cooperation model taking lifecycle dynamics and version requirements into account&lt;/li>&lt;li>Lightweight, highly dynamic — allows hot-deployment without restarting the server&lt;/li>&lt;/ul>"/>
+            <slide-headline-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="OSGi Terms"/>
+            <text-block-5
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>&lt;strong>Bundle&lt;/strong> — the module in OSGi. JAR files with extra metadata.&lt;/li>&lt;li>&lt;strong>Package&lt;/strong> — a Java package. OSGi decides per-package if exported (accessible from other bundles) or private.&lt;/li>&lt;li>&lt;strong>Service&lt;/strong> — an object registered in the service registry, looked up by interface name(s).&lt;/li>&lt;li>&lt;strong>Component&lt;/strong> — an object whose lifecycle is managed by OSGi. May bind/consume other services.&lt;/li>&lt;li>&lt;strong>Lifecycle&lt;/strong> — components can be started, stopped, listen to configuration changes. Bundles have their own lifecycle too.&lt;/li>&lt;/ul>"/>
+            <slide-headline-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Bundles and Lifecycle"/>
+            <text-block-6
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Bundles contain compiled Java code, scripts, content, and configuration. They can be loaded/installed during normal operations. One Maven project is usually one bundle.&lt;/p>&lt;p>&lt;strong>Bundle lifecycle states:&lt;/strong> INSTALLED → RESOLVED → STARTING → &lt;strong>ACTIVE&lt;/strong> → STOPPING → UNINSTALLED. Everything is OK when the bundle is &lt;em>active&lt;/em>!&lt;/p>"/>
+            <slide-headline-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="OSGi Versions and Semantic Versioning"/>
+            <text-block-7
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Each bundle and exported package has a version. OSGi has Semantic Versioning built-in:&lt;/p>&lt;ul>&lt;li>&lt;strong>Major&lt;/strong> — incompatible changes&lt;/li>&lt;li>&lt;strong>Minor&lt;/strong> — backwards compatible, new/updated features&lt;/li>&lt;li>&lt;strong>Micro&lt;/strong> — backwards compatible, usually only bugfixes&lt;/li>&lt;li>&lt;strong>Qualifier&lt;/strong> — optional fourth part (timestamp, build number). Comparison is alphanumeric.&lt;/li>&lt;/ul>&lt;p>When a bundle cannot be activated due to missing dependencies, it's always the &lt;em>package version&lt;/em> that is relevant, not the bundle version.&lt;/p>"/>
+            <slide-headline-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Hiding Implementation Details"/>
+            <text-block-8
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Only Java packages intended for use by other bundles should be exported. All others stay private.&lt;/p>&lt;ul>&lt;li>&lt;strong>bnd-maven-plugin&lt;/strong> (new projects): exports only packages with &lt;code>package-info.java&lt;/code> and &lt;code>@Version&lt;/code> or &lt;code>@Exported&lt;/code> annotation&lt;/li>&lt;li>&lt;strong>maven-bundle-plugin&lt;/strong> (legacy): exports all packages by default (except those with &amp;quot;impl&amp;quot; or &amp;quot;internal&amp;quot; in name)&lt;/li>&lt;/ul>"/>
+            <slide-headline-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Declarative Services — Define a Service"/>
+            <code-block-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@Component(service = OracleService.class, immediate = true)&#xa;public class OracleServiceImpl implements OracleService {&#xa;&#xa;    @Reference&#xa;    private GatekeeperService gatekeeperService;&#xa;&#xa;    @Activate&#xa;    protected void activate(Map&lt;String, Object> config) {&#xa;        // start service...&#xa;    }&#xa;&#xa;    @Override&#xa;    public void predictFuture() {&#xa;        // service logic&#xa;    }&#xa;}"
+                language="java"/>
+            <slide-headline-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Read Configuration"/>
+            <code-block-2
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/code-block"
+                code="@ObjectClassDefinition(name = &quot;Matrix System Configuration&quot;)&#xa;@interface OracleConfig {&#xa;    @AttributeDefinition(description = &quot;URL of prediction service&quot;)&#xa;    String entryPointUrl();&#xa;&#xa;    @AttributeDefinition(description = &quot;Default usage role.&quot;)&#xa;    String role() default &quot;public&quot;;&#xa;&#xa;    @AttributeDefinition(description = &quot;Set timeout in sec.&quot;)&#xa;    int timeout() default 5;&#xa;}&#xa;&#xa;@Component(service = OracleService.class, immediate = true)&#xa;@Designate(ocd = OracleConfig.class)&#xa;public class OracleServiceImpl implements OracleService {&#xa;&#xa;    @Activate&#xa;    protected void activate(OracleConfig config) {&#xa;        String url = config.entryPointUrl();&#xa;    }&#xa;}"
+                language="java"/>
+            <slide-headline-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="The Whiteboard Pattern"/>
+            <text-block-9
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>A replacement for Listener/Observer that fits the dynamic OSGi world. Uses the service registry as &amp;quot;whiteboard&amp;quot; to decouple listeners from sources.&lt;/p>&lt;p>Examples:&lt;/p>&lt;ul>&lt;li>OSGi eventing (sending events across bundles)&lt;/li>&lt;li>HTTP Whiteboard (register Servlets/Filters)&lt;/li>&lt;li>Register scheduled tasks and job executors in Sling&lt;/li>&lt;/ul>"/>
+            <slide-headline-12
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Maven Plugins for OSGi Bundles"/>
+            <text-block-10
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>The &lt;strong>bnd tool&lt;/strong> scans all classes to identify referenced packages and creates import/export statements. Maven plugin wrappers:&lt;/p>&lt;ul>&lt;li>&lt;strong>bnd-maven-plugin&lt;/strong> — recommended for all new projects. Released together with new bnd releases.&lt;/li>&lt;li>&lt;strong>maven-bundle-plugin&lt;/strong> — the de-facto standard for years, still usable for existing projects but no longer actively maintained.&lt;/li>&lt;/ul>"/>
+            <slide-headline-13
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Pitfalls of OSGi"/>
+            <text-block-11
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;ul>&lt;li>&lt;strong>Non-OSGi libraries:&lt;/strong> Many open-source projects now offer OSGi bundles. Those that don't can be repackaged using wrapper Maven projects.&lt;/li>&lt;li>&lt;strong>Classloading problems:&lt;/strong> Libraries using Thread Context Classloader (TCCL) or classpath scanning are difficult in OSGi. Workaround: temporarily reassign the thread context classloader.&lt;/li>&lt;li>&lt;strong>Profilers/Coverage tools:&lt;/strong> Need boot delegation configuration to work, e.g. &lt;code>org.osgi.framework.bootdelegation=com.jprofiler.*&lt;/code>&lt;/li>&lt;/ul>"/>
+        </main>
+    </jcr:content>
+</jcr:root>
