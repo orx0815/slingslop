@@ -25,6 +25,9 @@ nodes:
     variant: apache
   - role: slingslop-runtime
     variant: composite-nodestore
+    config:
+      httpVirtualThreads: true
+      httpThreadpoolMax: 200
 
 tenants:
 

@@ -57,6 +57,15 @@ files:
   validators:
   - json
 
+# Felix HTTP (Jetty 12) JVM -D options, rendered from the node's httpVirtualThreads
+# / httpThreadpoolMax params. Consumed by BOTH launcher/launch.sh (local dev) and
+# the Ansible slingslop role (appended to the container's EXTRA_JAVA_OPTS), so this
+# environment file is the single GitOps source of truth. Empty = defaults.
+- file: http-java-opts
+  dir: env
+  template: http-java-opts.hbs
+  validators: []
+
 config:
   # Maven coordinates of the generated /etc/map FileVault package, referenced by
   # the feature aggregate and installed next to slingslop.complete.
@@ -67,3 +76,12 @@ config:
   # ${...} is a Feature Model launch-time variable, escaped so CONGA emits it
   # literally rather than trying to resolve it.
   completePackageId: "org.motorbrot/slingslop.complete/\\${slingslop.launcher.version}/zip"
+
+  # Felix HTTP (Jetty 12) request thread model, surfaced into EXTRA_JAVA_OPTS.
+  # true = one virtual thread per request (JDK 21+; repo runs 25); false = the
+  # classic bounded platform-thread pool. Same -D property used by the
+  # container/Ansible path.
+  httpVirtualThreads: false
+  # Optional cap for the Jetty request thread pool (bounds the virtual-thread
+  # pool when enabled). Empty = Felix/Jetty default (unlimited).
+  httpThreadpoolMax: ""

@@ -11,6 +11,10 @@ nodes:
   roles:
   - role: slingslop-runtime
     variant: segment
+    # Local JVM tuning; rendered to env/http-java-opts, read by launcher/launch.sh.
+    config:
+      httpVirtualThreads: true
+      httpThreadpoolMax: 200
 
 tenants:
 

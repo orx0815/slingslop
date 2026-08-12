@@ -1,4 +1,11 @@
 ---
+- name: Assemble Sling JVM options (heap + run modes + CONGA-rendered Felix HTTP opts)
+  ansible.builtin.set_fact:
+    slingslop_extra_java_opts: >-
+      -Xmx{{ slingslop_java_heap_max }}
+      -Dsling.run.modes=oak_tar,prod
+      {{ lookup('file', conga_config_dir + '/env/http-java-opts', errors='ignore') | default('', true) | trim }}
+
 - name: Render slingslop env file
   ansible.builtin.copy:
     dest: "{{ slingslop_secrets_dir }}/slingslop.env"
@@ -7,7 +14,7 @@
     mode: "0600"
     content: |
       # Managed by Ansible
-      EXTRA_JAVA_OPTS=-Xmx{{ slingslop_java_heap_max }} -Dsling.run.modes=oak_tar,prod
+      EXTRA_JAVA_OPTS={{ slingslop_extra_java_opts | trim }}
 
 - name: Render app compose file
   ansible.builtin.template:
