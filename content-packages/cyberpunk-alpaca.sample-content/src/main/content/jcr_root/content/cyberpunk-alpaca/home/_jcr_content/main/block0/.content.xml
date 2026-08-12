@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="cyberpunk-alpaca/components/text-block"
+    headline="Dispatches from the Neon Frontier"
+    text="&lt;p&gt;The alpaca arrived at the terminal at 03:47 local time, fibre still damp from the acid rain, a data-chip wedged between its third and fourth neck vertebrae. Nobody questioned it. In this city, stranger things queue for the midnight tram.&lt;/p&gt;&lt;p&gt;It had seen the inside of fourteen server farms and outlasted two hostile takeovers. Its fleece held proprietary encryption keys nobody had managed to shear off yet — not for lack of trying.&lt;/p&gt;"/>
