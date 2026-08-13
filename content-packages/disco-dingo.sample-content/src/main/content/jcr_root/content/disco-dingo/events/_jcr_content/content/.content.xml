@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/parsys">
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="What's On"
+        headline="Upcoming Nights at Disco Dingo"
+        text="&lt;p&gt;From themed roller-discos to guest DJ residencies flown in straight from the height of the disco revival, there&amp;#8217;s a reason to put your dancing shoes on nearly every night of the week. Grab a ticket, round up your crew, and we&amp;#8217;ll see you on the floor.&lt;/p&gt;"/>
+    <event1
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/event-card"
+        dateDay="Fri"
+        dateNumber="12"
+        badge="🔥 Selling Fast"
+        title="Neon Nights: Guest DJ Starlight Sequin"
+        description="A three-hour set of classic disco and nu-disco imports, with a neon face-paint station on arrival and a confetti drop at midnight."/>
+    <event2
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/event-card"
+        dateDay="Sat"
+        dateNumber="13"
+        badge="✨ Fan Favourite"
+        title="Studio Dingo: A Tribute to the Golden Age"
+        description="Disco Dingo&amp;#8217;s own tribute night to the legendary clubs of the late seventies — velvet ropes optional, glitter mandatory."/>
+    <event3
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/event-card"
+        dateDay="Sun"
+        dateNumber="14"
+        badge=""
+        title="Family Roller-Disco Matinee"
+        description="An afternoon session for all ages — skates available for hire, family-friendly playlist, and the mirror ball turned down to a gentler shimmer."/>
+    <event4
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/event-card"
+        dateDay="Thu"
+        dateNumber="18"
+        badge=""
+        title="Motown &amp; Soul Thursdays"
+        description="A weekly midweek reset with the deepest soul and Motown cuts in the crate, hosted by our longest-serving resident DJ, Marvin Mirrorball."/>
+    <event5
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/event-card"
+        dateDay="Fri"
+        dateNumber="19"
+        badge="🎟️ Ticketed"
+        title="The Boogie Wonderland Ball"
+        description="Our biggest party of the season — full costume encouraged, live horn section for the first hour, and a mirror ball the size of a small car."/>
+</jcr:root>

@@ -1,0 +1,106 @@
+/*
+ * 05-hero.css — CSS-only disco-ball hero treatment
+ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--space-7);
+  isolation: isolate;
+  text-align: center;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10%;
+  background: var(--gradient-floor);
+  z-index: -2;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+      circle at 12% 20%,
+      color-mix(in oklch, var(--color-secondary) 70%, transparent) 0%,
+      transparent 1.4%
+    ),
+    radial-gradient(circle at 85% 15%, color-mix(in oklch, var(--color-accent) 70%, transparent) 0%, transparent 1.2%),
+    radial-gradient(
+      circle at 70% 70%,
+      color-mix(in oklch, var(--color-secondary) 70%, transparent) 0%,
+      transparent 1%
+    ),
+    radial-gradient(circle at 25% 80%, color-mix(in oklch, var(--color-primary) 70%, transparent) 0%, transparent 1.3%),
+    radial-gradient(circle at 45% 40%, color-mix(in oklch, var(--color-accent) 70%, transparent) 0%, transparent 0.9%),
+    radial-gradient(
+      circle at 92% 55%,
+      color-mix(in oklch, var(--color-secondary) 70%, transparent) 0%,
+      transparent 1.1%
+    );
+  opacity: 0.9;
+  z-index: -1;
+}
+
+.hero-ball {
+  width: clamp(4rem, 10vw, 7rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  margin-bottom: var(--space-4);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, oklch(100% 0 0 / 0.9) 0%, transparent 30%),
+    conic-gradient(
+      from 0deg,
+      var(--color-secondary) 0deg 20deg,
+      var(--color-bg-elevated) 20deg 40deg,
+      var(--color-secondary) 40deg 60deg,
+      var(--color-bg-elevated) 60deg 80deg,
+      var(--color-secondary) 80deg 100deg,
+      var(--color-bg-elevated) 100deg 120deg,
+      var(--color-secondary) 120deg 140deg,
+      var(--color-bg-elevated) 140deg 160deg,
+      var(--color-secondary) 160deg 180deg,
+      var(--color-bg-elevated) 180deg 200deg,
+      var(--color-secondary) 200deg 220deg,
+      var(--color-bg-elevated) 220deg 240deg,
+      var(--color-secondary) 240deg 260deg,
+      var(--color-bg-elevated) 260deg 280deg,
+      var(--color-secondary) 280deg 300deg,
+      var(--color-bg-elevated) 300deg 320deg,
+      var(--color-secondary) 320deg 340deg,
+      var(--color-bg-elevated) 340deg 360deg
+    );
+  box-shadow:
+    0 0 40px var(--color-secondary-glow),
+    0 10px 30px oklch(0% 0 0 / 0.5);
+  animation: disco-spin 12s linear infinite;
+}
+
+.hero-title {
+  font-size: var(--step-4);
+  margin-bottom: var(--space-3);
+}
+
+.hero-title .gradient-text {
+  display: block;
+}
+
+.hero-lede {
+  margin-inline: auto;
+  margin-bottom: var(--space-5);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-block: var(--space-6);
+  }
+}

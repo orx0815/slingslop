@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/footer"
+    blurb="A neighbourhood disco with a mirror ball, a mascot, and a very serious playlist."
+    copyright="© 2026 Disco Dingo"
+    link1Text="Visit Us"
+    link1Href="/content/disco-dingo/about.html"
+    link2Text="Upcoming Nights"
+    link2Href="/content/disco-dingo/events.html"
+    link3Text="Photo Gallery"
+    link3Href="/content/disco-dingo/gallery.html"
+    link4Text="Style Guide"
+    link4Href="/content/disco-dingo/styleguide.html"/>
