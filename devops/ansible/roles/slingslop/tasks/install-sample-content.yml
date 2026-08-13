@@ -6,6 +6,14 @@
 # /content/... root, so user content on other roots (e.g. the content-only
 # 'zen' tenant) is untouched. Runs AFTER the readiness gate.
 
+- name: Load sample-content install allow-list (CONGA env/sample-content; empty = all)
+  # Comma-separated token list rendered per node from the slingslop-runtime
+  # `sampleContent` param. Empty/absent → install every staged package.
+  ansible.builtin.set_fact:
+    slingslop_sample_content_include: >-
+      {{ lookup('file', conga_config_dir + '/env/sample-content', errors='ignore')
+         | default('', true) | trim }}
+
 - name: Install demo sample-content into the running Sling (always overwritten)
   # Pass the password inline, single-quoted, in a `shell` task (same pattern as
   # install-mappings.yml). `command` arg-splitting mangles a password with spaces,
@@ -23,6 +31,7 @@
       -e SLING_URL=http://127.0.0.1:8080
       -e SLING_USER=admin
       -e SLING_PASSWORD='{{ vault_sling_admin_password }}'
+      -e SAMPLE_CONTENT_INCLUDE='{{ slingslop_sample_content_include }}'
       slingslop bash /opt/sling/bin/install-sample-content.sh
   register: sample_content_install
   changed_when: true

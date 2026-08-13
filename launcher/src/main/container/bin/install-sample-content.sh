@@ -10,6 +10,8 @@
 #   SLING_USER          default admin
 #   SLING_PASSWORD      default admin
 #   SAMPLE_CONTENT_DIR  default /opt/sling/sample-content (dir of *.zip packages)
+#   SAMPLE_CONTENT_INCLUDE  comma-separated tokens; install only *.zip whose name
+#                       contains one of them. Empty (default) = install all.
 #   READY_TIMEOUT       seconds to wait for the Composum package manager  default 180
 set -eu
 
@@ -17,6 +19,7 @@ SLING_URL="${SLING_URL:-http://localhost:8080}"
 SLING_USER="${SLING_USER:-admin}"
 SLING_PASSWORD="${SLING_PASSWORD:-admin}"
 SAMPLE_CONTENT_DIR="${SAMPLE_CONTENT_DIR:-/opt/sling/sample-content}"
+SAMPLE_CONTENT_INCLUDE="${SAMPLE_CONTENT_INCLUDE:-}"
 READY_TIMEOUT="${READY_TIMEOUT:-180}"
 
 AUTH="${SLING_USER}:${SLING_PASSWORD}"
@@ -25,6 +28,19 @@ if [ ! -d "${SAMPLE_CONTENT_DIR}" ]; then
   echo "[sample-content] ${SAMPLE_CONTENT_DIR} not found, nothing to install"
   exit 0
 fi
+
+# When SAMPLE_CONTENT_INCLUDE is a non-empty comma-separated token list, a package
+# is installed only if its filename contains one of the tokens; empty = install all.
+included() {
+  base="$1"
+  [ -z "${SAMPLE_CONTENT_INCLUDE}" ] && return 0
+  oldifs=$IFS; IFS=,
+  for tok in ${SAMPLE_CONTENT_INCLUDE}; do
+    [ -z "${tok}" ] && continue
+    case "${base}" in *"${tok}"*) IFS=$oldifs; return 0 ;; esac
+  done
+  IFS=$oldifs; return 1
+}
 
 # Wait for Composum's package manager itself to be ready — the operation we need,
 # not just /starter.html (which goes 200 well before the package-manager servlet
@@ -91,7 +107,12 @@ found=0
 for zip in "${SAMPLE_CONTENT_DIR}"/*.zip; do
   [ -e "${zip}" ] || break
   found=1
-  echo "[sample-content] installing $(basename "${zip}")"
+  base=$(basename "${zip}")
+  if ! included "${base}"; then
+    echo "[sample-content] skipping ${base} (not in SAMPLE_CONTENT_INCLUDE)"
+    continue
+  fi
+  echo "[sample-content] installing ${base}"
 
   P=$(upload_pkg "${zip}") || { rc=1; continue; }
   if [ -z "${P}" ]; then

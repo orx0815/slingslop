@@ -28,6 +28,9 @@ nodes:
     config:
       httpVirtualThreads: true
       httpThreadpoolMax: 200
+      # Restrict which staged sample-content packages are (re)installed each deploy
+      # (substring match on the *.zip names). Unset/empty = install all (default).
+      # sampleContent: [zengarden, sling-matrix, digitalmedia]
 
 tenants:
 

@@ -66,6 +66,16 @@ files:
   template: http-java-opts.hbs
   validators: []
 
+# Sample-content install allow-list, rendered from the node's sampleContent param.
+# Consumed by the Ansible slingslop role's install-sample-content task (passed to
+# install-sample-content.sh as SAMPLE_CONTENT_INCLUDE). Empty file = install every
+# staged package (historical behaviour); a comma-separated token list restricts
+# the (re)install to matching *.zip names, so ops need not always install all.
+- file: sample-content
+  dir: env
+  template: sample-content.hbs
+  validators: []
+
 config:
   # Maven coordinates of the generated /etc/map FileVault package, referenced by
   # the feature aggregate and installed next to slingslop.complete.
@@ -85,3 +95,12 @@ config:
   # Optional cap for the Jetty request thread pool (bounds the virtual-thread
   # pool when enabled). Empty = Felix/Jetty default (unlimited).
   httpThreadpoolMax: ""
+
+  # Which staged sample-content packages to (re)install into the running instance
+  # on each deploy (see the slingslop role's install-sample-content task). Each
+  # entry is matched as a substring against the *.zip filenames baked into the
+  # image at /opt/sling/sample-content (e.g. 'sling-matrix' matches
+  # slingslop.sling-matrix.sample-content.zip). Empty (default) installs ALL of
+  # them — the historical behaviour — so ops opts IN to a subset, never silently
+  # loses content. The image always bakes the full set; this only gates install.
+  sampleContent: []
