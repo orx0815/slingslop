@@ -1,0 +1,16 @@
+<div class="card event-card"
+     data-sly-use.auth="org.discodingo.discodingo.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="event-date">
+    <small>${properties.dateDay}</small>${properties.dateNumber}
+  </div>
+  <div class="event-details">
+    <span class="badge" data-sly-test="${properties.badge}">${properties.badge}</span>
+    <h3>${properties.title}</h3>
+    <p class="text-muted">${properties.description}</p>
+  </div>
+</div>

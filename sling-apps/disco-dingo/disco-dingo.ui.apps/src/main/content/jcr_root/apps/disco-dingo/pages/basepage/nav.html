@@ -1,0 +1,15 @@
+<header class="site-header">
+  <div class="wrapper nav-bar">
+    <a class="nav-brand" href="/content/disco-dingo/home.html">
+      <span class="nav-brand-mark" aria-hidden="true">🪩</span>
+      Disco Dingo
+    </a>
+    <button type="button" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <nav class="nav-menu" aria-label="Primary">
+      <sly data-sly-use.nav="org.discodingo.discodingo.slingmodels.SiteNavigation"
+           data-sly-list.item="${nav.items}">
+        <a href="${item.href}">${item.title}</a>
+      </sly>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <sly data-sly-include="${'head.html'}"/>
+</head>
+<body>
+  <div id="editor-modal-container"></div>
+
+  <sly data-sly-include="${'nav.html'}" />
+
+  <main id="main-content">
+
+    <section class="section hero" style="padding-block: var(--space-6);">
+      <div class="wrapper">
+        <span class="eyebrow">Disco Dingo</span>
+        <h1 class="gradient-text">Living Style Guide</h1>
+        <p class="lede" style="margin-inline:auto;">
+          Every colour, type size and component on this page is generated from
+          two OKLCH hues. Change <code>--hue-primary</code> and
+          <code>--hue-secondary</code> in <code>00-variables.css</code> to
+          re-theme the whole site.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section--light text-on-light">
+      <div class="wrapper stack stack--lg">
+        <h2>Colour System</h2>
+        <div class="styleguide-swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--color-primary);"></div>
+            <div class="swatch-label">Primary<code>--color-primary</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--color-secondary);"></div>
+            <div class="swatch-label">Secondary<code>--color-secondary</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--color-accent);"></div>
+            <div class="swatch-label">Accent<code>--color-accent</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--color-bg);"></div>
+            <div class="swatch-label">Background<code>--color-bg</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--color-bg-card);"></div>
+            <div class="swatch-label">Card<code>--color-bg-card</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:var(--gradient-disco);"></div>
+            <div class="swatch-label">Gradient<code>--gradient-disco</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrapper stack stack--lg">
+        <h2>Typography</h2>
+        <div class="type-sample"><span class="type-label">H1</span><h1 style="margin:0;">Dance Floor</h1></div>
+        <div class="type-sample"><span class="type-label">H2</span><h2 style="margin:0;">Dance Floor</h2></div>
+        <div class="type-sample"><span class="type-label">H3</span><h3 style="margin:0;">Dance Floor</h3></div>
+        <div class="type-sample"><span class="type-label">H4</span><h4 style="margin:0;">Dance Floor</h4></div>
+        <div class="type-sample"><span class="type-label">Body</span><p style="margin:0;">The body copy font is used for paragraphs, captions and general reading text across Disco Dingo.</p></div>
+        <div class="type-sample"><span class="type-label">Eyebrow</span><span class="eyebrow">Eyebrow Label</span></div>
+      </div>
+    </section>
+
+    <section class="section section--light text-on-light">
+      <div class="wrapper stack stack--lg">
+        <h2>Buttons &amp; Badges</h2>
+        <div class="styleguide-row">
+          <a class="btn btn--primary" href="#">Get on the list</a>
+          <a class="btn btn--ghost" href="#">Learn more</a>
+          <span class="badge">✨ New Night</span>
+          <span class="badge">🔥 Sold Out</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrapper stack stack--lg">
+        <h2>Cards &amp; Events</h2>
+        <div class="grid grid--3">
+          <div class="card">
+            <h3>Sample Card</h3>
+            <p class="text-muted">Cards pick up a coloured glow and lift on hover — try it with your mouse.</p>
+          </div>
+          <div class="card event-card">
+            <div class="event-date"><small>Sat</small>27</div>
+            <div class="event-details">
+              <h3>Neon Nights</h3>
+              <p class="text-muted">Doors at 9pm — DJ Dingo spinning all night.</p>
+            </div>
+          </div>
+          <div class="card">
+            <blockquote>“Disco Dingo turned my Tuesday into a Saturday.”</blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <sly data-sly-include="${'footer.html'}" />
+
+</body>
+</html>

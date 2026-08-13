@@ -36,6 +36,7 @@
     <starter.min.bundles.count>233</starter.min.bundles.count>
     <starter.check.paths>
       /content/slingslop/zengarden/home.html,
+      /content/disco-dingo/home.html,
       /content/sling-matrix/home.html,
       /content/motorbrot/dma/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
@@ -330,6 +331,12 @@
                 <artifactItem>
                   <groupId>org.motorbrot</groupId>
                   <artifactId>slingslop.zengarden.sample-content</artifactId>
+                  <version>${slingslop.launcher.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.motorbrot</groupId>
+                  <artifactId>disco-dingo.sample-content</artifactId>
                   <version>${slingslop.launcher.version}</version>
                   <type>zip</type>
                 </artifactItem>

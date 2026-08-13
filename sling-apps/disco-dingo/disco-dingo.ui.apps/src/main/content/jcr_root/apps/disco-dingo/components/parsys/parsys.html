@@ -1,0 +1,6 @@
+<!--/* Renders every child resource of this container node in document order.
+       Sample-content pages add children under ./content/<name> with their own
+       sling:resourceType, and this parsys simply lists and includes them. */-->
+<sly data-sly-list.child="${resource.listChildren}">
+  <sly data-sly-resource="${child.name}"/>
+</sly>
