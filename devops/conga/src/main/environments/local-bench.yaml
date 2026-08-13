@@ -42,3 +42,6 @@ tenants:
     subdomain: www
     serverAliases:
     - "${domain}"
+    # See prod-motorbrot.yaml: reach the shared DML asset renditions (feature-image).
+    passthroughPaths:
+    - /content/motorbrot/dma/assets

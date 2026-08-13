@@ -61,6 +61,12 @@ tenants:
     - "${domain}"
     passthroughPaths:
     - /bin/public
+    # feature-image renders <picture> renditions served from the shared DML
+    # asset store. Those live under a DIFFERENT content root, so the tenant's
+    # short-URL catch-all would rewrite them under /content/sling-matrix and
+    # 404. Allow the published asset tree through unrewritten (read-only GET;
+    # POST/DELETE and .json are still blocked by the shared webcache filters).
+    - /content/motorbrot/dma/assets
 
 - tenant: digitalmedia
   roles:
