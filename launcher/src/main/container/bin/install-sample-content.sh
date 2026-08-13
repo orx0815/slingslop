@@ -65,6 +65,27 @@ upload_pkg() {
   done
 }
 
+# Install an already-uploaded package, retrying on the same transient codes as
+# the upload. Even after the readiness gate the instance may still be warming up
+# (bundles activating, node types/namespaces not yet registered), so a fire-once
+# install can transiently 500/503 at cold start though it succeeds moments later.
+install_pkg() {
+  path="$1"; d=$(( $(date +%s) + READY_TIMEOUT ))
+  while :; do
+    code=$(curl -s --connect-timeout 10 --max-time 300 \
+            -o /tmp/sc-install.json -w '%{http_code}' -u "${AUTH}" -X POST \
+            "${SLING_URL}/bin/cpm/package.install.json${path}")
+    if [ "${code}" = "200" ]; then return 0; fi
+    case "${code}" in
+      000|404|500|503)
+        [ "$(date +%s)" -lt "${d}" ] || { echo "[sample-content] install still ${code} after ${READY_TIMEOUT}s for ${path}" >&2; cat /tmp/sc-install.json >&2 || true; return 1; }
+        sleep 3; continue ;;
+      *)
+        echo "[sample-content] install failed (HTTP ${code}) for ${path}" >&2; cat /tmp/sc-install.json >&2 || true; return 1 ;;
+    esac
+  done
+}
+
 rc=0
 found=0
 for zip in "${SAMPLE_CONTENT_DIR}"/*.zip; do
@@ -78,14 +99,7 @@ for zip in "${SAMPLE_CONTENT_DIR}"/*.zip; do
     rc=1; continue
   fi
 
-  code=$(curl -s --connect-timeout 10 --max-time 300 \
-          -o /tmp/sc-install.json -w '%{http_code}' -u "${AUTH}" -X POST \
-          "${SLING_URL}/bin/cpm/package.install.json${P}")
-  if [ "${code}" != "200" ]; then
-    echo "[sample-content] install failed (HTTP ${code}) for ${P}" >&2
-    cat /tmp/sc-install.json >&2 || true
-    rc=1; continue
-  fi
+  install_pkg "${P}" || { rc=1; continue; }
   echo "[sample-content] installed ${P}"
 done
 
