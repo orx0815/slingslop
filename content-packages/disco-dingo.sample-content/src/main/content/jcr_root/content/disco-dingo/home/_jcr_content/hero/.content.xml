@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/hero"
+    eyebrow="Every Night is Saturday Night"
+    headline="Disco Dingo"
+    subheadline="Grab your platforms and your best moves — Disco Dingo is the neighbourhood dance floor where the mirror ball never stops spinning and the bassline never quits."
+    ctaText="See What's On"
+    ctaLink="/content/disco-dingo/events.html"
+    secondaryCtaText="Meet the Dingo"
+    secondaryCtaLink="/content/disco-dingo/about.html"/>

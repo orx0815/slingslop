@@ -1,0 +1,20 @@
+<section class="hero" role="banner"
+     data-sly-use.auth="org.discodingo.discodingo.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="wrapper">
+    <div class="hero-ball" aria-hidden="true"></div>
+    <span class="eyebrow">${properties.eyebrow}</span>
+    <h1 class="hero-title">
+      <span class="gradient-text">${properties.headline}</span>
+    </h1>
+    <p class="hero-lede lede">${properties.subheadline}</p>
+    <div class="hero-actions">
+      <a class="btn btn--primary" href="${properties.ctaLink @ context='uri'}">${properties.ctaText}</a>
+      <a class="btn btn--ghost" href="${properties.secondaryCtaLink @ context='uri'}">${properties.secondaryCtaText}</a>
+    </div>
+  </div>
+</section>

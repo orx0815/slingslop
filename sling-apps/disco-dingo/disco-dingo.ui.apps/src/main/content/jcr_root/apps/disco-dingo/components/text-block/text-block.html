@@ -1,0 +1,17 @@
+<section class="section" role="article"
+     data-sly-use.auth="org.discodingo.discodingo.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="wrapper stack">
+    <div class="section-header section-header--left" data-sly-test="${properties.headline}">
+      <span class="eyebrow" data-sly-test="${properties.eyebrow}">${properties.eyebrow}</span>
+      <h2>${properties.headline}</h2>
+    </div>
+    <div class="text-block-body" data-reveal>
+      ${properties.text @ context='html'}
+    </div>
+  </div>
+</section>

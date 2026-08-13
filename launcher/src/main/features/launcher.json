@@ -1,10 +1,12 @@
 {
   "bundles": [
     { "id": "org.motorbrot/slingslop.zengarden.core/${slingslop.launcher.version}", "start-order": 20 },
+    { "id": "org.motorbrot/disco-dingo.core/${slingslop.launcher.version}", "start-order": 20 },
     { "id": "org.motorbrot/sling-matrix.core/${slingslop.launcher.version}", "start-order": 20 }
   ],
   "content-packages:ARTIFACTS|required": [
     { "id": "org.motorbrot/slingslop.zengarden.ui.apps/${slingslop.launcher.version}/zip" },
+    { "id": "org.motorbrot/disco-dingo.ui.apps/${slingslop.launcher.version}/zip" },
     { "id": "org.motorbrot/sling-matrix.ui.apps/${slingslop.launcher.version}/zip" }
   ],
   "repoinit:TEXT|true": "@file"
