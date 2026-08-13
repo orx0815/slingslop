@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/parsys">
+    <welcome
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Welcome to the Floor"
+        headline="Where Sequins Meet Subwoofers"
+        text="&lt;p&gt;Disco Dingo started life as a single glitter-covered speaker in a backyard, and it never really stopped growing from there. These days we&amp;#8217;re a proper venue with a proper sound system, but the spirit is exactly the same: turn the lights down, turn the bass up, and let everybody find their groove.&lt;/p&gt; &lt;p&gt;Whether you&amp;#8217;re a seasoned regular who can do the hustle in your sleep or you&amp;#8217;ve never set foot on a dance floor before, our resident DJs and our disco-obsessed mascot will have you moving within the first thirty seconds. That&amp;#8217;s a promise, not a threat.&lt;/p&gt;"/>
+    <mascot
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Say Hi"
+        headline="Meet Disco Dingo"
+        text="&lt;p&gt;Our mascot, Disco Dingo, showed up at the very first night wearing sunglasses and a gold medallion, and frankly nobody had the heart to ask him to leave. He now greets every guest at the door, judges the dance-offs, and has strong opinions about which songs deserve a key change.&lt;/p&gt; &lt;blockquote&gt;&quot;Come for the music, stay for the mirror ball, leave with a slightly sore neck from all the head-bopping.&quot; &amp;#8212; Disco Dingo&lt;/blockquote&gt;"/>
+    <gallery-teaser
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/gallery"
+        eyebrow="Last Saturday"
+        headline="Snapshots From the Dance Floor"
+        image1Src="/content/disco-dingo/gallery/images/disco-dingo-hero-01.jpg"
+        image1Alt="Dance floor packed with people under a spinning mirror ball"
+        image1Caption="Peak hour on the main floor"
+        image2Src="/content/disco-dingo/gallery/images/disco-dingo-hero-02.jpg"
+        image2Alt="DJ booth glowing with pink and gold lights"
+        image2Caption="DJ Dingo behind the decks"
+        image3Src="/content/disco-dingo/gallery/images/disco-dingo-hero-03.jpg"
+        image3Alt="Close up of a glittering disco ball reflecting coloured light"
+        image3Caption="The famous mirror ball"/>
+</jcr:root>

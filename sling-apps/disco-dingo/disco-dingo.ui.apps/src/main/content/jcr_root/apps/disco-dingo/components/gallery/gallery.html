@@ -1,0 +1,40 @@
+<section class="section" role="region" aria-label="Photo gallery"
+     data-sly-use.auth="org.discodingo.discodingo.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="wrapper stack">
+    <div class="section-header" data-sly-test="${properties.headline}">
+      <span class="eyebrow" data-sly-test="${properties.eyebrow}">${properties.eyebrow}</span>
+      <h2>${properties.headline}</h2>
+    </div>
+    <div class="gallery-grid">
+      <figure class="gallery-item" data-sly-test="${properties.image1Src}">
+        <img src="${properties.image1Src @ context='uri'}" alt="${properties.image1Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image1Caption}">${properties.image1Caption}</figcaption>
+      </figure>
+      <figure class="gallery-item" data-sly-test="${properties.image2Src}">
+        <img src="${properties.image2Src @ context='uri'}" alt="${properties.image2Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image2Caption}">${properties.image2Caption}</figcaption>
+      </figure>
+      <figure class="gallery-item" data-sly-test="${properties.image3Src}">
+        <img src="${properties.image3Src @ context='uri'}" alt="${properties.image3Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image3Caption}">${properties.image3Caption}</figcaption>
+      </figure>
+      <figure class="gallery-item" data-sly-test="${properties.image4Src}">
+        <img src="${properties.image4Src @ context='uri'}" alt="${properties.image4Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image4Caption}">${properties.image4Caption}</figcaption>
+      </figure>
+      <figure class="gallery-item" data-sly-test="${properties.image5Src}">
+        <img src="${properties.image5Src @ context='uri'}" alt="${properties.image5Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image5Caption}">${properties.image5Caption}</figcaption>
+      </figure>
+      <figure class="gallery-item" data-sly-test="${properties.image6Src}">
+        <img src="${properties.image6Src @ context='uri'}" alt="${properties.image6Alt}" loading="lazy" />
+        <figcaption data-sly-test="${properties.image6Caption}">${properties.image6Caption}</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>

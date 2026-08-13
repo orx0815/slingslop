@@ -1,0 +1,72 @@
+/*
+ * 09-animations.css — disco motion
+ */
+@keyframes disco-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes disco-pulse-glow {
+  0%,
+  100% {
+    box-shadow: var(--shadow-glow-primary);
+  }
+  50% {
+    box-shadow: var(--shadow-glow-secondary);
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-brand-mark {
+  animation: disco-pulse-glow 4s ease-in-out infinite;
+}
+
+.mascot-emoji {
+  animation: float-y 3.5s ease-in-out infinite;
+}
+
+/* Reveal-on-scroll: elements start hidden, public.ts adds .is-revealed
+   when they enter the viewport (falls back to visible if JS disabled). */
+[data-reveal] {
+  opacity: 0;
+}
+
+[data-reveal].is-revealed {
+  animation: fade-up 0.6s var(--ease-disco) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-brand-mark,
+  .mascot-emoji,
+  .hero-ball {
+    animation: none !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+  }
+}

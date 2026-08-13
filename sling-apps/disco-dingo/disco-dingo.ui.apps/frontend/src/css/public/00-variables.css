@@ -1,0 +1,108 @@
+/*
+ * 00-variables.css — Disco Dingo colour system
+ *
+ * Two OKLCH base hues drive the entire palette:
+ *   --hue-primary   (hot pink / magenta)  — mascot colour, CTAs, headlines
+ *   --hue-secondary (gold / amber)        — disco-ball glints, accents
+ *
+ * Everything else (hover states, tints, shadows, glows, neutrals) is
+ * derived from these two hues using OKLCH relative colour syntax
+ * (`oklch(from var(...) ...)`), so re-theming the whole site is a two-line
+ * change. Complementary accents are derived at hue + 180deg.
+ */
+:root {
+  /* ── Hues — change these two numbers to re-theme the whole site ────── */
+  --hue-primary: 340; /* hot pink / magenta */
+  --hue-secondary: 85; /* gold / amber */
+
+  /* ── Primary (hot pink / magenta) ───────────────────────────────────── */
+  --color-primary-base: oklch(62% 0.24 var(--hue-primary));
+  --color-primary: var(--color-primary-base);
+  --color-primary-dark: oklch(from var(--color-primary-base) calc(l - 0.16) calc(c - 0.03) h);
+  --color-primary-darker: oklch(from var(--color-primary-base) calc(l - 0.28) calc(c - 0.05) h);
+  --color-primary-light: oklch(from var(--color-primary-base) calc(l + 0.14) calc(c - 0.06) h);
+  --color-primary-pale: oklch(from var(--color-primary-base) calc(l + 0.32) calc(c - 0.16) h);
+  --color-primary-glow: oklch(from var(--color-primary-base) l c h / 0.45);
+  --color-primary-glow-soft: oklch(from var(--color-primary-base) l c h / 0.18);
+
+  /* ── Secondary (gold / amber — disco-ball glints) ───────────────────── */
+  --color-secondary-base: oklch(80% 0.19 var(--hue-secondary));
+  --color-secondary: var(--color-secondary-base);
+  --color-secondary-dark: oklch(from var(--color-secondary-base) calc(l - 0.2) calc(c - 0.02) h);
+  --color-secondary-light: oklch(from var(--color-secondary-base) calc(l + 0.1) calc(c - 0.05) h);
+  --color-secondary-glow: oklch(from var(--color-secondary-base) l c h / 0.55);
+
+  /* ── Complementary accent (primary hue + 180deg) — electric cyan/teal ─ */
+  --color-accent-base: oklch(70% 0.16 calc(var(--hue-primary) + 180));
+  --color-accent: var(--color-accent-base);
+  --color-accent-dark: oklch(from var(--color-accent-base) calc(l - 0.18) c h);
+
+  /* ── Tinted neutrals — derived from primary hue at very low chroma ─── */
+  --color-bg: oklch(12% 0.03 calc(var(--hue-primary) - 20));
+  --color-bg-elevated: oklch(17% 0.035 calc(var(--hue-primary) - 20));
+  --color-bg-card: oklch(21% 0.04 calc(var(--hue-primary) - 20));
+  --color-surface-border: oklch(from var(--color-bg-card) calc(l + 0.14) calc(c + 0.02) h);
+
+  --color-bg-light: oklch(97% 0.012 calc(var(--hue-primary) - 20));
+  --color-bg-light-card: oklch(100% 0 0);
+
+  /* ── Text — tinted near-white / near-black for a soft night-club feel ─ */
+  --color-text: oklch(96% 0.015 calc(var(--hue-primary) - 20));
+  --color-text-muted: oklch(78% 0.03 calc(var(--hue-primary) - 20));
+  --color-text-inverse: oklch(18% 0.03 calc(var(--hue-primary) - 20));
+  --color-text-on-light: oklch(22% 0.02 calc(var(--hue-primary) - 20));
+  --color-text-on-light-muted: oklch(42% 0.02 calc(var(--hue-primary) - 20));
+
+  /* ── Gradients — the disco signature ────────────────────────────────── */
+  --gradient-disco: linear-gradient(
+    115deg,
+    oklch(from var(--color-primary-base) l c h) 0%,
+    oklch(from var(--color-accent-base) l c h) 50%,
+    oklch(from var(--color-secondary-base) l c h) 100%
+  );
+  --gradient-disco-soft: linear-gradient(
+    135deg,
+    oklch(from var(--color-primary-base) l c h / 0.85) 0%,
+    oklch(from var(--color-accent-base) l c h / 0.75) 100%
+  );
+  --gradient-floor: radial-gradient(
+    circle at 50% 0%,
+    oklch(from var(--color-primary-base) calc(l + 0.05) c h / 0.35) 0%,
+    transparent 60%
+  );
+
+  /* ── Shadows / glow ──────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.3);
+  --shadow-md: 0 6px 20px oklch(0% 0 0 / 0.35);
+  --shadow-glow-primary: 0 0 24px var(--color-primary-glow-soft);
+  --shadow-glow-secondary: 0 0 24px var(--color-secondary-glow);
+
+  /* ── Typography scale ────────────────────────────────────────────────── */
+  --font-display: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.4rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.7rem + 2vw, 3rem);
+  --step-4: clamp(2.8rem, 2.1rem + 3.5vw, 4.5rem);
+
+  /* ── Spacing / layout ────────────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --space-7: 6rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.75rem;
+  --radius-pill: 999px;
+
+  --content-max-width: 72rem;
+
+  --ease-disco: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
