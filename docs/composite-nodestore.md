@@ -130,7 +130,7 @@ All the OSGi configurations live in
    `NodeStore` registered with role `composite-mount-<mountName>`.
 
    ```json
-   "org.apache.jackrabbit.oak.spi.mount.impl.MountInfoProviderService": {
+   "org.apache.jackrabbit.oak.composite.MountInfoProviderService": {
      "mountedPaths": ["/libs", "/apps"],
      "mountName": "libs",
      "readOnlyMount:Boolean": true
