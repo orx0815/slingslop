@@ -99,3 +99,12 @@ tenants:
   config:
     contentRoot: /content/cyberpunk-alpaca
     appsRoot: /apps/cyberpunk-alpaca
+
+- tenant: disco-dingo
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/disco-dingo
+    # Clientlibs live at /apps/disco-dingo (not the /apps/slingslop/${tenant}
+    # default), so appsRoot must be set explicitly for the css/js passthrough.
+    appsRoot: /apps/disco-dingo
