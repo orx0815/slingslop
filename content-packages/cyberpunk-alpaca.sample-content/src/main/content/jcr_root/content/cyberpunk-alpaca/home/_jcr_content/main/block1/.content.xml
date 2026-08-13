@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
-    jcr:primaryType="nt:unstructured"
-    sling:resourceType="cyberpunk-alpaca/components/text-block"
-    headline="Capabilities &amp; Contraband"
-    text="&lt;p&gt;Specialises in distributed cache-warming, bespoke firmware embroidery, and the illegal importation of rare-earth OKLCH pigments. Available for consulting engagements, runway appearances, and the occasional hostile negotiation.&lt;/p&gt;&lt;p&gt;Do not attempt to scan the QR code on its left flank. Legal counsel advises against it.&lt;/p&gt;"/>
