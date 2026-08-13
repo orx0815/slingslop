@@ -12,6 +12,11 @@
   # and passing it via `environment:` + bare `-e SLING_PASSWORD` is stripped by
   # this play's `become`/sudo. Single quotes preserve spaces and don't depend on
   # the environment surviving sudo.
+  #
+  # no_log hides the whole result (the `cmd` embeds the vault password), so a raw
+  # failure is opaque. We therefore don't fail here — the two tasks below surface
+  # the script's stdout/stderr (which carry only "[sample-content] ..." messages
+  # and HTTP codes, never the password) and then fail with the real cause.
   ansible.builtin.shell:
     cmd: >
       docker exec
@@ -19,5 +24,23 @@
       -e SLING_USER=admin
       -e SLING_PASSWORD='{{ vault_sling_admin_password }}'
       slingslop bash /opt/sling/bin/install-sample-content.sh
+  register: sample_content_install
   changed_when: true
+  failed_when: false
   no_log: true
+
+- name: Show sample-content install output (sanitized — no credentials)
+  # Prints ONLY stdout/stderr lines (password-free). Never dump the whole result
+  # object: sample_content_install.cmd / .invocation still carry the password.
+  ansible.builtin.debug:
+    msg: >-
+      {{ (sample_content_install.stdout_lines | default([]))
+         + (sample_content_install.stderr_lines | default([])) }}
+  when: sample_content_install.rc | default(1) != 0
+
+- name: Fail if sample-content install did not succeed
+  ansible.builtin.fail:
+    msg: >-
+      sample-content install failed (rc={{ sample_content_install.rc | default('unknown') }}).
+      See the sanitized script output above for the failing package / HTTP code.
+  when: sample_content_install.rc | default(1) != 0
