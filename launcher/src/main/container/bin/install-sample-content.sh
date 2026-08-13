@@ -10,14 +10,14 @@
 #   SLING_USER          default admin
 #   SLING_PASSWORD      default admin
 #   SAMPLE_CONTENT_DIR  default /opt/sling/sample-content (dir of *.zip packages)
-#   READY_TIMEOUT       seconds to wait for Sling HTTP    default 120
+#   READY_TIMEOUT       seconds to wait for the Composum package manager  default 180
 set -eu
 
 SLING_URL="${SLING_URL:-http://localhost:8080}"
 SLING_USER="${SLING_USER:-admin}"
 SLING_PASSWORD="${SLING_PASSWORD:-admin}"
 SAMPLE_CONTENT_DIR="${SAMPLE_CONTENT_DIR:-/opt/sling/sample-content}"
-READY_TIMEOUT="${READY_TIMEOUT:-120}"
+READY_TIMEOUT="${READY_TIMEOUT:-180}"
 
 AUTH="${SLING_USER}:${SLING_PASSWORD}"
 
@@ -26,18 +26,28 @@ if [ ! -d "${SAMPLE_CONTENT_DIR}" ]; then
   exit 0
 fi
 
-# Wait for Sling to actually serve (200), not just accept the socket.
+# Wait for Composum's package manager itself to be ready — the operation we need,
+# not just /starter.html (which goes 200 well before the package-manager servlet
+# registers). package.list.json returns 200 once the PackagesServlet is up; a 401
+# means it IS up but the credentials are wrong (fail fast — that won't self-heal).
 deadline=$(( $(date +%s) + READY_TIMEOUT ))
-until [ "$(curl -s -o /dev/null -w '%{http_code}' "${SLING_URL}/starter.html")" = "200" ]; do
-  if [ "$(date +%s)" -ge "${deadline}" ]; then
-    echo "[sample-content] Sling did not become ready within ${READY_TIMEOUT}s at ${SLING_URL}" >&2
-    exit 1
-  fi
-  sleep 3
+while :; do
+  code=$(curl -s -o /dev/null -w '%{http_code}' -u "${AUTH}" "${SLING_URL}/bin/cpm/package.list.json")
+  case "${code}" in
+    200) break ;;
+    401|403) echo "[sample-content] authentication failed (HTTP ${code}) as ${SLING_USER} at ${SLING_URL} — check SLING_PASSWORD" >&2; exit 1 ;;
+    *)
+      if [ "$(date +%s)" -ge "${deadline}" ]; then
+        echo "[sample-content] Composum package manager not ready (last HTTP ${code}) within ${READY_TIMEOUT}s at ${SLING_URL}" >&2
+        exit 1
+      fi
+      sleep 3 ;;
+  esac
 done
 
-# Upload one package, retrying while the Composum package manager is still warming
-# up (503) or briefly unreachable (000). Echoes the uploaded package path on 200.
+# Upload one package, retrying while Composum's package-manager servlet is still
+# coming up. /starter.html goes 200 well before Composum registers, so during the
+# window the endpoint transiently returns 000/404/500/503 — keep retrying.
 upload_pkg() {
   zip="$1"; d=$(( $(date +%s) + READY_TIMEOUT ))
   while :; do
@@ -45,11 +55,13 @@ upload_pkg() {
             -o /tmp/sc-upload.json -w '%{http_code}' -u "${AUTH}" \
             -F "file=@${zip}" -F force=true "${SLING_URL}/bin/cpm/package.upload.json")
     if [ "${code}" = "200" ]; then sed -n 's/.*"path":"\([^"]*\)".*/\1/p' /tmp/sc-upload.json; return 0; fi
-    if [ "${code}" = "503" ] || [ "${code}" = "000" ]; then
-      [ "$(date +%s)" -lt "${d}" ] || { echo "[sample-content] package manager still ${code} after ${READY_TIMEOUT}s for ${zip}" >&2; return 1; }
-      sleep 3; continue
-    fi
-    echo "[sample-content] upload failed (HTTP ${code}) for ${zip}" >&2; cat /tmp/sc-upload.json >&2 || true; return 1
+    case "${code}" in
+      000|404|500|503)
+        [ "$(date +%s)" -lt "${d}" ] || { echo "[sample-content] package manager still ${code} after ${READY_TIMEOUT}s for ${zip}" >&2; cat /tmp/sc-upload.json >&2 || true; return 1; }
+        sleep 3; continue ;;
+      *)
+        echo "[sample-content] upload failed (HTTP ${code}) for ${zip}" >&2; cat /tmp/sc-upload.json >&2 || true; return 1 ;;
+    esac
   done
 }
 

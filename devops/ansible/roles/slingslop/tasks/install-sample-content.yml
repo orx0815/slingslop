@@ -7,12 +7,17 @@
 # 'zen' tenant) is untouched. Runs AFTER the readiness gate.
 
 - name: Install demo sample-content into the running Sling (always overwritten)
-  ansible.builtin.command:
+  # Pass the password inline, single-quoted, in a `shell` task (same pattern as
+  # install-mappings.yml). `command` arg-splitting mangles a password with spaces,
+  # and passing it via `environment:` + bare `-e SLING_PASSWORD` is stripped by
+  # this play's `become`/sudo. Single quotes preserve spaces and don't depend on
+  # the environment surviving sudo.
+  ansible.builtin.shell:
     cmd: >
       docker exec
       -e SLING_URL=http://127.0.0.1:8080
       -e SLING_USER=admin
-      -e SLING_PASSWORD={{ vault_sling_admin_password }}
+      -e SLING_PASSWORD='{{ vault_sling_admin_password }}'
       slingslop bash /opt/sling/bin/install-sample-content.sh
   changed_when: true
   no_log: true
