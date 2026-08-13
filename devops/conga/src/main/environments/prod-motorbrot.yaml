@@ -40,17 +40,6 @@ tenants:
   config:
     contentRoot: /content/slingslop/zengarden
     
-- tenant: zen
-  roles:
-  - public-cached
-  config:
-    contentRoot: /content/slingslop/zen
-    # A tenant is NOT always its own app: this is a second mount of the
-    # zengarden app at a different content root. Clientlibs are still served
-    # from the zengarden app, so appsRoot must point there (NOT /apps/.../zen)
-    # or the webcache's URL-shortener rewrites the css/js to a 404.
-    appsRoot: /apps/slingslop/zengarden
-
 # CONTENT-ONLY tenant: `zen` ships NO app of its own. It re-serves the existing
 # `zengarden` app at a second content root. `/content/slingslop/zen` is created
 # live in prod (a copy of zengarden) and lives in the content volume — it is NOT
