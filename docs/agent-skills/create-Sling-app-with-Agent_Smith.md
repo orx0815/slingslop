@@ -150,7 +150,7 @@ Task  9 — HTL component templates (view + edit-form-fields for each component)
 Task 10 — Sample content package (pom.xml, filter.xml, all content nodes)
 Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (stage-sample-content + starter.check.paths)
 Task 12 — ReadMe.md in sling-apps/{PROJECT_NAME}/
-Task 13 — Register the app for deployment via CONGA (PUBLIC-FACING apps only; see §2.8)
+Task 13 — Register the app for deployment via CONGA (PUBLIC-FACING apps only; see §2.9)
 Task 14 — Build and validate (mvn install, fix any errors)
 ```
 
@@ -176,7 +176,7 @@ older conventions that will mislead a fresh scaffold (and burn tokens):**
 - `devops/` — deployment / infrastructure, not app scaffolding
 
 **Sole exception:** `devops/conga/` — and only while executing **Task 13** (CONGA
-tenant registration) for a *public-facing* app, per §2.8. Otherwise stay out.
+tenant registration) for a *public-facing* app, per §2.9. Otherwise stay out.
 
 **NEVER create, edit, move, or delete secrets or deploy infrastructure.** In
 particular, do not touch any `vault.yml` / `vault.*.yml` (ansible-vault
@@ -583,10 +583,20 @@ So: "this app doesn't need ACL nodes" is only true for an app that is **never** 
 
 ---
 
-### 2.8 Register the app for deployment via CONGA (Task 13 — public-facing apps only)
+### 2.9 Register the app for deployment via CONGA (Task 13 — public-facing apps only)
 
 > **Skip this task for internal / building-block apps** that are never exposed on
 > their own sub-domain. For a **public-facing** app it is mandatory.
+>
+> **Default assumption: public-facing.** Every project kind in the issue template
+> (Website, Blog, Portfolio, Documentation site, Dashboard) is a public site, and
+> the template has **no field to opt out** of deployment. Unless the issue body
+> explicitly says the app is internal-only / not meant to be deployed, treat it as
+> public-facing and execute this task — do **not** skip it defensively just
+> because §2.0.2 says to stay out of `devops/`; this is the one named exception.
+> A scaffold that builds but was never registered here silently never gets a
+> live sub-domain, and nothing in the build (`mvn install`) catches that — so
+> also tick it off explicitly in the **Appendix A checklist**, not just here.
 
 Deployment config (Traefik router, webcache vhost, Sling short-URL mapping,
 launcher wiring) is **generated** by the [`devops/conga`](../../devops/conga/README.md)
@@ -602,9 +612,21 @@ the `local-*` environments). Derive the values from the Agent Smith variables:
 |---|---|
 | `PROJECT_NAME` (lower-case-hyphenated) | `tenant` (and default `subdomain`) |
 | `CONTENT_ROOT` | `config.contentRoot` |
-| `APPS_ROOT` | `config.appsRoot` (omit if it matches the default `/apps/slingslop/<tenant>`) |
+| `APPS_ROOT` | `config.appsRoot` (omit **only if** it is literally `/apps/slingslop/<tenant>`) |
 | home page node | `config.homePage` (omit if it is `home`) |
 | gated? (basicAuth) | `roles: [ gated ]` + `middlewares: [ sec-headers, editor-basicauth ]` vs. `roles: [ public-cached ]` |
+
+> **`appsRoot` is almost always required, not optional.** The default this skill
+> uses for `APPS_ROOT` is `/apps/{RT_PREFIX}` (e.g. `/apps/hello-sling`) — it does
+> **not** match the tenant's implicit default of `/apps/slingslop/<tenant>` unless
+> the app was deliberately placed under `/apps/slingslop/`. Every app scaffolded by
+> this skill so far (`alf-vs-agent`, `cyberpunk-alpaca`, `disco-dingo`, …) needed an
+> explicit `appsRoot`; only the legacy `zengarden` reference app omits it. Verify
+> the real value instead of guessing:
+> `grep -rhoE '(src|href)="/apps[^"]*"' sling-apps/{PROJECT_NAME} --include='*.html' | head -1`.
+> Getting this wrong doesn't break the build — the webcache's URL-shortener will
+> silently rewrite the app's CSS/JS requests to a 404 and the public site loads
+> unstyled, which is invisible unless you test the deployed sub-domain.
 
 ```yaml
 # devops/conga/src/main/environments/prod-motorbrot.yaml
@@ -614,6 +636,7 @@ tenants:
     roles: [ public-cached ]
     config:
       contentRoot: {CONTENT_ROOT}
+      appsRoot: {APPS_ROOT}
 ```
 
 **Step 2 — prove it renders:**
@@ -626,6 +649,13 @@ Confirm the new files appear under
 `devops/conga/target/configuration/prod-motorbrot/vps1/` (a `webcache/{PROJECT_NAME}.conf`,
 a `traefik/dynamic/router-{PROJECT_NAME}.yml`, and a
 `slingmappings/.../{subdomain}.motorbrot.org/.content.xml`).
+
+**This step is easy to silently skip — nothing in `mvn install` or the launcher
+integration tests catches a missing tenant.** The app builds, deploys its OSGi
+bundle and content package, and renders fine on `:8080` — it simply never gets a
+public vhost/sub-domain, and no test fails. Do not rely on the build being green
+as evidence Task 13 was done; verify the CONGA output directly (Step 2 above) and
+tick it in the Appendix A checklist.
 
 **Do not** hand-edit `devops/ansible/roles/webcache/templates/*.conf.j2`,
 `devops/ansible/roles/traefik/templates/*.j2` or the launcher features for the new
@@ -1647,6 +1677,14 @@ Use this checklist to verify completeness:
 - [ ] `content-packages/{PROJECT_NAME}.sample-content/src/main/content/META-INF/vault/filter.xml`
 - [ ] Sample content: homepage, content-page, styleguide (with all component nodes)
 - [ ] `sling-apps/{PROJECT_NAME}/ReadMe.md` — full project documentation
+- [ ] **CONGA tenant registered** (Task 13; §2.9) — a `- tenant: {PROJECT_NAME}` block
+      appended to `devops/conga/src/main/environments/prod-motorbrot.yaml`, with
+      `appsRoot` set explicitly whenever it isn't literally `/apps/slingslop/<tenant>`.
+      **Not covered by `mvn install`** — verify separately with
+      `mvn -q -f devops/conga/pom.xml clean package` and confirm
+      `webcache/{PROJECT_NAME}.conf` + `traefik/dynamic/router-{PROJECT_NAME}.yml`
+      appear under `devops/conga/target/configuration/prod-motorbrot/vps1/`.
+      Skip **only** if the app is explicitly internal/non-deployed.
 - [ ] `mvn install` succeeds
 
 ## Appendix B: What NOT to Do
