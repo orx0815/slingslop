@@ -25,9 +25,6 @@
     },
     {
       "id": "org.motorbrot/digitalmedia.ui.apps/${slingslop.launcher.version}/zip"
-    },
-    {
-      "id": "org.motorbrot/digitalmedia.sample-content/${slingslop.launcher.version}/zip"
     }
   ],
 

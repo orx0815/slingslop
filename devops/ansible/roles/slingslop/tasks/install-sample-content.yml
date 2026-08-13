@@ -1,0 +1,18 @@
+---
+# Install the demo sample-content into the running Sling. Sample-content is NOT
+# baked into the composite seed (code-only image); it lives as *.zip under
+# /opt/sling/sample-content in the image and is (re)installed here on every
+# deploy. ALWAYS overwritten — each package filter is scoped to its own
+# /content/... root, so user content on other roots (e.g. the content-only
+# 'zen' tenant) is untouched. Runs AFTER the readiness gate.
+
+- name: Install demo sample-content into the running Sling (always overwritten)
+  ansible.builtin.command:
+    cmd: >
+      docker exec
+      -e SLING_URL=http://127.0.0.1:8080
+      -e SLING_USER=admin
+      -e SLING_PASSWORD={{ vault_sling_admin_password }}
+      slingslop bash /opt/sling/bin/install-sample-content.sh
+  changed_when: true
+  no_log: true

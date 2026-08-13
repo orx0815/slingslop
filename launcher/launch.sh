@@ -16,4 +16,14 @@ export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDedupl
                   -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=38080 \
                   ${EXTRA_JAVA_OPTS:-} ${HTTP_JAVA_OPTS}"
 
+# Sample-content is no longer baked into the feature/seed (code-only). Install
+# the demo packages once Sling answers — always overwritten, scoped per content
+# root, so other/user content is untouched. Backgrounded so it can wait for HTTP
+# while the launcher runs in the foreground. Same script the prod deploy runs.
+if [ -d target/sample-content ]; then
+  ( SLING_URL=http://localhost:8080 \
+    SAMPLE_CONTENT_DIR="$(pwd)/target/sample-content" \
+    bash src/main/container/bin/install-sample-content.sh ) &
+fi
+
 target/dependency/org.apache.sling.feature.launcher/bin/launcher -f target/slingfeature-tmp/feature-slingslop_aggregate.json
