@@ -45,6 +45,27 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>disco-dingo.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>disco-dingo.ui.apps</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>disco-dingo.sample-content</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>sling-matrix.core</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
@@ -90,6 +111,11 @@
                         </embedded>
                         <embedded>
                             <groupId>${project.groupId}</groupId>
+                            <artifactId>disco-dingo.core</artifactId>
+                            <filter>true</filter>
+                        </embedded>
+                        <embedded>
+                            <groupId>${project.groupId}</groupId>
                             <artifactId>sling-matrix.core</artifactId>
                             <filter>true</filter>
                         </embedded>
@@ -103,6 +129,16 @@
                         <subPackage>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>slingslop.zengarden.sample-content</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>disco-dingo.ui.apps</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>disco-dingo.sample-content</artifactId>
                             <filter>true</filter>
                         </subPackage>
                         <subPackage>

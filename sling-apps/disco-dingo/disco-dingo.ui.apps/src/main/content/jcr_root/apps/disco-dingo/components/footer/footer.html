@@ -1,0 +1,34 @@
+<footer class="site-footer"
+        data-sly-use.auth="org.discodingo.discodingo.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="wrapper footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-brand">
+        <span aria-hidden="true">🪩</span> Disco Dingo
+      </div>
+      <p class="text-muted">${properties.blurb}</p>
+    </div>
+    <div class="footer-col">
+      <h4>Visit</h4>
+      <ul>
+        <li><a href="${properties.link1Href @ context='uri'}">${properties.link1Text}</a></li>
+        <li><a href="${properties.link2Href @ context='uri'}">${properties.link2Text}</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Follow</h4>
+      <ul>
+        <li><a href="${properties.link3Href @ context='uri'}">${properties.link3Text}</a></li>
+        <li><a href="${properties.link4Href @ context='uri'}">${properties.link4Text}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrapper footer-bottom">
+    <span>${properties.copyright}</span>
+    <span>Built with 🪩 by the Disco Dingo crew.</span>
+  </div>
+</footer>

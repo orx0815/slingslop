@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/parsys">
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Flashback"
+        headline="Moments From the Dance Floor"
+        text="&lt;p&gt;A running photo diary of glitter, grins and questionable-but-glorious dance moves. All photos are AI-generated placeholders standing in for real event photography — see the ReadMe for the image convention used across this sample content.&lt;/p&gt;"/>
+    <full-gallery
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/gallery"
+        image1Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-01.jpg"
+        image1Alt="Crowd dancing under coloured spotlights on the main floor"
+        image1Caption="Friday night, main floor"
+        image2Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-02.jpg"
+        image2Alt="Close up of disco ball scattering light across the ceiling"
+        image2Caption="The mirror ball at work"
+        image3Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-03.jpg"
+        image3Alt="DJ mixing on turntables bathed in pink light"
+        image3Caption="DJ Starlight Sequin on the decks"
+        image4Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-04.jpg"
+        image4Alt="Group of friends laughing on the dance floor in disco outfits"
+        image4Caption="Regulars living their best life"
+        image5Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-05.jpg"
+        image5Alt="Roller skaters gliding across the floor during the family matinee"
+        image5Caption="Sunday roller-disco matinee"
+        image6Src="/content/disco-dingo/gallery/images/disco-dingo-gallery-06.jpg"
+        image6Alt="Confetti falling over the crowd at midnight"
+        image6Caption="Midnight confetti drop"/>
+</jcr:root>

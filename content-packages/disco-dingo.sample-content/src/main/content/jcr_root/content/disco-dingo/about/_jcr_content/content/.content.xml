@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="disco-dingo/components/parsys">
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Our Story"
+        headline="From a Backyard Speaker to a Full-Blown Disco"
+        text="&lt;p&gt;It began, as all the best things do, with a single overworked speaker and a string of fairy lights. A few friends, a stack of vinyl, and a driveway that briefly became the most popular postcode in town. Word travelled fast, and within a year we&amp;#8217;d outgrown the driveway, the garage, and eventually the goodwill of the neighbours.&lt;/p&gt; &lt;p&gt;Today Disco Dingo occupies a converted warehouse with a proper sprung dance floor, a lighting rig that would make a planetarium jealous, and a sound system tuned specifically to make basslines feel like a hug. The fairy lights are still here, tucked into a corner, as a reminder of where it all started.&lt;/p&gt;"/>
+    <hours
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Plan Your Visit"
+        headline="Opening Hours &amp; House Rules"
+        text="&lt;ul&gt;&lt;li&gt;Thursday: 8pm &amp;#8211; 1am (Motown &amp;amp; Soul night)&lt;/li&gt;&lt;li&gt;Friday: 9pm &amp;#8211; 3am (Disco &amp;amp; Funk)&lt;/li&gt;&lt;li&gt;Saturday: 9pm &amp;#8211; 3am (Anything Goes)&lt;/li&gt;&lt;li&gt;Sunday: 4pm &amp;#8211; 9pm (Family Roller-Disco Matinee)&lt;/li&gt;&lt;/ul&gt; &lt;p&gt;House rules are simple: dance like nobody&amp;#8217;s watching, buy the DJ a drink if you love the set, and please don&amp;#8217;t try to out-glitter Disco Dingo himself. It has been attempted. It has never gone well.&lt;/p&gt;"/>
+    <team
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="disco-dingo/components/text-block"
+        eyebrow="Behind the Decks"
+        headline="The Crew Keeping the Party Alive"
+        text="&lt;p&gt;Our resident DJs cut their teeth on everything from classic Studio 54 twelve-inches to the latest nu-disco imports, and our lighting crew treats every Saturday like opening night. Front of house, our team makes sure the drinks flow, the playlist never dips, and every guest gets a proper Disco Dingo welcome at the door.&lt;/p&gt;"/>
+</jcr:root>
