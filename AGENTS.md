@@ -42,6 +42,7 @@ docs/
 - **Frontend builds** are per–ui.apps module under a `frontend/` subfolder, driven by `frontend-maven-plugin`
 - **Content packages** use `wcmio-content-package-maven-plugin` with upload/download shell scripts
 - **The `complete` package** in `content-packages/complete/` aggregates all apps — adding new artifacts there makes them part of the launcher and integration tests automatically
+- **Sample content is installed at runtime, not baked into the prod image** — a new app's `*.sample-content` package must also be added to the `stage-sample-content` execution in `launcher/pom.xml` (staged into the image, installed on every launch/deploy by `install-sample-content.sh`). Forgetting this passes `mvn install` but leaves the app's content missing in prod.
 
 ## Build & Run
 
