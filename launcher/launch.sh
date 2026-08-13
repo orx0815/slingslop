@@ -17,13 +17,28 @@ export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDedupl
                   ${EXTRA_JAVA_OPTS:-} ${HTTP_JAVA_OPTS}"
 
 # Sample-content is no longer baked into the feature/seed (code-only). Install
-# the demo packages once Sling answers — always overwritten, scoped per content
-# root, so other/user content is untouched. Backgrounded so it can wait for HTTP
-# while the launcher runs in the foreground. Same script the prod deploy runs.
+# the staged demo packages once Sling answers — always overwritten (force),
+# scoped per content root, so other/user content is untouched. Backgrounded so
+# it can wait while the launcher comes up in the foreground.
+#
+# Locally we drive this through the wcm.io content-package plugin rather than the
+# container's curl script: it uploads to Composum via the serviceURL configured
+# in the parent pom and has built-in retry (retryCount/retryDelay) that rides out
+# the cold-start window before the package-manager servlet registers. The AEM-
+# specific readiness probes are disabled (-) since they don't apply to plain
+# Sling+Composum. The container/prod deploy has no Maven, so it keeps using
+# src/main/container/bin/install-sample-content.sh.
 if [ -d target/sample-content ]; then
-  ( SLING_URL=http://localhost:8080 \
-    SAMPLE_CONTENT_DIR="$(pwd)/target/sample-content" \
-    bash src/main/container/bin/install-sample-content.sh ) &
+  SAMPLE_ZIPS=$(ls "$(pwd)"/target/sample-content/*.zip 2>/dev/null | paste -sd, - || true)
+  if [ -n "$SAMPLE_ZIPS" ]; then
+    ( mvn -N wcmio-content-package:install \
+        -Dvault.fileList="$SAMPLE_ZIPS" \
+        -Dvault.force=true \
+        -Dvault.retryCount=40 \
+        -Dvault.bundleStatusURL=- \
+        -Dvault.packageManagerInstallStatusURL=- \
+        -Dvault.systemReadyURL=- ) &
+  fi
 fi
 
 target/dependency/org.apache.sling.feature.launcher/bin/launcher -f target/slingfeature-tmp/feature-slingslop_aggregate.json
