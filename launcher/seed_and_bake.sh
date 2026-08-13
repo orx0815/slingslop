@@ -34,12 +34,14 @@ IMAGE_BASE="${IMAGE_BASE:-ghcr.io/orx0815/slingslop:snapshot}"
 IMAGE_OUT="${IMAGE_OUT:-ghcr.io/orx0815/slingslop:composite}"
 SEED_DIR="${SEED_DIR:-$(pwd)/target/seed}"
 SEED_TIMEOUT="${SEED_TIMEOUT:-180}"
-# App-agnostic readiness: /starter.html = Sling is serving (no app name hard-coded,
-# so apps can be added/removed freely). It can go green BEFORE the app ui.apps
-# content-packages finish installing, so SEED_SETTLE gives the OSGi content-package
-# installer time to finish before we snapshot the (code-only) seed.
-SEED_PROBE_URL="${SEED_PROBE_URL:-/starter.html}"
-SEED_SETTLE="${SEED_SETTLE:-30}"
+# Seed is code-only. Probe a deep /apps (ui.apps) resource that only exists once
+# the app content-packages are actually installed — a DETERMINISTIC "apps deployed"
+# signal. Do NOT use /starter.html: it goes 200 well before Composum installs the
+# ui.apps, so on a slow CI runner the seed would be snapshotted with an incomplete
+# /apps (-> composite mount consistency check fails -> repo won't start). SEED_SETTLE
+# is a small extra margin for the other apps + segment checkpoint.
+SEED_PROBE_URL="${SEED_PROBE_URL:-/apps/slingslop/zengarden/pages/homepage.json}"
+SEED_SETTLE="${SEED_SETTLE:-20}"
 SEED_HTTP_PORT="${SEED_HTTP_PORT:-18080}"
 
 CONTAINER_NAME="slingslop-seed-$$"
