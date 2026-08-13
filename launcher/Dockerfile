@@ -6,6 +6,12 @@ LABEL org.opencontainers.image.authors="orx0815@users.noreply.github.com"
 
 EXPOSE 8080
 
+# curl is used by install-sample-content.sh (invoked via `docker exec`) to push
+# the demo content packages into the running instance; the base image ships none.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system sling && \
     useradd --no-log-init --system --gid sling sling && \
     mkdir /opt/sling && \
@@ -32,6 +38,11 @@ VOLUME /opt/sling/launcher
 COPY src/main/container /opt/sling
 COPY target/dependency/org.apache.sling.feature.launcher /opt/sling/org.apache.sling.feature.launcher
 COPY target/artifacts /opt/sling/artifacts/
+
+# Demo sample-content packages, installed into the RUNNING instance on every
+# launch/deploy by /opt/sling/bin/install-sample-content.sh (NOT baked into the
+# feature/seed, which is code-only). See docs/composite-nodestore.md.
+COPY target/sample-content /opt/sling/sample-content/
 
 # ensure all files are readable by the sling user
 # for some reason some jar files are 0600 while most are 0644

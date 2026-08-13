@@ -70,3 +70,10 @@
       until: ready.status == 200
       retries: 60
       delay: 5
+
+    - name: Install demo sample-content (always overwritten, scoped per content root)
+      # Sample-content is not baked into the seed (code-only image); (re)install it
+      # into the running instance every deploy. Other/user content roots untouched.
+      ansible.builtin.include_role:
+        name: slingslop
+        tasks_from: install-sample-content

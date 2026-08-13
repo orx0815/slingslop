@@ -18,6 +18,9 @@
     "org.apache.jackrabbit.oak.composite.CompositeNodeStoreService": {
       "ignoreMissingMount:Boolean": false,
       "partialReadOnly:Boolean": true
+    },
+    "org.apache.jackrabbit.oak.composite.PrivateStoreValidatorProvider": {
+      "failOnDetection:Boolean": false
     }
   }
 }

@@ -23,7 +23,9 @@
 #   IMAGE_OUT        Composite image tag to produce      (default ghcr.io/orx0815/slingslop:composite)
 #   SEED_DIR         Local seed directory                 (default ./target/seed)
 #   SEED_TIMEOUT     Max seconds to wait for content      (default 180)
-#   SEED_PROBE_URL   URL that returns 200 once seeded     (default /content/slingslop/zengarden/home.html)
+#   SEED_PROBE_URL   URL that returns 200 once Sling serves (default /starter.html)
+#   SEED_SETTLE      Seconds to wait after the probe for the content-package
+#                    (ui.apps) install to finish before snapshotting (default 30)
 #   SEED_HTTP_PORT   Host port to bind for the probe      (default 18080)
 
 set -euo pipefail
@@ -32,7 +34,12 @@ IMAGE_BASE="${IMAGE_BASE:-ghcr.io/orx0815/slingslop:snapshot}"
 IMAGE_OUT="${IMAGE_OUT:-ghcr.io/orx0815/slingslop:composite}"
 SEED_DIR="${SEED_DIR:-$(pwd)/target/seed}"
 SEED_TIMEOUT="${SEED_TIMEOUT:-180}"
-SEED_PROBE_URL="${SEED_PROBE_URL:-/content/slingslop/zengarden/home.html}"
+# App-agnostic readiness: /starter.html = Sling is serving (no app name hard-coded,
+# so apps can be added/removed freely). It can go green BEFORE the app ui.apps
+# content-packages finish installing, so SEED_SETTLE gives the OSGi content-package
+# installer time to finish before we snapshot the (code-only) seed.
+SEED_PROBE_URL="${SEED_PROBE_URL:-/starter.html}"
+SEED_SETTLE="${SEED_SETTLE:-30}"
 SEED_HTTP_PORT="${SEED_HTTP_PORT:-18080}"
 
 CONTAINER_NAME="slingslop-seed-$$"
@@ -92,7 +99,8 @@ if [ "${ready}" -ne 1 ]; then
     docker logs --tail 200 "${CONTAINER_NAME}" || true
     exit 1
 fi
-echo "[INFO] Seed probe OK"
+echo "[INFO] Seed probe OK; settling ${SEED_SETTLE}s for content-package (ui.apps) install to finish"
+sleep "${SEED_SETTLE}"
 
 echo
 echo "[STEP 3/4] Stopping container cleanly (so segment store is checkpointed)"
