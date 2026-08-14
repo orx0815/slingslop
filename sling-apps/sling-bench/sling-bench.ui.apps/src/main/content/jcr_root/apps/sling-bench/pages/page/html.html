@@ -1,0 +1,4 @@
+<!--/* Thin delegate: the folder node only carries sling:resourceType; the actual
+     page content (and its own, possibly more specific, resourceType) lives on
+     the jcr:content child. Forward selectors so e.g. .noMinLibs survives the include. */-->
+<sly data-sly-resource="${'jcr:content' @ selectors=request.requestPathInfo.selectors}"/>

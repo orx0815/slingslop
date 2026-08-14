@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="sling-bench/components/parsys">
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="VT Bench Probe"
+        text="&lt;p&gt;An app-independent Servlet Filter for benchmarking virtual threads (Project Loom) vs. platform threads on this Sling instance.&lt;/p&gt;"/>
+    <what
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="What"
+        text="&lt;p&gt;&lt;code&gt;VtBenchProbeFilter&lt;/code&gt; sleeps the current request thread for a configurable duration, simulating blocking I/O. Drive enough concurrent requests at it and you can watch the Sling/Jetty thread pool either park (virtual threads) or saturate (platform threads).&lt;/p&gt;&lt;p&gt;It is a single OSGi bundle &amp;#8212; no &lt;code&gt;ui.apps&lt;/code&gt;, no JCR content, no HTL. It has nothing to do with any specific app.&lt;/p&gt;"/>
+    <why
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Why a Filter, not a Sling Model + selector script"
+        text="&lt;p&gt;The very first version of this lived inside &lt;code&gt;sling-matrix&lt;/code&gt; as a Sling Model plus a &lt;code&gt;vt-bench.html&lt;/code&gt; selector script under sling-matrix's own &lt;code&gt;pages/basepage/&lt;/code&gt;. That meant it only worked on sling-matrix pages, and every other app that wanted to be benchmarked would need its own copy of the same script and model.&lt;/p&gt;&lt;p&gt;&lt;code&gt;VtBenchProbeFilter&lt;/code&gt; is registered on the Sling filter whiteboard with &lt;code&gt;sling.filter.scope=REQUEST&lt;/code&gt;, which runs it before resource resolution. That means it intercepts every request on the instance &amp;#8212; any app, any path, even paths that don't resolve to a real resource &amp;#8212; with zero per-app wiring.&lt;/p&gt;"/>
+    <enable
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="How — enable it"
+        text="&lt;p&gt;Disabled by default (a sleep-on-demand endpoint has no business being live in production by accident):&lt;/p&gt;&lt;p&gt;&lt;code&gt;http://localhost:8080/system/console/configMgr&lt;/code&gt; &amp;#8594; &amp;quot;VT Bench Probe&amp;quot;&lt;br/&gt;PID: &lt;code&gt;org.motorbrot.vtbenchprobe.VtBenchProbeFilter&lt;/code&gt;&lt;/p&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Config field&lt;/th&gt;&lt;th&gt;Default&lt;/th&gt;&lt;th&gt;Meaning&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;enabled&lt;/code&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;&lt;td&gt;master on/off switch&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;queryParamName&lt;/code&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;_vtbenchDelay&lt;/code&gt;&lt;/td&gt;&lt;td&gt;presence on ANY request triggers the probe; its value is the delay in ms&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;maxDelayMs&lt;/code&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;5000&lt;/code&gt;&lt;/td&gt;&lt;td&gt;safety cap &amp;#8212; requested delay is clamped, so the probe can't hold a thread open indefinitely&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;renderRealPage&lt;/code&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;false&lt;/code&gt;: sleep, write a tiny plain-text body, stop. &lt;code&gt;true&lt;/code&gt;: sleep, then continue to the real resource so it also renders.&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;"/>
+    <use
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="How — use it"
+        text="&lt;p&gt;Once enabled, append the query param to &lt;strong&gt;any&lt;/strong&gt; URL on the instance. The response always carries &lt;code&gt;X-VT-Bench-Thread&lt;/code&gt; (&lt;code&gt;virtual&lt;/code&gt;/&lt;code&gt;platform&lt;/code&gt;), &lt;code&gt;X-VT-Bench-Delay-Ms&lt;/code&gt;, and &lt;code&gt;X-VT-Bench-Elapsed-Ms&lt;/code&gt; headers, whether or not &lt;code&gt;renderRealPage&lt;/code&gt; is on.&lt;/p&gt;"/>
+    <use-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="curl -D- &quot;http://localhost:8080/content/anything.html?_vtbenchDelay=100&quot;"/>
+    <loadtest
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="How — run the actual load test"
+        text="&lt;p&gt;&lt;code&gt;vt-bench.sh&lt;/code&gt; drives &lt;code&gt;wrk&lt;/code&gt; (preferred) or &lt;code&gt;hey&lt;/code&gt; against a list of URLs at increasing concurrency:&lt;/p&gt;"/>
+    <loadtest-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="cd sling-apps/sling-bench&#xa;./vt-bench.sh http://localhost:8080 100 10 10,50,200,500"/>
+    <loadtest-preflight
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;It refuses to run silently against a disabled probe: a disabled filter still returns a normal HTTP 200 (the real page just renders), so the script checks for the &lt;code&gt;X-VT-Bench-Thread&lt;/code&gt; response header first and tells you exactly how to enable it if that header is missing.&lt;/p&gt;"/>
+    <vt-knob
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="How — turn on virtual threads (the CONGA knob)"
+        text="&lt;p&gt;Virtual threads are not a code change here &amp;#8212; they're one config knob, rendered by CONGA (&lt;code&gt;devops/conga&lt;/code&gt;) into JVM system properties:&lt;/p&gt;"/>
+    <vt-knob-yaml
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="yaml"
+        code="# devops/conga/src/main/environments/local-plain.yaml&#xa;config:&#xa;  httpVirtualThreads: true    # or false&#xa;  httpThreadpoolMax: 200      # platform-thread ceiling (ignored when VT is on)"/>
+    <vt-knob-apply
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;Regenerate and restart to apply:&lt;/p&gt;"/>
+    <vt-knob-apply-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="cd devops/conga &amp;&amp; mvn generate-resources&#xa;cd launcher &amp;&amp; ./launch.sh"/>
+    <vt-knob-result
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;This renders to &lt;code&gt;devops/conga/target/configuration/local-plain/localhost/env/http-java-opts&lt;/code&gt;, picked up automatically by &lt;code&gt;launcher/launch.sh&lt;/code&gt;:&lt;/p&gt;"/>
+    <vt-knob-result-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="properties"
+        code="-Dorg.apache.felix.http.jetty.virtualthreads.enable=true&#xa;-Dorg.apache.felix.http.jetty.threadpool.max=200"/>
+    <vt-knob-prod
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;The same mechanism drives production &amp;#8212; see the &lt;code&gt;slingslop-runtime&lt;/code&gt; role config in &lt;code&gt;prod-motorbrot.yaml&lt;/code&gt;.&lt;/p&gt;"/>
+    <jvm-params
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="How — set custom JVM parameters"
+        text="&lt;p&gt;Two ways to pass extra JVM flags to the local launcher, without editing &lt;code&gt;launch.sh&lt;/code&gt; itself:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Ad-hoc, one-off flags&lt;/strong&gt; &amp;#8212; set &lt;code&gt;EXTRA_JAVA_OPTS&lt;/code&gt; before launching (example below).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Persistent, environment-specific flags&lt;/strong&gt; &amp;#8212; add them to the CONGA environment's &lt;code&gt;config:&lt;/code&gt; block (like &lt;code&gt;httpVirtualThreads&lt;/code&gt; above) and render a new line in &lt;code&gt;devops/conga/src/main/templates/slingslop-runtime/http-java-opts.hbs&lt;/code&gt;, so the flag is versioned and reproducible instead of typed by hand every time.&lt;/li&gt;&lt;/ul&gt;"/>
+    <jvm-params-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="EXTRA_JAVA_OPTS=&quot;-Xmx1g -XX:+PrintGCDetails&quot; ./launch.sh"/>
+    <jvm-params-order
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;&lt;code&gt;launch.sh&lt;/code&gt; assembles the final &lt;code&gt;JAVA_OPTS&lt;/code&gt; as: base flags (G1GC, compact headers, string dedup) + JDWP (only if port 38080 is free) + &lt;code&gt;EXTRA_JAVA_OPTS&lt;/code&gt; + the CONGA-rendered &lt;code&gt;http-java-opts&lt;/code&gt; file, in that order &amp;#8212; so both sources can add or override JVM system properties on the same run.&lt;/p&gt;"/>
+</jcr:root>

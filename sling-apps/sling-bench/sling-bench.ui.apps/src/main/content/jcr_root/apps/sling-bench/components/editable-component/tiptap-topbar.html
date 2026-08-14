@@ -1,0 +1,32 @@
+<!-- ── Tiptap Toolbar (fixed to viewport top) ─────────────────── -->
+<div id="tiptap-toolbar" class="tiptap-toolbar" role="toolbar" aria-label="Editor toolbar">
+  <div class="toolbar-group">
+    <button type="button" data-action="undo" title="Undo (Ctrl+Z)">↩</button>
+    <button type="button" data-action="redo" title="Redo (Ctrl+Y)">↪</button>
+  </div>
+  <div class="toolbar-group">
+    <select id="heading-select" title="Paragraph / Heading">
+      <option value="0">Paragraph</option>
+      <option value="1">H1</option>
+      <option value="2">H2</option>
+      <option value="3">H3</option>
+    </select>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" data-action="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button type="button" data-action="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button type="button" data-action="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+    <button type="button" data-action="code" title="Inline code">&lt;&gt;</button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" data-action="bulletList" title="Bullet list">• —</button>
+    <button type="button" data-action="orderedList" title="Numbered list">1. —</button>
+    <button type="button" data-action="blockquote" title="Blockquote">"…"</button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" data-action="link" title="Insert / edit link">🔗</button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" id="toggle-source" title="View HTML Source">&lt;/&gt; src</button>
+  </div>
+</div>

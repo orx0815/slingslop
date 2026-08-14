@@ -1,0 +1,31 @@
+<!--/* Plain (non-HTMX) multipart form — the most robust option for file inputs.
+     Gated to logged-in users; BenchmarkRunUploadServlet also enforces this
+     server-side (defence in depth, see sling-bench.core). */-->
+<section class="upload-form" id="upload-form" aria-labelledby="upload-form-title"
+          data-sly-use.auth="org.motorbrot.slingbench.slingmodels.UserIsLoggedIn">
+  <h2 id="upload-form-title">2. Upload the results</h2>
+
+  <sly data-sly-test="${!auth.loggedIn}">
+    <p class="upload-form__gate">
+      <a href="/system/sling/form/login?resource=${resource.path @ context='attribute'}.html">Log in</a>
+      to upload a benchmark run.
+    </p>
+  </sly>
+
+  <form data-sly-test="${auth.loggedIn}" class="upload-form__form"
+        method="post" enctype="multipart/form-data" action="/bin/slingbench/upload">
+    <label class="upload-form__field">
+      <span>Run label</span>
+      <input type="text" name="label" placeholder="e.g. 500 concurrent, VT on, 2-core VPS" />
+    </label>
+    <label class="upload-form__field">
+      <span>Result file (vt-bench-*.txt)</span>
+      <input type="file" name="resultFile" accept=".txt" required />
+    </label>
+    <label class="upload-form__field">
+      <span>CPU sampler CSV (optional, cpu-*.csv)</span>
+      <input type="file" name="cpuFile" accept=".csv" />
+    </label>
+    <button type="submit" class="btn btn-primary">Upload &amp; render charts</button>
+  </form>
+</section>

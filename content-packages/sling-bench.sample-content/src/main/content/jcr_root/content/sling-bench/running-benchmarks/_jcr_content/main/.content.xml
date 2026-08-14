@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="sling-bench/components/parsys">
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Running Benchmarks"
+        text="&lt;p&gt;The operational runbook for &lt;code&gt;vt-bench.sh&lt;/code&gt;: prerequisites, enabling the probe, the thread-pool ceiling, how CONGA actually gets a config change onto the running JVM, and how to tweak JVM options beyond what CONGA renders (heap sizing, experimental/incubator flags).&lt;/p&gt;&lt;p&gt;For what the probe filter itself does and why it's a Servlet Filter, see the &lt;a href=&quot;/content/sling-bench/vt-bench-probe.html&quot;&gt;VT Bench Probe&lt;/a&gt; page.&lt;/p&gt;"/>
+    <prereqs
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Prerequisites"
+        text="&lt;p&gt;One of the following load-testing tools, on your &lt;code&gt;$PATH&lt;/code&gt;:&lt;/p&gt;"/>
+    <prereqs-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="# wrk (preferred -- single process, Lua round-robin across URLs)&#xa;apt install wrk       # or: brew install wrk&#xa;&#xa;# hey (fallback -- sequential per-URL, still fine for smaller runs)&#xa;go install github.com/rakyll/hey@latest&#xa;apt install hey"/>
+    <enable
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Enable the probe"
+        text="&lt;p&gt;Off by default -- this is a load-testing tool, not something to leave on in production:&lt;/p&gt;&lt;p&gt;&lt;code&gt;http://localhost:8080/system/console/configMgr&lt;/code&gt; &amp;#8594; &amp;quot;VT Bench Probe&amp;quot; &amp;#8594; check &lt;strong&gt;Enabled&lt;/strong&gt;&lt;br/&gt;PID: &lt;code&gt;org.motorbrot.vtbenchprobe.VtBenchProbeFilter&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;code&gt;vt-bench.sh&lt;/code&gt; refuses to run silently against a disabled probe -- a disabled filter still returns HTTP 200 (the real page just renders), so the script checks for the &lt;code&gt;X-VT-Bench-Thread&lt;/code&gt; response header first.&lt;/p&gt;"/>
+    <ceiling
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="The thread-pool ceiling"
+        text="&lt;p&gt;&lt;code&gt;httpThreadpoolMax&lt;/code&gt; (default &lt;code&gt;200&lt;/code&gt; in &lt;code&gt;local-plain.yaml&lt;/code&gt;) is the platform-thread ceiling. Virtual threads park on &lt;code&gt;Thread.sleep&lt;/code&gt;; platform threads hold an OS thread for the duration of the sleep. Drive concurrency above the ceiling to see the difference:&lt;/p&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;code&gt;httpVirtualThreads&lt;/code&gt;&lt;/th&gt;&lt;th&gt;100ms I/O @ 500 concurrent&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;&lt;td&gt;queue fills, p99 spikes, RPS plateaus at the ceiling&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;&lt;td&gt;throughput keeps scaling, p99 stays flat&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;"/>
+    <conga-intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="CONGA: how a config change actually reaches the JVM"
+        text="&lt;p&gt;CONGA (&lt;code&gt;devops/conga&lt;/code&gt;) is this repo's config-generation module: it takes a small per-environment YAML file (roles + tenants + a &lt;code&gt;config:&lt;/code&gt; block of knobs) and renders it through Handlebars templates into the actual files each target consumes -- Traefik routers, webcache vhosts, Sling &lt;code&gt;/etc/map&lt;/code&gt; mappings, and, for our purposes here, a plain text file of JVM system properties.&lt;/p&gt;&lt;p&gt;&lt;code&gt;httpVirtualThreads&lt;/code&gt; and &lt;code&gt;httpThreadpoolMax&lt;/code&gt; are knobs on the &lt;code&gt;slingslop-runtime&lt;/code&gt; role. The role's template, &lt;code&gt;devops/conga/src/main/templates/slingslop-runtime/http-java-opts.hbs&lt;/code&gt;, turns them into two &lt;code&gt;-D&lt;/code&gt; flags (below). Nothing is hand-edited -- you change the YAML, CONGA regenerates the output file, and &lt;code&gt;launcher/launch.sh&lt;/code&gt; picks it up automatically because it always reads whatever is currently at that path.&lt;/p&gt;&lt;p&gt;This is the SAME mechanism in every environment -- only the source YAML differs. Locally that's &lt;code&gt;local-plain.yaml&lt;/code&gt;; in production it's &lt;code&gt;prod-motorbrot.yaml&lt;/code&gt; (under the &lt;code&gt;slingslop-runtime&lt;/code&gt; role config of the &lt;code&gt;vps1&lt;/code&gt; node). The Ansible &lt;code&gt;slingslop&lt;/code&gt; role reads the exact same rendered &lt;code&gt;http-java-opts&lt;/code&gt; file and appends it to the production JVM's launch options.&lt;/p&gt;"/>
+    <conga-yaml
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;The knobs, in &lt;code&gt;devops/conga/src/main/environments/local-plain.yaml&lt;/code&gt;:&lt;/p&gt;"/>
+    <conga-yaml-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="yaml"
+        code="nodes:&#xa;- node: localhost&#xa;  roles:&#xa;  - role: slingslop-runtime&#xa;    variant: segment&#xa;    config:&#xa;      httpVirtualThreads: true    # false = classic platform-thread pool&#xa;      httpThreadpoolMax: 200      # platform-thread ceiling (ignored when VT is on)"/>
+    <conga-apply
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;Regenerate and restart to apply:&lt;/p&gt;"/>
+    <conga-apply-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="cd devops/conga &amp;&amp; mvn generate-resources&#xa;cd launcher &amp;&amp; ./launch.sh"/>
+    <conga-result
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;Rendered to &lt;code&gt;devops/conga/target/configuration/local-plain/localhost/env/http-java-opts&lt;/code&gt;:&lt;/p&gt;"/>
+    <conga-result-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="properties"
+        code="-Dorg.apache.felix.http.jetty.virtualthreads.enable=true&#xa;-Dorg.apache.felix.http.jetty.threadpool.max=200"/>
+    <jvm-tuning-intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Tweaking JVM options (heap, experimental flags, ...)"
+        text="&lt;p&gt;CONGA's &lt;code&gt;http-java-opts&lt;/code&gt; only carries the two thread-pool flags above. Anything else -- heap sizing, GC tuning, incubator/preview features -- goes through &lt;code&gt;launch.sh&lt;/code&gt;'s &lt;code&gt;EXTRA_JAVA_OPTS&lt;/code&gt; environment variable, which is concatenated into the final &lt;code&gt;JAVA_OPTS&lt;/code&gt; alongside the CONGA-rendered flags (base flags + JDWP + &lt;code&gt;EXTRA_JAVA_OPTS&lt;/code&gt; + &lt;code&gt;http-java-opts&lt;/code&gt;, in that order).&lt;/p&gt;"/>
+    <jvm-tuning-heap
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Heap size example"
+        text="&lt;p&gt;Give the launcher a fixed 512MB floor / 2GB ceiling, or cap it as a percentage of the container's memory limit instead of an absolute number:&lt;/p&gt;"/>
+    <jvm-tuning-heap-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="EXTRA_JAVA_OPTS=&quot;-Xms512m -Xmx2g&quot; ./launch.sh&#xa;&#xa;# or, container-friendly (percentage of the cgroup memory limit instead of a fixed -Xmx):&#xa;EXTRA_JAVA_OPTS=&quot;-XX:MaxRAMPercentage=75.0&quot; ./launch.sh"/>
+    <jvm-tuning-experimental
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Experimental / incubator flags"
+        text="&lt;p&gt;Incubating APIs -- like the Vector API (JEP 508) -- need an explicit module plus a preview-features unlock; genuinely experimental JVM flags need &lt;code&gt;-XX:+UnlockExperimentalVMOptions&lt;/code&gt; before the JVM will accept them at all:&lt;/p&gt;"/>
+    <jvm-tuning-experimental-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="bash"
+        code="EXTRA_JAVA_OPTS=&quot;--add-modules jdk.incubator.vector --enable-preview -XX:+UnlockExperimentalVMOptions&quot; ./launch.sh"/>
+    <jvm-tuning-experimental-caveat
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        text="&lt;p&gt;&lt;code&gt;--enable-preview&lt;/code&gt; only helps code that was itself &lt;strong&gt;compiled&lt;/strong&gt; with &lt;code&gt;--enable-preview --release 25&lt;/code&gt; (or matching &lt;code&gt;--add-modules&lt;/code&gt;) -- it will not retroactively unlock preview behaviour in Sling's own bundles. This flag combination is only useful while experimenting with your own code that explicitly targets an incubating API, not as a general performance knob.&lt;/p&gt;"/>
+    <jvm-tuning-persist
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/doc-section"
+        heading="Making a flag permanent instead of ad-hoc"
+        text="&lt;p&gt;&lt;code&gt;EXTRA_JAVA_OPTS&lt;/code&gt; is one-off and easy to forget between runs. For a flag you want every teammate (and prod) to get automatically, add a new knob the same way &lt;code&gt;httpVirtualThreads&lt;/code&gt; was added: a &lt;code&gt;config:&lt;/code&gt; entry in the environment YAML, plus a line in &lt;code&gt;http-java-opts.hbs&lt;/code&gt; that renders it.&lt;/p&gt;"/>
+    <jvm-tuning-persist-example
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="sling-bench/components/code-block"
+        language="yaml"
+        code="# local-plain.yaml&#xa;config:&#xa;  httpVirtualThreads: true&#xa;  httpThreadpoolMax: 200&#xa;  maxRamPercentage: 75.0     # new knob&#xa;&#xa;# http-java-opts.hbs -- append:&#xa;# {{#if maxRamPercentage}} -XX:MaxRAMPercentage={{maxRamPercentage}}{{/if}}"/>
+</jcr:root>

@@ -14,6 +14,7 @@ import {
 } from './editor/component-modal';
 import { saveEditorContent } from './editor/save';
 import { wireConfirmModal } from './editor/confirm-modal';
+import { wireHoverBadge } from './editor/hover-badge';
 
 // htmx is loaded as a global script (dev) or inlined via banner (prod)
 declare const htmx: {
@@ -25,7 +26,7 @@ declare const htmx: {
 // htmx 4 event detail: swap/response events carry a `ctx` object.
 // target is the resolved swap target; response holds the fetch status.
 interface HtmxSwapDetail {
-  ctx: { target: HTMLElement };
+  ctx: { target: HTMLElement; response?: { status: number } };
 }
 interface HtmxResponseErrorDetail {
   ctx: { response: { status: number } };
@@ -47,6 +48,7 @@ declare global {
   function initializeEventListeners(): void {
     // Themed confirmation dialog in place of the native window.confirm()
     wireConfirmModal();
+    wireHoverBadge();
 
     // htmx 4 swaps 4xx/5xx responses by default (v2 did not). The save-error
     // overlay relies on error responses NOT being swapped into the page, so the
@@ -60,8 +62,32 @@ declare global {
     // Destroy editor before any swap that removes the active editing region.
     // With outerMorph htmx diffs the response into the live DOM, so the
     // Tiptap-managed DOM must be torn down here to avoid a dangling instance.
-    document.body.addEventListener('htmx:before:swap', function (event: Event): void {
+    //
+    // Listen on `document`, NOT `document.body`: htmx's outerMorph can only
+    // patch a node in place when the swapped-in markup's root has the SAME
+    // tag name as the element being replaced (e.g. a richtext component's
+    // <div> view swapped for the <div> edit-form wrapper). When the tag
+    // differs -- e.g. a modal-only component whose view root is a semantic
+    // <header>/<footer> (kept because host-page CSS commonly styles those
+    // tags directly) swapped for editable-component-modal's <div> wrapper --
+    // htmx cannot morph in place; it removes the old node and dispatches its
+    // lifecycle events directly on `document` instead of on a (now detached)
+    // element. Such events never reach a `document.body` listener, silently
+    // breaking the edit flow for every modal-only component. `document`
+    // catches both cases uniformly.
+    document.addEventListener('htmx:before:swap', function (event: Event): void {
       const htmxEvent = event as CustomEvent<HtmxSwapDetail>;
+      const status = htmxEvent.detail.ctx.response?.status;
+      // htmx still fires before:swap/after:swap for noSwap-listed error
+      // statuses (401/404/422/500) even though no content is swapped in --
+      // it just re-settles the existing DOM. Tearing the overlay down here
+      // for those statuses would delete #editor-save-error (portalled,
+      // found by ID) right as htmx:response:error tries to show it, and
+      // would destroy the live Tiptap instance while editing is still
+      // active, leaving Save looking like it silently did nothing.
+      if (status !== undefined && htmx.config.noSwap.includes(status)) {
+        return;
+      }
       if (htmxEvent.detail.ctx.target.hasAttribute('data-zen-editable-editing')) {
         hideComponentModal();
         unmountComponentModal();
@@ -73,7 +99,7 @@ declare global {
     // Init editing UI after htmx swaps in an edit form.
     // Richtext supertype renders #tiptap-editor.
     // Modal-only supertype omits it and opens the modal directly.
-    document.body.addEventListener('htmx:after:swap', function (): void {
+    document.addEventListener('htmx:after:swap', function (): void {
       const form = document.getElementById('editor-form') as HTMLElement | null;
       if (!form) {
         return;
@@ -94,7 +120,7 @@ declare global {
     });
 
     // Show a user-friendly message for save errors (401/422 = not logged in, 404, 500)
-    document.body.addEventListener('htmx:response:error', function (event: Event): void {
+    document.addEventListener('htmx:response:error', function (event: Event): void {
       const htmxEvent = event as CustomEvent<HtmxResponseErrorDetail>;
       const status = htmxEvent.detail.ctx.response.status;
 

@@ -1,0 +1,52 @@
+<section class="styleguide">
+  <h1>Sling Bench Style Guide</h1>
+  <p>A living reference for the colour system, typography and components used across the dashboard.</p>
+
+  <h2>Colours</h2>
+  <div class="styleguide__swatches">
+    <div class="swatch" style="background:var(--color-primary)">primary</div>
+    <div class="swatch" style="background:var(--color-primary-light)">primary-light</div>
+    <div class="swatch" style="background:var(--color-primary-dark)">primary-dark</div>
+    <div class="swatch" style="background:var(--color-secondary)">secondary</div>
+    <div class="swatch" style="background:var(--color-secondary-light)">secondary-light</div>
+    <div class="swatch" style="background:var(--color-secondary-dark)">secondary-dark</div>
+    <div class="swatch swatch--dark" style="background:var(--color-surface)">surface</div>
+    <div class="swatch swatch--dark" style="background:var(--color-bg)">bg</div>
+  </div>
+
+  <h2>Typography</h2>
+  <h1>Heading 1</h1>
+  <h2>Heading 2</h2>
+  <h3>Heading 3</h3>
+  <p>Body text with a <a href="#">link</a>, <strong>bold</strong>, <em>emphasis</em> and <code>inline code</code>.</p>
+  <blockquote>"Concurrency is not parallelism." — Rob Pike</blockquote>
+  <ul><li>List item one</li><li>List item two</li></ul>
+
+  <h2>Buttons</h2>
+  <div class="styleguide__row">
+    <button class="btn btn-primary">Primary</button>
+    <button class="btn btn-secondary">Secondary</button>
+    <button class="btn btn-danger">Danger</button>
+  </div>
+
+  <h2>Badges</h2>
+  <div class="styleguide__row">
+    <span class="badge badge--vt">virtual threads</span>
+    <span class="badge badge--pt">platform threads</span>
+  </div>
+
+  <h2>Charts</h2>
+  <p>Every chart on a run-detail page or the dashboard overview is server-rendered inline SVG — no client-side charting library. Sample bar chart:</p>
+  <div class="chart-card" style="max-width:480px">
+    <svg viewBox="0 0 480 220" width="100%" height="220" class="svg-chart">
+      <line x1="48" y1="12" x2="48" y2="192" class="svg-chart-axis"/>
+      <line x1="48" y1="192" x2="468" y2="192" class="svg-chart-axis"/>
+      <rect x="70" y="140" width="60" height="52" fill="var(--color-primary)" class="svg-chart-bar"/>
+      <rect x="180" y="90" width="60" height="102" fill="var(--color-primary)" class="svg-chart-bar"/>
+      <rect x="290" y="40" width="60" height="152" fill="var(--color-primary)" class="svg-chart-bar"/>
+      <text x="100" y="205" text-anchor="middle" class="svg-chart-axis-label">10</text>
+      <text x="210" y="205" text-anchor="middle" class="svg-chart-axis-label">50</text>
+      <text x="320" y="205" text-anchor="middle" class="svg-chart-axis-label">200</text>
+    </svg>
+  </div>
+</section>

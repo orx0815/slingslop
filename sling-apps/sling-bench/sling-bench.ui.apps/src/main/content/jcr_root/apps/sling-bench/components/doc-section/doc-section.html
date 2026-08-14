@@ -1,0 +1,6 @@
+<section class="doc-section">
+  <sly data-sly-test="${properties.heading}">
+    <h2>${properties.heading @ context='text'}</h2>
+  </sly>
+  <div class="doc-section__body">${properties.text @ context='html'}</div>
+</section>

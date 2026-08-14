@@ -1,0 +1,15 @@
+/*
+ * editor.css — editor bundle entry point
+ * Concatenated in order by the build script.
+ *
+ * The compiled output lives at:
+ *   src/main/content/jcr_root/apps/slingslop/zengarden/css/editor/editor.css
+ * That file is auto-generated — edit here, not there.
+ */
+@import "./00-variables.css";
+@import "./01-modal-overlay.css";
+@import "./02-modal-dialog.css";
+@import "./03-buttons.css";
+@import "./04-toolbar.css";
+@import "./05-tiptap-editor.css";
+@import "./06-inline-editor.css";

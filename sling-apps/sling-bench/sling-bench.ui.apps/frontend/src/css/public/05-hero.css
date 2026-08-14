@@ -1,0 +1,19 @@
+/**
+ * 05-hero.css — dashboard intro / text-block treatment.
+ * (No dedicated hero section — this is a tool, not a landing page — but the
+ * homepage's zen-editable intro text-block gets a subtle entrance.)
+ */
+@starting-style {
+  .text-block {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+.text-block {
+  transition: opacity 0.4s ease, translate 0.4s ease;
+}
+
+.text-block h2 {
+  color: var(--color-primary-light);
+}

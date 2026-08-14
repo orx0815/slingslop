@@ -41,6 +41,7 @@
       /content/motorbrot/dma/home.html,
       /content/alf-vs-agent/home.html,
       /content/cyberpunk-alpaca/home.html,
+      /content/sling-bench/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
       /slingshot/resources/images/background.jpg,
       /slingshot/users/slingshot2/places/landing/images/landing.jpg,
@@ -351,6 +352,12 @@
                 <artifactItem>
                   <groupId>org.motorbrot</groupId>
                   <artifactId>digitalmedia.sample-content</artifactId>
+                  <version>${slingslop.launcher.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.motorbrot</groupId>
+                  <artifactId>sling-bench.sample-content</artifactId>
                   <version>${slingslop.launcher.version}</version>
                   <type>zip</type>
                 </artifactItem>

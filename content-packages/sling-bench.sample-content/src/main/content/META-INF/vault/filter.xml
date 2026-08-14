@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+
+    <!-- mode="merge" never deletes content this package doesn't know about, and the
+         explicit exclude keeps /content/sling-bench/runs (uploaded benchmark data,
+         see BenchmarkRunUploadServlet) permanently out of this package's scope —
+         reinstalling sample content can never wipe uploaded runs. -->
+    <filter root="/content/sling-bench" mode="merge">
+        <exclude pattern="/content/sling-bench/runs(/.*)?"/>
+    </filter>
+
+</workspaceFilter>

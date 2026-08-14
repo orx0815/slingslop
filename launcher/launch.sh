@@ -11,9 +11,16 @@ HTTP_JAVA_OPTS=""
 CONGA_HTTP_JAVA_OPTS=../devops/conga/target/configuration/local-plain/localhost/env/http-java-opts
 [ -f "$CONGA_HTTP_JAVA_OPTS" ] && HTTP_JAVA_OPTS=$(cat "$CONGA_HTTP_JAVA_OPTS")
 
+# Only attach JDWP when port 38080 is free — a stale Sling JVM holding 38080
+# would otherwise cause the new JVM to abort before Sling even starts.
+JDWP_OPTS=""
+if ! ss -tlnp 2>/dev/null | grep -q ':38080 '; then
+  JDWP_OPTS="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=38080"
+fi
+
 export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication \
                   --enable-native-access=ALL-UNNAMED \
-                  -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=38080 \
+                  ${JDWP_OPTS} \
                   ${EXTRA_JAVA_OPTS:-} ${HTTP_JAVA_OPTS}"
 
 # Sample-content is no longer baked into the feature/seed (code-only). Install

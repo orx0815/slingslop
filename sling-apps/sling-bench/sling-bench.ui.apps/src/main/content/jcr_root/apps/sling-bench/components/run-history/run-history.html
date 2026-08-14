@@ -1,0 +1,33 @@
+<section class="run-history" id="run-history" aria-labelledby="run-history-title"
+          data-sly-use.history="org.motorbrot.slingbench.slingmodels.RunHistoryModel">
+  <h2 id="run-history-title">3. Run history</h2>
+
+  <sly data-sly-test="${history.empty}">
+    <p class="run-history__empty">No runs uploaded yet — generate a script above, run it, then upload the results.</p>
+  </sly>
+
+  <sly data-sly-test="${history.hasComparisonChart}">
+    <div class="chart-card">
+      <h3>Virtual threads vs. platform threads — avg req/s by concurrency (all runs)</h3>
+      ${history.comparisonChartSvg @ context='unsafe'}
+    </div>
+  </sly>
+
+  <table data-sly-test="${!history.empty}" class="run-history__table">
+    <thead>
+      <tr><th>Run</th><th>Uploaded</th><th>Tool</th><th>Threading</th><th>Peak req/s</th></tr>
+    </thead>
+    <tbody>
+      <tr data-sly-repeat.run="${history.runs}">
+        <td><a href="${run.url @ context='uri'}">${run.label @ context='text'}</a></td>
+        <td>${run.uploadedAtFormatted @ context='text'}</td>
+        <td>${run.tool @ context='text'}</td>
+        <td>
+          <sly data-sly-test="${run.httpVirtualThreads}"><span class="badge badge--vt">virtual threads</span></sly>
+          <sly data-sly-test="${!run.httpVirtualThreads}"><span class="badge badge--pt">platform threads</span></sly>
+        </td>
+        <td>${run.peakRps @ context='text'}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

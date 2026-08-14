@@ -1,0 +1,4 @@
+<!--/* Paragraph system — renders each child resource using its own sling:resourceType */-->
+<sly data-sly-list="${resource.listChildren}">
+    <sly data-sly-resource="${item}"/>
+</sly>

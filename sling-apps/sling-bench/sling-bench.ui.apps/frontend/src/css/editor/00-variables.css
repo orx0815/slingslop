@@ -1,0 +1,60 @@
+/*
+ * Color tokens — single source of truth for all editor colors.
+ * Sling Bench: cyan primary (matches the public dashboard's --hue-primary),
+ * everything else derived the same way as every other app's editor palette.
+ *
+ * Scoped to [data-zen-editable]/[data-zen-editable-editing]/#editor-modal-container
+ * (NOT :root): several of these names (--color-text, --color-white,
+ * --color-border, ...) collide with the public dashboard's own dark-theme
+ * variables of the same name. Declaring them on :root would override the
+ * public page's colors globally the moment this stylesheet loads (i.e. as
+ * soon as you log in), breaking contrast on every input/button on the page,
+ * not just the editor. #editor-modal-container is included because
+ * component-modal.ts portals the modal there (a body-level sibling, outside
+ * the [data-zen-editable] subtree) to escape overflow:hidden ancestors.
+ */
+[data-zen-editable], [data-zen-editable-editing], #editor-modal-container {
+  /* ── Primary palette ──────────────────────────────────────────────── */
+  --color-primary-base:      oklch(60.5% 0.15 195);
+  --color-primary:           var(--color-primary-base);
+  --color-primary-hover:     oklch(from var(--color-primary-base) calc(l - 0.138) calc(c - 0.053) h);
+  --color-primary-accent:    oklch(from var(--color-primary-base) calc(l - 0.027) calc(c + 0.011) calc(h + 3));
+  --color-focus-ring:        oklch(from var(--color-primary-base) calc(l + 0.178) calc(c - 0.103) calc(h - 6));
+  --color-active-border:     oklch(from var(--color-primary-base) calc(l + 0.036) calc(c - 0.086) calc(h - 6));
+  --color-active-bg:         oklch(from var(--color-primary-base) calc(l + 0.253) calc(c - 0.168) calc(h - 9));
+  --color-active-text:       oklch(from var(--color-primary-base) calc(l - 0.202) calc(c - 0.121) calc(h - 6));
+  --color-primary-hover-bg:       oklch(from var(--color-primary-base) l c h / 0.05);
+  --color-primary-hover-outline:  oklch(from var(--color-primary-base) l c h / 0.30);
+  --color-primary-glow:           oklch(from var(--color-primary-base) l c h / 0.15);
+  --color-accent-glow:            oklch(from var(--color-primary-accent) l c h / 0.25);
+  --color-active-border-tint:     oklch(from var(--color-active-border) l c h / 0.15);
+
+  --color-white:             #fff;
+  --color-white-soft:        #fefefe;
+  --color-black:             #000;
+
+  /* ── Secondary / neutral palette ─────────────────────────────────────── */
+  --color-secondary-base:    oklch(55.8% 0.015 195);
+  --color-secondary:         var(--color-secondary-base);
+  --color-secondary-hover:   oklch(from var(--color-secondary-base) calc(l - 0.09) c h);
+
+  --color-bg-subtle:         oklch(from var(--color-secondary-base) 98% calc(c * 0.1) h);
+  --color-border-ui:         oklch(from var(--color-secondary-base) 91% calc(c * 0.4) h);
+  --color-hover:             oklch(from var(--color-secondary-base) 88% 0            h);
+  --color-border:            oklch(from var(--color-secondary-base) 83% 0            h);
+  --color-text-placeholder:  oklch(from var(--color-secondary-base) 72% 0            h);
+  --color-text-muted:        oklch(from var(--color-secondary-base) 59% 0            h);
+  --color-text:              oklch(from var(--color-secondary-base) 27% 0            h);
+
+  /* Code editor */
+  --color-code-inline-bg:    #f0f0f0;
+  --color-code-bg:           #282828;
+  --color-code-fg:           #f8f8f2;
+  --color-source-editor-bg:  #1e1e2e;
+  --color-source-editor-fg:  #cdd6f4;
+
+  /* Error / Danger */
+  --color-error-bg:          #f8d7da;
+  --color-error-border:      #f5c2c7;
+  --color-error-text:        #842029;
+}

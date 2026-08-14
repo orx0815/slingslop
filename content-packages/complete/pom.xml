@@ -127,6 +127,35 @@
             <type>content-package</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sling-bench.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sling-bench.ui.apps</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sling-bench.sample-content</artifactId>
+            <version>${project.version}</version>
+            <type>content-package</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vt-bench-probe.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        
         <!--
             NOTE: the Digital Media Library (DML) is intentionally NOT part of this
             all-in-one container package. It is delivered as a standalone, releasable
@@ -169,6 +198,16 @@
                         <embedded>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>cyberpunk-alpaca.core</artifactId>
+                            <filter>true</filter>
+                        </embedded>
+                        <embedded>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>sling-bench.core</artifactId>
+                            <filter>true</filter>
+                        </embedded>
+                        <embedded>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>vt-bench-probe.core</artifactId>
                             <filter>true</filter>
                         </embedded>
                     </embeddeds>
@@ -221,6 +260,16 @@
                         <subPackage>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>cyberpunk-alpaca.sample-content</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>sling-bench.ui.apps</artifactId>
+                            <filter>true</filter>
+                        </subPackage>
+                        <subPackage>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>sling-bench.sample-content</artifactId>
                             <filter>true</filter>
                         </subPackage>
                     </subPackages>
