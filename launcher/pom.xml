@@ -345,6 +345,18 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.motorbrot</groupId>
+                  <artifactId>slingslop.alf-vs-agent.sample-content</artifactId>
+                  <version>${slingslop.launcher.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.motorbrot</groupId>
+                  <artifactId>cyberpunk-alpaca.sample-content</artifactId>
+                  <version>${slingslop.launcher.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.motorbrot</groupId>
                   <artifactId>slingslop.sling-matrix.sample-content</artifactId>
                   <version>${slingslop.launcher.version}</version>
                   <type>zip</type>
