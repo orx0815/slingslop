@@ -17,7 +17,9 @@ scrape_configs:
     static_configs:
       - targets: ['cadvisor:8080']
 
-  # Sling exposes /system/console/status-Configurations under HTTP basic auth
-  # — not Prometheus-formatted. We don't scrape Sling natively here; container
-  # metrics from cAdvisor are usually enough. Add a JMX exporter sidecar later
-  # if you want JVM internals.
+  # org.apache.sling.commons.metrics.prometheus exposes the JVM + Oak + Sling
+  # Dropwizard metrics registry at /metrics, unauthenticated. See
+  # launcher/src/main/features/launcher.json and devops/README.md §7.
+  - job_name: sling
+    static_configs:
+      - targets: ['slingslop:8080']

@@ -5,34 +5,117 @@
     {
       "type": "stat",
       "title": "Host load (1m)",
+      "description": "Rough guide for a small 2-vCPU VPS (Hetzner CX22/CPX21) — rescale thresholds if the box has more cores.",
       "datasource": "Prometheus",
       "targets": [{"expr": "node_load1", "refId": "A"}],
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "yellow", "value": 2},
+        {"color": "red", "value": 4}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Uptime",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "time() - node_boot_time_seconds", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "dtdurations"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
     },
     {
       "type": "stat",
       "title": "Mem used %",
       "datasource": "Prometheus",
       "targets": [{"expr": "100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)", "refId": "A"}],
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "yellow", "value": 75},
+        {"color": "red", "value": 90}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Swap used %",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "100 - (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes * 100)", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "yellow", "value": 25},
+        {"color": "red", "value": 75}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
     },
     {
       "type": "stat",
       "title": "Root FS used %",
       "datasource": "Prometheus",
       "targets": [{"expr": "100 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"} * 100)", "refId": "A"}],
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "yellow", "value": 80},
+        {"color": "red", "value": 90}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
     },
+    {
+      "type": "stat",
+      "title": "Root FS free",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "node_filesystem_avail_bytes{mountpoint=\"/\"}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 0}
+    },
+
     {
       "type": "timeseries",
       "title": "CPU usage by mode",
       "datasource": "Prometheus",
-      "targets": [{"expr": "sum by (mode) (rate(node_cpu_seconds_total[2m]))", "refId": "A"}],
+      "targets": [{"expr": "sum by (mode) (rate(node_cpu_seconds_total[2m]))", "legendFormat": "{{mode}}", "refId": "A"}],
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Memory breakdown",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "node_memory_MemTotal_bytes - node_memory_MemFree_bytes - node_memory_Cached_bytes - node_memory_Buffers_bytes", "legendFormat": "used", "refId": "A"},
+        {"expr": "node_memory_Cached_bytes", "legendFormat": "cached", "refId": "B"},
+        {"expr": "node_memory_Buffers_bytes", "legendFormat": "buffers", "refId": "C"},
+        {"expr": "node_memory_MemFree_bytes", "legendFormat": "free", "refId": "D"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Disk I/O (bytes/sec)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "rate(node_disk_read_bytes_total[5m])", "legendFormat": "{{device}} read", "refId": "A"},
+        {"expr": "rate(node_disk_written_bytes_total[5m])", "legendFormat": "{{device}} write", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+    },
+    {
+      "type": "timeseries",
+      "title": "Network I/O (bytes/sec)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m])", "legendFormat": "{{device}} rx", "refId": "A"},
+        {"expr": "rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m])", "legendFormat": "{{device}} tx", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
     }
   ],
   "schemaVersion": 39,
   "title": "Slingslop — Host",
   "uid": "slingslop-host",
-  "version": 1
+  "version": 2
 }
+

@@ -43,6 +43,10 @@
         - name: 'default'
           folder: ''
           type: file
+          # Allows editing a dashboard in the Grafana UI and hitting Save
+          # directly (writes the JSON back to disk here) — see devops/README.md
+          # §7 for the edit-in-prod / export-to-git workflow.
+          allowUiUpdates: true
           options:
             path: /var/lib/grafana/dashboards
 
@@ -50,12 +54,17 @@
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ slingslop_root }}/data/grafana/dashboards/{{ item }}"
+    # Only seed on first deploy — once a dashboard is editable via allowUiUpdates,
+    # subsequent site.yml runs must not clobber changes made (and saved) in the
+    # Grafana UI that haven't been exported back to git yet.
+    force: false
     owner: root
     group: root
     mode: "0644"
   loop:
     - node.json
     - docker.json
+    - sling.json
 
 - name: Render grafana env file
   ansible.builtin.copy:

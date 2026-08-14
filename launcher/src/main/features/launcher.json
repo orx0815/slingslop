@@ -1,7 +1,14 @@
 {
   "bundles": [
     { "id": "org.motorbrot/slingslop.zengarden.core/${slingslop.launcher.version}", "start-order": 20 },
-    { "id": "org.motorbrot/sling-matrix.core/${slingslop.launcher.version}", "start-order": 20 }
+    { "id": "org.motorbrot/sling-matrix.core/${slingslop.launcher.version}", "start-order": 20 },
+
+    { "id": "io.prometheus/simpleclient/0.10.0", "start-order": 20 },
+    { "id": "io.prometheus/simpleclient_common/0.10.0", "start-order": 20 },
+    { "id": "io.prometheus/simpleclient_servlet/0.10.0", "start-order": 20 },
+    { "id": "io.prometheus/simpleclient_dropwizard/0.10.0", "start-order": 20 },
+    { "id": "io.prometheus/simpleclient_hotspot/0.10.0", "start-order": 20 },
+    { "id": "org.apache.sling/org.apache.sling.commons.metrics.prometheus/0.1.2", "start-order": 20 }
   ],
   "content-packages:ARTIFACTS|required": [
     { "id": "org.motorbrot/slingslop.zengarden.ui.apps/${slingslop.launcher.version}/zip" },

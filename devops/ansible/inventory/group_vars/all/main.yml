@@ -65,7 +65,12 @@ grafana_image:    grafana/grafana:11.3.1
 loki_image:       grafana/loki:3.2.1
 promtail_image:   grafana/promtail:3.2.1
 node_exporter_image: prom/node-exporter:v1.8.2
-cadvisor_image:      gcr.io/cadvisor/cadvisor:v0.49.1
+# v0.49.1 could not read the container-level cgroups on newer Docker/overlay2
+# layouts ("failed to identify the read-write layer ID ... mount-id: no such
+# file or directory") — every per-container panel on the Containers dashboard
+# was silently empty. v0.53.0+ moved the image to ghcr.io; v0.56.0+ dropped
+# support for Docker < 25.0, which is what actually fixed it here.
+cadvisor_image:      ghcr.io/google/cadvisor:v0.60.5
 
 # Pull the slingslop image from its registry before starting the container.
 # Set false when the image was loaded onto the host out-of-band (e.g. the local

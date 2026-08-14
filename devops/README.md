@@ -271,9 +271,89 @@ see [devops/conga-handlebars-101.md](conga-handlebars-101.md).
 
 
 `monitoring` role brings up **Prometheus + Grafana + node-exporter + cAdvisor**.
-Grafana is provisioned (datasources, two starter dashboards) from
-`roles/monitoring/files/grafana/`. Public URL: `https://grafana.<DOMAIN>/`,
+Grafana is provisioned (datasources, starter dashboards) from
+`roles/monitoring/files/`. Public URL: `https://grafana.<DOMAIN>/`,
 gated by Traefik basicAuth (see §10).
+
+Three dashboards ship out of the box:
+
+| Dashboard | uid | Source | What it shows |
+|---|---|---|---|
+| **Slingslop — Host** | `slingslop-host` | node-exporter | Load, uptime, memory (used/swap/breakdown), root filesystem usage, CPU by mode, disk I/O, network I/O. |
+| **Slingslop — Containers** | `slingslop-containers` | cAdvisor + Loki | Per-container CPU/memory/network, slingslop's memory vs. its configured limit and CPU throttling, a container count, and a `$container`-driven Loki logs panel. |
+| **Slingslop — Sling / Oak** | `slingslop-sling` | Sling's own `/metrics` | See below. |
+
+#### ⚠️ cAdvisor version pin matters
+
+`cadvisor_image` was bumped from `gcr.io/cadvisor/cadvisor:v0.49.1` to
+`ghcr.io/google/cadvisor:v0.60.5`. The old pin (2023-era) could not read
+per-container cgroups on a modern Docker/overlay2 host — every container-level
+panel silently showed **no data**, logging
+`failed to identify the read-write layer ID for container "...": ... mount-id:
+no such file or directory` — while machine-wide node-exporter metrics kept
+working fine, masking the problem. If the Containers dashboard ever goes blank
+again after a host OS/Docker upgrade, check `docker logs slingslop-cadvisor`
+for that error first and bump the image (cAdvisor v0.56.0+ dropped support for
+Docker < 25.0, so keep both in step).
+
+
+#### Sling / Oak metrics
+
+Sling exposes its Dropwizard metrics registry (JVM, Oak, `org.apache.sling.*`)
+in Prometheus format at `/metrics`, unauthenticated, via the
+[`org.apache.sling.commons.metrics.prometheus`](https://github.com/apache/sling-org-apache-sling-commons-metrics-prometheus)
+bundle — added together with its `io.prometheus:simpleclient*:0.10.0`
+dependencies in [`launcher/src/main/features/launcher.json`](../launcher/src/main/features/launcher.json).
+Prometheus scrapes it as the `sling` job (`prometheus.yml.j2`), and the
+**"Slingslop — Sling / Oak"** dashboard (`roles/monitoring/files/sling.json`)
+visualizes it: JVM heap/threads, Oak query/commit timings, commit queue size,
+segment cache hit ratio, JCR login errors, discovery cluster instances, Sling
+event-job queues, scheduler running jobs, unclosed-ResourceResolver leak
+counter, and thread-pool utilization. Metric names were confirmed against a
+live instance (`curl localhost:8080/metrics`) rather than guessed — see
+Robert Munteanu's ["Sling applications: a DevOps perspective"](https://adapt.to/2023/robert-munteanu-sling-applications-a-devops-perspective.html)
+(adaptTo() 2023, monitoring section) for the source of the approach.
+
+#### Dashboards as code — edit in prod, sync back to git manually
+
+Dashboards are provisioned from files (`roles/monitoring/files/*.json` →
+`{{ slingslop_root }}/data/grafana/dashboards/` on the host) with
+`allowUiUpdates: true`. That means:
+
+- Editing a dashboard's panels in the Grafana UI and clicking **Save**
+  writes the change straight back to the JSON file on disk (no "cannot save
+  provisioned dashboard" prompt).
+- Ansible only **seeds** each dashboard file on first deploy (`force: false`)
+  — re-running `site.yml` never clobbers edits made live that haven't been
+  copied back to git yet.
+- There is **no automated export**. To persist a prod edit, manually pull the
+  file back into the repo and commit it, e.g.:
+  ```bash
+  scp deploy@<host>:/opt/slingslop/data/grafana/dashboards/sling.json \
+      devops/ansible/roles/monitoring/files/sling.json
+  git add devops/ansible/roles/monitoring/files/sling.json
+  ```
+  (Or use Grafana's Dashboard settings → JSON Model → copy, and paste over
+  the file by hand.)
+- To add a brand-new dashboard, drop a `<name>.json` export into
+  `roles/monitoring/files/` and add it to the `loop` in
+  `roles/monitoring/tasks/main.yml` ("Ship starter dashboards").
+
+#### ⚠️ Adding new bundles to the feature model on an existing deployment
+
+Rolling out a **new bundle set** (like the Prometheus exporter above) onto a
+host whose `slingslop-content` volume already has a JCR + Felix bundle cache
+from an *older* feature model can crash-loop the container with
+`org.osgi.framework.BundleException: Bundle symbolic name and version are not
+unique: ...`. Felix's persistent bundle cache (`framework/` inside the
+volume) can get out of sync with a changed bundle list on restart — this bit
+the local Vagrant test VM (whose volume predated this change) and was fixed by
+wiping the *test* volume (`docker volume rm slingslop_slingslop-content`) for a
+clean re-bootstrap. This has **not** been hit on the real prod host yet, but
+plan for it before rolling this specific change out: verify a plain `dc pull
+&& dc up -d --no-deps slingslop` still comes up cleanly, and if not, be
+prepared that a bundle-set change (as opposed to a routine version bump of
+already-known bundles) may need a framework-cache reset.
 
 ### 7a. Traefik dashboard
 

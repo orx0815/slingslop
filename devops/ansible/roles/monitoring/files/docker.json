@@ -1,31 +1,106 @@
 {
   "annotations": {"list": []},
   "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "container",
+        "type": "query",
+        "datasource": "Loki",
+        "query": "label_values(container)",
+        "current": {"text": "slingslop", "value": "slingslop"},
+        "refresh": 2,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
   "panels": [
+    {
+      "type": "stat",
+      "title": "Containers up",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "count(container_last_seen{name!=\"\"})", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Total container CPU (cores)",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[2m]))", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Total container memory (working set)",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sum(container_memory_working_set_bytes{name!=\"\"})", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Slingslop CPU throttled (5m rate)",
+      "description": "container_cpu_cfs_throttled_seconds_total for the slingslop container — sustained non-zero values mean it's hitting its CPU limit (slingslop_container_cpu_limit) and would benefit from more cores.",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "rate(container_cpu_cfs_throttled_seconds_total{name=\"slingslop\"}[5m])", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "s", "thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "yellow", "value": 0.05},
+        {"color": "red", "value": 0.2}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+    },
+
     {
       "type": "timeseries",
       "title": "Container CPU (cores)",
       "datasource": "Prometheus",
-      "targets": [{"expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[2m]))", "refId": "A"}],
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      "targets": [{"expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[2m]))", "legendFormat": "{{name}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
     },
     {
       "type": "timeseries",
-      "title": "Container RSS (MiB)",
+      "title": "Container memory — working set (MiB)",
+      "description": "container_memory_working_set_bytes is what the kernel/OOM-killer actually cares about (RSS + active page cache), a better OOM-risk indicator than plain RSS.",
       "datasource": "Prometheus",
-      "targets": [{"expr": "container_memory_rss{name!=\"\"} / 1024 / 1024", "refId": "A"}],
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      "targets": [{"expr": "container_memory_working_set_bytes{name!=\"\"} / 1024 / 1024", "legendFormat": "{{name}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Slingslop memory vs. limit",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "container_memory_working_set_bytes{name=\"slingslop\"}", "legendFormat": "working set", "refId": "A"},
+        {"expr": "container_spec_memory_limit_bytes{name=\"slingslop\"}", "legendFormat": "limit (slingslop_container_memory_limit)", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
     },
     {
+      "type": "timeseries",
+      "title": "Container network I/O (bytes/sec)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum by (name) (rate(container_network_receive_bytes_total{name!=\"\"}[5m]))", "legendFormat": "{{name}} rx", "refId": "A"},
+        {"expr": "sum by (name) (rate(container_network_transmit_bytes_total{name!=\"\"}[5m]))", "legendFormat": "{{name}} tx", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+    },
+
+    {
       "type": "logs",
-      "title": "Slingslop logs (Loki)",
+      "title": "Container logs (Loki) — $container",
       "datasource": "Loki",
-      "targets": [{"expr": "{compose_service=\"slingslop\"}", "refId": "A"}],
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 8}
+      "targets": [{"expr": "{container=\"$container\"}", "refId": "A"}],
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 20}
     }
   ],
   "schemaVersion": 39,
   "title": "Slingslop — Containers",
   "uid": "slingslop-containers",
-  "version": 1
+  "version": 2
 }

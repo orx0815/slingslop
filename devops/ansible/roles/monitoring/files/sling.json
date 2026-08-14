@@ -1,0 +1,159 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "JVM heap used",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "jvm_memory_bytes_used{area=\"heap\"}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "JVM threads",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "jvm_threads_current", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Oak session count",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "oak_SESSION_COUNT", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Discovery: cluster instances",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sling_discovery_oak_local_cluster_instances", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Oak query duration (p95 / p99)",
+      "description": "oak_QUERY_DURATION — Dropwizard Timer exported as a Prometheus summary.",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "oak_QUERY_DURATION{quantile=\"0.95\"}", "legendFormat": "p95", "refId": "A"},
+        {"expr": "oak_QUERY_DURATION{quantile=\"0.99\"}", "legendFormat": "p99", "refId": "B"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+    },
+    {
+      "type": "timeseries",
+      "title": "Oak commit time (p95 / p99) & commit queue size",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "oak_COMMIT_TIME{quantile=\"0.95\"}", "legendFormat": "commit p95 (s)", "refId": "A"},
+        {"expr": "oak_COMMIT_TIME{quantile=\"0.99\"}", "legendFormat": "commit p99 (s)", "refId": "B"},
+        {"expr": "oak_COMMIT_QUEUE_SIZE", "legendFormat": "queue size", "refId": "C"}
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Oak segment writes / commits (rate, 5m)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "rate(oak_SEGMENT_WRITES_total[5m])", "legendFormat": "segment writes/s", "refId": "A"},
+        {"expr": "rate(oak_COMMITS_COUNT_total[5m])", "legendFormat": "commits/s", "refId": "B"}
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 12}
+    },
+    {
+      "type": "stat",
+      "title": "Oak segment repo size",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "oak_SEGMENT_REPO_SIZE", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 12}
+    },
+    {
+      "type": "timeseries",
+      "title": "Oak login errors / logins (rate, 5m)",
+      "description": "JCR login failures — non-zero sustained values usually mean bad credentials being retried, or a misconfigured client.",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "rate(oak_LOGIN_ERRORS_total[5m])", "legendFormat": "login errors/s", "refId": "A"},
+        {"expr": "rate(oak_SESSION_LOGIN_COUNTER_total[5m])", "legendFormat": "logins/s", "refId": "B"}
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+    },
+    {
+      "type": "timeseries",
+      "title": "Oak segment cache hit ratio",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "rate(oak_CacheStats_Segment_Cache_hit[5m]) / rate(oak_CacheStats_Segment_Cache_request[5m])", "legendFormat": "hit ratio", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percentunit", "max": 1, "min": 0}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 16}
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Sling event jobs",
+      "description": "org.apache.sling.event queue counters — a sustained non-zero failed/active count usually means a job is stuck or repeatedly erroring.",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sling_event_jobs_active_count", "legendFormat": "active", "refId": "A"},
+        {"expr": "sling_event_jobs_queued_count", "legendFormat": "queued", "refId": "B"},
+        {"expr": "sling_event_jobs_failed_count", "legendFormat": "failed", "refId": "C"},
+        {"expr": "rate(sling_event_jobs_finished_count[5m])", "legendFormat": "finished/s", "refId": "D"}
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+    },
+    {
+      "type": "timeseries",
+      "title": "Sling scheduler running jobs",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sling_commons_scheduler_running_jobs", "legendFormat": "total", "refId": "A"},
+        {"expr": "sling_commons_scheduler_running_jobs_tp_default", "legendFormat": "default pool", "refId": "B"},
+        {"expr": "sling_commons_scheduler_running_jobs_tp_oak", "legendFormat": "oak pool", "refId": "C"}
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+    },
+
+    {
+      "type": "stat",
+      "title": "Unclosed ResourceResolvers",
+      "description": "sling_org_apache_sling_resourceresolver_unclosedResourceResolvers — should stay at 0. A rising count means code is not closing resource resolvers (a leak).",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sling_org_apache_sling_resourceresolver_unclosedResourceResolvers", "refId": "A"}],
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [
+        {"color": "green", "value": null},
+        {"color": "red", "value": 1}
+      ]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 28}
+    },
+    {
+      "type": "stat",
+      "title": "Vanity paths / aliases tracked",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sling_org_apache_sling_resourceresolver_numberOfVanityPaths", "legendFormat": "vanity paths", "refId": "A"},
+        {"expr": "sling_org_apache_sling_resourceresolver_numberOfResourcesWithAliasedChildren", "legendFormat": "aliased children", "refId": "B"}
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 28}
+    },
+    {
+      "type": "timeseries",
+      "title": "Default threadpool utilization",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sling_commons_threads_tp_default_ExecutorActiveCount", "legendFormat": "active", "refId": "A"},
+        {"expr": "sling_commons_threads_tp_default_ExecutorMaximumPoolSize", "legendFormat": "max", "refId": "B"}
+      ],
+      "gridPos": {"h": 4, "w": 12, "x": 12, "y": 28}
+    }
+  ],
+  "schemaVersion": 39,
+  "title": "Slingslop — Sling / Oak",
+  "uid": "slingslop-sling",
+  "version": 1
+}
