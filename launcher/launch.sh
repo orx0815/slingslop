@@ -24,4 +24,10 @@ export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDedupl
 # instead; see install-sample-content-local.sh for why the local path differs.
 ( ./install-sample-content-local.sh ) &
 
-target/dependency/org.apache.sling.feature.launcher/bin/launcher -f target/slingfeature-tmp/feature-slingslop_aggregate.json
+# onFirstInit wipes the persisted Felix bundle cache on every launch (fresh
+# JVM = "first init" every time), same rationale as the container's launch.sh:
+# avoids stale bundle-cache collisions if a SNAPSHOT module's bytes change
+# without its version changing across successive local launches.
+target/dependency/org.apache.sling.feature.launcher/bin/launcher \
+    -D "org.osgi.framework.storage.clean=onFirstInit" \
+    -f target/slingfeature-tmp/feature-slingslop_aggregate.json
