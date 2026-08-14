@@ -57,8 +57,18 @@ docker_network_name: slingslop_net
 docker_min_api_version: "1.24"
 
 # Images (override per-environment if you fork)
-slingslop_image: ghcr.io/orx0815/slingslop:snapshot-composite
-webcache_image:  ghcr.io/orx0815/slingslop-webcache:latest
+# NOTE: must track the branch actually deployed to this host (the floating
+# "<branch>-composite" tag ci-cd.yml pushes on every push to that branch), NOT
+# "main". update-slingslop.yml always overrides this with the exact sha-tagged
+# image, but site.yml (the "site" infra play) does NOT — it applies the
+# slingslop role with whatever this default is, so a stale value here silently
+# redeploys the wrong app set on a manual convergence run.
+slingslop_image: ghcr.io/orx0815/slingslop:motorbrot_prod-composite
+# Same reasoning as slingslop_image above: publish-webcache only ever pushes
+# "<branch_tag>" and "sha-<sha>" tags, never "latest" — site.yml renders the
+# edge compose with this default (unlike update-webcache.yml, which overrides
+# it), so it must track the deployed branch's floating tag too.
+webcache_image:  ghcr.io/orx0815/slingslop-webcache:motorbrot_prod
 traefik_image:   traefik:v3.2
 prometheus_image: prom/prometheus:v2.55.1
 grafana_image:    grafana/grafana:11.3.1
