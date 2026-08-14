@@ -11,6 +11,12 @@ set ACL for everyone (ACLOptions=merge)
 
 end
 
+# Sling Bench: pre-create the uploaded-runs folder. It is deliberately outside
+# the sling-bench.sample-content package's filter (see that package's
+# filter.xml), so it must exist before the first upload independent of any
+# content package install. BenchmarkRunUploadServlet writes run pages under it.
+create path (sling:OrderedFolder) /content/sling-bench/runs
+
 # Register AEM-specific node types so AEM content packages can be installed
 register nodetypes
 <<===

@@ -212,7 +212,9 @@
     <module>sling-apps/alf-vs-agent/alf-vs-agent.ui.apps</module>
     <module>sling-apps/cyberpunk-alpaca/cyberpunk-alpaca.core</module>
     <module>sling-apps/cyberpunk-alpaca/cyberpunk-alpaca.ui.apps</module>
-
+    <module>sling-apps/sling-bench/sling-bench.core</module>
+    <module>sling-apps/sling-bench/sling-bench.ui.apps</module>
+    <module>sling-apps/sling-bench/vt-bench-probe.core</module>
 
     <module>content-packages/zengarden.sample-content</module>
     <module>content-packages/disco-dingo.sample-content</module>
@@ -220,6 +222,7 @@
     <module>content-packages/sling-matrix.sample-content</module>
     <module>content-packages/digitalmedia.sample-content</module>
     <module>content-packages/cyberpunk-alpaca.sample-content</module>
+    <module>content-packages/sling-bench.sample-content</module>
     <module>content-packages/complete</module>
 
     <module>launcher</module>

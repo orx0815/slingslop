@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:description="A single uploaded benchmark run: overrides content.html to read
+        RunDetailModel directly off this jcr:content node — no child components needed."
+    jcr:primaryType="sling:Folder"
+    jcr:title="Sling Bench Run Detail"
+    sling:resourceSuperType="sling-bench/pages/basepage"/>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    sling:resourceType="sling-bench/components/text-block"
+    headline="About this dashboard"
+    text="&lt;p&gt;Sling Bench turns &lt;code&gt;vt-bench.sh&lt;/code&gt; from a terminal-only script into a shareable log. Generate a benchmark command below, run it against your own Sling instance, then upload the result to compare virtual-thread vs. platform-thread runs over time.&lt;/p&gt;&lt;p&gt;Every chart on this dashboard is rendered server-side as plain SVG — no charting library, no client-side JavaScript required to see the data.&lt;/p&gt;"/>

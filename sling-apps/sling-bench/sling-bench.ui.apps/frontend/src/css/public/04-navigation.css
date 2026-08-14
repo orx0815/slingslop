@@ -1,0 +1,47 @@
+/**
+ * 04-navigation.css — top bar
+ */
+.bench-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.bench-nav__brand {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-white) !important;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.bench-nav__logo {
+  color: var(--color-primary);
+}
+
+.bench-nav__links {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 0.9rem;
+}
+
+.bench-nav__links a {
+  text-decoration: none !important;
+  color: var(--color-text-muted);
+  transition: color 0.15s ease;
+}
+
+.bench-nav__links a:hover {
+  color: var(--color-primary);
+}

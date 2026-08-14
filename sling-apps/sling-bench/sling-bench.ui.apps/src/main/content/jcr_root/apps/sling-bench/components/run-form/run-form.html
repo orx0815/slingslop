@@ -1,0 +1,36 @@
+<!--/* Purely client-side: reads the fields below and renders the exact vt-bench.sh
+     command line into #generated-script, with a copy-to-clipboard button. No
+     server round-trip — the script is only ever *run* by the operator's own
+     terminal against their own Sling instance. See public.ts (initRunForm). */-->
+<section class="run-form" id="run-form" aria-labelledby="run-form-title">
+  <h2 id="run-form-title">1. Generate a benchmark command</h2>
+  <p class="run-form__hint">
+    Fill in the parameters, copy the command, and paste it into a terminal that has
+    <code>sling-apps/sling-bench/vt-bench.sh</code> on its <code>$PATH</code> (or run it from that directory).
+  </p>
+
+  <div class="run-form__grid">
+    <label class="run-form__field">
+      <span>Base URL</span>
+      <input type="text" id="rf-base-url" value="http://localhost:8080" />
+    </label>
+    <label class="run-form__field">
+      <span>Delay (ms simulated I/O)</span>
+      <input type="number" id="rf-delay-ms" value="100" min="0" />
+    </label>
+    <label class="run-form__field">
+      <span>Duration (s per level)</span>
+      <input type="number" id="rf-duration" value="10" min="1" />
+    </label>
+    <label class="run-form__field">
+      <span>Concurrency levels (comma-separated)</span>
+      <input type="text" id="rf-concurrencies" value="10,50,200,500" />
+    </label>
+  </div>
+
+  <div class="run-form__output">
+    <pre id="generated-script">./vt-bench.sh http://localhost:8080 100 10 10,50,200,500</pre>
+    <button type="button" id="rf-copy-btn" class="btn btn-primary">Copy to clipboard</button>
+    <span id="rf-copy-feedback" class="run-form__copy-feedback" aria-live="polite"></span>
+  </div>
+</section>

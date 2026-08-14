@@ -58,13 +58,20 @@
       </div>
     </div>
 
-    <!-- ── Bottom bar: open component modal + Save / Cancel (fixed to viewport bottom) ── -->
-    <div class="inline-editor-footer">
+    <!-- ── Bottom bar: open component modal + Save / Cancel (fixed to viewport bottom).
+         id is required -- editor/component-modal.ts portals this element (by id) into
+         #editor-modal-container on <body> so `position: fixed` reliably spans the true
+         viewport regardless of any transform/filter/animation on this page's own
+         ancestor elements (see the comment on mountEditorOverlay() for why). ── -->
+    <div id="inline-editor-footer" class="inline-editor-footer">
       <button type="button" id="edit-component-btn" class="btn btn-secondary">Edit Component</button>
       <div class="inline-editor-actions">
+        <!--/* Plain selector, NOT "closest": this button lives in #editor-modal-container
+             after portalling, so it is no longer a descendant of [data-zen-editable-editing]
+             and "closest" would never match, leaving Cancel unable to restore the view. */-->
         <button type="button" class="btn btn-secondary"
                 hx-get="${resource.path}.html"
-                hx-target="closest [data-zen-editable-editing]"
+                hx-target="[data-zen-editable-editing]"
                 hx-swap="outerMorph">Cancel</button>
         <button type="button" class="btn btn-primary" onclick="saveEditorContent()">Save</button>
       </div>

@@ -1,0 +1,84 @@
+<!--/* Overrides the default parsys-of-children body: by the time this script runs, the
+     current resource IS the jcr:content node the upload servlet wrote the parsed
+     metrics onto directly (see BenchmarkRunUploadServlet), so we read a Sling Model
+     off `resource` itself instead of iterating ./main children. */-->
+<sly data-sly-use.detail="org.motorbrot.slingbench.slingmodels.RunDetailModel">
+
+  <section class="run-detail">
+    <header class="run-detail__header">
+      <h1>${detail.label @ context='text'}</h1>
+      <dl class="run-detail__meta">
+        <div><dt>Uploaded</dt><dd>${detail.uploadedAtFormatted @ context='text'} by ${detail.uploadedBy @ context='text'}</dd></div>
+        <div><dt>Tool</dt><dd>${detail.tool @ context='text'}</dd></div>
+        <div><dt>Base URL</dt><dd>${detail.baseUrl @ context='text'}</dd></div>
+        <div><dt>Delay</dt><dd>${detail.delayMs @ context='text'} ms simulated I/O</dd></div>
+        <div><dt>Duration</dt><dd>${detail.duration @ context='text'} per level</dd></div>
+        <div>
+          <dt>Threading</dt>
+          <dd>
+            <sly data-sly-test="${detail.httpVirtualThreads}"><span class="badge badge--vt">virtual threads</span></sly>
+            <sly data-sly-test="${!detail.httpVirtualThreads}"><span class="badge badge--pt">platform threads</span></sly>
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    <sly data-sly-test="${detail.empty}">
+      <p class="run-detail__empty">No concurrency levels could be parsed from this result file.</p>
+    </sly>
+
+    <sly data-sly-test="${!detail.empty}">
+      <div class="run-detail__charts">
+        <div class="chart-card">
+          <h2>Requests / sec by concurrency</h2>
+          ${detail.rpsChartSvg @ context='unsafe'}
+        </div>
+        <div class="chart-card">
+          <h2>Average latency (ms)</h2>
+          ${detail.avgLatencyChartSvg @ context='unsafe'}
+        </div>
+        <div class="chart-card">
+          <h2>p99 latency (ms)</h2>
+          ${detail.p99LatencyChartSvg @ context='unsafe'}
+        </div>
+
+        <sly data-sly-test="${detail.hasCpuData}">
+          <div class="chart-card">
+            <h2>CPU %</h2>
+            ${detail.cpuPercentChartSvg @ context='unsafe'}
+          </div>
+          <div class="chart-card">
+            <h2>RSS (MB)</h2>
+            ${detail.rssChartSvg @ context='unsafe'}
+          </div>
+        </sly>
+      </div>
+
+      <table class="run-detail__table">
+        <thead>
+          <tr><th>Concurrency</th><th>Total req/s</th><th>Avg latency (ms)</th><th>p99 latency (ms)</th></tr>
+        </thead>
+        <tbody>
+          <tr data-sly-repeat.row="${detail.rows}">
+            <td>${row.concurrency @ context='text'}</td>
+            <td>${row.totalRps @ context='text'}</td>
+            <td>${row.avgLatencyMs @ context='text'}</td>
+            <td>${row.p99Ms @ context='text'}</td>
+          </tr>
+        </tbody>
+      </table>
+    </sly>
+
+    <details class="run-detail__raw">
+      <summary>Raw result log</summary>
+      <pre>${detail.rawResultText @ context='text'}</pre>
+    </details>
+
+    <sly data-sly-test="${detail.hasCpuData}">
+      <details class="run-detail__raw">
+        <summary>Raw CPU sampler CSV</summary>
+        <pre>${detail.rawCpuCsv @ context='text'}</pre>
+      </details>
+    </sly>
+  </section>
+</sly>

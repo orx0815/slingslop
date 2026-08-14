@@ -71,6 +71,18 @@ tenants:
     # POST/DELETE and .json are still blocked by the shared webcache filters).
     - /content/motorbrot/dma/assets
 
+- tenant: sling-bench
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/sling-bench
+    appsRoot: /apps/sling-bench
+    subdomain: bench
+    passthroughPaths:
+    # BenchmarkRunUploadServlet — outside contentRoot, POST-only, must reach
+    # Sling directly (never cached, never rewritten by the short-URL catch-all).
+    - /bin/slingbench/upload
+
 - tenant: digitalmedia
   roles:
   - gated
