@@ -4,6 +4,17 @@
     jcr:title="Home"
     jcr:description="A rogue camelid draped in neon, roaming the digital wasteland."
     sling:resourceType="cyberpunk-alpaca/pages/homepage">
+    <hero
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="cyberpunk-alpaca/components/hero"
+        eyebrow="Transmission Incoming"
+        title="Cyberpunk Alpaca"
+        subtitle="A rogue camelid draped in neon, roaming the digital wasteland."
+        description="Half livestock, half legend — hand-woven fibre wired straight into the grid. No corporation owns this wool."
+        ctaPrimaryLabel="Meet the Alpaca"
+        ctaPrimaryUrl="/content/cyberpunk-alpaca/about.html"
+        ctaSecondaryLabel="View Style Guide"
+        ctaSecondaryUrl="/content/cyberpunk-alpaca/styleguide.html"/>
     <navigation
         jcr:primaryType="nt:unstructured"
         sling:resourceType="cyberpunk-alpaca/components/navigation"
