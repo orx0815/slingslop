@@ -36,6 +36,7 @@
       set -eu
       U='{{ sling_internal_url }}'
       AUTH='admin:{{ vault_sling_admin_password }}'
+      READY_TIMEOUT=180
 
       # --- upload (capture HTTP status + body so failures are diagnosable) ---
       code=$(curl -s --connect-timeout 10 --max-time 180 \
@@ -54,16 +55,36 @@
         exit 1
       fi
 
-      # --- install ---
-      code=$(curl -s --connect-timeout 10 --max-time 300 \
-              -o /tmp/cpm-install.json -w '%{http_code}' -u "$AUTH" -X POST \
-              "$U/bin/cpm/package.install.json$P")
-      if [ "$code" != "200" ]; then
-        echo "package.install failed for $P: HTTP $code" >&2
-        cat /tmp/cpm-install.json >&2 || true
-        exit 1
-      fi
-      echo "installed $P (HTTP $code)"
+      # --- install (retry on transient cold-start codes, same as
+      # install-sample-content.sh's install_pkg(): even after the instance
+      # answers HTTP, Composum's package manager can still 500/503 briefly
+      # while bundles/node types settle) ---
+      d=$(( $(date +%s) + READY_TIMEOUT ))
+      while :; do
+        code=$(curl -s --connect-timeout 10 --max-time 300 \
+                -o /tmp/cpm-install.json -w '%{http_code}' -u "$AUTH" -X POST \
+                "$U/bin/cpm/package.install.json$P")
+        if [ "$code" = "200" ]; then
+          echo "installed $P (HTTP $code)"
+          break
+        fi
+        case "$code" in
+          000|404|500|503)
+            if [ "$(date +%s)" -lt "$d" ]; then
+              sleep 3
+              continue
+            fi
+            echo "package.install still $code after ${READY_TIMEOUT}s for $P" >&2
+            cat /tmp/cpm-install.json >&2 || true
+            exit 1
+            ;;
+          *)
+            echo "package.install failed for $P: HTTP $code" >&2
+            cat /tmp/cpm-install.json >&2 || true
+            exit 1
+            ;;
+        esac
+      done
   changed_when: true
 
 - name: Remove the uploaded package tarball from the host
