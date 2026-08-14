@@ -52,17 +52,18 @@ jobs:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-java@v5
-        if: inputs.play == 'webcache'
+        if: inputs.play == 'webcache' || inputs.play == 'site'
         with:
           distribution: temurin
           java-version: '25'
           cache: maven
 
       - name: Generate CONGA deploy config
-        # update-webcache.yml ships the CONGA-rendered vhosts; the webcache role
-        # hard-fails when devops/conga/target/configuration/<env>/<node>/webcache/
-        # is absent, so render it first (same step ci-cd.yml's deploy-webcache runs).
-        if: inputs.play == 'webcache'
+        # The webcache role hard-fails when
+        # devops/conga/target/configuration/<env>/<node>/webcache/ is absent, so
+        # render it first — needed for 'webcache' (update-webcache.yml) AND
+        # 'site' (site.yml also runs the webcache role).
+        if: inputs.play == 'webcache' || inputs.play == 'site'
         run: |
           mvn -U -pl launcher/launcher-dependencies,devops/conga -am \
             -DskipTests -Ddocker.skip=true clean package
