@@ -31,7 +31,15 @@ done
 export JAVA_OPTS
 echo "[INFO] JAVA_OPTS=${JAVA_OPTS}"
 
+# Every container start is a fresh Felix instance, so its persisted bundle
+# cache under $HOME_DIR/framework (same volume as /opt/sling/launcher) can go
+# stale against a newly-baked image with the same SNAPSHOT bundle
+# coordinates but different bytes, causing "Bundle symbolic name and version
+# are not unique" on install. onFirstInit wipes that cache every boot (cheap:
+# bundles are re-linked from the already-baked artifacts/ dir, no re-download)
+# without touching the JCR segment store under repository/.
 exec org.apache.sling.feature.launcher/bin/launcher \
     -c artifacts \
     -CC "org.apache.sling.commons.log.LogManager=MERGE_LATEST" \
+    -D "org.osgi.framework.storage.clean=onFirstInit" \
     -f ${feature}
