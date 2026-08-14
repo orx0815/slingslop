@@ -35,14 +35,34 @@
       changed_when: "'Started' in up_result.stderr or 'Recreated' in up_result.stderr or 'Created' in up_result.stderr"
 
     - name: Wait for Sling HTTP to answer
-      ansible.builtin.uri:
-        url: "{{ sling_internal_url | default('http://127.0.0.1:18080') }}/starter.html"
-        status_code: [200, 401, 302]
-        timeout: 5
-      register: http_up
-      until: http_up.status in [200, 401, 302]
-      retries: 60
-      delay: 5
+      # A connection-refused for the entire retry window means the container
+      # never bound the port (crashed/crash-looping at startup), not just a
+      # slow cold start. The rescue block below surfaces `docker logs` so that
+      # failure isn't as opaque as a bare timeout.
+      block:
+        - ansible.builtin.uri:
+            url: "{{ sling_internal_url | default('http://127.0.0.1:18080') }}/starter.html"
+            status_code: [200, 401, 302]
+            timeout: 5
+          register: http_up
+          until: http_up.status in [200, 401, 302]
+          retries: 60
+          delay: 5
+      rescue:
+        - name: Capture slingslop container logs for diagnostics
+          ansible.builtin.command:
+            cmd: "{{ slingslop_root }}/dc logs --tail 200 slingslop"
+          register: slingslop_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Show slingslop container logs
+          ansible.builtin.debug:
+            msg: "{{ slingslop_logs.stdout_lines | default([]) }}"
+
+        - name: Fail (Sling never answered HTTP — see captured logs above)
+          ansible.builtin.fail:
+            msg: "Sling did not answer HTTP within the readiness window."
 
     - name: Rotate Sling admin password to the vault value (idempotent)
       # A reseeded composite content volume comes up with the default admin/admin.
