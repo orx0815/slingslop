@@ -8,7 +8,10 @@
   <packaging>pom</packaging>
   <name>Slingslop - parent</name>
   <description>Slingslop Hypermedia PoC Parent POM</description>
-  
+  <!-- Trigger commit 2026-08-14: touches the "sling" ci-cd.yml path filter so
+       deploy-sling re-runs and pins the correct sha-tagged image, restoring
+       apps wiped by a prior manual "site" run's stale image default. -->
+
   <parent>
     <!-- wcm.io's parent is well curated. 
          Actually it's for AEM projects, but because Sling is it's foundation it works well here and we can skip lot's of plugin configs -->
