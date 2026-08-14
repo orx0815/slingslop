@@ -2,6 +2,9 @@
 # Full convergence run. Idempotent. Run after bootstrap.yml.
 #
 #   ansible-playbook -i inventory/hosts.yml playbooks/site.yml --ask-vault-pass
+#
+# Role tags (edge/sling/observability) let infra.yml's targeted manual plays
+# run `--tags <tag>` instead of the full convergence — see .github/workflows/infra.yml.
 
 - hosts: slingslop
   gather_facts: true
@@ -13,9 +16,9 @@
     - role: security
     - role: firewall
     - role: docker
-    - role: webcache    # render vhost config files (bind-mount sources) FIRST
-    - role: traefik     # brings up traefik + webcache containers
-    - role: slingslop
-    - role: monitoring  # render prometheus/grafana config files FIRST
-    - role: logging     # brings up obs stack
+    - { role: webcache, tags: [edge] }    # render vhost config files (bind-mount sources) FIRST
+    - { role: traefik, tags: [edge] }     # brings up traefik + webcache containers
+    - { role: slingslop, tags: [sling] }
+    - { role: monitoring, tags: [observability] }  # render prometheus/grafana config files FIRST
+    - { role: logging, tags: [observability] }     # brings up obs stack
     - role: backup
