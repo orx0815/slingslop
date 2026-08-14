@@ -8,17 +8,34 @@ name: Infra (manual)
 #   * "bootstrap" → bootstrap.yml as root on a FRESH box (creates the deploy
 #                   user, hardens SSH). Only works before SSH is locked down;
 #                   needs a ROOT key. Normally you run this once from a laptop.
-#   * "webcache"  → update-webcache.yml: re-render the CONGA webcache vhosts and
-#                   re-ship them, then (re)deploy the webcache image — cache
-#                   preserved. The same thing ci-cd.yml does on push, on demand
-#                   (e.g. re-ship vhosts without a code push). Uses `image_tag`.
-#   * "acme"      → retry-acme.yml: force-recreate Traefik so it re-attempts
-#                   Let's Encrypt for any router host still missing a cert (e.g. a
-#                   new subdomain whose first order failed on not-yet-propagated
-#                   DNS). No image build; Traefik-only, ~seconds of edge downtime.
+#   * "webcache"      → update-webcache.yml: re-render the CONGA webcache vhosts
+#                       and re-ship them, then (re)deploy the webcache image —
+#                       cache preserved. The same thing ci-cd.yml does on push,
+#                       on demand (e.g. re-ship vhosts without a code push).
+#                       Uses `image_tag`.
+#   * "sling"         → update-slingslop.yml: (re)deploy just the Sling app
+#                       container, readiness-gated (password rotation + /etc/map
+#                       mappings included). Uses `image_tag` (composited as
+#                       "<image_tag>-composite"). The manual equivalent of
+#                       ci-cd.yml's deploy-sling, without needing a commit that
+#                       touches the "sling" path filter.
+#   * "edge"          → site.yml --tags edge: re-converge JUST the webcache +
+#                       traefik roles (vhost configs, routers, middlewares,
+#                       ACME settings) and recreate whichever of the two
+#                       containers actually changed. No image build.
+#   * "observability" → site.yml --tags observability: re-converge JUST the
+#                       monitoring + logging roles (prometheus, grafana
+#                       dashboards/datasources, loki, promtail) and bring up the
+#                       obs stack. No image build.
+#   * "acme"          → retry-acme.yml: force-recreate Traefik so it re-attempts
+#                       Let's Encrypt for any router host still missing a cert
+#                       (e.g. a new subdomain whose first order failed on
+#                       not-yet-propagated DNS). No image build; Traefik-only,
+#                       ~seconds of edge downtime.
 #
 # Day-to-day app/webcache deploys ALSO happen automatically via ci-cd.yml on push
-# to deploy/motorbrot_prod; this workflow is the manual escape hatch for those.
+# to deploy/motorbrot_prod; this workflow is the manual escape hatch for those
+# (plus the more targeted sling/edge/observability plays for config-only changes).
 #
 # Secrets: DEPLOY_SSH_KEY (deploy user), ANSIBLE_VAULT_PASSWORD,
 #          ROOT_SSH_KEY (only needed for the bootstrap play).
@@ -35,9 +52,12 @@ on:
           - site
           - bootstrap
           - webcache
+          - sling
+          - edge
+          - observability
           - acme
       image_tag:
-        description: "GHCR webcache image tag to deploy (webcache play only)"
+        description: "GHCR image tag to deploy (webcache/sling plays only)"
         type: string
         default: motorbrot_prod
 
@@ -52,7 +72,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-java@v5
-        if: inputs.play == 'webcache' || inputs.play == 'site'
+        if: contains(fromJSON('["webcache","sling","edge","site"]'), inputs.play)
         with:
           distribution: temurin
           java-version: '25'
@@ -60,10 +80,12 @@ jobs:
 
       - name: Generate CONGA deploy config
         # The webcache role hard-fails when
-        # devops/conga/target/configuration/<env>/<node>/webcache/ is absent, so
-        # render it first — needed for 'webcache' (update-webcache.yml) AND
-        # 'site' (site.yml also runs the webcache role).
-        if: inputs.play == 'webcache' || inputs.play == 'site'
+        # devops/conga/target/configuration/<env>/<node>/webcache/ is absent, and
+        # the slingslop role's /etc/map install needs the slingmappings package —
+        # render first for every play that touches either role ('site' runs both;
+        # 'edge' runs webcache+traefik; 'sling' runs slingslop; 'webcache' runs
+        # its own update-webcache.yml which also needs the vhost output).
+        if: contains(fromJSON('["webcache","sling","edge","site"]'), inputs.play)
         run: |
           mvn -U -pl launcher/launcher-dependencies,devops/conga -am \
             -DskipTests -Ddocker.skip=true clean package
@@ -80,6 +102,7 @@ jobs:
           DEPLOY_DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'motorbrot.org' }}
           PLAY: ${{ inputs.play }}
           WEBCACHE_IMAGE: ghcr.io/orx0815/slingslop-webcache:${{ inputs.image_tag }}
+          SLING_IMAGE: ghcr.io/orx0815/slingslop:${{ inputs.image_tag }}-composite
         run: |
           set -euo pipefail
           [ -n "$VAULT_PASS" ] || { echo "::error::ANSIBLE_VAULT_PASSWORD secret is not set"; exit 1; }
@@ -95,6 +118,16 @@ jobs:
             ansible-playbook -i inventory/hosts.yml playbooks/update-webcache.yml \
               --vault-password-file /tmp/vp \
               -e "webcache_image=$WEBCACHE_IMAGE"
+          elif [ "$PLAY" = "sling" ]; then
+            ansible-playbook -i inventory/hosts.yml playbooks/update-slingslop.yml \
+              --vault-password-file /tmp/vp \
+              -e "slingslop_image=$SLING_IMAGE"
+          elif [ "$PLAY" = "edge" ]; then
+            ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
+              --vault-password-file /tmp/vp --tags edge
+          elif [ "$PLAY" = "observability" ]; then
+            ansible-playbook -i inventory/hosts.yml playbooks/site.yml \
+              --vault-password-file /tmp/vp --tags observability
           elif [ "$PLAY" = "acme" ]; then
             ansible-playbook -i inventory/hosts.yml playbooks/retry-acme.yml \
               --vault-password-file /tmp/vp
