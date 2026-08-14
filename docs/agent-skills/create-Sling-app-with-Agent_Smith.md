@@ -2,7 +2,7 @@
 
 > **Skill name:** New Sling App with Agent Smith  
 > **Persona:** Agent Smith — methodical, precise, dry humour, defaults to Matrix 1999 movie aesthetics (green digital rain, monospace, noir vibes) when the user has no strong preference.  
-> **User alias:** ALF — AEM Landing-page Facilitator / API Lifecycle Founder / Application Laboratory Frontend-Dev / ... .   May be an AEM backend dev new to plain Sling and modern frontend, **or** a frontend dev interested in hypermedia apps who knows nothing about Sling. Treat both as capable engineers who just need the right scaffolding.  
+> **User alias:** ALF — a capable engineer who just needs the right scaffolding; may be an AEM backend dev new to plain Sling and modern frontend, **or** a frontend dev interested in hypermedia apps who knows nothing about Sling. (Full joke-title directory: [persona/ALFs.md](persona/ALFs.md).)  
 > **Goal:** Scaffold a brand-new Sling application inside the slingslop mono-repo — ui.apps + core bundle + sample content — driven by a conversation that produces a visually polished "Hello Sling" starting point.
 
 ---
@@ -117,7 +117,8 @@ Based on the gathered information, Smith MUST present a summary of the plan and 
 > 4.  Generate new, original HTML and create basic Sling components.
 > 5.  Create a sample content page.
 > 6.  Integrate the new application into the `complete` package.
-> 7.  Run a full Maven build to validate the result.
+> 7.  Register the app for deployment (Traefik/webcache vhost) via CONGA, so it gets a live sub-domain.
+> 8.  Run a full Maven build to validate the result.
 
 The user must be presented with a `Start` or `Cancel` choice. Once started, the agent will proceed with all subsequent phases automatically without requiring further prompts.
 
@@ -146,7 +147,7 @@ Task  5 — Public CSS partials (00-variables through 09-animations)
 Task  6 — Editor CSS partials (00-variables through 06-inline-editor) — zen-editable only
 Task  7 — JCR .content.xml nodes for pages and components
 Task  8 — HTL page templates (page, basepage, homepage, contentpage, styleguide)
-Task  9 — HTL component templates (view + edit-form-fields for each component)
+Task  9 — HTL component templates (view + edit-form-fields for each component); editing supertypes COPIED via §3.0 Tier A2 (zen-editable only)
 Task 10 — Sample content package (pom.xml, filter.xml, all content nodes)
 Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (stage-sample-content + starter.check.paths)
 Task 12 — ReadMe.md in sling-apps/{PROJECT_NAME}/
@@ -699,6 +700,20 @@ cp "$SRC"/src/typescript/editor.ts "$DST"/src/typescript/
 cp "$SRC"/src/typescript/editor/*.ts "$DST"/src/typescript/editor/
 ```
 
+**Tier A2 — HTL editing supertypes (zen-editable only; copy verbatim, then patch the one illustrative path in the doc comments):**
+
+```bash
+SRC_COMP=sling-apps/zengarden/zengarden.ui.apps/src/main/content/jcr_root/apps/slingslop/zengarden/components
+DST_COMP=sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/src/main/content/jcr_root/apps/{RT_PREFIX}/components
+mkdir -p "$DST_COMP/editable-component" "$DST_COMP/editable-component-modal"
+cp "$SRC_COMP"/editable-component/{.content.xml,edit-form.html,edit-form-inner.html,edit-form-fields.html,tiptap-topbar.html} "$DST_COMP/editable-component/"
+cp "$SRC_COMP"/editable-component-modal/{.content.xml,edit-form.html} "$DST_COMP/editable-component-modal/"
+sed -i 's#slingslop/zengarden/components#{RT_PREFIX}/components#g' \
+  "$DST_COMP"/editable-component/edit-form.html "$DST_COMP"/editable-component-modal/edit-form.html
+```
+
+These two supertypes contain zero app-specific logic (only a `${resource.path}`-relative form and a doc comment illustrating the `sling:resourceSuperType` value) — copying them verbatim is what keeps the footer bar, its `id`, and the `hx-target` selectors correct (§5.6.2/§5.6.4) without having to remember why. Each concrete component still needs its own `edit-form-fields.html` overriding the supertype's placeholder (§5.6.1).
+
 **Tier B — copy, then patch the two identifiers (don't read the rest of the file):**
 
 ```bash
@@ -708,7 +723,7 @@ sed -i 's#apps/slingslop/zengarden#apps/{RT_PREFIX}#g; s/Zen Garden/{DISPLAY_NAM
 
 **Tier C — generate fresh (this is where tokens SHOULD go):**
 - `src/css/public/*` — the visual identity (§3.3)
-- `src/css/editor/00-variables.css` — copy zengarden's, then swap the OKLCH hues to ALF's palette (§4.1); zen-editable only
+- `src/css/editor/00-variables.css` — copy zengarden's, then swap the OKLCH `-base` hue values to ALF's palette (§4.1); zen-editable only. **Keep the file's selector as-is** — it is scoped to `[data-zen-editable], [data-zen-editable-editing], #editor-modal-container`, never `:root` (see §5.6.2). Only change the hue numbers; do not "simplify" the wrapper selector back to `:root`.
 - `src/typescript/public.ts` — project-specific public JS (§3.2)
 - `package.json` — write from the template in §3.1 (add `@tiptap/*` deps only if zen-editable)
 - all HTL templates, sample content, and dummy text
@@ -1044,9 +1059,7 @@ At minimum:
 | `navigation` | *(no editing)* | *(none)* | Site navigation (include via HTL) |
 | `footer` | `editable-component-modal` (if zen-editable, else none) | modal-only | Footer links |
 
-If zen-editable, also copy the two editing supertypes into the new project namespace:
-- `{RT_PREFIX}/components/editable-component` — with `edit-form.html`, `edit-form-inner.html`, `edit-form-fields.html`, `tiptap-topbar.html`
-- `{RT_PREFIX}/components/editable-component-modal` — with `edit-form.html`
+If zen-editable, copy the two editing supertypes into the new project namespace using the Tier A2 commands in §3.0 — `{RT_PREFIX}/components/editable-component` and `{RT_PREFIX}/components/editable-component-modal`. Do not hand-author these; copying is what keeps them correct (§5.6.2).
 
 **Important:** These are copies into the new namespace, not references to the zengarden components. The new project must be self-contained.
 
@@ -1071,6 +1084,22 @@ The Tiptap editor JS expects **exact element IDs** in every richtext component's
 - Omitting `form="editor-form"` on the hidden input — without it the value is not submitted with the HTMX POST.
 
 See `sling-apps/zengarden/…/components/main/explanation/edit-form-fields.html` for the reference pattern.
+
+### 5.6.2 Editor Overlay Robustness — copy the supertypes, don't hand-author them
+
+`editable-component`'s `edit-form-inner.html` contains two required pieces: the Tiptap toolbar (`tiptap-topbar.html`, `id="tiptap-toolbar"`) and a bottom bar (`id="inline-editor-footer"`) holding Edit Component/Cancel/Save. Both use `position: fixed`, which only stays pinned to the true viewport if nothing portals them away from an ancestor that might establish its own CSS containing block (any host page can do this, including CSS you're forbidden to touch). `editor.ts`/`editor/component-modal.ts` already portal all fixed editor chrome into `#editor-modal-container` by a fixed set of element IDs (`tiptap-toolbar`, `inline-editor-footer`, `editor-component-modal`, `editor-save-error`) — **use the Tier A2 copy commands in §3.0 for the whole `editable-component`/`editable-component-modal` folders instead of writing them by hand**; that is what keeps the footer bar, its `id`, and the portalling contract intact. Only `edit-form-fields.html` is overridden per concrete component (§5.6.1).
+
+### 5.6.3 Modal-only components with a non-`<div>` view root (`<header>`/`<footer>`/etc.)
+
+A component's own view root tag can differ from `editable-component-modal`'s `<div>` wrapper (e.g. a `banner.html`/`footer.html` using `<header>`/`<footer>`, kept because host CSS commonly targets those tags directly). This is fine — `editor.ts` (Tier A, copied verbatim in §3.0) already handles it by listening for htmx's lifecycle events on `document` rather than `document.body`, which is required when `outerMorph` has to replace rather than morph a mismatched-tag node. Nothing to do here beyond not hand-rewriting `editor.ts`.
+
+### 5.6.4 Portalled Cancel/Save buttons use plain `hx-target` selectors
+
+`inline-editor-footer`'s Cancel button (and the modal's Cancel/Close) target `hx-target="[data-zen-editable-editing]"` — a plain selector, not `closest` — because portalling moves them out from under the editing element. This is already correct in the Tier A2-copied `edit-form-inner.html`; don't re-derive it by hand.
+
+### 5.6.5 Save failures on a server error
+
+`editor.ts` guards its `htmx:before:swap` handler against `noSwap`-listed error statuses (401/404/422/500), so a failed save shows the error dialog instead of silently tearing down the active edit session. This is baked into the Tier A copy — no action needed as long as `editor.ts` isn't hand-edited.
 
 ### 5.7 Component HTL Pattern (View)
 
@@ -1455,6 +1484,17 @@ Do **not** use a single `<input type="hidden">` with `context='attribute'` — t
 2. Add `<acHandling>merge_preserve</acHandling>` in the `<properties>` section of the `filevault-package-maven-plugin` configuration in the **ui.apps** `pom.xml`.
 3. Copy these from `sling-apps/zengarden/zengarden.ui.apps/src/main/content/jcr_root/apps/slingslop/zengarden/css/_rep_policy.xml` as reference.
 
+> **The zen-editable overlay mechanics (toolbar/footer positioning, modal-only
+> component clicks, Cancel/Save targeting, save-error handling, hover
+> highlighting) are NOT a troubleshooting concern here.** Every bug class in
+> that area was found and fixed directly in the Tier A / Tier A2 reference files
+> (`editor.ts`, `editor/component-modal.ts`, `editor/hover-badge.ts`,
+> `css/editor/06-inline-editor.css`, and the `editable-component`/
+> `editable-component-modal` HTL supertypes) — see §5.6.2–§5.6.5. As long as all
+> of these are copied per §3.0 and never hand-authored or "simplified", none of
+> these bugs can occur. If you ever need to debug one anyway (e.g. after a
+> manual edit), §5.6.2–§5.6.5 have the full cause/fix.
+
 ---
 
 ## 10. Documentation Phase
@@ -1698,6 +1738,8 @@ Use this checklist to verify completeness:
 - **Never** hard-code the "silly hack" from zengarden's UserIsLoggedIn
 - **Never** touch secrets or deploy infra: no `vault.yml` / `vault.*.yml`, nothing under `devops/`, no `.github/workflows/**` — these are branch-protected and a stray edit can clobber the prod vault on merge (Task 13 only *appends a tenant block* to a CONGA `environments/*.yaml`)
 - **Never** skip the `mvn install` validation step
+- **Never** declare editor color tokens (`src/css/editor/00-variables.css`) on `:root` — keep them scoped to `[data-zen-editable], [data-zen-editable-editing], #editor-modal-container` as copied from zengarden (§5.6.2); generic names like `--color-text`/`--color-border`/`--color-white` are very likely to collide with the app's own public CSS variables of the same name
+- **Never** drop the `.inline-editor-footer` bottom bar (Edit Component/Cancel/Save) or rename the fixed IDs (`tiptap-toolbar`, `inline-editor-footer`, `editor-component-modal`, `editor-save-error`) — copy `editable-component`/`editable-component-modal` per the Tier A2 commands in §3.0 instead of hand-authoring them (§5.6.2)
 
 ## Appendix C: Smith's Creative Latitude
 

@@ -5,27 +5,34 @@
 
 /* ── Hover / cursor affordance for clickable-to-edit components ──────── */
 
+/* Never set `position` here, even on :hover: legacy designs (e.g. 199's
+   .preamble/.summary) use position:absolute on these same elements, and any
+   override relocates them. outline/box-shadow are paint-only and safe; the
+   "Click to edit" badge is positioned via JS instead -- see editor/hover-badge.ts. */
 [data-zen-editable] {
-  position: relative;
   cursor: pointer;
-  transition: background-color 0.2s;
-  padding: 10px;
-  border-radius: 4px;
+  transition: box-shadow 0.2s;
 
   &:hover {
-    background-color: var(--color-primary-hover-bg);
+    box-shadow: 0 0 0 10px var(--color-primary-hover-bg);
     outline: 2px dashed var(--color-primary-hover-outline);
+    outline-offset: 4px;
   }
+}
 
-  &:hover::after {
-    content: "\270E  Click to edit";
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size: 0.7rem;
-    font-family: sans-serif;
-    color: var(--color-primary);
-    pointer-events: none;
+/* ── "Click to edit" hover badge -- see editor/hover-badge.ts ─────────── */
+
+.zen-editable-hover-badge {
+  display: none;
+  position: fixed;
+  font-size: 0.7rem;
+  font-family: sans-serif;
+  color: var(--color-primary);
+  pointer-events: none;
+  z-index: 9002;
+
+  &.is-visible {
+    display: block;
   }
 }
 

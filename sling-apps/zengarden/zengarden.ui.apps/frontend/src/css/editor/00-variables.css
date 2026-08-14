@@ -1,7 +1,19 @@
 /*
- * Color tokens — single source of truth for all editor colors
+ * Color tokens — single source of truth for all editor colors.
+ *
+ * Scoped to [data-zen-editable]/[data-zen-editable-editing]/#editor-modal-container
+ * (NOT :root): several of these names (--color-text, --color-white,
+ * --color-border, ...) are generic enough that a host app's own public CSS is
+ * likely to declare the same custom property names for its own theme.
+ * Declaring them on :root would override the public page's colors globally
+ * the moment this stylesheet loads (i.e. as soon as you log in), breaking
+ * contrast on every input/button on the page, not just the editor.
+ * #editor-modal-container is included because component-modal.ts portals all
+ * fixed-position editor chrome there (a body-level sibling, outside the
+ * [data-zen-editable] subtree) — see the comment on mountEditorOverlay() in
+ * editor/component-modal.ts.
  */
-:root {
+[data-zen-editable], [data-zen-editable-editing], #editor-modal-container {
   /* ── Primary palette ────────────────────────────────────────────────────
    * Change --color-primary-base to retheme the entire editor.
    * All derived tokens shift automatically via OKLCH relative color.     */
