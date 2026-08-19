@@ -81,7 +81,7 @@ mutable content sits in the Docker volume - add `-Pcomposite-image`:
 mvn clean install -Ddocker.skip=false -Pcomposite-image
 ```
 
-This runs the base build first, then `launcher/seed_and_bake.sh` which boots
+This runs the base build first, then `launcher/src/build/seed_and_bake.sh` which boots
 the base image once to seed `/apps` and `/libs`, freezes that segment store
 and bakes it into a derived image tagged
 `ghcr.io/orx0815/slingslop:snapshot-composite`.

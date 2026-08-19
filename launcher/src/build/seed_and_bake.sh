@@ -16,7 +16,7 @@
 #
 # Usage:
 #   cd launcher
-#   ./seed_and_bake.sh
+#   ./src/build/seed_and_bake.sh
 #
 # Environment variables (all optional):
 #   IMAGE_BASE       Base image tag built by mvn package (default ghcr.io/orx0815/slingslop:snapshot)

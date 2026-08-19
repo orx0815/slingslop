@@ -149,7 +149,7 @@ Task  7 — JCR .content.xml nodes for pages and components
 Task  8 — HTL page templates (page, basepage, homepage, contentpage, styleguide)
 Task  9 — HTL component templates (view + edit-form-fields for each component); editing supertypes COPIED via §3.0 Tier A2 (zen-editable only)
 Task 10 — Sample content package (pom.xml, filter.xml, all content nodes)
-Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (stage-sample-content + starter.check.paths)
+Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (sample-content.artifactIds dependency + starter.check.paths)
 Task 12 — ReadMe.md in sling-apps/{PROJECT_NAME}/
 Task 13 — Register the app for deployment via CONGA (PUBLIC-FACING apps only; see §2.9)
 Task 14 — Build and validate (mvn install, fix any errors)
@@ -455,28 +455,50 @@ In `launcher/pom.xml`, add the new homepage path to `<starter.check.paths>`:
 /content/{RT_PREFIX}/home.html
 ```
 
+This is also what drives the IT's automatic sample-content pruning (§2.4.1) — no
+separate configuration needed for that, it's derived from this path alone.
+
 ### 2.4.1 Register sample-content for the runtime install (launcher/pom.xml)
 
 **This is easy to miss and there is no build error if you forget it.** Sample content
 is **not** baked into the composite (production) image — that seed is code-only. The
 demo packages are staged into the Docker context and installed into the *running*
 Sling on every launch/deploy (`launch.sh` locally, the Ansible `install-sample-content`
-task in prod). So the new app's sample-content package must also be added to the
-`stage-sample-content` execution of the `maven-dependency-plugin` in `launcher/pom.xml`,
-next to the existing entries — otherwise it is never staged into the image and never
-installed at runtime (the page will 404 in prod even though `mvn install` is green):
+task in prod); a separate, automatically pruned copy (keeping only what
+`starter.check.paths` needs, see §2.4) is installed for the integration tests by
+`launcher/src/build/prune-sample-content-it.sh`. Both paths are driven by the SAME
+registration — register the new app's sample-content package in **two places** in
+`launcher/pom.xml`, next to the existing entries:
+
+1. A `<dependency>` in `<dependencies>` — use the project's **real** `{GROUP_ID}`
+   (it does **not** have to be `org.motorbrot`; matching below is by `artifactId`
+   only, so a different `groupId` per app is fine):
 
 ```xml
-<artifactItem>
-  <groupId>org.motorbrot</groupId>
+<dependency>
+  <groupId>{GROUP_ID}</groupId>
   <artifactId>{PROJECT_NAME}.sample-content</artifactId>
   <version>${slingslop.launcher.version}</version>
   <type>zip</type>
-</artifactItem>
+  <scope>provided</scope>
+</dependency>
+```
+
+2. Its `artifactId` added to the `sample-content.artifactIds` property (comma list,
+   one entry per line):
+
+```xml
+<sample-content.artifactIds>
+  slingslop.zengarden.sample-content,
+  slingslop.sling-matrix.sample-content,
+  digitalmedia.sample-content,
+  {PROJECT_NAME}.sample-content
+</sample-content.artifactIds>
 ```
 
 Adding it to `content-packages/complete/pom.xml` (§2.3) only covers the plain-sling
-`complete` package; it does **not** cover the composite image's runtime install.
+`complete` package; it does **not** cover the composite image's runtime install or
+the integration tests — both come exclusively from `sample-content.artifactIds` above.
 
 ### 2.5 Filter Files
 
@@ -1383,11 +1405,12 @@ The `content-packages/complete/pom.xml` acts as an all-in-one deployment package
 See section 2.3 for the exact POM changes needed.
 
 > **`complete` is NOT the whole story for sample-content.** The composite (production)
-> image is code-only and installs sample-content into the running Sling at deploy time
-> from the packages staged by `launcher/pom.xml`'s `stage-sample-content` execution
-> (§2.4.1). Registering the app in `complete` alone will make it work in the plain-sling
-> path and the ITs, but the app's sample content will be **absent in prod** unless you
-> also add it to `stage-sample-content`.
+> image is code-only and installs sample-content into the running Sling at deploy time,
+> and the integration tests install a separate, automatically pruned copy — BOTH come
+> from the `sample-content.artifactIds` dependency registered in `launcher/pom.xml`
+> (§2.4.1), NOT from `complete`. Registering the app in `complete` alone only covers
+> the plain-sling `complete` package path; the app's sample content will be **absent
+> in prod AND in the ITs** unless you also register it via §2.4.1.
 
 ---
 
@@ -1693,7 +1716,7 @@ Use this checklist to verify completeness:
 - [ ] Root `pom.xml` — 3 new modules added
 - [ ] `content-packages/complete/pom.xml` — 3 dependencies + embeddeds + subPackages added
 - [ ] `launcher/pom.xml` — new path in `starter.check.paths`
-- [ ] `launcher/pom.xml` — new `sample-content` artifact in the `stage-sample-content` execution (composite-image runtime install; §2.4.1)
+- [ ] `launcher/pom.xml` — new `sample-content` `<dependency>` + entry in `sample-content.artifactIds` (composite-image runtime install + IT pruning; §2.4.1)
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.core/pom.xml`
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.core/src/main/java/.../UserIsLoggedIn.java`
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/pom.xml`

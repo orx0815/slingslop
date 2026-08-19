@@ -46,6 +46,14 @@
       /system/console/bundles
     </starter.check.paths>
     <feature.launcher.plugin.version>1.0.4</feature.launcher.plugin.version>
+
+    <!-- Single source of truth for stage-sample-content + unpack-sample-content-it
+         below, so the artifact list isn't declared twice. -->
+    <sample-content.artifactIds>
+      slingslop.zengarden.sample-content,
+      slingslop.sling-matrix.sample-content,
+      digitalmedia.sample-content
+    </sample-content.artifactIds>
   </properties>
 
   <dependencies>
@@ -65,6 +73,32 @@
       <artifactId>org.apache.felix.utils</artifactId>
       <version>1.11.8</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- Demo sample-content packages (not used at compile/runtime - see
+         stage-sample-content / unpack-sample-content-it executions below).
+         provided + skipAddFeatureDependencies=true keep them out of the OSGi
+         feature model. -->
+    <dependency>
+      <groupId>org.motorbrot</groupId>
+      <artifactId>slingslop.zengarden.sample-content</artifactId>
+      <version>${slingslop.launcher.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.motorbrot</groupId>
+      <artifactId>slingslop.sling-matrix.sample-content</artifactId>
+      <version>${slingslop.launcher.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.motorbrot</groupId>
+      <artifactId>digitalmedia.sample-content</artifactId>
+      <version>${slingslop.launcher.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   
@@ -316,36 +350,37 @@
           <!-- Sample-content is NOT in the feature/seed (code-only image). Stage the
                demo packages into the Docker context; install-sample-content.sh installs
                them into the RUNNING Sling on every launch/deploy (see launch.sh + the
-               slingslop role's install-sample-content task). -->
+               slingslop role's install-sample-content task). Artifacts are the
+               sample-content.artifactIds dependencies declared above. -->
           <execution>
             <id>stage-sample-content</id>
             <goals>
-              <goal>copy</goal>
+              <goal>copy-dependencies</goal>
             </goals>
             <phase>package</phase>
             <configuration>
               <outputDirectory>${project.build.directory}/sample-content</outputDirectory>
               <stripVersion>true</stripVersion>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.motorbrot</groupId>
-                  <artifactId>slingslop.zengarden.sample-content</artifactId>
-                  <version>${slingslop.launcher.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.motorbrot</groupId>
-                  <artifactId>slingslop.sling-matrix.sample-content</artifactId>
-                  <version>${slingslop.launcher.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.motorbrot</groupId>
-                  <artifactId>digitalmedia.sample-content</artifactId>
-                  <version>${slingslop.launcher.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
+              <includeArtifactIds>${sample-content.artifactIds}</includeArtifactIds>
+            </configuration>
+          </execution>
+
+          <!-- Unpacks each sample-content package (one subdirectory per artifact)
+               into a work dir so prune-and-zip-sample-content-it (exec-maven-plugin,
+               below) can trim each down to only what starter.check.paths needs
+               before re-zipping into sample-content-it for the IT install. Nothing
+               app-specific here or in the content-package modules - the pruning is
+               fully generic, derived from starter.check.paths at build time. -->
+          <execution>
+            <id>unpack-sample-content-it</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/sample-content-it-work</outputDirectory>
+              <includeArtifactIds>${sample-content.artifactIds}</includeArtifactIds>
+              <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
             </configuration>
           </execution>
         </executions>
@@ -451,9 +486,34 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <executions>
+          <!-- Prunes each package unpacked by unpack-sample-content-it (above) down
+               to only the JCR paths starter.check.paths needs, and re-zips them
+               into sample-content-it (see install-sample-content-for-it below).
+               Skipped with the ITs; skip is independent of docker.skip. -->
+          <execution>
+            <id>prune-and-zip-sample-content-it</id>
+            <phase>package</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <skip>${skipITs}</skip>
+              <executable>bash</executable>
+              <arguments>
+                <argument>${project.basedir}/src/build/prune-sample-content-it.sh</argument>
+                <argument>${project.build.directory}/sample-content-it-work</argument>
+                <argument>${project.build.directory}/sample-content-it</argument>
+                <argument>${starter.check.paths}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+
           <!-- Sample-content is not in the feature (code-only image); install it into
                the just-launched single-store instance so the IT content checks pass.
-               Declared AFTER feature-launcher so 'start' runs first; skipped with the ITs. -->
+               Declared AFTER feature-launcher so 'start' runs first; skipped with the ITs.
+               Uses the pruned sample-content-it dir (prune-and-zip-sample-content-it
+               above), NOT the full prod sample-content dir, so growing demo content
+               (more pages, heavier images) never slows down the build. -->
           <execution>
             <id>install-sample-content-for-it</id>
             <phase>pre-integration-test</phase>
@@ -470,7 +530,7 @@
                 <SLING_URL>http://localhost:${http.port}</SLING_URL>
                 <SLING_USER>admin</SLING_USER>
                 <SLING_PASSWORD>admin</SLING_PASSWORD>
-                <SAMPLE_CONTENT_DIR>${project.build.directory}/sample-content</SAMPLE_CONTENT_DIR>
+                <SAMPLE_CONTENT_DIR>${project.build.directory}/sample-content-it</SAMPLE_CONTENT_DIR>
               </environmentVariables>
             </configuration>
           </execution>
@@ -536,7 +596,7 @@
                 </goals>
                 <configuration>
                   <skip>${docker.skip}</skip>
-                  <executable>${project.basedir}/seed_and_bake.sh</executable>
+                  <executable>${project.basedir}/src/build/seed_and_bake.sh</executable>
                   <workingDirectory>${project.basedir}</workingDirectory>
                   <environmentVariables>
                     <IMAGE_BASE>${docker.image.name}:${docker.image.tag}</IMAGE_BASE>

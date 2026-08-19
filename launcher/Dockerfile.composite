@@ -1,7 +1,7 @@
 # Composite-mode image: extends the base Slingslop image with a pre-seeded
 # read-only segment store for /apps and /libs.
 #
-# Build flow (see ../launcher/seed_and_bake.sh):
+# Build flow (see src/build/seed_and_bake.sh):
 #   1. Build the base image with the regular Maven build.
 #   2. Run the base image once with the slingslop_aggregate feature against a
 #      throw-away local directory mounted as /opt/sling/launcher. Wait for

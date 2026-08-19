@@ -194,7 +194,7 @@ docker run ... ghcr.io/orx0815/slingslop:composite slingslop_composite_aggregate
 ```
 
 (Or build a derived image whose `CMD` is the composite aggregate - see
-[`seed_and_bake.sh`](../launcher/seed_and_bake.sh).)
+[`seed_and_bake.sh`](../launcher/src/build/seed_and_bake.sh).)
 
 ## The seeding workflow
 
@@ -203,7 +203,7 @@ against an empty `seed-repository/segmentstore` - there would be no `/apps` or
 `/libs` for anyone to read. The read-only mount has to be **populated first**
 by a regular non-composite run, then frozen.
 
-The script [`launcher/seed_and_bake.sh`](../launcher/seed_and_bake.sh)
+The script [`launcher/src/build/seed_and_bake.sh`](../launcher/src/build/seed_and_bake.sh)
 orchestrates this. It does, in order:
 
 1. **Build the base image** (`mvn -Pdocker -DskipITs ...`).
@@ -318,7 +318,7 @@ In the Felix Web Console (`/system/console/components`) you should see:
 | `launcher/pom.xml` (`slingslop_composite_aggregate`) | Aggregate that combines the standard features with the composite feature |
 | `launcher/Dockerfile` | Adds `/opt/sling/seed-repository` |
 | `launcher/Dockerfile.composite` | Derived image: copies seed in, sets composite `CMD` |
-| `launcher/seed_and_bake.sh` | Orchestrates seed → bake → push |
+| `launcher/src/build/seed_and_bake.sh` | Orchestrates seed → bake → push |
 | `docs/composite-nodestore.md` | This document |
 
 ## Glossary
