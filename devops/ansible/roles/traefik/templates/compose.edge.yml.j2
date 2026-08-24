@@ -15,6 +15,10 @@ services:
     image: {{ traefik_image }}
     container_name: slingslop-traefik
     restart: unless-stopped
+    # tini as real PID 1: the healthcheck below forks wget every interval, and
+    # traefik's own binary is not a subreaper, so orphaned/exited healthcheck
+    # processes were piling up as zombies under traefik's PID 1 (init reaps them).
+    init: true
     # Traefik needs to bind low ports; running with default user works fine in
     # Docker. read_only is OFF because the file provider watches a mounted dir.
     cap_drop: [ALL]
@@ -51,6 +55,9 @@ services:
     image: {{ webcache_image }}
     container_name: slingslop-webcache
     restart: unless-stopped
+    # Same zombie-reaping rationale as traefik above: its healthcheck forks
+    # apache2ctl/curl every interval.
+    init: true
     environment:
       AUTHOR_URL:   slingslop
       RENDERER_URL: slingslop
