@@ -192,7 +192,7 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
   - Events are namespaced: `htmx:before:swap`, `htmx:after:swap`, `htmx:response:error`
   - Event detail carries a `ctx` object: target is `detail.ctx.target`, response status is `detail.ctx.response.status`
   - `htmx.process()` and `htmx.trigger()` signatures are unchanged
-  - `htmx.config.noSwap` lists status codes that must not swap; error codes (401/404/422/500) are added so the save-error overlay keeps working
+  - `htmx.config.noSwap` lists status codes/patterns that must not swap; `'1xx'`/`'3xx'`/`'4xx'`/`'5xx'` wildcards (everything except `'2xx'`) are added so the save-error overlay keeps working for any non-2xx response, not just the ones with a bespoke message
 
 ---
 

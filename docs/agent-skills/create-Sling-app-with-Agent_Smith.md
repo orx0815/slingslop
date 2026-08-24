@@ -1121,7 +1121,7 @@ A component's own view root tag can differ from `editable-component-modal`'s `<d
 
 ### 5.6.5 Save failures on a server error
 
-`editor.ts` guards its `htmx:before:swap` handler against `noSwap`-listed error statuses (401/404/422/500), so a failed save shows the error dialog instead of silently tearing down the active edit session. This is baked into the Tier A copy — no action needed as long as `editor.ts` isn't hand-edited.
+`editor.ts` guards its `htmx:before:swap` handler by checking htmx's own `ctx.swap === 'none'` (set whenever a response status matches a `noSwap` pattern), and pushes htmx's `'1xx'/'3xx'/'4xx'/'5xx'` wildcards into `noSwap` -- i.e. everything except `'2xx'` -- so a failed save shows the error dialog instead of silently tearing down the active edit session for ANY non-2xx response. This is baked into the Tier A copy — no action needed as long as `editor.ts` isn't hand-edited.
 
 ### 5.7 Component HTL Pattern (View)
 
