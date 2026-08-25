@@ -19,13 +19,13 @@ import { wireHoverBadge } from './editor/hover-badge';
 declare const htmx: {
   process: (element: HTMLElement) => void;
   trigger: (element: HTMLElement, eventName: string) => void;
-  config: { noSwap: number[] };
+  config: { noSwap: (number | string)[] };
 };
 
 // htmx 4 event detail: swap/response events carry a `ctx` object.
 // target is the resolved swap target; response holds the fetch status.
 interface HtmxSwapDetail {
-  ctx: { target: HTMLElement; response?: { status: number } };
+  ctx: { target: HTMLElement; response?: { status: number }; swap?: string };
 }
 interface HtmxResponseErrorDetail {
   ctx: { response: { status: number } };
@@ -47,12 +47,14 @@ declare global {
   function initializeEventListeners(): void {
     wireHoverBadge();
 
-    // htmx 4 swaps 4xx/5xx responses by default (v2 did not). The save-error
-    // overlay relies on error responses NOT being swapped into the page, so the
-    // handled status codes are added to noSwap to restore the v2 behaviour.
-    for (const status of [401, 404, 422, 500]) {
-      if (!htmx.config.noSwap.includes(status)) {
-        htmx.config.noSwap.push(status);
+    // htmx 4 swaps non-2xx responses by default (v2 did not). The save-error
+    // overlay relies on error responses NOT being swapped into the page, so
+    // every non-2xx wildcard ('1xx'/'3xx'/'4xx'/'5xx' -- i.e. anything except
+    // '2xx') is added to noSwap to restore the v2 behaviour uniformly, not
+    // just for the status codes with a bespoke message below.
+    for (const pattern of ['1xx', '3xx', '4xx', '5xx']) {
+      if (!htmx.config.noSwap.includes(pattern)) {
+        htmx.config.noSwap.push(pattern);
       }
     }
 
@@ -74,15 +76,17 @@ declare global {
     // catches both cases uniformly.
     document.addEventListener('htmx:before:swap', function (event: Event): void {
       const htmxEvent = event as CustomEvent<HtmxSwapDetail>;
-      const status = htmxEvent.detail.ctx.response?.status;
-      // htmx still fires before:swap/after:swap for noSwap-listed error
-      // statuses (401/404/422/500) even though no content is swapped in --
-      // it just re-settles the existing DOM. Tearing the overlay down here
-      // for those statuses would delete #editor-save-error (portalled,
-      // found by ID) right as htmx:response:error tries to show it, and
-      // would destroy the live Tiptap instance while editing is still
-      // active, leaving Save looking like it silently did nothing.
-      if (status !== undefined && htmx.config.noSwap.includes(status)) {
+      // htmx already resolves noSwap (see above) into ctx.swap === 'none'
+      // before this event fires, so check that directly instead of
+      // re-deriving it from the status code ourselves.
+      // htmx still fires before:swap/after:swap for noSwap'd responses even
+      // though no content is swapped in -- it just re-settles the existing
+      // DOM. Tearing the overlay down here for those responses would delete
+      // #editor-save-error (portalled, found by ID) right as
+      // htmx:response:error tries to show it, and would destroy the live
+      // Tiptap instance while editing is still active, leaving Save looking
+      // like it silently did nothing.
+      if (htmxEvent.detail.ctx.swap === 'none') {
         return;
       }
       if (htmxEvent.detail.ctx.target.hasAttribute('data-zen-editable-editing')) {
@@ -116,7 +120,7 @@ declare global {
       document.body.setAttribute('data-zen-editing', '');
     });
 
-    // Show a user-friendly message for save errors (401/422 = not logged in, 404, 500)
+    // Show a user-friendly message for save errors (401/403/422 = not logged in / no permission, 404, 500)
     document.addEventListener('htmx:response:error', function (event: Event): void {
       const htmxEvent = event as CustomEvent<HtmxResponseErrorDetail>;
       const status = htmxEvent.detail.ctx.response.status;
@@ -126,6 +130,8 @@ declare global {
         message = "I'm sorry, Dave. I'm afraid I can't let you do that. (w/o login)";
       } else if (status === 401) {
         message = 'Save failed: you are not logged in. Please log in and try again.';
+      } else if (status === 403) {
+        message = "I'm sorry, Dave. I'm afraid I can't let you do that. (no permission)";
       } else if (status === 404) {
         message = 'Save failed: the content could not be found (404).';
       } else if (status === 500) {
