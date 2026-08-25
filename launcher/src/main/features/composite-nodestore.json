@@ -3,7 +3,8 @@
   "configurations": {
     "org.apache.jackrabbit.oak.segment.SegmentNodeStoreService": {
       "name": "Global NodeStore",
-      "role": "composite-global"
+      "role": "composite-global",
+      "repository.home": "/opt/sling/launcher/repository"
     },
     "org.apache.jackrabbit.oak.segment.SegmentNodeStoreService~libs": {
       "name": "Libs NodeStore (read-only)",
