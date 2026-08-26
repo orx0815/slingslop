@@ -103,15 +103,31 @@ All the OSGi configurations live in
 
 1. **Override the existing default `SegmentNodeStoreService`** so it stops being
    the global `NodeStore` and instead exposes itself with the role
-   `composite-global`. The data location is unchanged
-   (`${sling.home}/repository/segmentstore` = inside the volume).
+   `composite-global`, with an EXPLICIT `repository.home` pointing inside the
+   persistent volume.
 
    ```json
    "org.apache.jackrabbit.oak.segment.SegmentNodeStoreService": {
      "name": "Global NodeStore",
-     "role": "composite-global"
+     "role": "composite-global",
+     "repository.home": "/opt/sling/launcher/repository"
    }
    ```
+
+   **`repository.home` is REQUIRED here, not optional/inherited.** The same PID
+   (`org.apache.jackrabbit.oak.segment.SegmentNodeStoreService`) also exists in
+   the base `oak_persistence_sns` feature (Sling Starter), which sets its own
+   implicit default. Because the aggregator declares
+   `configurationOverride...=MERGE_LATEST` for this PID (see below), the LATER
+   config (this one) REPLACES the earlier one's properties wholesale -- it is
+   NOT a per-property deep merge. Omitting `repository.home` here does not "fall
+   back" to the base feature's value; it silently drops it, leaving the global
+   store with no configured persistence path. Found live in prod (2026-08-25):
+   the store had no `repository.home` for ~12 days, so it never wrote a single
+   segment `.tar` file to disk (confirmed via a filesystem-wide `find` inside
+   the container -- no `.tar` anywhere except the read-only seed) -- every
+   write only ever lived in memory, invisible until the process finally
+   restarted (a `dist-upgrade`+reboot) and everything vanished.
 
 2. **Add a second `SegmentNodeStoreService` via factory config** that points at
    the baked-in seed directory and exposes itself with role
