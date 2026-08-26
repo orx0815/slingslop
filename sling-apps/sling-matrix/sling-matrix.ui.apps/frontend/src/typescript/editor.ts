@@ -49,6 +49,9 @@ declare global {
     // Themed confirmation dialog in place of the native window.confirm()
     wireConfirmModal();
 
+    // "Click to edit" badge, positioned via JS -- see editor/hover-badge.ts
+    wireHoverBadge();
+
     // htmx 4 swaps non-2xx responses by default (v2 did not). The save-error
     // overlay relies on error responses NOT being swapped into the page, so
     // every non-2xx wildcard ('1xx'/'3xx'/'4xx'/'5xx' -- i.e. anything except

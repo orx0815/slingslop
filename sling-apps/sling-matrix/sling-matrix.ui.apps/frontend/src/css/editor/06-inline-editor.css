@@ -5,8 +5,11 @@
 
 /* ── Hover / cursor affordance for clickable-to-edit components ──────── */
 
+/* Never set `position` here, even on :hover: host CSS may rely on these
+   elements' own position:absolute/relative, and any override relocates them.
+   outline is paint-only and safe; the "Click to edit" badge is positioned
+   via JS instead -- see editor/hover-badge.ts. */
 [data-zen-editable] {
-  position: relative;
   cursor: pointer;
   transition: outline-color 0.2s, outline-offset 0.2s;
 
@@ -19,22 +22,27 @@
     outline: 2px dashed oklch(from var(--color-primary-base) l c h / 0.6);
     outline-offset: 4px;
   }
+}
 
-  &:hover::after {
-    content: "\270E  Click to edit";
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    font-family: sans-serif;
-    color: #fff;
-    background: var(--color-primary);
-    padding: 3px 8px;
-    border-radius: 3px;
-    pointer-events: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+/* ── "Click to edit" hover badge -- see editor/hover-badge.ts ─────────── */
+
+.zen-editable-hover-badge {
+  display: none;
+  position: fixed;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: sans-serif;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 3px 8px;
+  border-radius: 3px;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  z-index: 9002;
+
+  &.is-visible {
+    display: block;
   }
 }
 
