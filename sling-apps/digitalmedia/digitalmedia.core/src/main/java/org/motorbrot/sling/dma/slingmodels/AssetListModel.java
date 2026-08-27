@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class AssetListModel {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetListModel.class);
-    private static final String DEFAULT_ASSETS_PATH = "/content/motorbrot/dma/assets";
+    private static final String DEFAULT_ASSETS_PATH = "/content/motorbrot/dml/assets";
 
     @SlingObject
     private SlingJakartaHttpServletRequest request;

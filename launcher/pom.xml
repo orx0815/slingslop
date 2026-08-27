@@ -37,7 +37,7 @@
     <starter.check.paths>
       /content/slingslop/zengarden/home.html,
       /content/sling-matrix/home.html,
-      /content/motorbrot/dma/home.html,
+      /content/motorbrot/dml/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
       /slingshot/resources/images/background.jpg,
       /slingshot/users/slingshot2/places/landing/images/landing.jpg,
@@ -51,8 +51,7 @@
          below, so the artifact list isn't declared twice. -->
     <sample-content.artifactIds>
       slingslop.zengarden.sample-content,
-      slingslop.sling-matrix.sample-content,
-      digitalmedia.sample-content
+      slingslop.sling-matrix.sample-content
     </sample-content.artifactIds>
   </properties>
 
@@ -89,13 +88,6 @@
     <dependency>
       <groupId>org.motorbrot</groupId>
       <artifactId>slingslop.sling-matrix.sample-content</artifactId>
-      <version>${slingslop.launcher.version}</version>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.motorbrot</groupId>
-      <artifactId>digitalmedia.sample-content</artifactId>
       <version>${slingslop.launcher.version}</version>
       <type>zip</type>
       <scope>provided</scope>
@@ -389,7 +381,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.48.1</version>
+        <version>0.49.0</version>
         <configuration>
           <skip>${docker.skip}</skip>
           <skipPush>${docker.skip.push}</skipPush>
@@ -485,6 +477,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
+        <version>3.6.3</version>
         <executions>
           <!-- Prunes each package unpacked by unpack-sample-content-it (above) down
                to only the JCR paths starter.check.paths needs, and re-zips them
@@ -585,7 +578,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.5.0</version>
+            <version>3.6.3</version>
             <executions>
               <execution>
                 <id>seed-and-bake-composite-image</id>

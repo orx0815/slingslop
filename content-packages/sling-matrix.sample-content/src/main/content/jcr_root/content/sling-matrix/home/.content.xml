@@ -32,7 +32,7 @@
                 dmaFocusY="{Double}49.1"
                 dmaFormats="[matrix-feature-desktop,matrix-feature-mobile]"
                 dmaMedia="[(min-width: 768px)]"
-                fileReference="/content/motorbrot/dma/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
+                fileReference="/content/motorbrot/dml/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
                 headline="Follow the White Rabbit"
                 imagePosition="right"
                 text="&lt;p>Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p>&lt;ul>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/osgi/osgi-intro.html&quot;>&lt;strong>OSGi&lt;/strong>&lt;/a> - The modular foundation of the Matrix&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/jcr/jcr-intro.html&quot;>&lt;strong>JCR&lt;/strong>&lt;/a> - The repository that stores all truth&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/sling/sling-intro.html&quot;>&lt;strong>Sling&lt;/strong>&lt;/a> - The framework that brings it all together&lt;/p>&lt;/li>&lt;/ul>">

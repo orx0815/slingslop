@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class FolderTreeModel {
 
     private static final Logger LOG = LoggerFactory.getLogger(FolderTreeModel.class);
-    private static final String ASSETS_PATH = "/content/motorbrot/dma/assets";
+    private static final String ASSETS_PATH = "/content/motorbrot/dml/assets";
 
     @SlingObject
     private SlingJakartaHttpServletRequest request;

@@ -11,7 +11,7 @@ depending on the full Digital Media Library dashboard.
 
 The DML dashboard (`digitalmedia.core` + `digitalmedia.ui.apps`) is **only** needed
 to upload, store, and serve assets. Once an asset exists at e.g.
-`/content/motorbrot/dma/assets/foo.jpg`, any consumer can reference it.
+`/content/motorbrot/dml/assets/foo.jpg`, any consumer can reference it.
 
 ---
 
@@ -79,7 +79,7 @@ component node:
 
 | Property | Type | Meaning |
 |---|---|---|
-| `fileReference` | `String` | JCR path of the DML asset, e.g. `/content/motorbrot/dma/assets/foo.jpg` |
+| `fileReference` | `String` | JCR path of the DML asset, e.g. `/content/motorbrot/dml/assets/foo.jpg` |
 | `dmaFormats` | `String[]` | Ordered list of `MediaFormat` names |
 | `dmaMedia` | `String[]` | CSS media queries, **same order as `dmaFormats`**. The entry whose media query is missing/empty is the `<img>` fallback. |
 | `dmaAlt` | `String` | Alt text |
@@ -97,7 +97,7 @@ Sample-content seed:
 ```xml
 <feature-image-left
     sling:resourceType="sling-matrix/components/feature-image"
-    fileReference="/content/motorbrot/dma/assets/hero.jpg"
+    fileReference="/content/motorbrot/dml/assets/hero.jpg"
     dmaAlt="A hero shot"
     dmaFormats="[matrix-feature-desktop,matrix-feature-mobile]"
     dmaMedia="[(min-width: 768px)]"/>  <!-- one entry shorter → mobile is fallback -->
@@ -116,7 +116,7 @@ The picker widget writes `fileReference` + alt text + focus point in one go.
         altName='dmaAlt',
         altValue=properties.dmaAlt,
         ratio='4:3',
-        assetsRoot='/content/motorbrot/dma/assets'}"/>
+        assetsRoot='/content/motorbrot/dml/assets'}"/>
 
 <!-- Persist the per-consumer format list. Multi-value via repeated input name -->
 <!-- + explicit @TypeHint=String[]. Omit the trailing dmaMedia entry to mark    -->
@@ -140,7 +140,7 @@ Renditions are stored **on the asset itself**, not on the consuming component.
 Layout in JCR:
 
 ```
-/content/motorbrot/dma/assets/foo.jpg                    (nt:unstructured, isAsset=true)
+/content/motorbrot/dml/assets/foo.jpg                    (nt:unstructured, isAsset=true)
 ├── jcr:content                                          (nt:resource)
 │   └── jcr:data                                         ← original binary
 ├── metadata                                             (nt:unstructured)
@@ -160,7 +160,7 @@ Layout in JCR:
 Each rendition node is a normal `nt:file`, so it can be served directly:
 
 ```
-GET /content/motorbrot/dma/assets/foo.jpg/renditions/matrix-feature-desktop
+GET /content/motorbrot/dml/assets/foo.jpg/renditions/matrix-feature-desktop
 ```
 
 This is exactly the URL the `<picture>` / `<img>` elements emit — no servlet

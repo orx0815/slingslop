@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class FolderInfoModel {
 
     private static final Logger LOG = LoggerFactory.getLogger(FolderInfoModel.class);
-    private static final String ASSETS_ROOT = "/content/motorbrot/dma/assets";
+    private static final String ASSETS_ROOT = "/content/motorbrot/dml/assets";
 
     @SlingObject
     private SlingJakartaHttpServletRequest request;

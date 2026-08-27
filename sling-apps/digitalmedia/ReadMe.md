@@ -31,10 +31,13 @@ digitalmedia/
 │           ├── components/     # Reusable components
 │           ├── css/            # Built CSS (generated)
 │           └── js/             # Built JavaScript (generated)
-└── digitalmedia.sample-content/ # Sample content package
-    └── src/main/content/
-        └── jcr_root/content/motorbrot/dma/
 ```
+
+There is no `digitalmedia.sample-content` package: the dashboard page
+(`/content/motorbrot/dml/home`) and the empty `/content/motorbrot/dml/assets`
+folder are provisioned by repoinit (`launcher/src/main/features/digitalmedia-repoinit.txt`),
+so every launcher that includes the `digitalmedia` feature starts with a
+blank, ready-to-use library — no seed images baked in.
 
 ## Prerequisites
 
@@ -62,7 +65,7 @@ cd launcher
 
 ### Open in browser
 
-- **Dashboard**: http://localhost:8080/content/motorbrot/dma/home.html
+- **Dashboard**: http://localhost:8080/content/motorbrot/dml/home.html
 - **Login page**: http://localhost:8080/
 - **Default credentials**: admin / admin
 
@@ -169,7 +172,7 @@ The complementary color is automatically calculated by rotating the hue by 180°
 
 Sling resolves rendering scripts by `sling:resourceType`:
 
-1. Content node (e.g., `/content/motorbrot/dma/home`) has `sling:resourceType="motorbrot/dma/pages/page"`
+1. Content node (e.g., `/content/motorbrot/dml/home`) has `sling:resourceType="motorbrot/dma/pages/page"`
 2. `pages/page/html.html` delegates to `jcr:content` child
 3. `jcr:content` has its own `sling:resourceType` (e.g., `motorbrot/dma/pages/dashboard`)
 4. `pages/dashboard/content.html` renders the dashboard UI
@@ -178,7 +181,7 @@ Sling resolves rendering scripts by `sling:resourceType`:
 ### Content Paths
 
 - **Apps root**: `/apps/motorbrot/dma`
-- **Content root**: `/content/motorbrot/dma`
+- **Content root**: `/content/motorbrot/dml`
 - **Asset storage**: Assets stored as JCR nodes with:
   - Original binary in `jcr:data`
   - Metadata properties extracted by Tika

@@ -123,7 +123,7 @@ public class AssetUploadServlet extends SlingJakartaAllMethodsServlet {
             }
 
             // Resolve target folder — use selected parentPath when valid
-            String defaultAssetsPath = "/content/motorbrot/dma/assets";
+            String defaultAssetsPath = "/content/motorbrot/dml/assets";
             String assetsPath;
             if (parentPath != null && !parentPath.trim().isEmpty()
                     && parentPath.startsWith(defaultAssetsPath)) {

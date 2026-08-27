@@ -51,7 +51,7 @@ public class FolderCreationServlet extends SlingJakartaAllMethodsServlet {
             }
 
             // Determine parent: use the selected folder if provided and valid
-            String defaultAssetsPath = "/content/motorbrot/dma/assets";
+            String defaultAssetsPath = "/content/motorbrot/dml/assets";
             String parentParam = request.getParameter("folder");
             String assetsPath;
             if (parentParam != null && !parentParam.trim().isEmpty()

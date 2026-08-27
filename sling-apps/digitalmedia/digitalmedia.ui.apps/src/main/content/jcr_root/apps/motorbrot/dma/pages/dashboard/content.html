@@ -2,7 +2,7 @@
 <sly data-sly-use.auth="org.motorbrot.sling.dma.slingmodels.UserIsLoggedIn">
   <div class="dml-app dml-fade-in">
     <!--/* Single source of truth for the selected folder path */-->
-    <input type="hidden" id="dml-current-folder" name="folder" value="/content/motorbrot/dma/assets" />
+    <input type="hidden" id="dml-current-folder" name="folder" value="/content/motorbrot/dml/assets" />
 
     <header class="dml-header">
       <h1>Digital Media Library</h1>
@@ -106,7 +106,7 @@
 
     <script>
 (function () {
-  var ASSETS_ROOT = '/content/motorbrot/dma/assets';
+  var ASSETS_ROOT = '/content/motorbrot/dml/assets';
 
   function folderLabel(segment) {
     try { return decodeURIComponent(segment.replace(/\+/g, ' ')); } catch (e) { return segment; }

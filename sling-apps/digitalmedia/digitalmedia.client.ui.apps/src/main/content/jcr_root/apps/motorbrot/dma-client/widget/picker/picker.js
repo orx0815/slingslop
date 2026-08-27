@@ -89,7 +89,7 @@
   function listEndpointFor(picker) {
     return (
       picker.dataset.assetsListUrl ||
-      '/content/motorbrot/dma/home/_jcr_content.assets.html'
+      '/content/motorbrot/dml/home/_jcr_content.assets.html'
     );
   }
 
@@ -98,7 +98,7 @@
     const grid = dlg.querySelector('.dma-picker-grid');
     grid.innerHTML = '<p class="dma-picker-loading">Loading…</p>';
 
-    const root = picker.dataset.assetsRoot || '/content/motorbrot/dma/assets';
+    const root = picker.dataset.assetsRoot || '/content/motorbrot/dml/assets';
     const current = folder || root;
     picker.dataset.currentFolder = current;
 
@@ -125,7 +125,7 @@
   function openDialog(picker) {
     const dlg = picker.querySelector('.dma-picker-dialog');
     dlg.showModal();
-    const root = picker.dataset.assetsRoot || '/content/motorbrot/dma/assets';
+    const root = picker.dataset.assetsRoot || '/content/motorbrot/dml/assets';
     loadFolder(picker, picker.dataset.currentFolder || root);
   }
 

@@ -491,7 +491,6 @@ registration — register the new app's sample-content package in **two places**
 <sample-content.artifactIds>
   slingslop.zengarden.sample-content,
   slingslop.sling-matrix.sample-content,
-  digitalmedia.sample-content,
   {PROJECT_NAME}.sample-content
 </sample-content.artifactIds>
 ```

@@ -26,7 +26,7 @@
                 dmaFocusY="{Double}47.02"
                 dmaFormats="[matrix-feature-desktop,matrix-feature-mobile]"
                 dmaMedia="[(min-width: 768px)]"
-                fileReference="/content/motorbrot/dma/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
+                fileReference="/content/motorbrot/dml/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
                 headline="Image left"
                 imagePosition="left"
                 text="&lt;p>After picking a DML asset above, this column will show the &lt;strong>matrix-feature-desktop&lt;/strong> rendition (1200×900) on wide viewports and the &lt;strong>matrix-feature-mobile&lt;/strong> rendition (600×600) on phones. Missing renditions surface a &quot;Generate&quot; button for logged-in editors.&lt;/p>">
@@ -42,7 +42,7 @@
                 dmaFocusY="{Double}45.35"
                 dmaFormats="[matrix-feature-desktop,matrix-feature-mobile]"
                 dmaMedia="[(min-width: 768px)]"
-                fileReference="/content/motorbrot/dma/assets/slingslop/matrix/basics/sling_script_resolution.png"
+                fileReference="/content/motorbrot/dml/assets/slingslop/matrix/basics/sling_script_resolution.png"
                 headline="Image right"
                 imagePosition="right"
                 text="&lt;p>Same component, &lt;code>imagePosition=&quot;right&quot;&lt;/code>. The picker writes a focus point into the asset's metadata so &lt;em>all&lt;/em> consumers benefit when they later render a crop with a different aspect ratio.&lt;/p>">

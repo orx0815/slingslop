@@ -36,4 +36,4 @@ tenants:
     passthroughPaths:
     - /bin/public
     # See prod-motorbrot.yaml: reach the shared DML asset renditions (feature-image).
-    - /content/motorbrot/dma/assets
+    - /content/motorbrot/dml/assets

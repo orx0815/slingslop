@@ -30,7 +30,7 @@ This module contains:
 ## Content Structure
 
 - **Apps root**: `/apps/motorbrot/dma`
-- **Content root**: `/content/motorbrot/dma`
+- **Content root**: `/content/motorbrot/dml`
 - **Asset storage**: Assets are stored as JCR nodes with:
   - Original binary in `jcr:data`
   - Metadata properties extracted by Tika

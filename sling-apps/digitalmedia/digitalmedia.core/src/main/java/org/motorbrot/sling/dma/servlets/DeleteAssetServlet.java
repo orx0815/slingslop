@@ -55,7 +55,7 @@ public class DeleteAssetServlet extends SlingJakartaAllMethodsServlet {
 
             // Tell HTMX to redirect to home page (asset panel will clear itself)
             response.setStatus(200);
-            response.setHeader("HX-Redirect", "/content/motorbrot/dma/home.html");
+            response.setHeader("HX-Redirect", "/content/motorbrot/dml/home.html");
 
         } catch (Exception e) {
             LOG.error("Error deleting asset: {}", assetPath, e);

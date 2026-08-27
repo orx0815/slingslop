@@ -2,6 +2,7 @@
 echo '-------------------------------------------------------------------------------------------'
 echo '[NOTE] Launching application, this will fail if you did not build the project at least once'
 echo '[NOTE] Remove the launcher folder to throw away local changes'
+echo '[NOTE] Run ./install-sample-content-local.sh on your own seperately after first start'
 echo '-------------------------------------------------------------------------------------------'
 
 # Optional Felix HTTP JVM opts (e.g. virtual threads) from the CONGA local-plain
@@ -15,14 +16,6 @@ export JAVA_OPTS="-XX:+UseG1GC -XX:+UseCompactObjectHeaders -XX:+UseStringDedupl
                   --enable-native-access=ALL-UNNAMED \
                   -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=38080 \
                   ${EXTRA_JAVA_OPTS:-} ${HTTP_JAVA_OPTS}"
-
-# Sample-content is no longer baked into the feature/seed (code-only). Install
-# the staged demo packages once Sling answers — always overwritten (force),
-# scoped per content root, so other/user content is untouched. Backgrounded so
-# it can wait while the launcher comes up in the foreground. The container/prod
-# deploy has no Maven, so it keeps using src/main/container/bin/install-sample-content.sh
-# instead; see install-sample-content-local.sh for why the local path differs.
-( ./install-sample-content-local.sh ) &
 
 # onFirstInit wipes the persisted Felix bundle cache on every launch (fresh
 # JVM = "first init" every time), same rationale as the container's launch.sh:

@@ -30,7 +30,7 @@ import java.io.IOException;
 public class DeleteFolderServlet extends SlingJakartaAllMethodsServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeleteFolderServlet.class);
-    private static final String ASSETS_ROOT = "/content/motorbrot/dma/assets";
+    private static final String ASSETS_ROOT = "/content/motorbrot/dml/assets";
 
     @Override
     protected void doPost(SlingJakartaHttpServletRequest request, SlingJakartaHttpServletResponse response)
@@ -73,7 +73,7 @@ public class DeleteFolderServlet extends SlingJakartaAllMethodsServlet {
             session.save();
 
             // Redirect to home — triggers full page reload including sidebar refresh
-            response.setHeader("HX-Redirect", "/content/motorbrot/dma/home.html");
+            response.setHeader("HX-Redirect", "/content/motorbrot/dml/home.html");
             response.setStatus(200);
 
         } catch (Exception e) {

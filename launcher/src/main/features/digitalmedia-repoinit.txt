@@ -5,4 +5,18 @@
 # WITHOUT having to add them to its own launcher repoinit. Registration is
 # idempotent, so it is safe even if another feature registers the same types.
 
-# Empty for now
+# DML ships with NO sample-content package: the dashboard page and the empty
+# assets folder are provisioned here instead, so every launcher that includes
+# this feature starts with a blank, ready-to-use Digital Media Library.
+# NOTE: the content root is "dml" (Digital Media Library); only /apps and the
+# resourceTypes keep the "dma" (org.motorbrot.sling.dma) codename.
+ensure nodes (sling:Folder) /content/motorbrot/dml/home with properties
+  set sling:resourceType to "motorbrot/dma/pages/page"
+end
+
+ensure nodes (sling:Folder) /content/motorbrot/dml/home/jcr:content(nt:unstructured) with properties
+  set sling:resourceType to "motorbrot/dma/pages/dashboard"
+  set jcr:title to "Digital Media Library Dashboard"
+end
+
+ensure nodes (sling:Folder) /content/motorbrot/dml/assets
