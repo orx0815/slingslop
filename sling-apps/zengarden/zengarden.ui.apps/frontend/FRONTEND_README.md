@@ -183,7 +183,7 @@ All Tiptap packages are MIT-licensed and bundled via esbuild — no CDN, no API 
 - `@tiptap/extension-typography` — smart quotes, em-dashes, ellipsis
 
 ### htmx
-- **v4.x** (`htmx.org 4.0.0-beta5`) — built-in DOM morphing, namespaced events, `fetch`-based requests
+- **v4.x** (`htmx.org 4.0.0`) — built-in DOM morphing, namespaced events, `fetch`-based requests
 - Copied from `node_modules/htmx.org/dist/htmx.js` by `copy:htmx`
 - In prod (`editor-bundle.min.js`) htmx is prepended as an esbuild banner so it is available before the editor IIFE runs
 - In dev (`.noMinLibs` selector) htmx is loaded as a separate `<script>` tag

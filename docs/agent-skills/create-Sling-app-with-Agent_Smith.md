@@ -781,7 +781,7 @@ Replicate the zengarden frontend build pattern exactly. The build produces **two
     "check": "npm run format && npm run lint && npm run typecheck"
   },
   "dependencies": {
-    "htmx.org": "4.0.0-beta5"
+    "htmx.org": "4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
