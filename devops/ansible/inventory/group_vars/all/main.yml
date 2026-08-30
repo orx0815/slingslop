@@ -93,6 +93,11 @@ slingslop_image_pull: true
 # image containing freshly-added apps. Empty = registry pull (the prod default).
 slingslop_image_load_tar: ""
 
+# Same mechanism as slingslop_image_load_tar above, for the webcache image —
+# lets the local Vagrant test exercise LOCAL devops/webcache changes instead of
+# whatever was last published to GHCR. Empty = registry pull (the prod default).
+webcache_image_load_tar: ""
+
 # ---------------------------------------------------------------------------
 # CONGA-generated deploy config (Pattern A — see docs/conga-config-generation-concept.md §6)
 # ---------------------------------------------------------------------------

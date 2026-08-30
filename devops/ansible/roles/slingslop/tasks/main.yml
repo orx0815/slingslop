@@ -76,3 +76,10 @@
 - name: Install CONGA /etc/map short-URL mappings package
   ansible.builtin.include_tasks: install-mappings.yml
   tags: [slingmappings]
+
+# Sample-content is NOT baked into the image (code-only) — a fresh convergence
+# (first site.yml run, or this local Vagrant harness) needs it installed too,
+# not just update-slingslop.yml's incremental redeploy path.
+- name: Install demo sample-content (always overwritten, scoped per content root)
+  ansible.builtin.include_tasks: install-sample-content.yml
+  tags: [sample-content]

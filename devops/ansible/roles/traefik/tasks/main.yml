@@ -86,6 +86,26 @@
     group: root
     mode: "0640"
 
+# Local test path: ship a locally-built webcache image (containing freshly-made
+# devops/webcache changes) into the host instead of pulling from GHCR.
+- name: Load locally-built webcache image tarball
+  when: webcache_image_load_tar | default('') | length > 0
+  block:
+    - name: Copy webcache image tarball to host
+      ansible.builtin.copy:
+        src: "{{ webcache_image_load_tar }}"
+        dest: /tmp/webcache-image.tar
+        mode: "0644"
+    - name: docker load the webcache image
+      ansible.builtin.command:
+        cmd: "docker load -i /tmp/webcache-image.tar"
+      register: webcache_img_load
+      changed_when: "'Loaded image' in webcache_img_load.stdout"
+    - name: Remove the webcache tarball
+      ansible.builtin.file:
+        path: /tmp/webcache-image.tar
+        state: absent
+
 - name: Bring up edge stack
   ansible.builtin.command:
     cmd: "{{ slingslop_root }}/dc up -d --no-deps traefik webcache"

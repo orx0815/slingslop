@@ -26,6 +26,12 @@ slingslop_image: ghcr.io/orx0815/slingslop:snapshot
 slingslop_image_pull: false
 slingslop_image_load_tar: "{{ playbook_dir }}/../local/.runtime/slingslop-image.tar"
 
+# --- Same idea for webcache: test-local.sh builds devops/webcache locally and
+# `docker save`s it here too, so edge convergence tests YOUR webcache changes
+# instead of the last image published to GHCR. ---
+webcache_image: slingslop-webcache:local
+webcache_image_load_tar: "{{ playbook_dir }}/../local/.runtime/webcache-image.tar"
+
 # --- The whole point of the local harness: no Let's Encrypt on a private VM.
 # Traefik serves its built-in self-signed cert; browsers will warn (expected).
 traefik_acme_enabled: false

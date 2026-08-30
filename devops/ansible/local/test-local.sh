@@ -8,8 +8,8 @@
 # Usage:
 #   ./test-local.sh up         # boot VM + run bootstrap + site (default)
 #   ./test-local.sh bootstrap  # (re)run bootstrap.yml only
-#   ./test-local.sh site       # rebuild image + CONGA config, then (re)run site.yml
-#   ./test-local.sh image      # only rebuild the local image + CONGA config (docker save)
+#   ./test-local.sh site       # rebuild images + CONGA config, then (re)run site.yml
+#   ./test-local.sh image      # only rebuild the local slingslop + webcache images + CONGA config (docker save)
 #   ./test-local.sh hosts      # print the /etc/hosts lines you need
 #   ./test-local.sh ssh        # ssh into the VM as the deploy user
 #   ./test-local.sh status     # vagrant status
@@ -31,6 +31,7 @@ SECRETS_VARS="${RUNTIME_DIR}/secrets.local.yml"
 BOOTSTRAP_INV="${RUNTIME_DIR}/bootstrap-inventory.ini"
 DEPLOY_INV="${RUNTIME_DIR}/deploy-inventory.ini"
 IMAGE_TAR="${RUNTIME_DIR}/slingslop-image.tar"
+WEBCACHE_IMAGE_TAR="${RUNTIME_DIR}/webcache-image.tar"
 
 MAIN_VARS="${ANSIBLE_DIR}/inventory/group_vars/all/main.yml"
 LOCAL_VARS="${LOCAL_DIR}/vars.local.yml"
@@ -98,8 +99,11 @@ vault_grafana_basicauth_users_htpasswd: |
 vault_traefik_dashboard_htpasswd: |
   ${htpasswd}
 EOF
-  # GHCR pull credentials for the private slingslop/webcache images.
-  # Set via env so the token never lands in a committed file:
+  # GHCR pull credentials — NOT needed for the default local flow any more:
+  # both slingslop and webcache images are now built locally and docker-load'ed
+  # into the VM (see build_and_save_image). Only relevant if you point
+  # slingslop_image/webcache_image at a real GHCR tag instead (e.g. to test a
+  # published image). Set via env so the token never lands in a committed file:
   #   export GHCR_USER=<github-user>
   #   export GHCR_TOKEN=<PAT with read:packages>
   if [[ -n "${GHCR_TOKEN:-}" ]]; then
@@ -108,9 +112,6 @@ vault_ghcr_pull_user: "${GHCR_USER:-}"
 vault_ghcr_pull_token: "${GHCR_TOKEN}"
 EOF
     log "GHCR credentials picked up from env (user: ${GHCR_USER:-<unset>})."
-  else
-    warn "GHCR_TOKEN not set — private images (slingslop, webcache) will fail to pull."
-    warn "  export GHCR_USER=<github-user>; export GHCR_TOKEN=<PAT read:packages>; then re-run."
   fi
 }
 
@@ -171,7 +172,10 @@ cmd_up() {
 # image so Ansible can load it into the VM (the VM must run *your* code, incl.
 # freshly-added apps, not a prebuilt registry image). The same `mvn install` also
 # populates devops/conga/target/configuration/, which the webcache/traefik roles
-# ship onto the box.
+# ship onto the box. Also builds + saves the webcache image from devops/webcache
+# so LOCAL webcache/CONGA-template changes get exercised too, instead of
+# whatever was last published to GHCR (which needs GHCR_TOKEN and never reflects
+# uncommitted local changes).
 build_and_save_image() {
   require docker "Install Docker (the local test loads a locally-built image into the VM)."
   log "Building slingslop image + CONGA deploy config (mvn … -Ddocker.skip=false) …"
@@ -179,6 +183,10 @@ build_and_save_image() {
   mkdir -p "${RUNTIME_DIR}"
   log "Saving image to ${IMAGE_TAR} (docker save) …"
   docker save ghcr.io/orx0815/slingslop:snapshot -o "${IMAGE_TAR}"
+  log "Building webcache image (devops/webcache) …"
+  docker build -t slingslop-webcache:local "${REPO_ROOT}/devops/webcache"
+  log "Saving webcache image to ${WEBCACHE_IMAGE_TAR} (docker save) …"
+  docker save slingslop-webcache:local -o "${WEBCACHE_IMAGE_TAR}"
 }
 
 cmd_bootstrap() { ensure_prereqs; ensure_venv; ensure_ssh_key; gen_secrets; write_inventories; run_play "${BOOTSTRAP_INV}" bootstrap.yml; }
