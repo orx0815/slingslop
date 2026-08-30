@@ -3,7 +3,7 @@ name: CI/CD
 # Push to main             → build + test + push all images to GHCR
 # Push to deploy/motorbrot_prod → same, then deploy to motorbrot.org:
 #   * sling image is deployed only when sling-apps / launcher / content-packages / pom.xml change
-#   * webcache is deployed only when docker/webcache changes
+#   * webcache is deployed only when devops/webcache changes
 #   * if both change: sling first (readiness-gated), then webcache
 #   * the deployed image is the one built from THIS commit (immutable sha tag),
 #     never main's — so a branch deploy can never pull main's image.
@@ -83,7 +83,7 @@ jobs:
               - 'content-packages/**'
               - 'pom.xml'
             webcache:
-              - 'docker/webcache/**'
+              - 'devops/webcache/**'
             tenants:
               # CONGA roles / templates / environments (the tenant list). A change
               # here — e.g. Agent Smith adding a tenant — triggers an edge-config
@@ -159,7 +159,7 @@ jobs:
       - name: Build + push webcache (GHCR)
         uses: docker/build-push-action@v6
         with:
-          context: docker/webcache
+          context: devops/webcache
           push: true
           tags: |
             ${{ env.GHCR_WEBCACHE }}:${{ needs.meta.outputs.branch_tag }}

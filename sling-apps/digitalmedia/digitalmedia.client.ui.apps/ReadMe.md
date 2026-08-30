@@ -211,7 +211,7 @@ crop.
 ## Cache & lifecycle
 
 - Sling's default `nt:file` GET handler serves renditions with `Last-Modified`
-  and `ETag` headers — the front cache (`docker/webcache/`) caches them like
+  and `ETag` headers — the front cache (`devops/webcache/`) caches them like
   any other static asset.
 - Re-clicking **Generate** for the same `format` overwrites the existing
   rendition node in place (same UUID, new `jcr:data`). Browsers will revalidate

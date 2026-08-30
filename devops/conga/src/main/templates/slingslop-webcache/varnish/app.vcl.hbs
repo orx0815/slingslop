@@ -87,8 +87,10 @@ sub vcl_backend_response {
     }
     unset beresp.http.Set-Cookie;
 
-    # TTLs mirror the shared htmlTtlSeconds / staticTtlSeconds params.
-    if (bereq.url ~ "(?i)\.(css|js|png|jpe?g|gif|svg|woff2?)(\?|$)") {
+    # TTLs mirror the shared htmlTtlSeconds / staticTtlSeconds / cssJsTtlSeconds params.
+    if (bereq.url ~ "(?i)\.(css|js)(\?|$)") {
+        set beresp.ttl = {{cssJsTtlSeconds}}s;
+    } else if (bereq.url ~ "(?i)\.(png|jpe?g|gif|svg|woff2?)(\?|$)") {
         set beresp.ttl = {{staticTtlSeconds}}s;
     } else {
         set beresp.ttl = {{htmlTtlSeconds}}s;

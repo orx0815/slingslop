@@ -64,10 +64,12 @@ server {
     proxy_ignore_headers Cache-Control Expires Set-Cookie;
 
     # Allow list: paths reaching Sling UNREWRITTEN ({{appsRoot}} + passthroughPaths).
+    # {{appsRoot}} serves the app's css/js clientlibs -> cssJsTtlSeconds (short for
+    # apps with no URL-fingerprinted clientlibs, e.g. zengarden).
     location {{appsRoot}}/ {
         proxy_pass http://sling:8080{{appsRoot}}/;
-        proxy_cache_valid 200 {{staticTtlSeconds}}s;
-        expires {{staticTtlSeconds}}s;
+        proxy_cache_valid 200 {{cssJsTtlSeconds}}s;
+        expires {{cssJsTtlSeconds}}s;
     }
 {{#each passthroughPaths}}
     location {{this}}/ {

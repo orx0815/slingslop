@@ -35,8 +35,8 @@ Agent-Smith → review → deploy loop.
 	A complete-package to install everything at once into a running instance.  
 	(Note the three different kinds of  [packageType](https://jackrabbit.apache.org/filevault-package-maven-plugin/generate-metadata-mojo.html#packageType) : `application`|`content`|`container` using different validators.) 
 	
-- `docker/`  
-  Contains `docker-compose.yml` with example configurations for the web cache proxy.
+- `devops/`  
+  Production deployment (Ansible → single VPS) and the CONGA config generator. Also home of `docker-compose.yml` for a local sandbox with the caching web-proxy in front — see [devops/README.md](devops/README.md).
   
 - `launcher/`  
   The core module responsible for building the runnable Sling application using the `slingfeature-maven-plugin`. The feature definitions are in `launcher/src/main/features`.
@@ -106,13 +106,20 @@ There are four primary ways to run the application locally:
 2.  **Using Docker Compose:**
     This method uses the `docker-compose.yml` file to start the application and the web cache proxy.
 
+    The `zengarden` and `www` vhosts are CONGA-generated (same templates/knobs as
+    prod); generate them once before the first `up` (and again after any webcache
+    template/env change):
+
+    ```bash
+    mvn -pl devops/conga -am -DskipTests clean package
+    ```
+
     ```bash
     # From the root directory
-    docker-compose -f docker/docker-compose.yml up --build
+    docker compose -f devops/docker-compose.yml up --build
     ```
-    You will also need to add entries to your `/etc/hosts` file as described in `docker/README.md` to access the different sites like you would in production.
+    You will also need to add entries to your `/etc/hosts` file as described in [devops/README.md](devops/README.md) to access the different sites like you would in production.
 
-    http://editor.motorbrot.local/  
     http://www.motorbrot.local/  
 
 3.  **Start the official Sling Docker image** backed by 

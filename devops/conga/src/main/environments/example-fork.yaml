@@ -30,6 +30,8 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/slingslop/zengarden
+    # zengarden's css/js have no URL fingerprinting -> short TTL so a deploy is picked up quickly.
+    cssJsTtlSeconds: 300
 
 # ...and add their own app, served on www.someoneelse.org.
 - tenant: myshop

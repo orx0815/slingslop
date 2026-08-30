@@ -380,12 +380,13 @@ the in-repo `devops/conga/` module (source templates) for Slingslop itself.
 
 The *same* roles compose different **local** stacks purely by choosing which
 node-roles/variants an environment assigns — no "dev vs. prod" branches in the
-templates. The three local topologies we care about:
+templates. The local topologies we care about:
 
 | Environment | Roles on the single node | Access | Use |
 |---|---|---|---|
 | `local-plain` | `slingslop-runtime` only | Sling directly on `:8080` (via `launcher/launch.sh`) | fastest inner loop; hit `/content/…` (or Sling-mapped) URLs |
-| `local-webcache` | `slingslop-runtime` + `slingslop-webcache:apache` | webcache Docker `:80 → :8080` | verify caching + inbound short-URL re-expansion locally |
+| `local-webcache` | `slingslop-runtime` + `slingslop-webcache:apache` | webcache Docker `:80 → :8080` | verify caching + inbound short-URL re-expansion locally (Ansible/vagrant harness) |
+| `local-docker-quickstart` | `slingslop-webcache:apache` | `devops/docker-compose.yml`, `:80 → :8080` | feeds the plain `docker compose up` quickstart (no Traefik); domain `motorbrot.local`/`.org` matches its documented `/etc/hosts` entries |
 | `local-full` (vagrant) | `slingslop-edge:selfsigned` + `slingslop-webcache` + `slingslop-runtime` + observability | Traefik `:443` on `slingslop.local` | full prod-like stack incl. TLS + Grafana/Loki |
 
 ```yaml
@@ -576,7 +577,8 @@ devops/conga/                             ← Maven module (packaging `config`; 
     environments/
       prod-motorbrot.yaml                     # OPS  (no dots — env name becomes a Maven classifier)
       local-plain.yaml                        # OPS — runtime only, launch.sh on :8080
-      local-webcache.yaml                     # OPS — apache webcache :80
+      local-webcache.yaml                     # OPS — apache webcache :80 (Ansible/vagrant harness)
+      local-docker-quickstart.yaml            # OPS — feeds devops/docker-compose.yml
       local-full.yaml                         # OPS — vagrant: traefik+webcache+runtime
       example-fork.yaml                       # OPS (documented template for forks)
   target/configuration/…                      # generated (git-ignored)

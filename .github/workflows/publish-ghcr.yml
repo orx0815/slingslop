@@ -65,7 +65,7 @@ jobs:
       - name: Build and push webcache image
         uses: docker/build-push-action@v6
         with:
-          context: docker/webcache
+          context: devops/webcache
           push: true
           tags: |
             ghcr.io/orx0815/slingslop-webcache:${{ github.event.inputs.image_tag }}

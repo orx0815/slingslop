@@ -69,7 +69,7 @@ cache tier with **shared** knobs read identically by all three webcache engines
 (apache / nginx / varnish): `serverAliases` (add domains), `passthroughPaths`
 (allow-list paths to Sling), `jsonAllowlist`, `denySelectors`,
 `denyPathPrefixes`, `uncachedPatterns`, `allowedMethods`, `htmlTtlSeconds` /
-`staticTtlSeconds`. They are declared with defaults + docs in
+`staticTtlSeconds` / `cssJsTtlSeconds`. They are declared with defaults + docs in
 [`roles/slingslop-app-base.yaml`](src/main/roles/slingslop-app-base.yaml). See
 [devops/webcache.md](../webcache.md) for the knob table + worked example,
 and [devops/conga-handlebars-101.md](../conga-handlebars-101.md) for a

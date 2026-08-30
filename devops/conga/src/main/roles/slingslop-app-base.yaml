@@ -102,8 +102,15 @@ config:
   # Cache lifetime for HTML-ish responses, in seconds (short — content changes).
   htmlTtlSeconds: 10
 
-  # Cache lifetime for long-lived static assets (css/js/images), in seconds.
+  # Cache lifetime for long-lived static assets (images/fonts), in seconds.
   staticTtlSeconds: 2592000   # 30 days
+
+  # Cache lifetime for css/js specifically, in seconds. Defaults to staticTtlSeconds
+  # (assumes URL-fingerprinted clientlibs). Override to a short value (e.g. 300) for
+  # apps with NO cache-busting on their css/js URLs, so a deploy is picked up quickly
+  # instead of waiting out the long static TTL (e.g. zengarden — see clientlib
+  # cache-busting notes in devops/webcache.md).
+  cssJsTtlSeconds: "${staticTtlSeconds}"
 
   # Traefik middleware chain applied to this app's router. Gated apps add
   # 'editor-basicauth' (and optionally 'editor-allowlist').

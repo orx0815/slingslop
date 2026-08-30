@@ -22,12 +22,13 @@ RUN a2enmod expires
 RUN a2enmod headers
 
 # Configure sites
-RUN mkdir -p /var/www/vhosts/editor.motorbrot && mkdir -p /var/www/vhosts/www && \
+RUN mkdir -p /var/www/vhosts/www && \
     mkdir -p /var/www/vhosts/zengarden && \
     mkdir -p /var/cache/httpd/slingslop && \
     chown -R www-data:www-data /var/cache/httpd
 
-COPY *.conf /etc/apache2/sites-enabled/
+# No vhosts baked in — docker-compose.yml bind-mounts the CONGA-generated
+# zengarden/www configs into /etc/apache2/sites-enabled at run time.
 
 # Expose endpoints
 EXPOSE 80

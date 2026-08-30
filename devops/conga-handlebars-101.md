@@ -47,9 +47,8 @@ a parameter. The round trip is five small steps — here we turn a hard-coded
 
 4. **Regenerate & cross-check**: `mvn -pl devops/conga clean package`, then read
    `devops/conga/target/configuration/<env>/<node>/webcache/<app>.conf`. Because a
-   webcache change must work in **all three** engines, spin the
-   [webcache bench](../docker/webcache-bench/docker-compose.yml) up and diff the
-   apache / nginx / varnish behaviour side-by-side.
+   webcache change must work in **all three** engines, check the generated
+   apache / nginx / varnish output for each variant directly.
 
 5. **Ship** it with the normal playbook run.
 

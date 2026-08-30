@@ -81,9 +81,9 @@
    ExpiresByType image/gif "access plus {{staticTtlSeconds}} seconds"
    ExpiresByType image/jpeg "access plus {{staticTtlSeconds}} seconds"
    ExpiresByType image/png "access plus {{staticTtlSeconds}} seconds"
-   ExpiresByType text/css "access plus {{staticTtlSeconds}} seconds"
-   ExpiresByType text/javascript "access plus {{staticTtlSeconds}} seconds"
-   ExpiresByType application/javascript "access plus {{staticTtlSeconds}} seconds"
+   ExpiresByType text/css "access plus {{cssJsTtlSeconds}} seconds"
+   ExpiresByType text/javascript "access plus {{cssJsTtlSeconds}} seconds"
+   ExpiresByType application/javascript "access plus {{cssJsTtlSeconds}} seconds"
 
    # Configure Proxy
    ProxyPassInterpolateEnv On

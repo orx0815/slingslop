@@ -13,8 +13,7 @@ sling-apps/           ← Sling applications (each = ui.apps + core bundle)
   zengarden/          ← CSS Zen Garden demo app (reference implementation)
 content-packages/     ← Sample content (VLT zips) + 'complete' container package
 launcher/             ← Feature-model launcher, Docker image, integration tests
-docker/               ← docker-compose + web cache proxy configs (local dev)
-devops/               ← CONGA config generator + Production Ansible deployment (single-VPS, GitOps-ready)
+devops/               ← CONGA config generator + Production Ansible deployment (single-VPS, GitOps-ready) + local docker-compose sandbox
 docs/
   agent-skills/       ← Executable agent skill files (invoke via VS Code Copilot)
   editing-patterns.md ← Component editing supertypes and contracts

@@ -39,6 +39,8 @@ tenants:
   - public-cached
   config:
     contentRoot: /content/slingslop/zengarden
+    # zengarden's css/js have no URL fingerprinting -> short TTL so a deploy is picked up quickly.
+    cssJsTtlSeconds: 300
 
 # CONTENT-ONLY tenant: `zen` ships NO app of its own. It re-serves the existing
 # `zengarden` app at a second content root. `/content/slingslop/zen` is created
@@ -52,6 +54,8 @@ tenants:
   config:
     contentRoot: /content/slingslop/zen
     appsRoot: /apps/slingslop/zengarden
+    # Re-serves the zengarden app's un-fingerprinted css/js -> same short TTL.
+    cssJsTtlSeconds: 300
 
 - tenant: sling-matrix
   roles:
