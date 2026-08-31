@@ -69,6 +69,21 @@ slingslop_image: ghcr.io/orx0815/slingslop:motorbrot_prod-composite
 # edge compose with this default (unlike update-webcache.yml, which overrides
 # it), so it must track the deployed branch's floating tag too.
 webcache_image:  ghcr.io/orx0815/slingslop-webcache:motorbrot_prod
+# Same idea, nginx (OpenResty) variant. Only used when the CONGA environment's
+# slingslop-webcache role picks `variant: nginx` — see roles/webcache "Detect
+# which webcache-variant marker CONGA rendered". Nothing to set for varnish —
+# it's the stock `varnish:7.5` image, no custom build/publish needed.
+webcache_image_nginx: ghcr.io/orx0815/slingslop-webcache-nginx:motorbrot_prod
+webcache_image_varnish: varnish:7.5
+# RAM cap for the varnish variant (malloc storage) — no disk cache, so this IS
+# the whole cache budget; cold on every restart (see devops/webcache.md).
+varnish_cache_size: 512m
+# Optional shared secret for the internal :8088/flush endpoint (apache/nginx
+# read it as a container env var; varnish instead bakes the equivalent
+# `flushToken` tenant param straight into its generated VCL — see
+# slingslop-app-base.yaml). Empty = no token required on any variant, relying
+# on docker-network isolation alone (see devops/webcache.md).
+webcache_flush_token: ""
 traefik_image:   traefik:v3.2
 prometheus_image: prom/prometheus:v2.55.1
 grafana_image:    grafana/grafana:11.3.1

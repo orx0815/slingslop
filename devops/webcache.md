@@ -52,6 +52,19 @@ Output filenames differ only so the three defs don't collide inside CONGA:
 apache → `<app>.conf`, nginx → `<app>.nginx.conf`, varnish → `<app>.vcl`. A node
 runs one variant, so its `webcache/` dir holds only that engine's files.
 
+**Deployment picks the engine up automatically — `variant:` is the only
+setting ops ever touches.** CONGA also renders a node-level marker file
+(`env/webcache-variant-apache|nginx|varnish`, one of the three, matching
+whatever `variant:` was set). The Ansible `webcache` role stats for whichever
+marker exists and sets a `webcache_variant` fact from it; the `traefik` role's
+`compose.edge.yml.j2` then picks the right image, cache volume / bind-mount
+target, healthcheck and startup command purely from that fact — there is no
+second place to keep in sync, and deploying the wrong image for the rendered
+config is a hard `ansible.builtin.fail` (missing marker), not a silent
+mismatch. Varnish additionally only supports **one** tenant's `.vcl` per node
+(see the note below) — the `webcache` role stages that single file at a fixed
+path and fails fast if zero or more than one is found.
+
 > **Varnish note.** Varnish loads **one** VCL per instance, so each generated
 > `<app>.vcl` is a complete single-host VCL. To run several tenants on one
 > Varnish node, compose their per-app blocks (the `backend` + the host-guarded
@@ -125,6 +138,7 @@ suit a normal public HTML site. Set them per tenant in the environment file:
 | `allowedMethods` | HTTP methods forwarded to Sling; anything else → 405. | `GET, HEAD` |
 | `htmlTtlSeconds` / `staticTtlSeconds` | Cache lifetime for HTML-ish vs. long-lived static assets (images/fonts). | `10` / `2592000` |
 | `cssJsTtlSeconds` | Cache lifetime for css/js specifically. Defaults to `staticTtlSeconds` (assumes fingerprinted clientlib URLs); override to a short value (e.g. `300`) for apps with no cache-busting on their css/js, like `zengarden`/`zen`, so a deploy is picked up quickly. | `${staticTtlSeconds}` |
+| `flushToken` | Shared secret for the internal `:8088/flush?prefix=...` endpoint (see "Selective cache flush" below) — same value, same effect on all 3 engines. Apache/nginx read it as a `FLUSH_TOKEN` container env var (`webcache_flush_token` Ansible group_var); Varnish has no env-var access from VCL, so it's baked straight into the generated `.vcl` instead. Empty = no token required (docker-network isolation is the primary control on every variant). | `""` (disabled) |
 
 Worked example — a tenant that adds an apex-domain alias, exposes a JSON API,
 keeps a live fragment uncached and lets a servlet path through unrewritten:
@@ -164,7 +178,66 @@ that doesn't exist yet? See [conga-handlebars-101.md](conga-handlebars-101.md).
   cold after restart.
 - **Deploys don't flush the proxy.** The prod deploy recreates only the Sling
   container, not the webcache, and the cache volume persists — so a changed asset
-  can serve stale until the URL changes (cache-buster) or you flush.
+  can serve stale until the URL changes (cache-buster) or you flush. See
+  "Selective cache flush" below, or nuke the whole disk cache:
+  `docker exec slingslop-webcache sh -c 'rm -rf /var/cache/httpd/slingslop/*'`
+  (safe while Apache runs — the next request per URL is just a fresh MISS).
+
+---
+
+## Selective cache flush — same endpoint on all 3 engines
+
+All three variants expose the **identical** internal-only contract, so Sling
+(or any caller) never needs to know which engine is running:
+
+```
+GET/POST http://webcache:8088/flush?prefix=/apps/sling-matrix/
+GET/POST http://webcache:8088/flush?prefix=/content/sling-matrix/home.html
+```
+
+- `prefix` must match `^/(apps|content)/[A-Za-z0-9/_.-]+$`, else 400.
+- Reachable only on the docker network — a **separate `:8088` listener**,
+  never published to the host or routed by Traefik.
+- Optional shared secret: set `flushToken` (CONGA tenant/role param — see the
+  table above) to also require an `X-Flush-Token: <token>` header; empty
+  (default) = network isolation is the only control.
+- Success → `200`; bad/missing `prefix` → `400`; disallowed client → `403`;
+  hitting `/flush` on the public `:80` listener → `404` (confirmed for all 3
+  engines during verification).
+
+**Not yet wired up from the app** — nothing calls this today (e.g. on a
+content publish event). It's available as a primitive; hooking it into a
+deploy or publish workflow is a follow-up.
+
+How each engine implements the same contract underneath:
+
+- **apache** (`devops/webcache/`): `flush.cgi` + `flush.conf` expose the
+  endpoint via `mod_cgid`. mod_cache_disk names files by a hash of the cache
+  key (`CACHE_ROOT/<a>/<b>/<hash>.header|.data`), not by URL path, so
+  `purge-cache.sh` greps the `.header` files (they store the original request
+  URL) for the substring and deletes matching pairs. No Apache reload needed.
+- **varnish** (`devops/conga/.../varnish/app.vcl.hbs`): a `vcl_recv` branch
+  guarded by `std.port(local.ip) == 8088` parses `prefix` off the query string
+  and calls Varnish's native `ban("obj.http.X-Url ~ ^" + prefix)` — every
+  cached object is tagged with its own URL (`beresp.http.X-Url`) precisely so
+  bans can match by prefix ("ban-lurker friendly"). No script, no reload.
+- **nginx** (`devops/webcache-nginx/`, OpenResty): stock `nginx:alpine` has no
+  purge module or scripting hook, so this variant is built on OpenResty
+  instead — an internal `server { listen 8088; }` block's
+  `content_by_lua_block` shells out to `purge-cache.sh`, adapted to nginx's
+  single-file-per-entry cache format (matches the `KEY:` line each cache file
+  stores). `CACHE_ROOT` defaults to `/var/cache/nginx` (the parent of every
+  tenant's own `proxy_cache_path` zone), so one script instance covers all
+  tenants on that node.
+
+All three were verified end-to-end on a throwaway local rig (real backend +
+real engine container): cache a URL, flush its prefix, confirm the next
+request is a fresh MISS serving updated content, and that a wrong/missing
+prefix or the public `:80` listener are correctly rejected.
+
+Not wired into the ansible/compose deployment (only `apache` is; nginx/varnish
+are generated-config-only today, see the CONGA docs) — this is the standalone
+image, built and run the same way as `devops/webcache/`.
 
 ---
 

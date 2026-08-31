@@ -1,9 +1,11 @@
 ---
 # Ship the webcache vhosts that CONGA generated for this environment/node.
-# One `<app>.conf` per public-cached tenant is rendered by `mvn -pl devops/conga`
-# into devops/conga/target/configuration/<env>/<node>/webcache/ ; here we just
-# copy that directory onto the host, where compose bind-mounts it over the
-# image's /etc/apache2/sites-enabled. Adding an app needs *no* change here —
+# One `<app>.conf|.vcl|.nginx.conf` per public-cached tenant is rendered by
+# `mvn -pl devops/conga` into devops/conga/target/configuration/<env>/<node>/
+# webcache/ ; here we just copy that directory onto the host, where compose
+# bind-mounts it over the running engine's config dir (see the traefik role's
+# compose.edge.yml.j2 — the mount target/image/healthcheck all follow
+# webcache_variant, detected below). Adding an app needs *no* change here —
 # only a new tenant in the CONGA environment file.
 
 - name: Create webcache config dir
@@ -28,6 +30,77 @@
       Run `mvn -pl devops/conga clean package` on the control node first
       (conga_env={{ conga_env }}, conga_node={{ conga_node }}).
   when: not conga_webcache_dir.stat.exists
+
+# Which webcache engine did CONGA actually render for this node? Ops only ever
+# sets `variant:` on the slingslop-webcache role in the CONGA environment file
+# — nothing else needs to be kept in sync by hand. Stats for whichever of the
+# 3 possible markers CONGA emitted (see roles/slingslop-webcache.yaml) and
+# derives the fact from THAT. Consumed below (varnish's single-file mount) and
+# by the traefik role (image/mounts/healthcheck in compose.edge.yml.j2) — set
+# here (not there) because this role runs first in site.yml and facts persist
+# across roles within the same play.
+- name: Detect which webcache-variant marker CONGA rendered
+  ansible.builtin.stat:
+    path: "{{ conga_config_dir }}/env/webcache-variant-{{ item }}"
+  delegate_to: localhost
+  become: false
+  loop: [apache, varnish, nginx]
+  register: webcache_variant_stats
+
+- name: Fail if no webcache-variant marker was found
+  ansible.builtin.fail:
+    msg: >-
+      No webcache-variant marker under {{ conga_config_dir }}/env/ .
+      Run `mvn -pl devops/conga clean package` first
+      (conga_env={{ conga_env }}, conga_node={{ conga_node }}).
+  when: webcache_variant_stats.results | selectattr('stat.exists') | list | length == 0
+
+- name: Set webcache_variant fact from the detected marker
+  ansible.builtin.set_fact:
+    webcache_variant: "{{ (webcache_variant_stats.results | selectattr('stat.exists') | map(attribute='item') | list)[0] }}"
+
+- name: Ship CONGA-generated webcache vhosts (one per public-cached app)
+  ansible.builtin.copy:
+    src: "{{ conga_config_dir }}/webcache/"
+    dest: "{{ slingslop_root }}/data/webcache/"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart webcache
+
+# Varnish loads exactly ONE vcl file (no directory-of-fragments support like
+# apache/nginx) — stage whichever single tenant .vcl CONGA rendered at a FIXED
+# name so compose.edge.yml.j2 can bind-mount it without needing to know the
+# tenant name. Multiple public-cached tenants on one varnish node isn't
+# supported yet (see devops/webcache.md, "Three cache engines") — fail fast
+# instead of silently picking one and dropping the rest.
+- name: Find generated tenant .vcl files (varnish only)
+  when: webcache_variant == 'varnish'
+  ansible.builtin.find:
+    paths: "{{ slingslop_root }}/data/webcache"
+    patterns: "*.vcl"
+  register: webcache_vcl_files
+
+- name: Fail if varnish has zero or multiple tenant .vcl files
+  ansible.builtin.fail:
+    msg: >-
+      Expected exactly one *.vcl in {{ slingslop_root }}/data/webcache (found
+      {{ webcache_vcl_files.files | length }}). Varnish loads a single VCL per
+      instance — multiple public-cached tenants on one varnish node need their
+      per-app blocks composed into one file by hand (see devops/webcache.md),
+      not supported by this role yet.
+  when: webcache_variant == 'varnish' and webcache_vcl_files.files | length != 1
+
+- name: Stage the single tenant .vcl at a fixed path (varnish only)
+  when: webcache_variant == 'varnish'
+  ansible.builtin.copy:
+    src: "{{ webcache_vcl_files.files[0].path }}"
+    dest: "{{ slingslop_root }}/data/webcache/default.vcl"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart webcache
 
 - name: Ship CONGA-generated webcache vhosts (one per public-cached app)
   ansible.builtin.copy:

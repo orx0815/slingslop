@@ -52,3 +52,30 @@ files:
     roles:
     - public-cached
   validators: []
+
+# ---- Node-level "which engine did CONGA render?" marker, one per variant ----
+# (distinct filenames — CONGA de-dupes RoleFile entries by dir+file BEFORE
+# variant filtering, so all 3 sharing one name would silently collapse to
+# just one regardless of the active variant). Ansible's traefik role stats
+# for whichever of these 3 actually exists to pick the webcache image/mounts/
+# healthcheck — the ONLY thing ops ever sets is `variant:` on this role.
+- file: webcache-variant-apache
+  dir: env
+  template: apache/variant.hbs
+  variants:
+  - apache
+  validators: []
+
+- file: webcache-variant-varnish
+  dir: env
+  template: varnish/variant.hbs
+  variants:
+  - varnish
+  validators: []
+
+- file: webcache-variant-nginx
+  dir: env
+  template: nginx/variant.hbs
+  variants:
+  - nginx
+  validators: []
