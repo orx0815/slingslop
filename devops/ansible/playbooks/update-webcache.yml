@@ -13,6 +13,17 @@
   become: true
 
   tasks:
+    # Render the bind-mounted vhost configs from the single source of truth.
+    # This also seeds any *new* config file (e.g. a newly added vhost) before
+    # `dc up`, so Docker never finds a missing bind source and auto-creates a
+    # directory in its place. The role's "restart webcache" handler is flushed
+    # explicitly below, before the image swap. MUST run before the compose
+    # re-render below: it's what sets the webcache_variant fact that template
+    # depends on (detected from the marker file CONGA renders).
+    - name: Render webcache vhost configs (roles/webcache = source of truth)
+      ansible.builtin.import_role:
+        name: webcache
+
     - name: Re-render edge compose with the target webcache_image
       ansible.builtin.template:
         src: "{{ playbook_dir }}/../roles/traefik/templates/compose.edge.yml.j2"
@@ -20,15 +31,6 @@
         owner: root
         group: root
         mode: "0640"
-
-    # Render the bind-mounted vhost configs from the single source of truth.
-    # This also seeds any *new* config file (e.g. a newly added vhost) before
-    # `dc up`, so Docker never finds a missing bind source and auto-creates a
-    # directory in its place. The role's "restart webcache" handler is flushed
-    # explicitly below, before the image swap.
-    - name: Render webcache vhost configs (roles/webcache = source of truth)
-      ansible.builtin.import_role:
-        name: webcache
 
     - name: Pull webcache image
       ansible.builtin.command:
