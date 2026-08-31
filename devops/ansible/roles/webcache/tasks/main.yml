@@ -102,12 +102,3 @@
     mode: "0644"
   notify: restart webcache
 
-- name: Ship CONGA-generated webcache vhosts (one per public-cached app)
-  ansible.builtin.copy:
-    src: "{{ conga_config_dir }}/webcache/"
-    dest: "{{ slingslop_root }}/data/webcache/"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: restart webcache
-
