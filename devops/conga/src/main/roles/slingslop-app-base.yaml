@@ -112,6 +112,14 @@ config:
   # cache-busting notes in devops/webcache.md).
   cssJsTtlSeconds: "${staticTtlSeconds}"
 
+  # Shared secret for the internal cache-flush endpoint (:8088/flush?prefix=...,
+  # same on all 3 engines — see devops/webcache.md). Empty = no token required
+  # (docker-network isolation is the primary control on every variant). Apache
+  # and nginx read this as a runtime FLUSH_TOKEN container env var instead (so
+  # ops can rotate it without regenerating config); Varnish has no env-var
+  # access from VCL, so it's baked into the generated .vcl here instead.
+  flushToken: ""
+
   # Traefik middleware chain applied to this app's router. Gated apps add
   # 'editor-basicauth' (and optionally 'editor-allowlist').
   middlewares:

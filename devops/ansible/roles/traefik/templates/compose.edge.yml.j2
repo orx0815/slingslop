@@ -52,26 +52,67 @@ services:
         max-file: "{{ docker_log_max_files | string }}"
 
   webcache:
+{% if webcache_variant == 'nginx' %}
+    image: {{ webcache_image_nginx }}
+{% elif webcache_variant == 'varnish' %}
+    image: {{ webcache_image_varnish }}
+{% else %}
     image: {{ webcache_image }}
+{% endif %}
     container_name: slingslop-webcache
     restart: unless-stopped
     # Same zombie-reaping rationale as traefik above: its healthcheck forks
-    # apache2ctl/curl every interval.
+    # apache2ctl/curl/varnishadm every interval.
     init: true
+{% if webcache_variant == 'varnish' %}
+    # Bypass the stock image's entrypoint so we control the listener list
+    # directly: :80 for real traffic, :8088 for the internal flush endpoint
+    # (see app.vcl.hbs) — the entrypoint's own VARNISH_HTTP_PORT only binds one.
+    entrypoint: varnishd
+    command: ["-F", "-a", ":80", "-a", ":8088", "-f", "/etc/varnish/default.vcl", "-s", "malloc,{{ varnish_cache_size }}"]
+{% endif %}
+{% if webcache_variant == 'apache' %}
     environment:
       RENDERER_URL: slingslop
+{% if webcache_flush_token %}
+      FLUSH_TOKEN: "{{ webcache_flush_token }}"
+{% endif %}
+{% elif webcache_variant == 'nginx' and webcache_flush_token %}
+    environment:
+      FLUSH_TOKEN: "{{ webcache_flush_token }}"
+{% endif %}
+{# varnish: no env vars — FLUSH_TOKEN-equivalent is the flushToken CONGA param, baked straight into the generated .vcl (VCL can't read container env). #}
     volumes:
+{% if webcache_variant == 'apache' %}
       - webcache-cache:/var/cache/httpd
       # The whole CONGA-generated vhost set is bind-mounted over the image's
       # sites-enabled — one <app>.conf per public-cached tenant. Adding an app
       # drops a new file in here automatically (see roles/webcache).
       - {{ slingslop_root }}/data/webcache:/etc/apache2/sites-enabled:ro
+{% elif webcache_variant == 'nginx' %}
+      - webcache-cache:/var/cache/nginx
+      # Same convention as apache — one <app>.nginx.conf per public-cached
+      # tenant, bind-mounted over the image's conf.d.
+      - {{ slingslop_root }}/data/webcache:/etc/nginx/conf.d:ro
+{% elif webcache_variant == 'varnish' %}
+      # Varnish loads exactly ONE vcl — roles/webcache stages the single
+      # tenant's generated .vcl at this fixed name (see its tasks/main.yml).
+      # No disk cache volume: varnish is RAM-only (malloc), cold on restart.
+      - {{ slingslop_root }}/data/webcache/default.vcl:/etc/varnish/default.vcl:ro
+{% endif %}
     healthcheck:
+{% if webcache_variant == 'apache' %}
       # mod_status isn't enabled in the image, so this always falls through to
       # curl. No `-f`: a non-2xx from whatever vhost Apache treats as default
       # for this Host-less request is still a live, connected Apache -- `-f`
       # would wrongly mark the container unhealthy and Traefik would drop it.
       test: ["CMD-SHELL", "apache2ctl status >/dev/null 2>&1 || curl -s http://127.0.0.1/ >/dev/null"]
+{% elif webcache_variant == 'nginx' %}
+      # Same "any response is healthy" reasoning as apache — see above.
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1/ >/dev/null"]
+{% elif webcache_variant == 'varnish' %}
+      test: ["CMD", "varnishadm", "ping"]
+{% endif %}
       interval: 30s
       timeout: 5s
       retries: 3
