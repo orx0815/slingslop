@@ -1,0 +1,15 @@
+<!--/*
+  Static, non-editable embed of a pre-generated architecture diagram (an
+  interactive standalone HTML file, referenced by absolute path via
+  `fileReference`). Unlike the other components in this parsys, this one does
+  NOT extend editable-component[-modal] — there is nothing here to edit.
+*/-->
+<div class="architecture-diagram" data-sly-test.fileReference="${properties.fileReference}">
+  <h3 data-sly-test="${properties.headline}" class="architecture-diagram__headline">${properties.headline}</h3>
+  <iframe class="architecture-diagram__frame"
+          src="${fileReference}"
+          title="${properties.headline || 'Architecture diagram'}"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          style="width:100%;height:80vh;min-height:520px;border:0;border-radius:8px;"></iframe>
+</div>
