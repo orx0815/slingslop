@@ -21,7 +21,6 @@
             <architecture-diagram-1
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="sling-matrix/components/architecture-diagram"
-                fileReference="/content/sling-matrix/home/sling/architecture/diagram.html"
                 headline="Interactive system map"/>
         </main>
     </jcr:content>
