@@ -67,7 +67,11 @@ services:
       # drops a new file in here automatically (see roles/webcache).
       - {{ slingslop_root }}/data/webcache:/etc/apache2/sites-enabled:ro
     healthcheck:
-      test: ["CMD-SHELL", "apache2ctl status >/dev/null 2>&1 || curl -sf http://127.0.0.1/ >/dev/null"]
+      # mod_status isn't enabled in the image, so this always falls through to
+      # curl. No `-f`: a non-2xx from whatever vhost Apache treats as default
+      # for this Host-less request is still a live, connected Apache -- `-f`
+      # would wrongly mark the container unhealthy and Traefik would drop it.
+      test: ["CMD-SHELL", "apache2ctl status >/dev/null 2>&1 || curl -s http://127.0.0.1/ >/dev/null"]
       interval: 30s
       timeout: 5s
       retries: 3
