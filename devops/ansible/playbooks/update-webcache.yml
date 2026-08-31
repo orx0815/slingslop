@@ -46,8 +46,15 @@
       changed_when: "'Started' in up_result.stderr or 'Recreated' in up_result.stderr or 'Created' in up_result.stderr"
 
     - name: Verify webcache responds inside the network
+      # Only confirms the container/Apache process came back up after the
+      # swap. Without a matching Host header this hits whatever vhost Apache
+      # treats as default (undefined/arbitrary among the generated tenants) --
+      # a non-2xx from THAT vhost is still a normal, connected response, not a
+      # failure of the webcache deploy itself (which doesn't own Sling content
+      # or vhost precedence). Do NOT add `-f`: it would fail this check on any
+      # such non-2xx, unrelated to whether webcache actually came back up.
       ansible.builtin.command:
-        cmd: docker exec slingslop-webcache curl -sf -o /dev/null -w '%{http_code}\n' http://127.0.0.1/
+        cmd: docker exec slingslop-webcache curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1/
       register: probe
       retries: 20
       delay: 3
