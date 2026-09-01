@@ -29,17 +29,17 @@ services:
       - slingslop-volume:/opt/sling/launcher
       # zengarden + www (sling-matrix) vhosts are CONGA-generated (single source
       # of truth shared with prod). Generate first:
-      # mvn -pl devops/conga -am -DskipTests clean package (env: local-docker-quickstart)
+      # mvn -pl devops/conga -am -DskipTests clean package (env: local-webcache)
       # create_host_path: false -> fails loudly if you forgot to generate,
       # instead of silently bind-mounting an empty directory over the vhost.
       - type: bind
-        source: conga/target/configuration/local-docker-quickstart/localhost/webcache/zengarden.conf
+        source: conga/target/configuration/local-webcache/localhost/webcache/zengarden.conf
         target: /etc/apache2/sites-enabled/zengarden.conf
         read_only: true
         bind:
           create_host_path: false
       - type: bind
-        source: conga/target/configuration/local-docker-quickstart/localhost/webcache/sling-matrix.conf
+        source: conga/target/configuration/local-webcache/localhost/webcache/sling-matrix.conf
         target: /etc/apache2/sites-enabled/www.conf
         read_only: true
         bind:

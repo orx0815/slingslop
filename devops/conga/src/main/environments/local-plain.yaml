@@ -3,7 +3,7 @@
 # launcher/launch.sh. CONGA emits only the runtime feature/mapping files.
 
 config:
-  domain: localhost
+  domain: slingslop.local
 
 nodes:
 
