@@ -49,8 +49,10 @@
         if (!theme) {
           try { theme = localStorage.getItem('archify-theme'); } catch (_) {}
         }
+        // Always dark unless the visitor (URL param / localStorage) says otherwise —
+        // ignore the desktop's prefers-color-scheme.
         if (theme !== 'light' && theme !== 'dark') {
-          theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          theme = 'dark';
         }
         document.documentElement.setAttribute('data-theme', theme);
       } catch (_) {}
@@ -5713,7 +5715,9 @@
         if (fromUrl) return fromUrl;
         var saved = readStored();
         if (saved === 'light' || saved === 'dark') return saved;
-        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        // Always dark unless the visitor (URL param / localStorage) says otherwise —
+        // ignore the desktop's prefers-color-scheme.
+        return 'dark';
       }
 
       function apply(theme) {
@@ -5731,17 +5735,9 @@
       apply(resolveInitial());
       btn.addEventListener('click', toggle);
 
-      // Follow live OS theme changes while the user has no explicit preference.
-      try {
-        var media = window.matchMedia('(prefers-color-scheme: light)');
-        var onChange = function (e) {
-          var saved = readStored();
-          if (urlOverride() || saved === 'light' || saved === 'dark') return;
-          apply(e.matches ? 'light' : 'dark');
-        };
-        if (media.addEventListener) media.addEventListener('change', onChange);
-        else if (media.addListener) media.addListener(onChange);
-      } catch (_) {}
+      // Deliberately not following live OS theme changes: dark is the fixed
+      // default here regardless of desktop preference (only URL param /
+      // the toggle button / localStorage override it).
 
       return { toggle: toggle };
     })();
