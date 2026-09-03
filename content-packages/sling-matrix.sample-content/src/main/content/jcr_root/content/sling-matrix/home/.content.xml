@@ -35,7 +35,7 @@
                 fileReference="/content/motorbrot/dml/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
                 headline="Follow the White Rabbit"
                 imagePosition="right"
-                text="&lt;p>Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p>&lt;ul>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/osgi/osgi-intro.html&quot;>&lt;strong>OSGi&lt;/strong>&lt;/a> - The modular foundation of the Matrix&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/jcr/jcr-intro.html&quot;>&lt;strong>JCR&lt;/strong>&lt;/a> - The repository that stores all truth&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/sling/sling-intro.html&quot;>&lt;strong>Sling&lt;/strong>&lt;/a> - The framework that brings it all together&lt;/p>&lt;/li>&lt;/ul>">
+                text="&lt;p>Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p>&lt;ul>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/osgi/osgi-intro.html&quot;>&lt;strong>OSGi&lt;/strong>&lt;/a> - The modular foundation of the Matrix&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/jcr/jcr-intro.html&quot;>&lt;strong>JCR&lt;/strong>&lt;/a> - The repository that stores all truth&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/sling/sling-intro.html&quot;>&lt;strong>Sling&lt;/strong>&lt;/a> - The framework that brings it all together&lt;/p>&lt;/li>&lt;/ul>">
                 <renditions jcr:primaryType="nt:unstructured">
                     <matrix-feature-desktop_cropped/>
                 </renditions>
@@ -48,7 +48,7 @@
             link1Title="Apache Sling"
             link1Url="https://sling.apache.org"
             link2Title="Documentation"
-            link2Url="/content/sling-matrix/home/osgi/osgi-intro.html"
+            link2Url="/content/sling-matrix/home/basics/osgi/osgi-intro.html"
             link3Title="GitHub"
             link3Url="https://github.com/apache/sling"/>
     </jcr:content>

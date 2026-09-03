@@ -57,24 +57,31 @@ hljs.registerLanguage('ts', typescript);
    * Handles the circular navigation menu interaction.
    *
    * Fine-pointer (mouse) devices use hover: the grip opens the ring and each
-   * first-level bubble reveals its second-level list on hover.
+   * bubble/list item reveals its own nested submenu (".nav-submenu", any
+   * depth) on hover.
    *
    * Coarse-pointer (touch) devices have no hover, so everything is tap-driven:
-   * tap the grip to open/close the ring, tap a bubble to reveal its submenu
-   * (a second tap on the same bubble follows the link), and tap outside to close.
+   * tap the grip to open/close the ring, tap an item to reveal its submenu
+   * (a second tap on the same item follows the link), and tap outside to close.
    */
   function initCircularNav(): void {
     const navToggle = document.querySelector('.nav-toggle');
-    const navLevel1 = document.querySelector('.nav-level-1');
-    const navItems = document.querySelectorAll('.nav-item');
+    const navLevel1 = document.querySelector('.nav-level-1') as HTMLElement | null;
     const nav = document.querySelector('.matrix-nav');
 
     if (!navToggle || !navLevel1) {
       return;
     }
 
-    // Clamp a second-level menu into the viewport on both axes.
-    const positionLevel2 = (el: HTMLElement): void => {
+    // Every item that can own a submenu, at any depth.
+    const navItems = navLevel1.querySelectorAll('.nav-item');
+
+    // The submenu directly owned by an item (not a deeper-nested one).
+    const submenuOf = (item: Element): HTMLElement | null =>
+      item.querySelector(':scope > .nav-submenu');
+
+    // Clamp a submenu into the viewport on both axes.
+    const clampIntoViewport = (el: HTMLElement): void => {
       // Reset first so getBoundingClientRect() measures the true final position
       // (the base CSS transform is translateY(-50%), no transition to fight).
       el.style.transform = '';
@@ -97,18 +104,36 @@ hljs.registerLanguage('ts', typescript);
       }
     };
 
-    const closeAllLevel2 = (): void => {
-      navItems.forEach((item) => {
-        const level2 = item.querySelector('.nav-level-2');
-        if (level2) {
-          level2.classList.remove('nav-level-2-open');
+    // Close a submenu and everything nested inside it, so reopening a branch
+    // never resurfaces a stale deeper submenu.
+    const closeSubmenu = (submenu: Element): void => {
+      submenu.classList.remove('nav-submenu-open');
+      submenu.querySelectorAll('.nav-submenu').forEach((nested) => {
+        nested.classList.remove('nav-submenu-open');
+      });
+    };
+
+    // Close every OTHER submenu in the same list as `item`, so only one
+    // branch of the tree is expanded at a time — ancestors are left alone.
+    const closeSiblingSubmenus = (item: Element): void => {
+      const parentList = item.parentElement;
+      if (!parentList) {
+        return;
+      }
+      Array.from(parentList.children).forEach((sibling) => {
+        if (sibling === item) {
+          return;
+        }
+        const siblingSubmenu = submenuOf(sibling);
+        if (siblingSubmenu) {
+          closeSubmenu(siblingSubmenu);
         }
       });
     };
 
     const closeAll = (): void => {
       navLevel1.classList.remove('nav-open');
-      closeAllLevel2();
+      navLevel1.querySelectorAll('.nav-submenu').forEach((submenu) => closeSubmenu(submenu));
     };
 
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -125,21 +150,21 @@ hljs.registerLanguage('ts', typescript);
       });
 
       navItems.forEach((item) => {
-        const level2 = item.querySelector('.nav-level-2') as HTMLElement | null;
-        const link = item.querySelector('.nav-item-link') as HTMLElement | null;
-        if (!level2 || !link) {
-          return; // Childless bubble — its link navigates on the first tap.
+        const submenu = submenuOf(item);
+        const link = item.querySelector(':scope > a') as HTMLElement | null;
+        if (!submenu || !link) {
+          return; // Childless item — its link navigates on the first tap.
         }
         link.addEventListener('click', (e) => {
-          if (!level2.classList.contains('nav-level-2-open')) {
+          if (!submenu.classList.contains('nav-submenu-open')) {
             // First tap reveals the submenu instead of navigating.
             e.preventDefault();
             e.stopPropagation();
-            closeAllLevel2();
-            level2.classList.add('nav-level-2-open');
-            positionLevel2(level2);
+            closeSiblingSubmenus(item);
+            submenu.classList.add('nav-submenu-open');
+            clampIntoViewport(submenu);
           }
-          // Second tap on the same bubble falls through and follows the link.
+          // Second tap on the same item falls through and follows the link.
         });
       });
 
@@ -172,35 +197,37 @@ hljs.registerLanguage('ts', typescript);
     navToggle.addEventListener('mouseleave', scheduleClose);
 
     navItems.forEach((item) => {
-      const level2 = item.querySelector('.nav-level-2') as HTMLElement | null;
+      const submenu = submenuOf(item);
 
+      // mouseenter/mouseleave don't bubble, so each item's own hitbox is
+      // independent regardless of nesting depth.
       item.addEventListener('mouseenter', () => {
         if (closeTimeout) {
           clearTimeout(closeTimeout);
         }
-        closeAllLevel2();
-        if (level2) {
-          level2.classList.add('nav-level-2-open');
-          positionLevel2(level2);
+        closeSiblingSubmenus(item);
+        if (submenu) {
+          submenu.classList.add('nav-submenu-open');
+          clampIntoViewport(submenu);
         }
       });
 
       item.addEventListener('mouseleave', (e) => {
-        // Don't close if the pointer is moving into the submenu.
-        const relatedTarget = e.relatedTarget as HTMLElement;
-        if (level2 && level2.contains(relatedTarget)) {
+        // Don't close if the pointer is moving into this item's own submenu.
+        const relatedTarget = (e as MouseEvent).relatedTarget as HTMLElement | null;
+        if (submenu && relatedTarget && submenu.contains(relatedTarget)) {
           return;
         }
         scheduleClose();
       });
 
-      if (level2) {
-        level2.addEventListener('mouseenter', () => {
+      if (submenu) {
+        submenu.addEventListener('mouseenter', () => {
           if (closeTimeout) {
             clearTimeout(closeTimeout);
           }
         });
-        level2.addEventListener('mouseleave', scheduleClose);
+        submenu.addEventListener('mouseleave', scheduleClose);
       }
     });
   }
