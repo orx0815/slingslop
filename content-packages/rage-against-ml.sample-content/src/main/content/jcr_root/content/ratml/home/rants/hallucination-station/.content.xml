@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    sling:resourceType="ratml/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Hallucination Station"
+        sling:resourceType="ratml/pages/contentpage">
+        <hero
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/hero"
+            eyebrow="rant no. 2"
+            title="Hallucination Station"
+            subtitle="All aboard the imaginary API express"
+            description="A guided tour of methods that have never existed, in libraries that almost do."/>
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/parsys"
+            allowedComponents="[text-block,pull-quote]">
+            <the-method
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Method That Wasn't"
+                text="&lt;p>&lt;code>resource.adaptTo(Miracle.class)&lt;/code>. That's what it wrote. It looked plausible. It compiled in the model's imagination, which is unfortunately not one of our supported build targets. The import statement pointed to a package that has never existed in any version of the framework, though it &lt;em>sounds&lt;/em> like it should — and that's the trick. Hallucinations don't look wrong. They look like documentation from a slightly better universe.&lt;/p>&lt;p>We spent forty minutes searching for that class. Not because we trusted the machine, but because we could no longer trust our own memory of the API. That's the real damage: it doesn't just invent code, it makes you audit reality.&lt;/p>"/>
+            <the-quote
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/pull-quote"
+                quote="The method exists in spirit."
+                attribution="No one. But it's coming."/>
+            <the-defense
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Defense Mechanism"
+                text="&lt;p>Our fix is boring and it works: &lt;strong>read the actual source&lt;/strong>. This very site runs on a framework where every rendered page can be traced — resource, resourceType, script, done. When this page renders, it's because a real script at a real path matched a real property. No sampling. No temperature. No vibes.&lt;/p>&lt;p>If a machine ever tells you this page is served by &lt;code>ratml/pages/quantumpage&lt;/code>, you'll know exactly what station it boarded at.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

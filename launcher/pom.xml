@@ -37,6 +37,7 @@
     <starter.check.paths>
       /content/slingslop/zengarden/home.html,
       /content/sling-matrix/home.html,
+      /content/ratml/home.html,
       /content/motorbrot/dml/home.html,
       /slingshot/users/slingshot1/travel/home/images/home.jpg,
       /slingshot/resources/images/background.jpg,
@@ -51,7 +52,8 @@
          below, so the artifact list isn't declared twice. -->
     <sample-content.artifactIds>
       slingslop.zengarden.sample-content,
-      slingslop.sling-matrix.sample-content
+      slingslop.sling-matrix.sample-content,
+      rage-against-ml.sample-content
     </sample-content.artifactIds>
   </properties>
 
@@ -88,6 +90,13 @@
     <dependency>
       <groupId>org.motorbrot</groupId>
       <artifactId>slingslop.sling-matrix.sample-content</artifactId>
+      <version>${slingslop.launcher.version}</version>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.motorbrot</groupId>
+      <artifactId>rage-against-ml.sample-content</artifactId>
       <version>${slingslop.launcher.version}</version>
       <type>zip</type>
       <scope>provided</scope>

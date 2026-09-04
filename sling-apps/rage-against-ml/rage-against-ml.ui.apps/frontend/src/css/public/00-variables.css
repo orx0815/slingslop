@@ -1,0 +1,75 @@
+/*
+ * 00-variables.css — design tokens for Rage Against the Machine Learning
+ *
+ * The whole palette hangs off TWO hue values on the OKLCH colour wheel.
+ * Rotate --hue-primary and everything — accents, tints, even the near-blacks —
+ * shifts in harmony. The complement is derived automatically at +180°.
+ *
+ *   --hue-primary   27  → riot red (protest-poster red)
+ *   --hue-secondary 80  → hazard amber (warning-tape accents, used sparingly)
+ */
+:root {
+  /* ── Base hues ── */
+  --hue-primary: 27;
+  --hue-secondary: 80;
+  --hue-primary-complement: calc(var(--hue-primary) + 180);
+  --hue-secondary-complement: calc(var(--hue-secondary) + 180);
+
+  /* ── Primary palette (riot red) ── */
+  --color-primary: oklch(0.56 0.215 var(--hue-primary));
+  --color-primary-light: oklch(0.68 0.19 var(--hue-primary));
+  --color-primary-dark: oklch(0.42 0.17 var(--hue-primary));
+  --color-primary-hover: oklch(0.62 0.23 var(--hue-primary));
+  --color-primary-subtle: oklch(0.24 0.06 var(--hue-primary));
+
+  /* ── Secondary palette (hazard amber) ── */
+  --color-secondary: oklch(0.78 0.15 var(--hue-secondary));
+  --color-secondary-dark: oklch(0.6 0.13 var(--hue-secondary));
+
+  /* ── Complementary accents ── */
+  --color-complement-primary: oklch(0.72 0.1 var(--hue-primary-complement));
+
+  /* ── Neutrals: photocopied-zine blacks and off-whites, tinted by the red hue ── */
+  --color-bg: oklch(0.16 0.012 var(--hue-primary)); /* ink black */
+  --color-bg-deep: oklch(0.12 0.01 var(--hue-primary)); /* deeper panel black */
+  --color-surface: oklch(0.21 0.015 var(--hue-primary)); /* raised panels */
+  --color-border: oklch(0.34 0.02 var(--hue-primary));
+  --color-text: oklch(0.93 0.008 var(--hue-primary)); /* xerox off-white */
+  --color-text-muted: oklch(0.68 0.015 var(--hue-primary));
+
+  /* ── Black & white, still tinted ── */
+  --color-black: oklch(0.1 0.01 var(--hue-primary));
+  --color-white: oklch(0.97 0.005 var(--hue-primary));
+
+  /* ── Typography ── */
+  --font-display: 'Archivo Black', Impact, 'Arial Black', 'Franklin Gothic Bold', sans-serif;
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+  /* ── Fluid type scale ── */
+  --text-xs: clamp(0.72rem, 0.68rem + 0.2vw, 0.8rem);
+  --text-sm: clamp(0.85rem, 0.8rem + 0.25vw, 0.95rem);
+  --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.2rem);
+  --text-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.7rem);
+  --text-xl: clamp(1.7rem, 1.4rem + 1.5vw, 2.6rem);
+  --text-2xl: clamp(2.4rem, 1.8rem + 3vw, 4.2rem);
+  --text-mega: clamp(3rem, 2rem + 5vw, 6.5rem);
+
+  /* ── Spacing scale ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --space-7: 6rem;
+
+  /* ── Structure ── */
+  --content-width: 72rem;
+  --rant-width: 46rem; /* measure for long rants */
+  --nav-height: 3.5rem;
+
+  /* ── Punk details ── */
+  --tape-angle: -1.2deg;
+  --stamp-border: 3px solid var(--color-primary);
+}

@@ -1,0 +1,16 @@
+<header class="hero"
+        data-sly-use.auth="org.motorbrot.ratml.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <div class="hero__inner">
+    <span class="hero__eyebrow" data-sly-test="${properties.eyebrow}">${properties.eyebrow}</span>
+    <h1 class="hero__title">${properties.title}</h1>
+    <p class="hero__subtitle" data-sly-test="${properties.subtitle}">${properties.subtitle}</p>
+    <p class="hero__description" data-sly-test="${properties.description}">${properties.description}</p>
+    <a class="hero__cta" data-sly-test="${properties.ctaLabel && properties.ctaUrl}"
+       href="${properties.ctaUrl @ context='uri'}">${properties.ctaLabel}</a>
+  </div>
+</header>

@@ -202,6 +202,8 @@
     <module>sling-apps/zengarden/zengarden.ui.apps</module>
     <module>sling-apps/sling-matrix/sling-matrix.core</module>
     <module>sling-apps/sling-matrix/sling-matrix.ui.apps</module>
+    <module>sling-apps/rage-against-ml/rage-against-ml.core</module>
+    <module>sling-apps/rage-against-ml/rage-against-ml.ui.apps</module>
     <module>sling-apps/digitalmedia/digitalmedia.client.core</module>
     <module>sling-apps/digitalmedia/digitalmedia.core</module>
     <module>sling-apps/digitalmedia/digitalmedia.client.ui.apps</module>
@@ -209,6 +211,7 @@
 
     <module>content-packages/zengarden.sample-content</module>
     <module>content-packages/sling-matrix.sample-content</module>
+    <module>content-packages/rage-against-ml.sample-content</module>
     <module>content-packages/complete</module>
 
     <module>launcher</module>

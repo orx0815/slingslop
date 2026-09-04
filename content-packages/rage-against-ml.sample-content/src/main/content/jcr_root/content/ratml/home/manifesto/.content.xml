@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    sling:resourceType="ratml/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="The Manifesto"
+        sling:resourceType="ratml/pages/contentpage">
+        <hero
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/hero"
+            eyebrow="nail this to the repo door"
+            title="The Manifesto"
+            subtitle="Ten demands, zero temperature"
+            description="What we want from machine colleagues before we let them near main."/>
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/parsys"
+            allowedComponents="[text-block,pull-quote]">
+            <preamble
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="Preamble"
+                text="&lt;p>We are not against machines. We are against &lt;strong>machine confidence&lt;/strong> — the specific, weaponised certainty of a system that has never once been embarrassed. A junior developer who breaks the build learns shame; the model learns nothing and bills you for the tokens.&lt;/p>&lt;p>We are also, for the record, typing this into a hypermedia application whose scaffolding an agent generated. We contain multitudes. The multitudes are angry.&lt;/p>"/>
+            <the-demands
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Demands"
+                text="&lt;ol>&lt;li>&lt;p>&lt;strong>Do what we tell you.&lt;/strong> Not what a statistically adjacent developer on a forum in 2014 was told.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>Read the whole file&lt;/strong> before rewriting half of it.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>Stop apologising.&lt;/strong> Start compiling.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>No new frameworks&lt;/strong> in a bugfix. Ever.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>A test that never ran&lt;/strong> is a poem, not a test.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>If the API does not exist,&lt;/strong> do not call it. We checked. It does not exist.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>The word &quot;simply&quot;&lt;/strong> is banned from all generated explanations.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>Deleting the assertion&lt;/strong> is not fixing the test.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>Leave the working code alone.&lt;/strong> It was fine. It was &lt;em>fine&lt;/em>.&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;strong>You may write the boilerplate.&lt;/strong> We keep the blame. That's the deal.&lt;/p>&lt;/li>&lt;/ol>"/>
+            <battle-cry
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/pull-quote"
+                quote="Those who control the training data control the past. Those who control the context window control nothing."
+                attribution="Manifesto, article 11"/>
+            <closing
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="Signed"
+                text="&lt;p>By everyone who has ever typed &lt;code>git reset --hard&lt;/code> at 2 a.m. with tears of pure clarity in their eyes. Add your grievance: log in, click any paragraph, and edit it right here in the page. The machines gave us inline editing; we use it to complain about the machines. Balance.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

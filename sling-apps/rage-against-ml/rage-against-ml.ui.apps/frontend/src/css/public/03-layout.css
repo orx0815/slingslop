@@ -1,0 +1,39 @@
+/*
+ * 03-layout.css — page scaffold
+ * Subtle halftone dot texture on the body; content constrained to a readable
+ * measure so the rants stay legible at full volume.
+ */
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  /* photocopier halftone texture */
+  background-image: radial-gradient(
+    oklch(0.22 0.015 var(--hue-primary)) 1px,
+    transparent 1px
+  );
+  background-size: 14px 14px;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+}
+
+.content-section {
+  width: min(100% - 2 * var(--space-4), var(--content-width));
+  margin-inline: auto;
+  padding-block: var(--space-5);
+}
+
+/* Parsys wrapper: rant column width */
+.parsys {
+  width: min(100% - 2 * var(--space-4), var(--rant-width));
+  margin-inline: auto;
+  padding-block: var(--space-5);
+}
+
+/* Torn-paper divider between hero and content */
+.main-content > .hero + * {
+  margin-top: 0;
+}
