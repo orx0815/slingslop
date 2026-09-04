@@ -1,12 +1,15 @@
 <!--/*
   Circular site navigation, built dynamically from the content tree.
 
-  NavigationModel walks up to the homepage, then lists its child sections
-  (level 1) and their child pages (level 2). Every href is externalized through
-  the LinkBuilder service. A trailing "Home" entry links back to the homepage.
+  NavigationModel walks up to the homepage, then recursively lists its child
+  sections (level 1), their child pages/sections (level 2) and, when a level-2
+  entry is itself a section, its own child pages (level 3). Every href is
+  externalized through the LinkBuilder service. A trailing "Home" entry links
+  back to the homepage.
 
   The public-bundle JS arranges the level-1 items in a circle and reveals each
-  level-2 list on hover (fine pointers) or on tap (touch devices).
+  nested submenu (".nav-submenu") on hover (fine pointers) or on tap (touch
+  devices), clamping it into the viewport so it never renders off-screen.
 */-->
 <sly data-sly-use.nav="org.motorbrot.slingmatrix.slingmodels.NavigationModel">
 <nav class="matrix-nav" role="navigation">
@@ -15,10 +18,17 @@
     <li class="nav-item" data-sly-repeat.item="${nav.items}"
         data-sly-attribute.aria-current="${item.active ? 'page' : ''}">
       <a href="${item.url}" class="nav-item-link" title="${item.title}">${item.title}</a>
-      <ul class="nav-level-2" data-sly-test="${item.hasChildren}">
-        <li data-sly-repeat.child="${item.children}">
-          <a href="${child.url}"
-             data-sly-attribute.aria-current="${child.active ? 'page' : ''}">${child.title}</a>
+      <ul class="nav-level-2 nav-submenu" data-sly-test="${item.hasChildren}">
+        <li data-sly-repeat.child="${item.children}"
+            data-sly-attribute.class="${child.hasChildren ? 'nav-item nav-item--parent' : 'nav-item'}"
+            data-sly-attribute.aria-current="${child.active ? 'page' : ''}">
+          <a href="${child.url}">${child.title}</a>
+          <ul class="nav-level-3 nav-submenu" data-sly-test="${child.hasChildren}">
+            <li class="nav-item" data-sly-repeat.grandchild="${child.children}"
+                data-sly-attribute.aria-current="${grandchild.active ? 'page' : ''}">
+              <a href="${grandchild.url}">${grandchild.title}</a>
+            </li>
+          </ul>
         </li>
       </ul>
     </li>

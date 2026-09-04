@@ -10,20 +10,52 @@
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/hero"
             heroText="\ud83d\udcbb Sling"
-            subtitle="Enter the world of Apache Sling - where content meets code"
-            title="Welcome to the Matrix"/>
+            subtitle="Build web-applications on top of Apache Sling (+ htmx)"
+            title="Welcome to Slingslop"/>
         <main
             jcr:primaryType="nt:unstructured"
             sling:resourceType="sling-matrix/components/parsys"
             allowedComponents="[code-block,feature-image,slide-headline,text-block]">
-            <slide-headline-1
+            <slide_headline
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="sling-matrix/components/slide-headline"
-                headline="What is Sling Matrix?"/>
+                headline="What is Sling, a CMS ?"/>
             <text-block-1
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="sling-matrix/components/text-block"
-                text="&lt;p>Sling Matrix is your gateway to mastering Apache Sling. Like Neo awakening to the true nature of reality, you'll discover the power beneath the surface of web content management.&lt;/p>&lt;p>This documentation will guide you through the fundamental concepts of OSGi, JCR, and Sling - the three pillars that support the Matrix of modern content-driven applications.&lt;/p>&lt;p>Strangely there is no content here yet …&lt;/p>"/>
+                text="&lt;p>No. It's an under-appreciated open-source framework for web-applications in general.&lt;br>It's currently serving very large sites in form of Adobe Experience Manager (AEM), which is a CMS build on top of Sling.&lt;/p>&lt;p>Sling itself is quite abtract, it doesn't even know what a page is. It's all resources in an unstructured content-tree (JCR), some of them happen to get rendered as HTML. But it does not come with a built-in user interface. You need to code the frontend (HTML, CSS, JavaScript) on your own.&lt;/p>&lt;p>Due to its modularity, Sling consists of more than 300 modules. There is one for almost everything an &quot;enterprise&quot; application server needs. &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/bundles/scheduler-service-commons-scheduler.html&quot;>Scheduling&lt;/a>,&amp;nbsp;&lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/bundles/apache-sling-eventing-and-job-handling.html&quot;>Eventing and Jobs&lt;/a>,&amp;nbsp; &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/bundles/discovery-api-and-impl.html&quot;>Cluster Discovery&lt;/a>&amp;nbsp;and &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/bundles/distribution.html&quot;>Distribution&lt;/a>, &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/development.html#testing-sling-based-applications-1&quot;>Testing ecosystem&lt;/a>, &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://jackrabbit.apache.org/oak/docs/plugins/blobstore.html&quot;>S3/Azure Blobstore&lt;/a>,&amp;nbsp;&lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/development/logging.html&quot;>Logging&lt;/a>, &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://sling.apache.org/documentation/bundles/graphql-core.html&quot;>GraphQL&lt;/a>&amp;nbsp;...&lt;/p>&lt;p>Chances are you don't need any of that; you can start simple.&lt;/p>"/>
+            <slide-headline-1
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Dealing with complexity"/>
+            <text_block
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>There is a bit of a learning curve to get started. Even the most simple project needs five modules:&lt;/p>&lt;ul>&lt;li>&lt;p>Frontend build with TypeScript and CSS&lt;/p>&lt;/li>&lt;li>&lt;p>HTML templates and components&lt;/p>&lt;/li>&lt;li>&lt;p>Business-Logic: where things from the real-world get a name (the hard part) and become Java-Objects&lt;/p>&lt;/li>&lt;li>&lt;p>Content: the story to tell with text and images&lt;/p>&lt;/li>&lt;li>&lt;p>Server: something that boots, creates a repository, installs all of the above and listens to incoming HTTP requests&lt;/p>&lt;/li>&lt;/ul>&lt;p>This is intimidating at first, but we've get 'separation of concerns' from the start:&lt;br>Designers, frontend and backend developers, editors and operations can work on the same project, in parallel, without stepping on each others toes. Regardless of the software stack, these concerns have to get adressed in every project — one way or the other.&lt;/p>"/>
+            <slide_headline_1894683868
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="What is Slingslop ?"/>
+            <text_block_349740335
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>The page you're readling right now is a Sling app, a static but editable &lt;strong>MPA&lt;/strong> (Multi-Page Application, formerly known as website).&lt;br>While Sling is perfectly capable of serving headless json-content for an &lt;strong>SPA&lt;/strong> (Single-Page Application, yes &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://medium.com/@toimrank/aem-sling-model-exporter-90dc872835b9&quot;>there is a module&lt;/a> for that too) we will focus on &lt;strong>HDA&lt;/strong> (Hypermedia-Driven Application) driven by &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://htmx.org/&quot;>htmx&lt;/a>.&lt;/p>&lt;p>Keep in mind that Sling can be used in all sorts of integrations. The architecture suggested here exemplifies the simplicity of both, Sling and htmx play together in way that makes one wonder how they do htmx with 'only static endpoints'. It's a great way of explaining to core-concept of Sling by coming from htmx. More on that later.&lt;/p>&lt;p>Slingslop is a project on github that showcases the complete setup. It's not software on it's own, just a plumbing-together of open-source pieces. The license allows you to copy everything for a quick start without the duty to keep your work open-source.&lt;/p>"/>
+            <slide_headline_1841771543
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="Inspired by the Sling community"/>
+            <text_block_1769692192
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>Experiments on this started after the adaptTo conference in 2019, where the &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://adapt.to/2019/schedule/the-sling-feature-model-1-0-revealed&quot;>Sling Feature Model 1.0 was revealed&lt;/a> and two CMSs were presented: &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://adapt.to/2019/schedule/everything-is-a-component-site-development-with-composum-pages&quot;>Composum Pages&lt;/a> and &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://www.youtube.com/watch?v=I_Zkh31r_fQ&amp;amp;t=39s&quot;>Peregine CMS&lt;/a>: &quot;There is no CMS in Sling, now there are suddenly three that are open source&quot;. (Third one being &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://adapt.to/2021/schedule/sling-cms-building-a-simple-cms-on-apache-sling&quot;>Sling CMS presented in 2021&lt;/a>).&lt;/p>&lt;p>In short, in combination it's possible to bake two CMSs into the same &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://hub.docker.com/r/orx0815dockerhub/slimpogrine&quot;>docker image&lt;/a>, which is a silly thing to do but it makes a few important points:&lt;/p>&lt;ul>&lt;li>&lt;p>about the application-serverness of Sling: the ability to host &lt;strong>multiple&lt;/strong> complex apps. Side-note: Peregrine renders a vue SPA, completely breaking with AEM's traditional MPA style&lt;/p>&lt;/li>&lt;li>&lt;p>about shared infrastucture:&lt;/p>&lt;ul>&lt;li>&lt;p>Composum's JCR node-browser (similar to what /crx/de does in AEM)&lt;/p>&lt;/li>&lt;li>&lt;p>a user-manager that also allows to set read/write permissions in JCR&lt;/p>&lt;/li>&lt;li>&lt;p>a package-manager to up/download content zip-files, which in turn enables deployment of apps in the browser - instead of commandline or sling-feature-model&lt;/p>&lt;/li>&lt;/ul>&lt;/li>&lt;/ul>&lt;p>Technically these three tools are also &quot;only&quot; apps on top of Sling, but shipped with the official &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://github.com/apache/sling-org-apache-sling-starter&quot;>Sling Starter&lt;/a>. Sling doesn't needs them, they just make live a bit easier.&lt;/p>"/>
+            <slide_headline_1879353919
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/slide-headline"
+                headline="CSS zengarden"/>
+            <text_block_848300787
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="sling-matrix/components/text-block"
+                text="&lt;p>The maven &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://github.com/apache/sling-project-archetype&quot;>&lt;strong>sling-project-archetype&lt;/strong>&lt;/a> is a good starting point. For the above, only the launcher's feature-model was needed so Peregrine and Composum-Pages were added there. But it also comes with an example app for new projects. It's a plain 'Hello World' experience. Didn't want to throw it away, but how to make it look nice? This was pre-AI, lacking the frontent-skills I had the idea to &quot;borrow&quot; around 20 styles from &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://csszengarden.com/&quot;>CSS Zen Garden: The Beauty of CSS Design&lt;/a> from 2003, take it's oldschool html and replace it's static text by JCR content.&lt;/p>&lt;p>The only &quot;Business-Logic&quot; is one class that randomly selects a design, page gets a new look on reload, resulting in confusion. Designs predate smartphones, can't cope with longer texts, overlay headlines with images you can't change so the text below needs to match somehow. For editing text or creating a new page you'd have to use the node-browser.&lt;/p>&lt;p>Apart from the separation of look&amp;amp;feel from content, some lessons can be learned for creating a Sling application from scatch:&lt;br>Importing existing markup as Sightly script (aka &lt;a target=&quot;_blank&quot; rel=&quot;noopener nofollow&quot; class=&quot;external-link&quot; href=&quot;https://github.com/adobe/htl-spec&quot;>HTL&lt;/a>), split it up into includes and components, copy over the CSS, separate markup from text. At some point in future I'll add a step-by-step HowTo, promise ;-)&lt;/p>"/>
             <feature_image
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="sling-matrix/components/feature-image"
@@ -35,7 +67,7 @@
                 fileReference="/content/motorbrot/dml/assets/slingslop/matrix/jackrabbits/follow_the_white_jackrabbit_4.png"
                 headline="Follow the White Rabbit"
                 imagePosition="right"
-                text="&lt;p>Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p>&lt;ul>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/osgi/osgi-intro.html&quot;>&lt;strong>OSGi&lt;/strong>&lt;/a> - The modular foundation of the Matrix&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/jcr/jcr-intro.html&quot;>&lt;strong>JCR&lt;/strong>&lt;/a> - The repository that stores all truth&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/sling/sling-intro.html&quot;>&lt;strong>Sling&lt;/strong>&lt;/a> - The framework that brings it all together&lt;/p>&lt;/li>&lt;/ul>">
+                text="&lt;p>Ready to see how deep the rabbit hole goes? Explore our documentation sections to unlock the secrets of Apache Sling:&lt;/p>&lt;ul>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/osgi/osgi-intro.html&quot;>&lt;strong>OSGi&lt;/strong>&lt;/a> - The modular foundation of the Matrix&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/jcr/jcr-intro.html&quot;>&lt;strong>JCR&lt;/strong>&lt;/a> - The repository that stores all truth&lt;/p>&lt;/li>&lt;li>&lt;p>&lt;a target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; href=&quot;./home/basics/sling/sling-intro.html&quot;>&lt;strong>Sling&lt;/strong>&lt;/a> - The framework that brings it all together&lt;/p>&lt;/li>&lt;/ul>">
                 <renditions jcr:primaryType="nt:unstructured">
                     <matrix-feature-desktop_cropped/>
                 </renditions>
@@ -48,7 +80,7 @@
             link1Title="Apache Sling"
             link1Url="https://sling.apache.org"
             link2Title="Documentation"
-            link2Url="/content/sling-matrix/home/osgi/osgi-intro.html"
+            link2Url="/content/sling-matrix/home/basics/osgi/osgi-intro.html"
             link3Title="GitHub"
             link3Url="https://github.com/apache/sling"/>
     </jcr:content>
