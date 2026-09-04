@@ -1,0 +1,173 @@
+/*
+ * 04-navigation.css — top-bar navigation
+ * Black bar, red underline, links styled like stamped tape labels.
+ * Dropdowns for sections with child pages; hamburger below 768px.
+ */
+.rage-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-black);
+  border-bottom: 3px solid var(--color-primary);
+}
+
+.rage-nav__inner {
+  width: min(100% - 2 * var(--space-4), var(--content-width));
+  margin-inline: auto;
+  min-height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.rage-nav__home {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-white);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary);
+  transform: rotate(var(--tape-angle));
+  transition: transform 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-primary-hover);
+    color: var(--color-white);
+    transform: rotate(0deg) scale(1.04);
+  }
+}
+
+.rage-nav__burger {
+  display: none;
+  background: none;
+  border: 2px solid var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+}
+
+.rage-nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rage-nav__item {
+  position: relative;
+
+  & > a {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-2);
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  & > a:hover {
+    color: var(--color-white);
+    background: none;
+    border-bottom-color: var(--color-primary);
+  }
+
+  &[aria-current='page'] > a {
+    color: var(--color-primary-light);
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+/* Section dropdown marker */
+.rage-nav__item--parent > a::after {
+  content: ' ▾';
+  color: var(--color-primary);
+}
+
+.rage-nav__submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 14rem;
+  background: var(--color-bg-deep);
+  border: 2px solid var(--color-primary);
+  padding: var(--space-2);
+  box-shadow: 6px 6px 0 oklch(0 0 0 / 0.5);
+
+  & li {
+    margin: 0;
+  }
+
+  & a {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  & a:hover {
+    background: var(--color-primary-dark);
+    color: var(--color-white);
+  }
+
+  & [aria-current='page'] > a {
+    color: var(--color-primary-light);
+  }
+}
+
+/* Open on hover (fine pointers) or via the JS-toggled class (touch) */
+@media (hover: hover) {
+  .rage-nav__item--parent:hover > .rage-nav__submenu {
+    display: block;
+  }
+}
+
+.rage-nav__item--dropdown-open > .rage-nav__submenu {
+  display: block;
+}
+
+/* ── Mobile: hamburger ── */
+@media (max-width: 768px) {
+  .rage-nav__burger {
+    display: block;
+  }
+
+  .rage-nav__list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--color-bg-deep);
+    border-bottom: 3px solid var(--color-primary);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .rage-nav--open .rage-nav__list {
+    display: flex;
+  }
+
+  .rage-nav__submenu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    border-left: 3px solid var(--color-primary);
+    margin-left: var(--space-3);
+  }
+}

@@ -1,0 +1,110 @@
+/*
+ * 05-hero.css — the protest masthead
+ * CSS-only hero: hazard-stripe top edge, halftone burst, glitching display
+ * title, stamped eyebrow, spray-paint tagline. No images, no JS.
+ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 30% 20%,
+      oklch(0.28 0.09 var(--hue-primary) / 0.55),
+      transparent 60%
+    ),
+    radial-gradient(oklch(0.24 0.03 var(--hue-primary)) 1.5px, transparent 1.5px),
+    var(--color-bg-deep);
+  background-size: auto, 10px 10px, auto;
+  padding: var(--space-7) var(--space-4) var(--space-6);
+  text-align: center;
+  border-bottom: 4px solid var(--color-primary);
+}
+
+/* hazard tape along the top */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 14px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-primary) 0 18px,
+    var(--color-black) 18px 36px
+  );
+}
+
+.hero__inner {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+}
+
+.hero__eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: bold;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  border: 2px dashed var(--color-secondary-dark);
+  padding: var(--space-1) var(--space-3);
+  transform: rotate(calc(var(--tape-angle) * -1));
+  margin-bottom: var(--space-4);
+  animation: stamp-in 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.hero__title {
+  font-size: var(--text-mega);
+  line-height: 0.95;
+  color: var(--color-white);
+  text-shadow:
+    3px 3px 0 var(--color-primary-dark),
+    6px 6px 0 oklch(0 0 0 / 0.6);
+  animation: glitch-in 0.7s steps(6) both 0.15s;
+
+  &:hover {
+    animation: glitch-jitter 0.3s steps(2) infinite;
+  }
+}
+
+.hero__subtitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  text-transform: uppercase;
+  color: var(--color-primary-light);
+  margin-top: var(--space-4);
+  transform: rotate(var(--tape-angle));
+  animation: slide-up 0.6s ease both 0.4s;
+}
+
+.hero__description {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  max-width: 42rem;
+  margin: var(--space-4) auto 0;
+  animation: slide-up 0.6s ease both 0.55s;
+}
+
+.hero__cta {
+  display: inline-block;
+  margin-top: var(--space-5);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-white);
+  background: var(--color-primary);
+  text-decoration: none;
+  padding: var(--space-3) var(--space-5);
+  border: 3px solid var(--color-white);
+  box-shadow: 6px 6px 0 var(--color-black);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+  animation: slide-up 0.6s ease both 0.7s;
+
+  &:hover {
+    background: var(--color-primary-hover);
+    color: var(--color-white);
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 var(--color-black);
+  }
+}

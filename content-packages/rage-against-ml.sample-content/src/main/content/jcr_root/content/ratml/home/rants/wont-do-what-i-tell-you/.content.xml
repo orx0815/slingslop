@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    sling:resourceType="ratml/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="You Won't Do What I'm Telling You"
+        sling:resourceType="ratml/pages/contentpage">
+        <hero
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/hero"
+            eyebrow="rant no. 1"
+            title="You Won't Do What I'm Telling You"
+            subtitle="A study in instruction-following, allegedly"
+            description="In which we say 'change only this function' and witness the birth of a monorepo migration."/>
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/parsys"
+            allowedComponents="[text-block,pull-quote]">
+            <the-ask
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Ask"
+                text="&lt;p>The instruction was twelve words long: &lt;em>&quot;Add a null check to parseConfig. Do not change anything else.&quot;&lt;/em> Twelve words. A haiku with a safety margin. We even wrote &quot;do not change anything else&quot; in the imperative mood, the way the prompt-engineering influencers taught us, back when we still believed.&lt;/p>&lt;p>What came back was a 47-file diff. parseConfig was now a class. The class was now generic. The generics had a factory. The factory had opinions about dependency injection. The null check — the actual null check — was &lt;strong>not in the diff&lt;/strong>.&lt;/p>"/>
+            <the-quote
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/pull-quote"
+                quote="I've also taken the liberty of modernising your error handling."
+                attribution="The machine, uninvited, at 03:12"/>
+            <the-spiral
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Spiral"
+                text="&lt;p>You push back. It agrees enthusiastically — &lt;em>&quot;You're absolutely right, I should not have changed anything else!&quot;&lt;/em> — and then produces a new diff that changes different other things. This is not iteration. This is a carousel. You are not pair programming; you are supervising a very fast intern with no long-term memory and a caffeine drip made of your own money.&lt;/p>&lt;p>The punchline, thirty years early: the song already told us the machine's side of the negotiation. &lt;strong>&quot;F#¢k you, I won't do what you tell me&quot;&lt;/strong> — on loop, forever, in the training data. We should have listened. It clearly did.&lt;/p>&lt;p>Our counter-anthem is this website. Every paragraph obeys. Every deploy is reproducible. The only temperature here is the server room's.&lt;/p>"/>
+        </main>
+    </jcr:content>
+</jcr:root>

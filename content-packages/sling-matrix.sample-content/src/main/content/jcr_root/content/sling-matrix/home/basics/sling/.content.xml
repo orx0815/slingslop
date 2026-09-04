@@ -3,7 +3,6 @@
     jcr:primaryType="sling:OrderedFolder"
     jcr:title="Sling">
     <sling-intro/>
-    <architecture/>
     <sling-components/>
     <htl-sightly/>
     <sling-resource-api/>

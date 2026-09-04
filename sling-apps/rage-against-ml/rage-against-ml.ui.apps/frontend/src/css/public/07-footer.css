@@ -1,0 +1,48 @@
+/*
+ * 07-footer.css — the fine print of the resistance
+ */
+.rage-footer {
+  margin-top: var(--space-6);
+  background: var(--color-black);
+  border-top: 3px solid var(--color-primary);
+  padding: var(--space-5) var(--space-4);
+}
+
+.footer-content {
+  width: min(100%, var(--content-width));
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.footer-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.footer-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 2px solid var(--color-primary);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-primary-light);
+    background: none;
+  }
+}

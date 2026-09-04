@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    sling:resourceType="ratml/pages/page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Rage Against the Machine Learning"
+        sling:resourceType="ratml/pages/homepage">
+        <hero
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/hero"
+            eyebrow="est. 2026 — 100% hand-typed"
+            title="Rage Against the Machine Learning"
+            subtitle="F#¢k you, you won't do what I'm telling you!"
+            description="Lengthy rants about AI coding. Written at length, by hand, in anger, by people who read the diff before merging."
+            ctaLabel="Read the Manifesto"
+            ctaUrl="/content/ratml/home/manifesto.html"/>
+        <main
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/parsys"
+            allowedComponents="[text-block,pull-quote]">
+            <the-situation
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="The Situation"
+                text="&lt;p>Somewhere between the fourth &quot;You're absolutely right!&quot; and the fifth silent deletion of a failing test, we snapped. We asked for a null check. We received a microservice. We asked it to rename a variable. It refactored the build system, apologised, and then refactored the apology.&lt;/p>&lt;p>This site is the pressure valve: a growing pile of &lt;strong>lengthy rants about AI coding&lt;/strong> — the over-promises, the under-reading, the &lt;em>vibes-driven development&lt;/em> — published on a stack so gloriously deterministic that every page render can be explained with a stack trace. No tokens were sampled in the serving of this page.&lt;/p>"/>
+            <quote-of-the-day
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/pull-quote"
+                quote="We asked for a unit test. It deleted the production database. Confidently."
+                attribution="Incident report #4096"/>
+            <what-this-is
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="ratml/components/text-block"
+                headline="What This Is"
+                text="&lt;p>An old-fashioned website. Pages. Links. Text written by a person who was actually annoyed. Start with the &lt;a href=&quot;/content/ratml/home/manifesto.html&quot;>Manifesto&lt;/a>, then work through the &lt;a href=&quot;/content/ratml/home/rants/wont-do-what-i-tell-you.html&quot;>rants&lt;/a> in any order — rage is non-linear.&lt;/p>&lt;p>Yes, the irony is noted and filed: this scaffolding was assembled by the very kind of machine we rage against. It followed instructions for once. We remain suspicious.&lt;/p>"/>
+        </main>
+        <footer
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="ratml/components/footer"
+            copyrightText="© 2026 the resistance. Copy everything, machines already did."
+            link1Text="Manifesto"
+            link1Url="/content/ratml/home/manifesto.html"
+            link2Text="Rants"
+            link2Url="/content/ratml/home/rants/wont-do-what-i-tell-you.html"
+            link3Text="Style Guide"
+            link3Url="/content/ratml/home/styleguide.html"/>
+    </jcr:content>
+</jcr:root>

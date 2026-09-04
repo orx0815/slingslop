@@ -1,0 +1,10 @@
+<figure class="pull-quote"
+        data-sly-use.auth="org.motorbrot.ratml.slingmodels.UserIsLoggedIn"
+        data-sly-set.editPath="${resource.path}.edit-form.html"
+        data-zen-editable="true"
+        data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+        data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+        data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <blockquote class="pull-quote__text">${properties.quote}</blockquote>
+  <figcaption class="pull-quote__attribution" data-sly-test="${properties.attribution}">${properties.attribution}</figcaption>
+</figure>

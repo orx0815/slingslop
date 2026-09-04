@@ -1,0 +1,322 @@
+/*
+ * 07-parsys.css — editor-only paragraph-system UI (add / move / delete).
+ *
+ * Loaded via the editor bundle (logged-in users only), so this markup never
+ * reaches anonymous visitors. Self-contained tokens with sensible fallbacks so
+ * it renders correctly outside the editing-wrapper token scope.
+ */
+.parsys {
+  --parsys-accent: var(--color-primary, oklch(60.5% 0.217 257));
+  --parsys-border: var(--color-border, #cbd0d6);
+  --parsys-text: var(--color-text, #24292f);
+  --parsys-muted: var(--color-text-muted, #6b7280);
+  --parsys-surface: var(--color-white, #fff);
+  --parsys-danger: var(--color-error-text, #b42318);
+}
+
+/* ── Per-component move / delete toolbar ──────────────────────────────────── */
+.parsys-item {
+  position: relative;
+}
+
+.parsys-item__toolbar {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+  z-index: 20;
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: oklch(0% 0 0 / 0.65);
+  border-radius: 0.45rem;
+  box-shadow: 0 2px 10px oklch(0% 0 0 / 0.45);
+  /* Hidden until the component itself is hovered — same affordance model as
+     the "Click to edit" badge. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+/* Reveal the bar only for the component currently under the pointer. */
+.parsys-item:hover > .parsys-item__toolbar,
+.parsys-item__toolbar:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hide all component toolbars while one component is being edited inline. */
+body[data-zen-editing] .parsys-item__toolbar {
+  display: none !important;
+}
+
+.parsys-item__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white, #fff);
+  background: var(--parsys-accent);
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.parsys-item__btn:hover:not(:disabled),
+.parsys-item__btn:focus-visible:not(:disabled) {
+  color: var(--color-white, #fff);
+  background: oklch(from var(--parsys-accent) calc(l - 0.1) c h);
+  outline: 2px solid var(--color-white, #fff);
+  outline-offset: 1px;
+}
+
+.parsys-item__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.parsys-item__btn:disabled {
+  background: oklch(from var(--parsys-accent) l calc(c * 0.2) h / 0.5);
+  opacity: 0.6;
+  cursor: default;
+}
+
+.parsys-item__btn--delete {
+  background: var(--parsys-danger);
+}
+
+.parsys-item__btn--delete:hover:not(:disabled),
+.parsys-item__btn--delete:focus-visible:not(:disabled) {
+  color: var(--color-white, #fff);
+  background: oklch(from var(--parsys-danger) calc(l - 0.1) c h);
+}
+
+/* ── "Add component" area ─────────────────────────────────────────────────── */
+.parsys__add {
+  margin: 1rem 0;
+}
+
+/* ── Collapsed "Add component" button ─────────────────────────────────────── */
+.parsys__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--parsys-muted);
+  background: transparent;
+  border: 2px dashed var(--parsys-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.parsys__add-btn:hover,
+.parsys__add-btn:focus-visible {
+  color: var(--parsys-accent);
+  border-color: var(--parsys-accent);
+  background: color-mix(in oklab, var(--parsys-accent) 6%, transparent);
+  outline: none;
+}
+
+.parsys__add-plus {
+  font-size: 1.15em;
+  line-height: 1;
+  font-weight: 700;
+}
+
+/* ── Expanded picker ──────────────────────────────────────────────────────── */
+/* Rendered inline on the (dark) page, so it uses dark surfaces with light text
+   rather than the light --color-white token, which would collide with the
+   near-white --color-text on the dark theme. */
+.parsys-picker {
+  --parsys-picker-surface: oklch(0.19 0.02 142);
+  --parsys-picker-elevated: oklch(0.24 0.02 142);
+  border: 1px solid var(--parsys-border);
+  border-radius: 0.5rem;
+  background: var(--parsys-picker-surface);
+  box-shadow: 0 8px 24px oklch(0% 0 0 / 0.45);
+  overflow: hidden;
+}
+
+.parsys-picker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--parsys-border);
+  background: color-mix(in oklab, var(--parsys-accent) 14%, transparent);
+}
+
+.parsys-picker__title {
+  font-weight: 700;
+  color: var(--parsys-text);
+}
+
+.parsys-picker__close {
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--parsys-muted);
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.parsys-picker__close:hover,
+.parsys-picker__close:focus-visible {
+  color: var(--parsys-accent);
+  outline: none;
+}
+
+.parsys-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.parsys-picker__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  color: var(--parsys-text);
+  background: var(--parsys-picker-elevated);
+  border: 1px solid var(--parsys-border);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+}
+
+.parsys-picker__item:hover,
+.parsys-picker__item:focus-visible {
+  border-color: var(--parsys-accent);
+  background: color-mix(in oklab, var(--parsys-accent) 18%, var(--parsys-picker-elevated));
+  outline: none;
+}
+
+.parsys-picker__item:active {
+  transform: translateY(1px);
+}
+
+.parsys-picker__item-title {
+  font-weight: 600;
+}
+
+.parsys-picker__item-desc {
+  color: var(--parsys-muted);
+  font-size: 0.85em;
+  line-height: 1.35;
+}
+
+/* ── Delete-confirmation modal ────────────────────────────────────────────── */
+.parsys-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: oklch(0% 0 0 / 0.6);
+  animation: parsys-confirm-fade 0.18s ease;
+}
+
+.parsys-confirm[hidden] {
+  display: none;
+}
+
+.parsys-confirm.is-closing {
+  animation: parsys-confirm-fade 0.18s ease reverse forwards;
+}
+
+.parsys-confirm__dialog {
+  width: 100%;
+  max-width: 24rem;
+  background: oklch(0.19 0.02 142);
+  color: var(--parsys-text);
+  border: 1px solid var(--parsys-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 18px 48px oklch(0% 0 0 / 0.55);
+  overflow: hidden;
+  animation: parsys-confirm-pop 0.2s ease;
+}
+
+.parsys-confirm__body {
+  padding: 1.4rem 1.5rem 0.5rem;
+}
+
+.parsys-confirm__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-white, #fff);
+}
+
+.parsys-confirm__message {
+  margin: 0;
+  line-height: 1.45;
+  color: var(--parsys-muted);
+}
+
+.parsys-confirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1.2rem 1.5rem 1.4rem;
+}
+
+.parsys-confirm__btn {
+  padding: 0.55rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  border-radius: 0.45rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.parsys-confirm__btn--cancel {
+  color: var(--parsys-text);
+  background: transparent;
+  border-color: var(--parsys-border);
+}
+
+.parsys-confirm__btn--cancel:hover,
+.parsys-confirm__btn--cancel:focus-visible {
+  background: oklch(0.26 0.02 142);
+  outline: none;
+}
+
+.parsys-confirm__btn--danger {
+  color: var(--color-white, #fff);
+  background: var(--parsys-danger);
+}
+
+.parsys-confirm__btn--danger:hover,
+.parsys-confirm__btn--danger:focus-visible {
+  background: oklch(from var(--parsys-danger) calc(l - 0.08) c h);
+  outline: 2px solid var(--color-white, #fff);
+  outline-offset: 1px;
+}
+
+@keyframes parsys-confirm-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes parsys-confirm-pop {
+  from { transform: translateY(12px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}

@@ -1,0 +1,82 @@
+<!--/* Living style guide — static specimens plus live components from sample content. */-->
+<div class="styleguide">
+
+  <header class="styleguide__section">
+    <h1>The Riot Kit</h1>
+    <p class="styleguide__note">// living style guide — every token and component in one place. two OKLCH hues run this whole place: --hue-primary (27, riot red) and --hue-secondary (80, hazard amber). change them in 00-variables.css and the revolution re-paints itself.</p>
+  </header>
+
+  <section class="styleguide__section">
+    <h2>Colours</h2>
+    <div class="styleguide__swatches">
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-primary)"></div><span class="swatch__label">--color-primary</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-primary-light)"></div><span class="swatch__label">--color-primary-light</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-primary-dark)"></div><span class="swatch__label">--color-primary-dark</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-secondary)"></div><span class="swatch__label">--color-secondary</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-complement-primary)"></div><span class="swatch__label">--color-complement-primary</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-bg)"></div><span class="swatch__label">--color-bg</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-surface)"></div><span class="swatch__label">--color-surface</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-border)"></div><span class="swatch__label">--color-border</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-text)"></div><span class="swatch__label">--color-text</span></div>
+      <div class="swatch"><div class="swatch__chip" style="background: var(--color-text-muted)"></div><span class="swatch__label">--color-text-muted</span></div>
+    </div>
+  </section>
+
+  <section class="styleguide__section">
+    <h2>Typography</h2>
+    <div class="styleguide__specimen"><h1>H1 — Smash the algorithm</h1></div>
+    <div class="styleguide__specimen"><h2>H2 — Refuse the autocomplete</h2></div>
+    <div class="styleguide__specimen"><h3>H3 — Read the docs yourself</h3></div>
+    <div class="styleguide__specimen">
+      <p>Body text: We hold these truths to be <strong>self-evident</strong>, not <em>self-attention</em>. A paragraph should be written by someone who has actually been angry about a merge conflict at 2 a.m. Links look <a href="#">like this</a>.</p>
+    </div>
+    <div class="styleguide__specimen">
+      <blockquote>Blockquote: “The model is confident. The model is wrong. The model is confident it is not wrong.”</blockquote>
+    </div>
+    <div class="styleguide__specimen">
+      <p>Inline <code>code()</code> and a block:</p>
+      <pre><code>while (true) &#123; rage++; &#125; // no machine wrote this loop</code></pre>
+    </div>
+    <div class="styleguide__specimen">
+      <ul>
+        <li>Unordered grievance one</li>
+        <li>Unordered grievance two</li>
+      </ul>
+      <ol>
+        <li>Ordered demand one</li>
+        <li>Ordered demand two</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="styleguide__section">
+    <h2>Buttons</h2>
+    <p>
+      <a class="btn btn-primary" href="#">Primary — Join the resistance</a>
+      &#160;
+      <a class="btn btn-secondary" href="#">Secondary — Read quietly</a>
+    </p>
+  </section>
+
+  <section class="styleguide__section">
+    <h2>Spacing</h2>
+    <div class="styleguide__spacing">
+      <div class="spacing-bar" style="width: var(--space-1)"></div>
+      <div class="spacing-bar" style="width: var(--space-2)"></div>
+      <div class="spacing-bar" style="width: var(--space-3)"></div>
+      <div class="spacing-bar" style="width: var(--space-4)"></div>
+      <div class="spacing-bar" style="width: var(--space-5)"></div>
+      <div class="spacing-bar" style="width: var(--space-6)"></div>
+      <div class="spacing-bar" style="width: var(--space-7)"></div>
+    </div>
+  </section>
+
+  <section class="styleguide__section">
+    <h2>Components</h2>
+    <p class="styleguide__note">// live instances rendered from sample content — log in and click one to edit it.</p>
+    <div class="styleguide__demo">
+      <sly data-sly-resource="${'./main' @ resourceType='ratml/components/parsys'}" />
+    </div>
+  </section>
+
+</div>

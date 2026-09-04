@@ -1,0 +1,33 @@
+<!--/*
+  Top-bar site navigation, built dynamically from the content tree.
+
+  NavigationModel walks up to the homepage, then lists its child sections
+  (level 1) and their child pages (level 2, shown as dropdowns). Every href is
+  externalized through the LinkBuilder service. The home link is the stamped
+  brand tag on the left.
+
+  Mobile (<768px): the list collapses behind the [MENU] burger button, wired
+  in public.ts.
+*/-->
+<sly data-sly-use.nav="org.motorbrot.ratml.slingmodels.NavigationModel">
+<nav class="rage-nav" role="navigation" aria-label="Main">
+  <div class="rage-nav__inner">
+    <a href="${nav.homeUrl}" class="rage-nav__home"
+       data-sly-attribute.aria-current="${nav.homeActive ? 'page' : ''}">RATML</a>
+    <button type="button" class="rage-nav__burger" aria-expanded="false" aria-label="Toggle menu">[menu]</button>
+    <ul class="rage-nav__list">
+      <li data-sly-repeat.item="${nav.items}"
+          data-sly-attribute.class="${item.hasChildren ? 'rage-nav__item rage-nav__item--parent' : 'rage-nav__item'}"
+          data-sly-attribute.aria-current="${item.active ? 'page' : ''}">
+        <a href="${item.url}">${item.title}</a>
+        <ul class="rage-nav__submenu" data-sly-test="${item.hasChildren}">
+          <li data-sly-repeat.child="${item.children}"
+              data-sly-attribute.aria-current="${child.active ? 'page' : ''}">
+            <a href="${child.url}">${child.title}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+</sly>

@@ -87,3 +87,13 @@ tenants:
     middlewares:
     - sec-headers
     - editor-basicauth
+
+- tenant: rage-against-ml
+  roles:
+  - public-cached
+  config:
+    contentRoot: /content/ratml
+    appsRoot: /apps/ratml
+    subdomain: ratml
+    # css/js have no URL fingerprinting -> short TTL so a deploy is picked up quickly.
+    cssJsTtlSeconds: 300
