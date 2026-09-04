@@ -27,14 +27,16 @@ Requires [Docker](https://docs.docker.com/install/) + [Docker Compose](https://d
 3. **Map the hostnames** to your docker host — add to `/etc/hosts`:
 
    ```
-   127.0.0.1 www.motorbrot.local
-   127.0.0.1 zengarden.motorbrot.local
+   127.0.0.1 www.slingslop.local
+   127.0.0.1 zengarden.slingslop.local
    ```
 
-Then visit http://www.motorbrot.local/ (sling-matrix) or
-http://zengarden.motorbrot.local/ (CSS Zen Garden). For content editing, use
+Then visit http://www.slingslop.local/ (sling-matrix) or
+http://zengarden.slingslop.local/ (CSS Zen Garden). For content editing, use
 plain Sling directly on http://localhost:8080/ — there's no author/editor host
-in this sandbox.
+in this sandbox. (This reuses the `local-webcache` CONGA environment — the same
+one used to manually compare cache-engine variants; see
+devops/conga-config-generation-concept.md.)
 
 Rebuild after changing the webcache template: `docker compose -f devops/docker-compose.yml build --no-cache --force-rm`.
 Tear down: `docker compose -f devops/docker-compose.yml down && docker volume rm devops_slingslop-volume`.

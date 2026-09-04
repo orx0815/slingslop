@@ -233,5 +233,5 @@ contains the two `MediaFormat` services used by the demo:
 `sling-apps/sling-matrix/sling-matrix.ui.apps/src/main/content/jcr_root/apps/sling-matrix/components/feature-image/`
 is the consumer component: a 2-column section that delegates its image to
 `motorbrot/dma-client/components/responsive-image`. The demo page at
-<http://localhost:8080/content/sling-matrix/home/sling/sling-dml-demo.html>
+<http://localhost:8080/content/sling-matrix/home/basics/sling/sling-dml-demo.html>
 shows it end-to-end.

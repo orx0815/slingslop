@@ -149,9 +149,9 @@ Task  7 — JCR .content.xml nodes for pages and components
 Task  8 — HTL page templates (page, basepage, homepage, contentpage, styleguide)
 Task  9 — HTL component templates (view + edit-form-fields for each component); editing supertypes COPIED via §3.0 Tier A2 (zen-editable only)
 Task 10 — Sample content package (pom.xml, filter.xml, all content nodes)
-Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (sample-content.artifactIds dependency + starter.check.paths)
+Task 11 — Wire root pom.xml + content-packages/complete/pom.xml + launcher/pom.xml (sample-content.artifactIds dependency + starter.check.paths) + launcher.json feature model
 Task 12 — ReadMe.md in sling-apps/{PROJECT_NAME}/
-Task 13 — Register the app for deployment via CONGA (PUBLIC-FACING apps only; see §2.9)
+Task 13 — Register the app in CONGA: prod-motorbrot.yaml + local-plain/local-webcache/local-full.yaml (PUBLIC-FACING apps only; see §2.9)
 Task 14 — Build and validate (mvn install, fix any errors)
 ```
 
@@ -499,6 +499,45 @@ Adding it to `content-packages/complete/pom.xml` (§2.3) only covers the plain-s
 `complete` package; it does **not** cover the composite image's runtime install or
 the integration tests — both come exclusively from `sample-content.artifactIds` above.
 
+### 2.4.2 Register in the Feature Model (launcher.json) — MANDATORY
+
+**This is the most commonly missed step. There is no build error if you forget it.**
+The launcher's feature model at `launcher/src/main/features/launcher.json` controls
+what bundles and content-packages are deployed to the Sling instance at runtime
+(local launch, Docker image, and integration tests). If the new app is not listed
+here, Sling starts without the app's code — `mvn install` still passes, but the IT
+fails with "Resource dumped by HtmlRenderer" because Sling can't find the HTL scripts.
+
+Edit `launcher/src/main/features/launcher.json` and add **two entries**:
+
+1. The core bundle to `"bundles"`:
+
+```json
+{ "id": "{GROUP_ID}/{PROJECT_NAME}.core/${slingslop.launcher.version}", "start-order": 20 }
+```
+
+2. The ui.apps package to `"content-packages:ARTIFACTS|required"`:
+
+```json
+{ "id": "{GROUP_ID}/{PROJECT_NAME}.ui.apps/${slingslop.launcher.version}/zip" }
+```
+
+**Why this is separate from `content-packages/complete/pom.xml` (§2.3):**
+The complete package is a FileVault aggregate for manual installs. The feature
+model is what the launcher actually deploys — it's the runtime truth. Both are
+needed, and neither replaces the other.
+
+**Why this is separate from `launcher/pom.xml` sample-content wiring (§2.4.1):**
+The `launcher/pom.xml` sample-content entries (starter.check.paths) cover integration-test content installation
+(reduced/pruned to that list to speed up ITs). The feature model covers code (bundles + ui.apps).
+All three registration points are independent and required:
+
+| Registration point | Covers | Where |
+|---|---|---|
+| `content-packages/complete/pom.xml` | FileVault aggregate (manual install) | §2.3 |
+| `launcher/pom.xml` sample-content | Demo content (runtime + IT) | §2.4.1 |
+| `launcher.json` feature model | Code: bundles + ui.apps (runtime + IT) | §2.4.2 |
+
 ### 2.5 Filter Files
 
 **ui.apps filter.xml:**
@@ -626,9 +665,19 @@ module from a single per-app *tenant* block — you do **not** hand-edit the
 Traefik, webcache or launcher files. See the full design in
 [docs/conga-config-generation-concept.md](../conga-config-generation-concept.md).
 
-**Step 1 — append one tenant block** to every environment the app should ship in
-(at minimum `devops/conga/src/main/environments/prod-motorbrot.yaml`; optionally
-the `local-*` environments). Derive the values from the Agent Smith variables:
+**Step 1 — append one tenant block to FOUR environment files, not just prod.**
+A new app must be reachable in every local test harness before it ever reaches
+prod, so the same tenant block is repeated in:
+
+| Environment file | Domain | What it drives |
+|---|---|---|
+| `devops/conga/src/main/environments/prod-motorbrot.yaml` | `motorbrot.org` | the real deployed site (Traefik + webcache + Sling mapping) |
+| `devops/conga/src/main/environments/local-plain.yaml` | `slingslop.local` | `launcher/launch.sh` — plain Sling on `:8080`, no webcache |
+| `devops/conga/src/main/environments/local-webcache.yaml` | `slingslop.local` | `devops/docker-compose.yml` quickstart + manual cache-engine testing |
+| `devops/conga/src/main/environments/local-full.yaml` | `slingslop.local` | the vagrant/Ansible full-stack local harness (`devops/ansible/local/`) |
+
+Derive the values from the Agent Smith variables (identical across all four
+files — only the surrounding domain differs, and that's already set per-file):
 
 | Agent Smith variable | Tenant field |
 |---|---|
@@ -651,7 +700,8 @@ the `local-*` environments). Derive the values from the Agent Smith variables:
 > unstyled, which is invisible unless you test the deployed sub-domain.
 
 ```yaml
-# devops/conga/src/main/environments/prod-motorbrot.yaml
+# same block appended to EACH of the four files above (only the domain differs,
+# and that's already fixed per-file — do not repeat it here)
 tenants:
   # ...existing apps...
   - tenant: {PROJECT_NAME}
@@ -661,23 +711,27 @@ tenants:
       appsRoot: {APPS_ROOT}
 ```
 
-**Step 2 — prove it renders:**
+**Step 2 — prove it renders (one build covers all four environments):**
 
 ```bash
 mvn -q -f devops/conga/pom.xml clean package
 ```
 
-Confirm the new files appear under
-`devops/conga/target/configuration/prod-motorbrot/vps1/` (a `webcache/{PROJECT_NAME}.conf`,
-a `traefik/dynamic/router-{PROJECT_NAME}.yml`, and a
-`slingmappings/.../{subdomain}.motorbrot.org/.content.xml`).
+Confirm the new files appear under **all four** of:
+- `devops/conga/target/configuration/prod-motorbrot/vps1/` — `webcache/{PROJECT_NAME}.conf`,
+  `traefik/dynamic/router-{PROJECT_NAME}.yml`, `slingmappings/.../{subdomain}.motorbrot.org/.content.xml`
+- `devops/conga/target/configuration/local-plain/localhost/` — `slingmappings/.../{subdomain}.slingslop.local/.content.xml`
+- `devops/conga/target/configuration/local-webcache/localhost/` — `webcache/{PROJECT_NAME}.conf`
+- `devops/conga/target/configuration/local-full/localhost/` — `webcache/{PROJECT_NAME}.conf`,
+  `traefik/dynamic/router-{PROJECT_NAME}.yml`, `slingmappings/.../{subdomain}.slingslop.local/.content.xml`
 
 **This step is easy to silently skip — nothing in `mvn install` or the launcher
 integration tests catches a missing tenant.** The app builds, deploys its OSGi
 bundle and content package, and renders fine on `:8080` — it simply never gets a
-public vhost/sub-domain, and no test fails. Do not rely on the build being green
-as evidence Task 13 was done; verify the CONGA output directly (Step 2 above) and
-tick it in the Appendix A checklist.
+public vhost/sub-domain (prod) or a routable local hostname, and no test fails.
+Do not rely on the build being green as evidence Task 13 was done; verify the
+CONGA output directly (Step 2 above) — in **all four** environments, not just
+prod — and tick it in the Appendix A checklist.
 
 **Do not** hand-edit `devops/ansible/roles/webcache/templates/*.conf.j2`,
 `devops/ansible/roles/traefik/templates/*.j2` or the launcher features for the new
@@ -1694,7 +1748,10 @@ The `wcmio-content-package-maven-plugin` is configured in the parent POM pluginM
 
 ### 11.4 Feature Model
 
-The launcher's feature model at `launcher/src/main/features/launcher.json` deploys the complete package. No changes needed there — the complete package automatically picks up new artifacts through its dependencies.
+The launcher's feature model at `launcher/src/main/features/launcher.json` controls
+what bundles and content-packages are deployed to the Sling instance at runtime
+(local launch, Docker image, and integration tests). **Every new app MUST be
+registered here — forgetting this step passes `mvn install` but misses the app
 
 ### 11.5 RepoinIt
 
@@ -1716,6 +1773,7 @@ Use this checklist to verify completeness:
 - [ ] `content-packages/complete/pom.xml` — 3 dependencies + embeddeds + subPackages added
 - [ ] `launcher/pom.xml` — new path in `starter.check.paths`
 - [ ] `launcher/pom.xml` — new `sample-content` `<dependency>` + entry in `sample-content.artifactIds` (composite-image runtime install + IT pruning; §2.4.1)
+- [ ] `launcher/src/main/features/launcher.json` — core bundle in `"bundles"` + ui.apps in `"content-packages:ARTIFACTS|required"` (§11.4; **MANDATORY**)
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.core/pom.xml`
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.core/src/main/java/.../UserIsLoggedIn.java`
 - [ ] `sling-apps/{PROJECT_NAME}/{PROJECT_NAME}.ui.apps/pom.xml`
@@ -1739,13 +1797,16 @@ Use this checklist to verify completeness:
 - [ ] `content-packages/{PROJECT_NAME}.sample-content/src/main/content/META-INF/vault/filter.xml`
 - [ ] Sample content: homepage, content-page, styleguide (with all component nodes)
 - [ ] `sling-apps/{PROJECT_NAME}/ReadMe.md` — full project documentation
-- [ ] **CONGA tenant registered** (Task 13; §2.9) — a `- tenant: {PROJECT_NAME}` block
-      appended to `devops/conga/src/main/environments/prod-motorbrot.yaml`, with
+- [ ] **CONGA tenant registered** (Task 13; §2.9) — the SAME `- tenant: {PROJECT_NAME}`
+      block appended to **all four** env files: `prod-motorbrot.yaml`,
+      `local-plain.yaml`, `local-webcache.yaml`, `local-full.yaml`, with
       `appsRoot` set explicitly whenever it isn't literally `/apps/slingslop/<tenant>`.
       **Not covered by `mvn install`** — verify separately with
       `mvn -q -f devops/conga/pom.xml clean package` and confirm
       `webcache/{PROJECT_NAME}.conf` + `traefik/dynamic/router-{PROJECT_NAME}.yml`
-      appear under `devops/conga/target/configuration/prod-motorbrot/vps1/`.
+      appear under `devops/conga/target/configuration/prod-motorbrot/vps1/`
+      **and** under `local-webcache/localhost/` + `local-full/localhost/`
+      (`local-plain/localhost/` only gets the `slingmappings/` mapping, no webcache).
       Skip **only** if the app is explicitly internal/non-deployed.
 - [ ] `mvn install` succeeds
 

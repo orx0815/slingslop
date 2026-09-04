@@ -1,12 +1,18 @@
 # local-webcache — OPERATIONS-owned.
-# One local box running Sling + the Apache webcache. Use to verify caching and
-# inbound short-URL re-expansion without TLS / Traefik.
+# Webcache-only stack (variant: apache|nginx|varnish) in front of a Sling
+# instance running elsewhere — no Traefik/TLS, no runtime role. Two uses:
+#   1. manually comparing cache-engine variants without the full vagrant harness
+#   2. feeding devops/docker-compose.yml's quickstart (see devops/README.md),
+#      which bind-mounts target/configuration/local-webcache/localhost/webcache/
+#      over the webcache image's sites-enabled.
+# Map hostnames to 127.0.0.1 in /etc/hosts, e.g. zengarden.slingslop.local,
+# www.slingslop.local.
 #
 # Add an app = append one `- tenant:` block below. Nothing else changes.
 
 config:
   # Base domain for this environment. Visible to nodes and tenants alike.
-  domain: localhost
+  domain: slingslop.local
 
 nodes:
 

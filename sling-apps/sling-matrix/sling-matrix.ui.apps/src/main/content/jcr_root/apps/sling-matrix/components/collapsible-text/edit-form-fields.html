@@ -1,0 +1,30 @@
+<div class="edit-fields-list">
+
+  <div class="edit-fields-group">
+    <div class="edit-fields-grid">
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Headline</span>
+          <small class="edit-field-description">Always-visible heading above the collapsed text.</small>
+        </span>
+        <input type="text" id="headline-input" name="headline" value="${properties.headline}"
+               class="edit-field-input inline-headline-input" placeholder="Headline" form="editor-form" />
+      </label>
+
+      <label class="edit-field-row">
+        <span class="edit-field-meta">
+          <span class="edit-field-label">Toggle label</span>
+          <small class="edit-field-description">Subline shown instead of the text; click it to reveal the text.</small>
+        </span>
+        <input type="text" name="toggleLabel" value="${properties.toggleLabel}"
+               class="edit-field-input" placeholder="Click here to read more" form="editor-form" />
+      </label>
+    </div>
+  </div>
+
+</div>
+
+<textarea id="content-editor" style="display:none;">
+  ${properties.text}
+</textarea>
+<input type="hidden" id="content-hidden" name="text" form="editor-form" />

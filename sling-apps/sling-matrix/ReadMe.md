@@ -51,9 +51,9 @@ cd launcher
 ### Open in browser
 
 - **Homepage:** http://localhost:8080/content/sling-matrix/home.html
-- **OSGi Intro:** http://localhost:8080/content/sling-matrix/home/osgi/osgi-intro.html
-- **JCR Intro:** http://localhost:8080/content/sling-matrix/home/jcr/jcr-intro.html
-- **Sling Intro:** http://localhost:8080/content/sling-matrix/home/sling/sling-intro.html
+- **OSGi Intro:** http://localhost:8080/content/sling-matrix/home/basics/osgi/osgi-intro.html
+- **JCR Intro:** http://localhost:8080/content/sling-matrix/home/basics/jcr/jcr-intro.html
+- **Sling Intro:** http://localhost:8080/content/sling-matrix/home/basics/sling/sling-intro.html
 
 ### Login for inline editing
 

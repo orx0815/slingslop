@@ -120,7 +120,7 @@ There are four primary ways to run the application locally:
     ```
     You will also need to add entries to your `/etc/hosts` file as described in [devops/README.md](devops/README.md) to access the different sites like you would in production.
 
-    http://www.motorbrot.local/  
+    http://www.slingslop.local/  
 
 3.  **Start the official Sling Docker image** backed by 
 

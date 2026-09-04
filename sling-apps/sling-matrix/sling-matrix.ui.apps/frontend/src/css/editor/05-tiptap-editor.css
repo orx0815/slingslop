@@ -109,6 +109,15 @@
       border-top: 2px solid var(--color-hover);
       margin: 1em 0;
     }
+
+    /* ── Lists ───────────────────────────────────────────────────────── */
+    /* The editing wrapper re-scopes --color-text / --color-primary to
+       editor-UI (light-theme) tokens, so the public li/::marker rules
+       resolve dark-on-dark here. Inherit the page's computed color. */
+    li,
+    li::marker {
+      color: inherit;
+    }
   }
 }
 
