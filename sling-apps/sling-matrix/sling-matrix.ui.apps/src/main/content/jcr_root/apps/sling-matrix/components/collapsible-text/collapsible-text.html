@@ -1,0 +1,13 @@
+<div class="collapsible-text"
+     data-sly-use.auth="org.motorbrot.slingmatrix.slingmodels.UserIsLoggedIn"
+     data-sly-set.editPath="${resource.path}.edit-form.html"
+     data-zen-editable="true"
+     data-sly-attribute.hx-get="${auth.loggedIn ? editPath : false}"
+     data-sly-attribute.hx-trigger="${auth.loggedIn ? 'click' : false}"
+     data-sly-attribute.hx-swap="${auth.loggedIn ? 'outerMorph' : false}">
+  <h3>${properties.headline}</h3>
+  <details class="collapsible-text__details">
+    <summary class="collapsible-text__summary">${properties.toggleLabel || 'Click here to read more'}</summary>
+    <div class="collapsible-text__body">${properties.text @ context='html'}</div>
+  </details>
+</div>
